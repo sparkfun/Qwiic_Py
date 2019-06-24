@@ -55,34 +55,41 @@
 #
 #
 #-----------------------------------------------------------------------------
-# try:
-# 	from __future__ import print_function
-# except:
-# 	pass
+from __future__ import print_function
 	
-# from . import qwiic_i2c
-# from .qwiicdevice import QwiicDevice
+import qwiic_i2c
 import sys
-import os
 
 #-----------------------------------------------------------------------------
 # Objects exported from this package. 
 #
-# For each device added, add it's device object import below.
+# For each device added, add it's device object is imported below
+# and added to the internal device list. This is a simple method and 
+# not very scalable, but works for now.  
 #
-# example:
+# Note - we maintain a list of our driver classes. These are used in
+#        some of higher level services this package provides.
+
+_qwiic_devices = []
 #
-# from .exampledevice import ExampleDevice
+# While a basic system to manage our devices, it works for now. 
 
-# from .qwiic_bme280 			import QwiicBME280
-# from .qwiic_ccs811 			import QwiicCCS811
-# from .qwiic_micro_oled 		import QwiicMicroOLED
-# from .qwiic_proximity  		import QwiicProximity
-# from .qwiic_distance   		import QwiicDistance
-# from .qwiic_twist			import QwiicTwist
-# from .qwiic_human_presence	import QwiicHumanPresence
-# from .qwiic_scmd			import QwiicSCMD
+from qwiic_bme280 			import QwiicBme280
+_qwiic_devices.append(QwiicBme280)
 
+from qwiic_ccs811 			import QwiicCcs811
+_qwiic_devices.append(QwiicCcs811)
+
+from qwiic_micro_oled 		import QwiicMicroOled
+_qwiic_devices.append(QwiicMicroOled)
+
+from qwiic_proximity  		import QwiicProximity
+_qwiic_devices.append(QwiicProximity)
+
+from qwiic_scmd				import QwiicScmd
+_qwiic_devices.append(QwiicScmd)
+
+# Create a list of 
 #-----------------------------------------------------------------------
 # The I2C Device driver
 _i2cDriver = None
@@ -97,11 +104,11 @@ def _getI2CDriver():
 	_i2cDriver = qwiic_i2c.getI2CDriver()
 
 	if _i2cDriver == None:
-		print("Unable to get the plaform I2C driver for QWIIC.", file=sys.stderr)
+		print("Unable to get the plaform I2C driver for QWIIC.")
 
 	return _i2cDriver
 
-# -----------------------------------------------------------------------
+#-----------------------------------------------------------------------
 # I2C Bus / Device methods
 #-----------------------------------------------------------------------
 # 
@@ -112,79 +119,6 @@ def _getI2CDriver():
 
 __availableDevices = {}
 
-#-----------------------------------------------------------------------
-# Dynamic loading of the qwiic driver object/classes.
-#
-# We determine what drivers are available at runtime and set those 
-# classes as attributes for the this package. 
-#
-# The pattern followed is:
-#   - list the modules in the driver subdirectory.
-#	- Derive a class name for these 
-#		- take "one_two_three" and camel case it = "OneTwoThree"
-#	- Load the module
-#	- Get the class definition
-#	- set the <name> attribue to the class definition (which is the constructor)
-#
-
-def __loadDriver(driver_dir, driver_class):
-
-	# load the driver module
-	drvModule = __import__('qwiic.drivers.'+driver_dir + '.' + driver_dir, fromlist=(driver_class))
-
-	# get the class for the driver
-
-	dvrClass = getattr(drvModule, driver_class)
-
-	# Create a driver instance AND change the value for this attribute to
-	# the class definition (away from this function)
-
-	drvObj = dvrClass()
-
-	setattr(sys.modules[__name__], driver_class, dvrClass)
-
-	return drvObj
-
-
-# define a lambda to lazy load the driver and associated class. 
-#
-# This is called so we can capture the current scope/context when we create the lambda. 
-def __lambda_factory(driver_dir, driver_class):
-
-	return lambda : __loadDriver(driver_dir, driver_class)
-# 
-def __setupDriverAttributes():
-
-	# get the subdirectories of the driver folder
-
-	dirDriver = __file__.rsplit(os.sep, 1)[0] + os.sep + 'drivers'
-	theDrivers = os.listdir(dirDriver)
-
-	if len(theDrivers) == 0:
-		print("No qwiic drivers found. Is the package installed properly")
-		return
-
-	for driver_dir in theDrivers:
-
-		# camel case name 
-		dvrClass = ''.join(x.capitalize() for x in driver_dir.split('_'))
-
-		# Define a lambda function so we can lazy load the drivers as needed
-
-		dvrFunc = __lambda_factory(driver_dir, dvrClass)
-
-		# set attribute on this package for driver classname to 
-		# the lambda function. This way, the driver isn't loaded until
-		# needed. 
-		setattr(sys.modules[__name__], dvrClass, dvrFunc)
-
-		# Used to keep a running list of devices -- used in later functions
-		__availableDevices[dvrClass] = ''
-#
-
-# setup the driver load functions
-
-__setupDriverAttributes()
 #-----------------------------------------------------------------------
 # _getAvailableDevices()
 #
@@ -203,13 +137,9 @@ def _getAvailableDevices():
 	if len(__availableDevices) > 0:  
 		return __availableDevices
 
-	# Time to build the dictionary. Go through and find all subclasses
-	# of the QwiicDevice class. From this list, loop through and add 
-	# the class to the dict - address is the key.
+	# Loop through the device lists and add the class to the dict - address is the key.
 
-	subClasses = QwiicDevice.__subclasses__()
-
-	for deviceClass in subClasses:
+	for deviceClass in _qwiic_devices:
 
 		# loop over the device addresses - add name/address 
 		for addr in deviceClass.available_addresses:
@@ -313,7 +243,7 @@ def get_devices():
 def create_device(device=None):
 
 	if device == None:
-		print("No device provided.", file=sys.stderr)
+		print("No device provided.")
 		return None
 
 	connDevices = list_devices()
@@ -331,7 +261,7 @@ def create_device(device=None):
 			return qwiicDefs[currDev[0]]()
 
 	# if we are here, we have an issue 
-	print("Unabled to create requested device - is the device connected?", file=sys.stderr)
+	print("Unabled to create requested device - is the device connected?")
 
 	return None
 
