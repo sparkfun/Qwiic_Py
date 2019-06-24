@@ -1,4 +1,4 @@
-Qwiic I2C Driver
+Qwiic Package
 ==========================
 
-This package provdes support cross platform I2C support for the qwiic python packages
+This package provides an overall python support for the qwiic system.

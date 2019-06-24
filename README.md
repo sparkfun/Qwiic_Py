@@ -1,5 +1,5 @@
-# Qwiic_I2C_Py
-Python package to support multi platform I2C bus integrations
+# Qwiic_Py
+Overall Python package to provide a single entry point for the qwiic system
 
 ## Installation
 To install, make sure the setuptools package is installed on the system.
@@ -16,4 +16,4 @@ To build a package for use with pip:
 A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
 ```
   cd dist
-  pip install sparkfun_qwiic_i2c-0.8.6.tar.gz
+  pip install sparkfun_qwiic_-0.8.6.tar.gz
