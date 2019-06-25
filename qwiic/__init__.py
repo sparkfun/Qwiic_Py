@@ -35,22 +35,11 @@
 #	import qwiic
 #   myDevice = qwiic.MyDevice()
 #
-# Option 2 - Import the object from the package directly
-#
-#	from qwiic import MyDevice
-#   myDevice = MyDevice()
-#
-# Option 3 - Create the device object using the devices Human Readable Name (listed on the board)
-# ### Not Implemented ###
+# Option 2 - Create the device object using the device address, classname or 
+#			 human readable name
 #
 #	import qwiic
-#	myDevice = qwiic.createDevice("My Device Name")
-#
-# Option 4 - Create the device object using the devices i2c ID
-# ### Not Implemented ###
-#
-#   import qwiic
-#	myDevice = qwiic.createDevicByID(idNumber)
+#	myDevice = qwiic.create_device("My Device Name")
 #
 #
 #
@@ -63,7 +52,7 @@ import sys
 #-----------------------------------------------------------------------------
 # Objects exported from this package. 
 #
-# For each device added, add it's device object is imported below
+# For each device imported, add it's device object is imported below
 # and added to the internal device list. This is a simple method and 
 # not very scalable, but works for now.  
 #
