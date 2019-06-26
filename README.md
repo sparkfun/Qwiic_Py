@@ -30,6 +30,12 @@ Qwiic_Py/
 
 ```
 
+#### Dependencies
+The qwiic package depends on the qwiic I2C driver: 
+[Qwiic_I2C_Py](https://github.com/sparkfun/Qwiic_I2C_Py)
+
+This package is also dependent on the driver packages contained in the [drivers directory](https://github.com/sparkfun/Qwiic_Py/tree/master/drivers).
+
 ## Checkout
 To clone this repository, a standard git clone command will create a local copy of this repository:
 ```
