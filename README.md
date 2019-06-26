@@ -1,7 +1,9 @@
 # Qwiic_Py
 
-<p align="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>
+<p align="center" valign="center">
+   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
+	<img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>
+    
 </p>
 
 An overall Python package to provide a single entry point for the [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
