@@ -15,11 +15,11 @@ An overall Python package to provide a single entry point for the [SparkFun qwii
 The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object.
 
 ## Contents
-* [Structure]()
-* [Dependent Modules]()
-* [Checkout Commands]()
-* [Installation]()
-* [Example Use]()
+* [Structure](#structure)
+* [Dependent Modules](#dependent-modules)
+* [Checkout Commands](#checkout-commands)
+* [Installation](#installation)
+* [Example Use](#example-use)
 
 ## Structure
 Each qwiic board has an independent driver library that implements the required logic for the specific board. This driver implementation is structured as a python package that supports standard python package management operations and tools. Additionally, each driver is deployed in a distinct GitHub repository which provides a central area for package management and development.
