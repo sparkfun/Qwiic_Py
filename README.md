@@ -14,6 +14,13 @@ An overall Python package to provide a single entry point for the [SparkFun qwii
 
 The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object.
 
+## Contents
+* [Structure]()
+* [Dependent Modules]()
+* [Checkout Commands]()
+* [Installation]()
+* [Example Use]()
+
 ## Structure
 Each qwiic board has an independent driver library that implements the required logic for the specific board. This driver implementation is structured as a python package that supports standard python package management operations and tools. Additionally, each driver is deployed in a distinct GitHub repository which provides a central area for package management and development.
 
@@ -40,7 +47,7 @@ The qwiic package depends on the qwiic I2C driver:
 
 This package is also dependent on the driver packages contained in the [drivers directory](https://github.com/sparkfun/Qwiic_Py/tree/master/drivers).
 
-## Checkout
+## Checkout Commands
 To clone this repository, a standard git clone command will create a local copy of this repository:
 ```
 	git clone https://github.com/sparkfun/Qwiic_Py
