@@ -27,7 +27,7 @@ Each qwiic board has an independent driver library that implements the required 
 To provide dynamic discovery and instantiation capabilities, the qwiic package imports all the underlying qwiic driver packages at runtime. As such the qwiic driver packages must be installed prior to using this package. These packages can be installed manually, or the overall package will install them automatically when using a PyPi based package manger (aka pip).
 
 ### Dependent Modules
-To make development and evaluation easer, the modules this package is dependent on are including in this repository as git submodules. This allows rapid checkout and access to the entire qwiic python ecosystem if needed. 
+To make development and evaluation easer, the modules this package is dependent on are included in this repository as git submodules. This allows rapid checkout and access to the entire qwiic python ecosystem if needed. 
 
 This structure has the following layout:
 ```
