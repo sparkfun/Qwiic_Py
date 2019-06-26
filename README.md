@@ -74,5 +74,6 @@ A package file is built and placed in a subdirectory called dist. This package f
 
 ## Example Use
 
-
-<img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-products-hooked-up.jpg">
+<p align="center">
+<img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
+</p>
