@@ -1,5 +1,7 @@
 # Qwiic_Py
 
+<img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=150>
+
 An overall Python package to provide a single entry point for the [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object.
@@ -69,3 +71,6 @@ A package file is built and placed in a subdirectory called dist. This package f
 ```
 
 ## Example Use
+
+
+<img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-products-hooked-up.jpg">
