@@ -6,6 +6,13 @@ Qwiic_Py
    <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
 </p>
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+![Python](https://img.shields.io/badge/python-v2.7+-green.svg)
+![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
+[![GitHub Issues](https://img.shields.io/github/issues/sparkfun/Qwiic_Py/issues.svg)](https://github.com/sparkfun/Qwiic_Py/issues)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+
 An overall Python package to provide a single entry point for the [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 <p align="center" valign="center">
