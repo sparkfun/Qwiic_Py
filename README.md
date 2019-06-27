@@ -1,4 +1,5 @@
-# Qwiic_Py
+Qwiic_Py
+========
 
 <p align="center" valign="center">
    <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
@@ -21,7 +22,8 @@ The SparkFun qwiic python package aggregates all python qwiic drivers/modules to
 * [Installation](#installation)
 * [Example Use](#example-use)
 
-## Structure
+Structure
+-------------
 Each qwiic board has an independent driver library that implements the required logic for the specific board. This driver implementation is structured as a python package that supports standard python package management operations and tools. Additionally, each driver is deployed in a distinct GitHub repository which provides a central area for package management and development.
 
 To provide dynamic discovery and instantiation capabilities, the qwiic package imports all the underlying qwiic driver packages at runtime. As such the qwiic driver packages must be installed prior to using this package. These packages can be installed manually, or the overall package will install them automatically when using a PyPi based package manger (aka pip).
@@ -47,7 +49,8 @@ The qwiic package depends on the qwiic I2C driver:
 
 This package is also dependent on the driver packages contained in the [drivers directory](https://github.com/sparkfun/Qwiic_Py/tree/master/drivers).
 
-## Checkout Commands
+Checkout Commands
+-----------------
 To clone this repository, a standard git clone command will create a local copy of this repository:
 ```
 	git clone https://github.com/sparkfun/Qwiic_Py
@@ -57,7 +60,8 @@ This will create a local version of this repository, but the submodule directori
 ```
 	git clone --recurse-submodules https://github.com:sparkfun/Qwiic_Py.git 
 ```
-## Installation
+Installation
+-------------
 ### PyPi Installation
 On systems that support PyPi installation via pip, this package is installed using the following commands. 
 
@@ -91,7 +95,8 @@ A package file is built and placed in a subdirectory called dist. This package f
   pip install sparkfun_qwiic_-<version>.tar.gz
 ```
 
-## Example Use
+Example Use
+------------
 ```python
 #TBD
 ```
