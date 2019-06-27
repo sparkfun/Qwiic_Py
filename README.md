@@ -7,8 +7,8 @@ Qwiic_Py
 </p>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-![Python](https://img.shields.io/badge/python-v2.7+-green.svg)
-![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
+![Python](https://img.shields.io/badge/python-v2.7+-orange.svg)
+![Python](https://img.shields.io/badge/python-v3.6+-orange.svg)
 [![GitHub Issues](https://img.shields.io/github/issues/sparkfun/Qwiic_Py/issues.svg)](https://github.com/sparkfun/Qwiic_Py/issues)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
