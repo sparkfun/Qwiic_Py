@@ -33,11 +33,11 @@ This structure has the following layout:
 ```
 Qwiic_Py/
 	Drivers/
-		- Qwiic Board Driver Submodules
+		Qwiic Board Driver Submodules
 	qwiic_i2c/ 
-		- The cross platform I2C bus access driver. 
+		The cross platform I2C bus access driver 
 	qwiic/
-		- Package Implementation
+		Package Implementation
 
 ```
 
