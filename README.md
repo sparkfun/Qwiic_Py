@@ -15,7 +15,7 @@ Qwiic_Py
 An overall Python package to provide a single entry point for the [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 <p align="center" valign="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-products-hooked-up.jpg"  width=600>  
+   <img src="https://cdn.sparkfun.com//assets/parts/1/3/8/7/9/Qwiic_pHAT_Pi-3-B-Plus.jpg"  width=600>  
   
 </p>
 
