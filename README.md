@@ -72,13 +72,13 @@ This package is also dependent on the driver packages contained in the [drivers 
 Checkout Commands
 -----------------
 To clone this repository, a standard git clone command will create a local copy of this repository:
-```
-	git clone https://github.com/sparkfun/Qwiic_Py
+```sh
+git clone https://github.com/sparkfun/Qwiic_Py
 ```
 
 This will create a local version of this repository, but the submodule directories (drivers/*, and qwiic_i2c/ ) will be empty. To clone the git repository and include the submodule contents, use the following command:
-```
-	git clone --recurse-submodules https://github.com:sparkfun/Qwiic_Py.git 
+```sh
+git clone --recurse-submodules https://github.com:sparkfun/Qwiic_Py.git 
 ```
 Installation
 -------------
@@ -86,13 +86,13 @@ Installation
 On systems that support PyPi installation via pip, this package is installed using the following commands. 
 
 For all users (note: the user must have sudo privileges):
-```
-  sudo pip install sparkfun_qwiic
+```sh
+sudo pip install sparkfun_qwiic
 ```
 For the current user:
 
-```
-  pip install sparkfun_qwiic
+```sh
+pip install sparkfun_qwiic
 ```
 
 This process will also install all modules the qwiic package requires for operation, including the needed qwiic driver packages.
@@ -101,34 +101,34 @@ This process will also install all modules the qwiic package requires for operat
 To install, make sure the setuptools package is installed on the system.
 
 Direct installation at the command line:
-```
-  $ python setup.py install
+```sh
+python setup.py install
 ```
 
 To build a package for use with pip:
-```
-  $ python setup.py sdist
+```sh
+python setup.py sdist
  ```
 A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
-```
-  cd dist
-  pip install sparkfun_qwiic_-<version>.tar.gz
+```sh
+cd dist
+pip install sparkfun_qwiic_-<version>.tar.gz
 ```
 Documentation
 -------------
 
 #### scan()
-  Used to scan the I2C bus, returning a list of I2C address attached to the computer.
+Used to scan the I2C bus, returning a list of I2C address attached to the computer.
 
-  _Arguments_
- 	
-	None
+_Arguments_	
+
+None
 	
-  _Return Value_ 
-  	
-	A list of I2C addresses. If no devices are attached, an empty list is returned.
+ _Return Value_ 
 
-  **Example**
+A list of I2C addresses. If no devices are attached, an empty list is returned.
+
+**Example**
 ```python
 import qwiic
 
@@ -137,19 +137,19 @@ print(results)
 >>	[61, 91, 96, 119]
 ```
 #### list_devices()
-  Returns a list of known qwiic devices connected to the I2C bus.
+Returns a list of known qwiic devices connected to the I2C bus.
 
-  _Arguments_
+_Arguments_
  	
-	None
+None
 	
-  _Return Value_ 
+_Return Value_ 
   	
-	A list of known attached qwiic devices. If no devices are attached, an empty list 
-	is returned. Each element of the list a tuple that contains the following values
-		`(Device I2C Address, Device Name, Device Driver Class Name)`
+A list of known attached qwiic devices. If no devices are attached, an empty list 
+is returned. Each element of the list a tuple that contains the following values
+	`(Device I2C Address, Device Name, Device Driver Class Name)`
 
-  **Example**
+**Example**
 ```python
 import qwiic
 
@@ -162,17 +162,17 @@ print(results)
 ```
 
 #### get_devices()
-  Used to create device objects for all qwiic devices attached to the computer.
+Used to create device objects for all qwiic devices attached to the computer.
 
-  _Arguments_
+_Arguments_
  	
-	None
+None
 	
-  _Return Value_ 
+_Return Value_ 
   	
-	A list of qwiic device objects. If no qwiic devices are an empty list is returned.
+A list of qwiic device objects. If no qwiic devices are an empty list is returned.
 
-  **Example**
+**Example**
 ```python
 import qwiic
 
@@ -185,18 +185,17 @@ print(results)
 ```
 
 #### create_device(device)
-  Used to create a device object for a specific qwiic device
+Used to create a device object for a specific qwiic device
 
-  _Arguments_
+_Arguments_
   	
-	device   The I2C address, Name or Class name of the device to created.
+*device*   The I2C address, Name or Class name of the device to created.
 	
-  _Return Value_ 
+_Return Value_ 
   	
-	A qwiic device object for the specified qwiic device.
-	If the specified device isn't found, None is returned. 
+A qwiic device object for the specified qwiic device. If the specified device isn't found, None is returned. 
 
-  **Example**
+**Example**
 ```python
 import qwiic
 		
