@@ -17,14 +17,16 @@ Qwiic_Py
            	 alt="follow on Twitter"></a>
 	
 </p>
-The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object. 
+
+<img src="https://cdn.sparkfun.com//assets/parts/1/3/8/7/9/Qwiic_pHAT_Pi-3-B-Plus.jpg"  align="right" width=300> 
+
+The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object.
 
 New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
-<p align="center">
-   <img src="https://cdn.sparkfun.com//assets/parts/1/3/8/7/9/Qwiic_pHAT_Pi-3-B-Plus.jpg"  width=450>  
-</p>
 
 ## Contents
+
+
 * [Structure](#structure)
 * [Dependent Modules](#dependent-modules)
 * [Checkout Commands](#checkout-commands)
