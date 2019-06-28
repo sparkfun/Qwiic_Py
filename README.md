@@ -128,10 +128,10 @@ import qwiic
 
 results = qwiic.get_devices()
 print(results) 
-	[<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
- 	 <qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
- 	 <qwiic_proximity.QwiicProximity at 0x752b0e10>,
- 	<qwiic_bme280.QwiicBme280 at 0x752b0a30>]
+>>	[<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
+>> 	 <qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
+>> 	 <qwiic_proximity.QwiicProximity at 0x752b0e10>,
+>> 	<qwiic_bme280.QwiicBme280 at 0x752b0a30>]
 ```
 Example Use
 ------------
