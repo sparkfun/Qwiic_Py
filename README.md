@@ -121,10 +121,12 @@ Documentation
   Used to scan the I2C bus, returning a list of I2C address attached to the computer.
 
   _Arguments_
- 	None
+ 	
+	None
 	
   _Return Value_ 
-  	A list of I2C addresses. If no devices are attached, an empty list is returned.
+  	
+	A list of I2C addresses. If no devices are attached, an empty list is returned.
 
   **Example**
 ```python
@@ -138,10 +140,12 @@ print(results)
   Returns a list of known qwiic devices connected to the I2C bus.
 
   _Arguments_
- 	None
+ 	
+	None
 	
   _Return Value_ 
-  	A list of known attached qwiic devices. If no devices are attached, an empty list 
+  	
+	A list of known attached qwiic devices. If no devices are attached, an empty list 
 	is returned. Each element of the list a tuple that contains the following values
 		`(Device I2C Address, Device Name, Device Driver Class Name)`
 
@@ -161,10 +165,12 @@ print(results)
   Used to create device objects for all qwiic devices attached to the computer.
 
   _Arguments_
- 	None
+ 	
+	None
 	
   _Return Value_ 
-  	A list of qwiic device objects. If no qwiic devices are an empty list is returned.
+  	
+	A list of qwiic device objects. If no qwiic devices are an empty list is returned.
 
   **Example**
 ```python
@@ -182,10 +188,12 @@ print(results)
   Used to create a device object for a specific qwiic device
 
   _Arguments_
-  	device   The I2C address, Name or Class name of the device to created.
+  	
+	device   The I2C address, Name or Class name of the device to created.
 	
   _Return Value_ 
-  	A qwiic device object for the specified qwiic device.
+  	
+	A qwiic device object for the specified qwiic device.
 	If the specified device isn't found, None is returned. 
 
   **Example**
