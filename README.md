@@ -46,11 +46,11 @@ This structure has the following layout:
 ```
 Qwiic_Py/
    +--- drivers/
-   |       |--- qwiic_bme280
-   |       |--- qwiic_micro_oled
-   |       `--- ... Qwiic Driver Packages
+   |       |--- qwiic_bme280			--> The qwiic_bme280 submodule
+   |       |--- qwiic_micro_oled		--> The qwiic_micro_oled submodule
+   |       `--- ... links to qwiic driver submodule repositories
    |
-   +--- qwiic_i2c/ 
+   +--- qwiic_i2c/        --> Link to the qwiic_i2c submodule repository
    |      |--- __index__.py
    |      `--- ... The cross platform I2C bus access driver 
    |
