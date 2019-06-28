@@ -23,6 +23,7 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 <p align="center">
    <img src="https://cdn.sparkfun.com//assets/parts/1/3/8/7/9/Qwiic_pHAT_Pi-3-B-Plus.jpg"  width=450>  
 </p>
+
 ## Contents
 * [Structure](#structure)
 * [Dependent Modules](#dependent-modules)
