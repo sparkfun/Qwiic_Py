@@ -120,7 +120,11 @@ Documentation
 #### scan()
   Used to scan the I2C bus, returning a list of I2C address attached to the computer.
 
-  Return Value: A list of I2C addresses. If no devices are attached, an empty list is returned.
+  _Arguments_
+ 	None
+	
+  _Return Value_ 
+  	A list of I2C addresses. If no devices are attached, an empty list is returned.
 
   **Example**
 ```python
@@ -130,10 +134,37 @@ results = qwiic.scan()
 print(results) 
 >>	[61, 91, 96, 119]
 ```
+#### list_devices()
+  Returns a list of known qwiic devices connected to the I2C bus.
+
+  _Arguments_
+ 	None
+	
+  _Return Value_ 
+  	A list of known attached qwiic devices. If no devices are attached, an empty list 
+	is returned. Each element of the list a tuple that contains the following values
+		`(Device I2C Address, Device Name, Device Driver Class Name)`
+
+  **Example**
+```python
+import qwiic
+
+results = qwiic.list_devices()
+print(results) 
+>>	[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'),
+>> 	 (91, 'Qwiic CCS811', 'QwiicCcs811'),
+>> 	 (96, 'Qwiic Proximity Sensor', 'QwiicProximity'),
+>> 	 (119, 'Qwiic BME280', 'QwiicBme280')]
+```
+
 #### get_devices()
   Used to create device objects for all qwiic devices attached to the computer.
 
-  Return Value: A list of qwiic device objects. If no qwiic devices are an empty list is returned.
+  _Arguments_
+ 	None
+	
+  _Return Value_ 
+  	A list of qwiic device objects. If no qwiic devices are an empty list is returned.
 
   **Example**
 ```python
@@ -145,6 +176,32 @@ print(results)
 >> 	 <qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
 >> 	 <qwiic_proximity.QwiicProximity at 0x752b0e10>,
 >> 	<qwiic_bme280.QwiicBme280 at 0x752b0a30>]
+```
+
+#### create_device(device)
+  Used to create a device object for a specific qwiic device
+
+  _Arguments_
+  	device   The I2C address, Name or Class name of the device to created.
+	
+  _Return Value_ 
+  	A qwiic device object for the specified qwiic device.
+	If the specified device isn't found, None is returned. 
+
+  **Example**
+```python
+import qwiic
+		
+results = qwiic.list_devices()
+		
+print(results)
+>>	[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'), (91, 'Qwiic CCS811', 'QwiicCcs811'), 
+>>	(96, 'Qwiic Proximity Sensor', 'QwiicProximity'), (119, 'Qwiic BME280', 'QwiicBme280')]
+		
+mydevice = qwiic.create_device(results[0][0])
+		
+print(mydevice)
+>>	<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled object at 0x751fdab0>
 ```
 Example Use
 ------------
