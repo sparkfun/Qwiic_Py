@@ -45,12 +45,22 @@ To make development and evaluation easer, the modules this package is dependent 
 This structure has the following layout:
 ```
 Qwiic_Py/
-	drivers/
-		Qwiic Board Driver Submodules
-	qwiic_i2c/ 
-		The cross platform I2C bus access driver 
-	qwiic/
-		Package Implementation
+   +--- drivers/
+   |       |--- qwiic_bme280
+   |       |--- qwiic_micro_oled
+   |       `--- ... Qwiic Driver Packages
+   |
+   +--- qwiic_i2c/ 
+   |      |--- __index__.py
+   |      `--- ... The cross platform I2C bus access driver 
+   |
+   +--- qwiic/
+   |      |--- __index__.py
+   |      `--- ... Package Implementation
+   |
+   +--- README.rd
+   +--- setup.py
+   `--- ...etc
 
 ```
 
