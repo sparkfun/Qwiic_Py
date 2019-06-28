@@ -30,7 +30,7 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 * [Dependent Modules](#dependent-modules)
 * [Checkout Commands](#checkout-commands)
 * [Installation](#installation)
-* [Example Use](#example-use)
+* [Documentation](#documentation)
 
 Structure
 -------------
