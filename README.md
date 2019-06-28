@@ -204,7 +204,8 @@ results = qwiic.list_devices()
 print(results)
 >>	[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'), (91, 'Qwiic CCS811', 'QwiicCcs811'), 
 >>	(96, 'Qwiic Proximity Sensor', 'QwiicProximity'), (119, 'Qwiic BME280', 'QwiicBme280')]
-		
+
+# Create a Micro OLED driver object using the I2C address of the board.
 mydevice = qwiic.create_device(results[0][0])
 		
 print(mydevice)
