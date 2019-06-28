@@ -5,11 +5,18 @@ Qwiic_Py
    <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
    <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
 </p>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-![Python](https://img.shields.io/pypi/pyversions/sparkfun_qwiic.svg)
-[![GitHub Issues](https://img.shields.io/github/issues/sparkfun/Qwiic_Py/issues.svg)](https://github.com/sparkfun/Qwiic_Py/issues)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+	<a href="https://test.pypi.org/project/sparkfun-qwiic/" alt="Package">
+		<img src="https://img.shields.io/pypi/pyversions/sparkfun_qwiic.svg" /></a>
+	<a href="https://github.com/sparkfun/Qwiic_Py/issues" alt="Issues">
+		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_Py/issues.svg" /></a>
+	<a href="https://github.com/sparkfun/Qwiic_Py/blob/master/LICENSE" alt="License">
+		<img src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+	<a href="https://twitter.com/intent/follow?screen_name=sparkfun">
+        	<img src="https://img.shields.io/twitter/follow/sparkfun.svg?style=social&logo=twitter"
+           	 alt="follow on Twitter"></a>
+	
+</p>
 
 
 An overall Python package to provide a single entry point for the [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
