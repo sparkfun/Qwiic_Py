@@ -189,7 +189,7 @@ Used to create a device object for a specific qwiic device
 
 _Arguments_
   	
-**device** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The I2C address, Name or Class name of the device to created.
+**device** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- The I2C address, Name or Class name of the device to created.
 	
 _Return Value_ 
   	
