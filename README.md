@@ -58,7 +58,7 @@ Qwiic_Py/
    |      |--- __index__.py
    |      `--- ... Package Implementation
    |
-   +--- README.rd
+   +--- README.md
    +--- setup.py
    `--- ...etc
 
