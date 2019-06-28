@@ -117,6 +117,19 @@ A package file is built and placed in a subdirectory called dist. This package f
 Documentation
 -------------
 
+#### scan()
+  Used to scan the I2C bus, returning a list of I2C address attached to the computer.
+
+  Return Value: A list of I2C addresses. If no devices are attached, an empty list is returned.
+
+  **Example**
+```python
+import qwiic
+
+results = qwiic.scan()
+print(results) 
+>>	[61, 91, 96, 119]
+```
 #### get_devices()
   Used to create device objects for all qwiic devices attached to the computer.
 
