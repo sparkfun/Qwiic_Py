@@ -26,7 +26,6 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 ## Contents
 
-
 * [Structure](#structure)
 * [Dependent Modules](#dependent-modules)
 * [Checkout Commands](#checkout-commands)
@@ -115,7 +114,25 @@ A package file is built and placed in a subdirectory called dist. This package f
   cd dist
   pip install sparkfun_qwiic_-<version>.tar.gz
 ```
+Documentation
+-------------
 
+#### get_devices()
+  Used to create device objects for all qwiic devices attached to the computer.
+
+  Return Value: A list of qwiic device objects. If no qwiic devices are an empty list is returned.
+
+  **Example**
+```python
+import qwiic
+
+results = qwiic.get_devices()
+print(results) 
+	[<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
+ 	 <qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
+ 	 <qwiic_proximity.QwiicProximity at 0x752b0e10>,
+ 	<qwiic_bme280.QwiicBme280 at 0x752b0a30>]
+```
 Example Use
 ------------
 ```python
