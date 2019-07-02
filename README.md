@@ -6,7 +6,7 @@ Qwiic_Py
    <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
 </p>
 <p align="center">
-	<a href="https://test.pypi.org/project/sparkfun-qwiic/" alt="Package">
+	<a href="https://test.pypi.org/project/sparkfun_qwiic/" alt="Package">
 		<img src="https://img.shields.io/pypi/pyversions/sparkfun_qwiic.svg" /></a>
 	<a href="https://github.com/sparkfun/Qwiic_Py/issues" alt="Issues">
 		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_Py/issues.svg" /></a>
@@ -204,7 +204,8 @@ results = qwiic.list_devices()
 print(results)
 >>	[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'), (91, 'Qwiic CCS811', 'QwiicCcs811'), 
 >>	(96, 'Qwiic Proximity Sensor', 'QwiicProximity'), (119, 'Qwiic BME280', 'QwiicBme280')]
-		
+
+# Create a Micro OLED driver object using the I2C address of the board.
 mydevice = qwiic.create_device(results[0][0])
 		
 print(mydevice)
