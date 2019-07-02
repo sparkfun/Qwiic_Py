@@ -43,6 +43,15 @@
 #
 #
 #
+"""
+qwiic
+========
+
+The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object.
+
+New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+
+"""
 #-----------------------------------------------------------------------------
 from __future__ import print_function
 	
@@ -144,6 +153,8 @@ def _getAvailableDevices():
 #
 def scan():
 	"""
+	.. function:: scan()
+
 		Used to scan the I2C bus, returning a list of I2C address attached to the computer.
 
 		:return: A list of I2C addresses. If no devices are attached, an empty list is returned.
@@ -151,9 +162,9 @@ def scan():
 
 		:example:
 
-		In [1]: import qwiic
-		In [2]: qwiic.scan()
-		Out[2]: [61, 91, 96, 119]
+		>>> import qwiic
+		>>> [2]: qwiic.scan()
+		[61, 91, 96, 119]
 	"""
 
 	i2cDriver = _getI2CDriver()
@@ -172,23 +183,24 @@ def scan():
 #
 def list_devices():
 	""" 
+	.. function:: list_devices()
+
 		Returns a list of known qwiic devices connected to the I2C bus.
 
 		:return: A list of known attached qwiic devices. If no devices are attached, 
-		         an empty list is returned.
-				 Each element of the list a tuple that contains the following values
-				 	(Device I2C Address, Device Name, Device Driver Class Name)
+			an empty list is returned. 
+			Each element of the list a tuple that contains the following values
+			(Device I2C Address, Device Name, Device Driver Class Name)
 		:rtype: list
 
 		:example:
 
-		In [1]: import qwiic
-		In [2]: qwiic.list_devices()
-		Out[2]: 
+		>>> import qwiic
+		>>> qwiic.list_devices()
 		[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'),
- 		 (91, 'Qwiic CCS811', 'QwiicCcs811'),
- 	     (96, 'Qwiic Proximity Sensor', 'QwiicProximity'),
- 		 (119, 'Qwiic BME280', 'QwiicBme280')]
+ 		(91, 'Qwiic CCS811', 'QwiicCcs811'),
+ 		(96, 'Qwiic Proximity Sensor', 'QwiicProximity'),
+ 		(119, 'Qwiic BME280', 'QwiicBme280')]
 	"""
 
 	# Scan the bus
@@ -220,10 +232,10 @@ def list_devices():
 #   I2C bus.
 #
 def get_devices():
-	""" qwiic.get_devices()
+	""" 
+	.. function:: get_devices()
 
-		Used to create device objects for all qwiic devices attached to the 
-	    computer.
+		Used to create device objects for all qwiic devices attached to the computer.
 
 		:return: A list of qwiic device objects. 
 		         If no qwiic devices are an empty list is returned.
@@ -231,14 +243,13 @@ def get_devices():
 
 		:example:
 
-		In [1]: import qwiic
+		>>> import qwiic
 
-		In [2]: qwiic.get_devices()
-		Out[2]: 
-			[<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
- 			 <qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
- 			 <qwiic_proximity.QwiicProximity at 0x752b0e10>,
- 			 <qwiic_bme280.QwiicBme280 at 0x752b0a30>]
+		>>> qwiic.get_devices()
+		[<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
+ 		<qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
+ 		<qwiic_proximity.QwiicProximity at 0x752b0e10>,
+ 		<qwiic_bme280.QwiicBme280 at 0x752b0a30>]
 
 	"""
 
@@ -274,7 +285,29 @@ def get_devices():
 # 	use this method to create the device
 #
 def create_device(device=None):
+	""" 
+	.. function:: create_device(device)
 
+		Used to create a device object for a specific qwiic device
+
+		:param device: The I2C address, Name or Class name of the device to created.
+		:return: A qwiic device object for the specified qwiic device.
+		         If the specified device isn't found, None is returned. 
+		:rtype: Object
+
+		:example:
+
+		>>> import qwiic
+		>>> results = qwiic.list_devices()
+		>>> print(results)
+		[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'), (91, 'Qwiic CCS811', 'QwiicCcs811'), 
+		(96, 'Qwiic Proximity Sensor', 'QwiicProximity'), (119, 'Qwiic BME280', 'QwiicBme280')]
+		
+		>>> mydevice = qwiic.create_device(results[0][0])
+		>>> print(mydevice)
+		<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled object at 0x751fdab0>
+
+	"""
 	if device == None:
 		print("No device provided.")
 		return None
