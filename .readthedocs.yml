@@ -6,3 +6,4 @@ python:
 
 submodules:
   exclude: all
+  recursive: false
