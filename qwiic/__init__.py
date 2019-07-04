@@ -166,8 +166,6 @@ def _getAvailableDevices():
 #
 def scan():
 	"""
-	.. function:: scan()
-
 		Used to scan the I2C bus, returning a list of I2C address attached to the computer.
 
 		:return: A list of I2C addresses. If no devices are attached, an empty list is returned.
@@ -196,8 +194,6 @@ def scan():
 #
 def list_devices():
 	""" 
-	.. function:: list_devices()
-
 		Returns a list of known qwiic devices connected to the I2C bus.
 
 		:return: A list of known attached qwiic devices. If no devices are attached, 
@@ -246,8 +242,6 @@ def list_devices():
 #
 def get_devices():
 	""" 
-	.. function:: get_devices()
-
 		Used to create device objects for all qwiic devices attached to the computer.
 
 		:return: A list of qwiic device objects. 
@@ -299,8 +293,6 @@ def get_devices():
 #
 def create_device(device=None):
 	""" 
-	.. function:: create_device(device)
-
 		Used to create a device object for a specific qwiic device
 
 		:param device: The I2C address, Name or Class name of the device to created.
