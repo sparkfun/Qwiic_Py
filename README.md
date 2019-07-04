@@ -6,7 +6,7 @@ Qwiic_Py
    <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
 </p>
 <p align="center">
-	<a href="https://test.pypi.org/project/sparkfun_qwiic/" alt="Package">
+	<a href="https://pypi.org/project/sparkfun-qwiic/" alt="Package">
 		<img src="https://img.shields.io/pypi/pyversions/sparkfun_qwiic.svg" /></a>
 	<a href="https://github.com/sparkfun/Qwiic_Py/issues" alt="Issues">
 		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_Py.svg" /></a>
@@ -93,7 +93,7 @@ git clone --recurse-submodules https://github.com:sparkfun/Qwiic_Py.git
 Installation
 -------------
 ### PyPi Installation
-On systems that support PyPi installation via pip, this package is installed using the following commands
+This repository is hosted on PyPi as the [sparkfun-qwiic](https://pypi.org/project/sparkfun-qwiic/) package. On systems that support PyPi installation via pip, this package is installed using the following commands
 For all users (note: the user must have sudo privileges):
 ```sh
 sudo pip install sparkfun_qwiic
