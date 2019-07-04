@@ -22,7 +22,7 @@ copyright = '2019, SparkFun Electronics'
 author = 'SparkFun Electronics'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.9'
+release = '0.9.1'
 
 
 # -- General configuration ---------------------------------------------------
