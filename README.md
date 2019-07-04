@@ -63,7 +63,8 @@ Qwiic_Py/
 
 ```
 
-#### Dependencies
+Dependencies
+-------------
 The qwiic package depends on the qwiic I2C driver: 
 [Qwiic_I2C_Py](https://github.com/sparkfun/Qwiic_I2C_Py)
 
@@ -83,20 +84,17 @@ git clone --recurse-submodules https://github.com:sparkfun/Qwiic_Py.git
 Installation
 -------------
 ### PyPi Installation
-On systems that support PyPi installation via pip, this package is installed using the following commands. 
-
+On systems that support PyPi installation via pip, this package is installed using the following commands
 For all users (note: the user must have sudo privileges):
 ```sh
 sudo pip install sparkfun_qwiic
 ```
 For the current user:
-
 ```sh
 pip install sparkfun_qwiic
 ```
 
 This process will also install all modules the qwiic package requires for operation, including the needed qwiic driver packages.
-
 ### Local Installation
 To install, make sure the setuptools package is installed on the system.
 
