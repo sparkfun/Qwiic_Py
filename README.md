@@ -38,7 +38,8 @@ Each qwiic board has an independent driver library that implements the required 
 
 To provide dynamic discovery and instantiation capabilities, the qwiic package imports all the underlying qwiic driver packages at runtime. As such the qwiic driver packages must be installed prior to using this package. These packages can be installed manually, or the overall package will install them automatically when using a PyPi based package manger (aka pip).
 
-### Dependent Modules
+Dependent Modules
+------------------
 To make development and evaluation easer, the modules this package is dependent on are included in this repository as git submodules. This allows rapid checkout and access to the entire qwiic python ecosystem if needed. 
 
 This structure has the following layout:
@@ -70,8 +71,13 @@ The qwiic package depends on the qwiic I2C driver:
 
 This package is also dependent on the driver packages contained in the [drivers directory](https://github.com/sparkfun/Qwiic_Py/tree/master/drivers).
 
+Documentation
+--------------
+The Sparkfun qwiic package documentation is hosted at [ReadTheDocs](https://qwiic-py.readthedocs.io/en/latest/index.html)
+
+
 Checkout Commands
------------------
+------------------
 To clone this repository, a standard git clone command will create a local copy of this repository:
 ```sh
 git clone https://github.com/sparkfun/Qwiic_Py
@@ -112,88 +118,9 @@ A package file is built and placed in a subdirectory called dist. This package f
 cd dist
 pip install sparkfun_qwiic_-<version>.tar.gz
 ```
-Documentation
--------------
 
-#### scan()
-Used to scan the I2C bus, returning a list of I2C address attached to the computer.
-
-_Arguments_	
-
-None
-	
- _Return Value_ 
-
-A list of I2C addresses. If no devices are attached, an empty list is returned.
-
-**Example**
-```python
-import qwiic
-
-results = qwiic.scan()
-print(results) 
->>	[61, 91, 96, 119]
-```
-#### list_devices()
-Returns a list of known qwiic devices connected to the I2C bus.
-
-_Arguments_
- 	
-None
-	
-_Return Value_ 
-  	
-A list of known attached qwiic devices. If no devices are attached, an empty list 
-is returned. Each element of the list a tuple that contains the following values
-	`(Device I2C Address, Device Name, Device Driver Class Name)`
-
-**Example**
-```python
-import qwiic
-
-results = qwiic.list_devices()
-print(results) 
->>	[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'),
->> 	 (91, 'Qwiic CCS811', 'QwiicCcs811'),
->> 	 (96, 'Qwiic Proximity Sensor', 'QwiicProximity'),
->> 	 (119, 'Qwiic BME280', 'QwiicBme280')]
-```
-
-#### get_devices()
-Used to create device objects for all qwiic devices attached to the computer.
-
-_Arguments_
- 	
-None
-	
-_Return Value_ 
-  	
-A list of qwiic device objects. If no qwiic devices are an empty list is returned.
-
-**Example**
-```python
-import qwiic
-
-results = qwiic.get_devices()
-print(results) 
->>	[<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
->> 	 <qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
->> 	 <qwiic_proximity.QwiicProximity at 0x752b0e10>,
->> 	<qwiic_bme280.QwiicBme280 at 0x752b0a30>]
-```
-
-#### create_device(device)
-Used to create a device object for a specific qwiic device
-
-_Arguments_
-  	
-**device** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- The I2C address, Name or Class name of the device to created.
-	
-_Return Value_ 
-  	
-A qwiic device object for the specified qwiic device. If the specified device isn't found, None is returned. 
-
-**Example**
+Example Use
+--------------
 ```python
 import qwiic
 		
