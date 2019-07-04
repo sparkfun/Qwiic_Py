@@ -3,16 +3,16 @@
 	url = https://github.com/sparkfun/Qwiic_BME280_Py.git
 [submodule "drivers/qwiic_ccs811"]
 	path = drivers/qwiic_ccs811
-	url = https://github.com:sparkfun/Qwiic_CCS811_Py.git
+	url = https://github.com/sparkfun/Qwiic_CCS811_Py.git
 [submodule "drivers/qwiic_mico_oled"]
 	path = drivers/qwiic_mico_oled
-	url = https://github.com:sparkfun/Qwiic_Micro_OLED_Py.git
+	url = https://github.com/sparkfun/Qwiic_Micro_OLED_Py.git
 [submodule "drivers/qwiic_proximity"]
 	path = drivers/qwiic_proximity
-	url = https://github.com:sparkfun/Qwiic_Proximity_Py.git
+	url = https://github.com/sparkfun/Qwiic_Proximity_Py.git
 [submodule "drivers/qwiic_scmd"]
 	path = drivers/qwiic_scmd
-	url = https://github.com:sparkfun/Qwiic_SCMD_Py.git
+	url = https://github.com/sparkfun/Qwiic_SCMD_Py.git
 [submodule "qwiic_i2c"]
 	path = qwiic_i2c
-	url = https://github.com:sparkfun/Qwiic_I2C_Py.git
+	url = https://github.com/sparkfun/Qwiic_I2C_Py.git
