@@ -1,6 +1,6 @@
 [submodule "drivers/qwiic_bme280"]
 	path = drivers/qwiic_bme280
-	url = git@github.com:sparkfun/Qwiic_BME280_Py.git
+	url = https://github.com/sparkfun/Qwiic_BME280_Py.git
 [submodule "drivers/qwiic_ccs811"]
 	path = drivers/qwiic_ccs811
 	url = git@github.com:sparkfun/Qwiic_CCS811_Py.git
