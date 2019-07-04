@@ -87,6 +87,7 @@ This will create a local version of this repository, but the submodule directori
 ```sh
 git clone --recurse-submodules https://github.com:sparkfun/Qwiic_Py.git 
 ```
+
 Installation
 -------------
 ### PyPi Installation
