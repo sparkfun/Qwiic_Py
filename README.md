@@ -96,11 +96,11 @@ Installation
 This repository is hosted on PyPi as the [sparkfun-qwiic](https://pypi.org/project/sparkfun-qwiic/) package. On systems that support PyPi installation via pip, this package is installed using the following commands
 For all users (note: the user must have sudo privileges):
 ```sh
-sudo pip install sparkfun_qwiic
+sudo pip install sparkfun-qwiic
 ```
 For the current user:
 ```sh
-pip install sparkfun_qwiic
+pip install sparkfun-qwiic
 ```
 
 This process will also install all modules the qwiic package requires for operation, including the needed qwiic driver packages.
