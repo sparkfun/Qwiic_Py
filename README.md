@@ -75,7 +75,7 @@ This package is also dependent on the driver packages contained in the [drivers 
 
 Documentation
 --------------
-The Sparkfun qwiic package documentation is hosted at [ReadTheDocs](https://qwiic-py.readthedocs.io/en/latest/index.html)
+The SparkFun qwiic package documentation is hosted at [ReadTheDocs](https://qwiic-py.readthedocs.io/en/latest/index.html)
 
 
 Checkout Commands
