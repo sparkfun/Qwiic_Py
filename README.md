@@ -96,7 +96,7 @@ git clone https://github.com/sparkfun/Qwiic_Py
 
 This will create a local version of this repository, but the submodule directories (drivers/*, and qwiic_i2c/ ) will be empty. To clone the git repository and include the submodule contents, use the following command:
 ```sh
-git clone --recurse-submodules https://github.com:sparkfun/Qwiic_Py.git 
+git clone --recurse-submodules https://github.com/sparkfun/Qwiic_Py.git 
 ```
 
 Installation
