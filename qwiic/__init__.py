@@ -100,6 +100,12 @@ _qwiic_devices.append(QwiicProximity)
 from qwiic_scmd				import QwiicScmd
 _qwiic_devices.append(QwiicScmd)
 
+from qwiic_keypad			import QwiicKeypad
+_qwiic_devices.append(QwiicKeypad)
+
+from qwiic_joystick			import QwiicJoystick
+_qwiic_devices.append(QwiicJoystick)
+
 # Create a list of 
 #-----------------------------------------------------------------------
 # The I2C Device driver
