@@ -22,3 +22,6 @@
 [submodule "drivers/qwiic_joystick"]
 	path = drivers/qwiic_joystick
 	url = https://github.com/sparkfun/Qwiic_Joystick_Py.git
+[submodule "drivers/qwiic_twist"]
+	path = drivers/qwiic_twist
+	url = https://github.com/sparkfun/Qwiic_Twist_Py.git
