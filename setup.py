@@ -36,6 +36,7 @@
 
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
 from os import path
+import os
 import io
 
 here = path.abspath(path.dirname(__file__))
@@ -44,11 +45,14 @@ here = path.abspath(path.dirname(__file__))
 with io.open(path.join(here, "DESCRIPTION.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
-setup_requires = ['sparkfun-qwiic-ccs811', 'sparkfun-qwiic-bme280', \
-            'sparkfun-qwiic-micro-oled', 'sparkfun-qwiic-proximity', \
-            'sparkfun-qwiic-scmd', 'sparkfun-qwiic_i2c', \
-            'sparkfun-qwiic-keypad', 'sparkfun-qwiic-joystick']
+# Build up our list of dependant modules. 
+#
+setup_requires = ['sparkfun-qwiic-i2c']
 
+# Use the dir names of the submodules in the ./drives directory
+sub_mods = os.listdir(here+os.sep+'drivers')
+for daDriver in sub_mods:
+    setup_requires.append('sparkfun-%s' % (daDriver.replace('_','-')))
 
 setup(
 
