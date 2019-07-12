@@ -44,9 +44,10 @@ here = path.abspath(path.dirname(__file__))
 with io.open(path.join(here, "DESCRIPTION.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
-setup_requires = ['sparkfun_qwiic_ccs811', 'sparkfun_qwiic_bme280', \
-            'sparkfun_qwiic_micro_oled', 'sparkfun_qwiic_proximity', \
-            'sparkfun_qwiic_scmd', 'sparkfun_qwiic_i2c']
+setup_requires = ['sparkfun-qwiic-ccs811', 'sparkfun-qwiic-bme280', \
+            'sparkfun-qwiic-micro_oled', 'sparkfun-qwiic-proximity', \
+            'sparkfun-qwiic-scmd', 'sparkfun-qwiic_i2c', \
+            'sparkfun-qwiic-keypad', 'sparkfun-qwiic-joystick']
 
 
 setup(
@@ -56,7 +57,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.9.2',
+    version='0.9.3',
 
     description='SparkFun Electronics qwiic library',
     long_description=long_description,
