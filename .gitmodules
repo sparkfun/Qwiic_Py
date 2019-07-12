@@ -5,7 +5,7 @@
 	path = drivers/qwiic_ccs811
 	url = https://github.com/sparkfun/Qwiic_CCS811_Py.git
 [submodule "drivers/qwiic_mico_oled"]
-	path = drivers/qwiic_mico_oled
+	path = drivers/qwiic_micro_oled
 	url = https://github.com/sparkfun/Qwiic_Micro_OLED_Py.git
 [submodule "drivers/qwiic_proximity"]
 	path = drivers/qwiic_proximity
