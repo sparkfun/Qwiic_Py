@@ -45,7 +45,7 @@ with io.open(path.join(here, "DESCRIPTION.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup_requires = ['sparkfun-qwiic-ccs811', 'sparkfun-qwiic-bme280', \
-            'sparkfun-qwiic-micro_oled', 'sparkfun-qwiic-proximity', \
+            'sparkfun-qwiic-micro-oled', 'sparkfun-qwiic-proximity', \
             'sparkfun-qwiic-scmd', 'sparkfun-qwiic_i2c', \
             'sparkfun-qwiic-keypad', 'sparkfun-qwiic-joystick']
 
