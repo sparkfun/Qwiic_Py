@@ -5,10 +5,10 @@
 #
 #
 # Written by  SparkFun Electronics, May 2019
-# 
-# This python library supports the SparkFun Electroncis qwiic 
+#
+# This python library supports the SparkFun Electroncis qwiic
 # qwiic sensor/board ecosystem on a Raspberry Pi (and compatable) single
-# board computers. 
+# board computers.
 #
 # More information on qwiic is at https://www.sparkfun.com/qwiic
 #
@@ -17,42 +17,45 @@
 #==================================================================================
 # Copyright (c) 2019 SparkFun Electronics
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy 
-# of this software and associated documentation files (the "Software"), to deal 
-# in the Software without restriction, including without limitation the rights 
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-# copies of the Software, and to permit persons to whom the Software is 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all 
+# The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #==================================================================================
+#
+# pylint: disable=old-style-class, missing-docstring, wrong-import-position
+#
 #-----------------------------------------------------------------------------
 # Usage
 #
-# The package provides a wrapper/overview of classes that encapsulate a specific 
+# The package provides a wrapper/overview of classes that encapsulate a specific
 # object that represnets a qwiic enabled device.
 #
 # Use of the pacakge is as follows:
 #
 # Option 1 - import the package, create the specific class
 #
-#	import qwiic
+#   import qwiic
 #   myDevice = qwiic.MyDevice()
 #
-# Option 2 - Create the device object using the device address, classname or 
-#			 human readable name
+# Option 2 - Create the device object using the device address, classname or
+#            human readable name
 #
-#	import qwiic
-#	myDevice = qwiic.create_device("My Device Name")
+#   import qwiic
+#   myDevice = qwiic.create_device("My Device Name")
 #
 #
 #
@@ -60,286 +63,306 @@
 qwiic
 ========
 
-The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object.
+The SparkFun qwiic python package aggregates all python qwiic
+drivers/modules to provide a single entity for qwiic within a
+python environment. The qwiic package delivers the high-level
+functionality needed to dynamically discover connected qwiic
+devices and construct their associated driver object.
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to qwiic? Take a look at the entire
+[SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 """
 #-----------------------------------------------------------------------------
 from __future__ import print_function
-	
-import qwiic_i2c
 import sys
+import os
+
+import qwiic_i2c
 
 #-----------------------------------------------------------------------------
-# Objects exported from this package. 
+# Define a class to store content, etc using class scoped methods and variables
 #
-# For each device imported, add it's device object is imported below
-# and added to the internal device list. This is a simple method and 
-# not very scalable, but works for now.  
+# Simple method to encapsulate information, and create a simple
+# store that doesnt' required the use of 'global'
+
+class _QwiicInternal:
+    qwiic_devices = []
+    available_devices = {}
+    i2c_driver = None
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def add_qwiic_device(cls, new_device):
+        cls.qwiic_devices.append(new_device)
+
+    @classmethod
+    def get_qwiic_devices(cls):
+        return cls.qwiic_devices
+
+    @classmethod
+    def get_i2c_driver(cls):
+
+        if cls.i2c_driver is None:
+
+            cls.i2c_driver = qwiic_i2c.getI2CDriver()
+
+            if cls.i2c_driver is None:
+                print("Unable to get the plaform I2C driver for QWIIC.")
+
+        return cls.i2c_driver
+
+    #-----------------------------------------------------------------------
+    # _getAvailableDevices()
+    #
+    # Return a dictionary that defines the available qwiic devices in the
+    # package. The key is the I2C address.
+    #
+    # Devices with multiple possible addresses have mulitple entries.
+    @classmethod
+    def get_available_devices(cls):
+
+        # do we already have these
+        if not cls.available_devices:
+
+            # Loop through the device lists and add the class to the
+            # dict - address is the key.
+
+            for device_class in cls.qwiic_devices:
+
+                # loop over the device addresses - add name/address
+                for addr in device_class.available_addresses:
+                    cls.available_devices[addr] = device_class
+
+        return cls.available_devices
+
+
+#----------------------------------------------------
+# _load_driver_classes()
 #
-# Note - we maintain a list of our driver classes. These are used in
-#        some of higher level services this package provides.
-
-_qwiic_devices = []
+# Method to load the qwiic driver Classes AND expose them as
+# attributes to this package.
 #
-# While a basic system to manage our devices, it works for now. 
+# Use the driver sub directory of this package to determine the names
+# and drivers of these pacakges .
+#
 
-from qwiic_bme280 			import QwiicBme280
-_qwiic_devices.append(QwiicBme280)
+def _load_driver_classes():
 
-from qwiic_ccs811 			import QwiicCcs811
-_qwiic_devices.append(QwiicCcs811)
+    driver_dir = __file__.rsplit(os.sep, 1)[0] +  os.sep + "drivers"
 
-from qwiic_micro_oled 		import QwiicMicroOled
-_qwiic_devices.append(QwiicMicroOled)
+    try:
+        driver_packages = os.listdir(driver_dir)
+    except IOError:
+        print("The qwiic drivers are not installed - please check your installation")
+        return
 
-from qwiic_proximity  		import QwiicProximity
-_qwiic_devices.append(QwiicProximity)
+    for driver in driver_packages:
+        # The driver objects are just the driver pacakge names in camelcase
 
-from qwiic_scmd				import QwiicScmd
-_qwiic_devices.append(QwiicScmd)
+        tmp_parts = driver.split('_')
 
-from qwiic_keypad			import QwiicKeypad
-_qwiic_devices.append(QwiicKeypad)
+        class_name = tmp_parts[0].title() + ''.join(x.title() for x in tmp_parts[1:])
 
-from qwiic_joystick			import QwiicJoystick
-_qwiic_devices.append(QwiicJoystick)
+        try:
+            module = __import__(driver)
+            cls_driver = getattr(module, class_name)
 
-# Create a list of 
-#-----------------------------------------------------------------------
-# The I2C Device driver
-_i2cDriver = None
+            setattr(sys.modules[__name__], class_name, cls_driver)
 
-def _getI2CDriver():
+            _QwiicInternal.add_qwiic_device(cls_driver)
+        except ImportError as err:
+            print("Error loading module `%s`: %s" % (driver, err))
+            continue
 
-	global _i2cDriver
 
-	if _i2cDriver != None:
-		return _i2cDriver
 
-	_i2cDriver = qwiic_i2c.getI2CDriver()
-
-	if _i2cDriver == None:
-		print("Unable to get the plaform I2C driver for QWIIC.")
-
-	return _i2cDriver
+# load the driver modules...
+_load_driver_classes()
 
 #-----------------------------------------------------------------------
 # I2C Bus / Device methods
 #-----------------------------------------------------------------------
-# 
+#
 # Cache for QWIIC device classes - determined at runtime
-#
-# The qwiic device classe defs are stored in a dictionary indexed by I2C 
-# addresse(s) for the specific device. 
 
-__availableDevices = {}
-
-#-----------------------------------------------------------------------
-# _getAvailableDevices()
-#
-# Return a dictionary that defines the available qwiic devices in the 
-# package. The key is the I2C address. 
-#
-# Devices with multiple possible addresses have mulitple entries.
-#
-#
-
-def _getAvailableDevices():
-
-	global __availableDevices
-
-	# do we already have these 
-	if len(__availableDevices) > 0:  
-		return __availableDevices
-
-	# Loop through the device lists and add the class to the dict - address is the key.
-
-	for deviceClass in _qwiic_devices:
-
-		# loop over the device addresses - add name/address 
-		for addr in deviceClass.available_addresses:
-
-			__availableDevices[addr] = deviceClass
-
-
-	return __availableDevices
 #-----------------------------------------------------------------------
 # scan()
 #
 # Scans the I2C bus and returns a list of addresses that have a devices connected
 #
 def scan():
-	"""
-		Used to scan the I2C bus, returning a list of I2C address attached to the computer.
+    """
+        Used to scan the I2C bus, returning a list of I2C address attached to the computer.
 
-		:return: A list of I2C addresses. If no devices are attached, an empty list is returned.
-		:rtype: list
+        :return: A list of I2C addresses. If no devices are attached, an empty list is returned.
+        :rtype: list
 
-		:example:
+        :example:
 
-		>>> import qwiic
-		>>> [2]: qwiic.scan()
-		[61, 91, 96, 119]
-	"""
+        >>> import qwiic
+        >>> [2]: qwiic.scan()
+        [61, 91, 96, 119]
+    """
 
-	i2cDriver = _getI2CDriver()
+    i2c_driver = _QwiicInternal.get_i2c_driver()
 
-	if i2cDriver == None:
-		return []
-	
-	return i2cDriver.scan()
+    if i2c_driver is None:
+        return []
+
+    return i2c_driver.scan()
 
 
 #-----------------------------------------------------------------------
 # list_devices()
 #
-#	Return a list of tubles that define the qwiic devices connected to the 
+#   Return a list of tubles that define the qwiic devices connected to the
 #   I2C bus.
 #
 def list_devices():
-	""" 
-		Returns a list of known qwiic devices connected to the I2C bus.
+    """
+        Returns a list of known qwiic devices connected to the I2C bus.
 
-		:return: A list of known attached qwiic devices. If no devices are attached, 
-			an empty list is returned. 
-			Each element of the list a tuple that contains the following values
-			(Device I2C Address, Device Name, Device Driver Class Name)
-		:rtype: list
+        :return: A list of known attached qwiic devices. If no devices are attached,
+            an empty list is returned.
+            Each element of the list a tuple that contains the following values
+            (Device I2C Address, Device Name, Device Driver Class Name)
+        :rtype: list
 
-		:example:
+        :example:
 
-		>>> import qwiic
-		>>> qwiic.list_devices()
-		[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'),
- 		(91, 'Qwiic CCS811', 'QwiicCcs811'),
- 		(96, 'Qwiic Proximity Sensor', 'QwiicProximity'),
- 		(119, 'Qwiic BME280', 'QwiicBme280')]
-	"""
+        >>> import qwiic
+        >>> qwiic.list_devices()
+        [(61, 'Qwiic Micro OLED', 'QwiicMicroOled'),
+        (91, 'Qwiic CCS811', 'QwiicCcs811'),
+        (96, 'Qwiic Proximity Sensor', 'QwiicProximity'),
+        (119, 'Qwiic BME280', 'QwiicBme280')]
+    """
 
-	# Scan the bus
-	foundDevices = scan()
-	if len(foundDevices) == 0:
-		return []
+    # Scan the bus
+    found_devices = scan()
+    if not found_devices:
+        return []
 
-	# What QWIIC devices do we know about -- what's defined in the package
-	qwiicDefs = _getAvailableDevices()
-	if len(qwiicDefs) == 0:
-		return []
+    # What QWIIC devices do we know about -- what's defined in the package
+    qwiic_devs = _QwiicInternal.get_available_devices()
+    if not qwiic_devs:
+        return []
 
-	foundQwiic = []
-	# match scan, with definition
-	for currAddress in foundDevices:
+    found_qwiic = []
+    # match scan, with definition
+    for address in found_devices:
 
-		if currAddress in qwiicDefs.keys():
+        if address in qwiic_devs.keys():
+            # make the return tuple
+            found_qwiic.append((address, qwiic_devs[address].device_name, \
+                qwiic_devs[address].__name__))
 
-			foundQwiic.append((currAddress, qwiicDefs[currAddress].device_name, qwiicDefs[currAddress].__name__))
 
-
-	return foundQwiic
+    return found_qwiic
 
 
 #-------------------
 # get_devices()
 #
-# 	Returns a list of objects that define the qwiic devices attached to the 
+#   Returns a list of objects that define the qwiic devices attached to the
 #   I2C bus.
 #
 def get_devices():
-	""" 
-		Used to create device objects for all qwiic devices attached to the computer.
+    """
+        Used to create device objects for all qwiic devices attached to the computer.
 
-		:return: A list of qwiic device objects. 
-		         If no qwiic devices are an empty list is returned.
-		:rtype: list
+        :return: A list of qwiic device objects.
+                 If no qwiic devices are an empty list is returned.
+        :rtype: list
 
-		:example:
+        :example:
 
-		>>> import qwiic
+        >>> import qwiic
 
-		>>> qwiic.get_devices()
-		[<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
- 		<qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
- 		<qwiic_proximity.QwiicProximity at 0x752b0e10>,
- 		<qwiic_bme280.QwiicBme280 at 0x752b0a30>]
+        >>> qwiic.get_devices()
+        [<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled at 0x76081ef0>,
+        <qwiic_ccs811.QwiicCcs811 at 0x752b78b0>,
+        <qwiic_proximity.QwiicProximity at 0x752b0e10>,
+        <qwiic_bme280.QwiicBme280 at 0x752b0a30>]
 
-	"""
+    """
 
-	# Scan the bus
-	foundDevices = scan()
-	if len(foundDevices) == 0:
-		return []
+    # Scan the bus
+    found_devices = scan()
+    if not found_devices:
+        return []
 
-	# What QWIIC devices do we know about -- what's defined in the package
-	qwiicDefs = _getAvailableDevices()
-	if len(qwiicDefs) == 0:
-		return []
-
-	foundQwiic = []
-	# match scan, with definition
-	for currAddress in foundDevices:
-
-		if currAddress in qwiicDefs.keys():
-			# Create an object and append to our found list
-			# note: class defs are stored in the defs dictionary..
-			foundQwiic.append(qwiicDefs[currAddress]())
+    # What QWIIC devices do we know about -- what's defined in the package
+    qwiic_devs = _QwiicInternal.get_available_devices()
+    if not qwiic_devs:
+        return []
 
 
-	return foundQwiic
+    found_qwiic = []
+    # match scan, with definition
+    for address in found_devices:
+
+        if address in qwiic_devs.keys():
+            # Create an object and append to our found list
+            # note: class defs are stored in the defs dictionary..
+            found_qwiic.append(qwiic_devs[address]())
+
+
+    return found_qwiic
 
 #-------------------
 # create_device()
 #
-# 	Given the Address, Name or Clasname of a qwiic device, create the 
-#	assocaited device object and return it to the caller.
+#   Given the Address, Name or Clasname of a qwiic device, create the
+#   assocaited device object and return it to the caller.
 #
-#   The intent is for the user to call list_devices(), find a device they like AND 
-# 	use this method to create the device
+#   The intent is for the user to call list_devices(), find a device they like AND
+#   use this method to create the device
 #
 def create_device(device=None):
-	""" 
-		Used to create a device object for a specific qwiic device
+    """
+        Used to create a device object for a specific qwiic device
 
-		:param device: The I2C address, Name or Class name of the device to created.
-		:return: A qwiic device object for the specified qwiic device.
-		         If the specified device isn't found, None is returned. 
-		:rtype: Object
+        :param device: The I2C address, Name or Class name of the device to created.
+        :return: A qwiic device object for the specified qwiic device.
+                 If the specified device isn't found, None is returned.
+        :rtype: Object
 
-		:example:
+        :example:
 
-		>>> import qwiic
-		>>> results = qwiic.list_devices()
-		>>> print(results)
-		[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'), (91, 'Qwiic CCS811', 'QwiicCcs811'), 
-		(96, 'Qwiic Proximity Sensor', 'QwiicProximity'), (119, 'Qwiic BME280', 'QwiicBme280')]
-		
-		>>> mydevice = qwiic.create_device(results[0][0])
-		>>> print(mydevice)
-		<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled object at 0x751fdab0>
+        >>> import qwiic
+        >>> results = qwiic.list_devices()
+        >>> print(results)
+        [(61, 'Qwiic Micro OLED', 'QwiicMicroOled'), (91, 'Qwiic CCS811', 'QwiicCcs811'),
+        (96, 'Qwiic Proximity Sensor', 'QwiicProximity'), (119, 'Qwiic BME280', 'QwiicBme280')]
 
-	"""
-	if device == None:
-		print("No device provided.")
-		return None
+        >>> mydevice = qwiic.create_device(results[0][0])
+        >>> print(mydevice)
+        <qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled object at 0x751fdab0>
 
-	connDevices = list_devices()
+    """
+    if device is None:
+        print("No device provided.")
+        return None
 
-	for currDev in connDevices:
-		# the entries in the connDevices list are tuples, with the following values
-		#   (I2C address, Device Name, Class Name)
-		#
-		# If the provided value is in the current device tuple, we're done
-		if device in currDev:
-			# we need the class definition 
-			qwiicDefs = _getAvailableDevices()
+    conn_devices = list_devices()
 
-			# Index using the I2C address (entry 0 of currDev)
-			return qwiicDefs[currDev[0]]()
+    for curr_dev in conn_devices:
+        # the entries in the connDevices list are tuples, with the following values
+        #   (I2C address, Device Name, Class Name)
+        #
+        # If the provided value is in the current device tuple, we're done
+        if device in curr_dev:
+            # we need the class definition
+            qwiic_defs = _QwiicInternal.get_available_devices()
 
-	# if we are here, we have an issue 
-	print("Unabled to create requested device - is the device connected?")
+            # Index using the I2C address (entry 0 of currDev)
+            return qwiic_defs[curr_dev[0]]()
 
-	return None
+    # if we are here, we have an issue
+    print("Unabled to create requested device - is the device connected?")
 
-
+    return None
