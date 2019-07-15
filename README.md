@@ -56,10 +56,6 @@ To make development and evaluation easer, the modules this package is dependent 
 This structure has the following layout:
 ```
 Qwiic_Py/
-   +--- drivers/
-   |       |--- qwiic_bme280			     --> The qwiic_bme280 submodule
-   |       |--- qwiic_micro_oled		     --> The qwiic_micro_oled submodule
-   |       `--- ... links to qwiic driver submodule repositories
    |
    +--- qwiic_i2c/                                   --> Link to the qwiic_i2c submodule repository
    |      |--- __index__.py
@@ -67,7 +63,11 @@ Qwiic_Py/
    |
    +--- qwiic/
    |      |--- __index__.py
-   |      `--- ... Package Implementation
+   |      +--- ... Package Implementation
+   |      `--- drivers/
+   |            |--- qwiic_bme280	             --> The qwiic_bme280 submodule
+   |            |--- qwiic_micro_oled		     --> The qwiic_micro_oled submodule
+   |            `--- ... links to qwiic driver submodule repositories
    |
    +--- README.md
    +--- setup.py
