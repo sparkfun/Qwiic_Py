@@ -1,27 +1,27 @@
 [submodule "drivers/qwiic_bme280"]
-	path = drivers/qwiic_bme280
+	path = qwiic/drivers/qwiic_bme280
 	url = https://github.com/sparkfun/Qwiic_BME280_Py.git
 [submodule "drivers/qwiic_ccs811"]
-	path = drivers/qwiic_ccs811
+	path = qwiic/drivers/qwiic_ccs811
 	url = https://github.com/sparkfun/Qwiic_CCS811_Py.git
 [submodule "drivers/qwiic_mico_oled"]
-	path = drivers/qwiic_micro_oled
+	path = qwiic/drivers/qwiic_micro_oled
 	url = https://github.com/sparkfun/Qwiic_Micro_OLED_Py.git
 [submodule "drivers/qwiic_proximity"]
-	path = drivers/qwiic_proximity
+	path = qwiic/drivers/qwiic_proximity
 	url = https://github.com/sparkfun/Qwiic_Proximity_Py.git
 [submodule "drivers/qwiic_scmd"]
-	path = drivers/qwiic_scmd
+	path = qwiic/drivers/qwiic_scmd
 	url = https://github.com/sparkfun/Qwiic_SCMD_Py.git
 [submodule "qwiic_i2c"]
 	path = qwiic_i2c
 	url = https://github.com/sparkfun/Qwiic_I2C_Py.git
 [submodule "drivers/qwiic_keypad"]
-	path = drivers/qwiic_keypad
+	path = qwiic/drivers/qwiic_keypad
 	url = https://github.com/sparkfun/Qwiic_Keypad_Py.git
 [submodule "drivers/qwiic_joystick"]
-	path = drivers/qwiic_joystick
+	path = qwiic/drivers/qwiic_joystick
 	url = https://github.com/sparkfun/Qwiic_Joystick_Py.git
 [submodule "drivers/qwiic_twist"]
-	path = drivers/qwiic_twist
+	path = qwiic/drivers/qwiic_twist
 	url = https://github.com/sparkfun/Qwiic_Twist_Py.git
