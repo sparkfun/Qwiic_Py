@@ -25,3 +25,12 @@
 [submodule "drivers/qwiic_twist"]
 	path = qwiic/drivers/qwiic_twist
 	url = https://github.com/sparkfun/Qwiic_Twist_Py.git
+[submodule "qwiic/drivers/qwiic_vl53l1x"]
+	path = qwiic/drivers/qwiic_vl53l1x
+	url = https://github.com/sparkfun/Qwiic_VL53L1X_Py
+[submodule "qwiic/drivers/qwiic_pca9685"]
+	path = qwiic/drivers/qwiic_pca9685
+	url = https://github.com/sparkfun/Qwiic_PCA9685_Py
+[submodule "qwiic/drivers/pi_servo_hat"]
+	path = qwiic/drivers/pi_servo_hat
+	url = https://github.com/sparkfun/PiServoHat_Py
