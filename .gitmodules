@@ -34,3 +34,6 @@
 [submodule "qwiic/drivers/pi_servo_hat"]
 	path = qwiic/drivers/pi_servo_hat
 	url = https://github.com/sparkfun/PiServoHat_Py
+[submodule "qwiic/drivers/qwiic_ublox_gps"]
+	path = qwiic/drivers/qwiic_ublox_gps
+	url = https://github.com/sparkfun/Qwiic_Ublox_Gps_Py
