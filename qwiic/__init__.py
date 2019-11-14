@@ -168,12 +168,32 @@ def _load_driver_classes():
 
         try:
             module = __import__(driver)
+
+            # by default we look for a class name of QwiicName, where name is camel cased
+            # Camel case is sometimes missed by the driver implementors, so we try to
+            # catch this here.. Adds a little to startup, but it's a one time event.
+
+            if not hasattr(module, class_name):
+                moduleItems = dir(module)
+                i =0
+                lname = class_name.lower()
+                for tmp in moduleItems:
+                    if lname == tmp.lower():
+                        break
+                    i = i + 1
+
+                if i >= len(moduleItems):
+                    print("Invalid driver class name. Unable to locate %s" % class_name)
+                    continue
+
+                class_name = moduleItems[i]
+
             cls_driver = getattr(module, class_name)
 
             setattr(sys.modules[__name__], class_name, cls_driver)
 
             _QwiicInternal.add_qwiic_device(cls_driver)
-        except ImportError as err:
+        except Exception as err:
             print("Error loading module `%s`: %s" % (driver, err))
             continue
 
