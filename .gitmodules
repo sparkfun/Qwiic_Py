@@ -39,4 +39,4 @@
 	url = https://github.com/sparkfun/Qwiic_Ublox_Gps_Py
 [submodule "qwiic/drivers/qwiic_titan_gps"]
 	path = qwiic/drivers/qwiic_titan_gps
-	url = git@github.com:sparkfun/Qwiic_Titan_Gps_Py.git
+	url = https://github.com/sparkfun/Qwiic_Titan_Gps_Py
