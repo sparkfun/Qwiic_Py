@@ -46,3 +46,6 @@
 [submodule "qwiic/drivers/qwiic_dual_encoder_reader"]
 	path = qwiic/drivers/qwiic_dual_encoder_reader
 	url = https://github.com/sparkfun/Qwiic_Dual_Encoder_Reader_Py.git
+[submodule "qwiic/drivers/top_phat_button"]
+	path = qwiic/drivers/top_phat_button
+	url = https://github.com/sparkfun/Top_pHAT_Button_Py
