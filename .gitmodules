@@ -43,3 +43,6 @@
 [submodule "qwiic/drivers/qwiic_tca9548a"]
 	path = qwiic/drivers/qwiic_tca9548a
 	url = https://github.com/sparkfun/Qwiic_TCA9548A_Py.git
+[submodule "qwiic/drivers/qwiic_dual_encoder_reader"]
+	path = qwiic/drivers/qwiic_dual_encoder_reader
+	url = https://github.com/sparkfun/Qwiic_Dual_Encoder_Reader_Py.git
