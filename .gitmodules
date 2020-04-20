@@ -49,3 +49,6 @@
 [submodule "qwiic/drivers/top_phat_button"]
 	path = qwiic/drivers/top_phat_button
 	url = https://github.com/sparkfun/Top_pHAT_Button_Py
+[submodule "qwiic/drivers/qwiic_icm20948"]
+	path = qwiic/drivers/qwiic_icm20948
+	url = https://github.com/sparkfun/Qwiic_9DoF_IMU_ICM20948_Py.git
