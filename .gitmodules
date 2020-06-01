@@ -52,3 +52,6 @@
 [submodule "qwiic/drivers/qwiic_icm20948"]
 	path = qwiic/drivers/qwiic_icm20948
 	url = https://github.com/sparkfun/Qwiic_9DoF_IMU_ICM20948_Py.git
+[submodule "qwiic/drivers/qwiic_max3010x"]
+	path = qwiic/drivers/qwiic_max3010x
+	url = https://github.com/sparkfun/Qwiic_MAX3010x_Py.git
