@@ -55,3 +55,6 @@
 [submodule "qwiic/drivers/qwiic_max3010x"]
 	path = qwiic/drivers/qwiic_max3010x
 	url = https://github.com/sparkfun/Qwiic_MAX3010x_Py.git
+[submodule "qwiic/drivers/qwiic_relay"]
+	path = qwiic/drivers/qwiic_relay
+	url = https://github.com/sparkfun/Qwiic_Relay_Py.git
