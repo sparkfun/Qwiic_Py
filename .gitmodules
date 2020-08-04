@@ -58,3 +58,6 @@
 [submodule "qwiic/drivers/qwiic_relay"]
 	path = qwiic/drivers/qwiic_relay
 	url = https://github.com/sparkfun/Qwiic_Relay_Py.git
+[submodule "qwiic/drivers/ublox_gps"]
+	path = qwiic/drivers/ublox_gps
+	url = https://github.com/sparkfun/qwiic_ublox_gps_py
