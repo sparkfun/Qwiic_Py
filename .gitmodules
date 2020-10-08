@@ -64,3 +64,6 @@
 [submodule "qwiic/drivers/qwiic_serlcd"]
 	path = qwiic/drivers/qwiic_serlcd
 	url = https://github.com/sparkfun/Qwiic_SerLCD_Py
+[submodule "qwiic/drivers/qwiic_gpio"]
+	path = qwiic/drivers/qwiic_gpio
+	url = https://github.com/sparkfun/Qwiic_GPIO_Py.git
