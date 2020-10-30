@@ -67,3 +67,6 @@
 [submodule "qwiic/drivers/qwiic_gpio"]
 	path = qwiic/drivers/qwiic_gpio
 	url = https://github.com/sparkfun/Qwiic_GPIO_Py.git
+[submodule "qwiic/drivers/qwiic_adxl313"]
+	path = qwiic/drivers/qwiic_adxl313
+	url = https://github.com/sparkfun/Qwiic_ADXL313_Py
