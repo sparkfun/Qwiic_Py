@@ -70,6 +70,6 @@
 [submodule "qwiic/drivers/qwiic_adxl313"]
 	path = qwiic/drivers/qwiic_adxl313
 	url = https://github.com/sparkfun/Qwiic_ADXL313_Py
-[submodule "qwiic/drivers/Qwiic_Button_Py"]
-	path = qwiic/drivers/Qwiic_Button_Py
+[submodule "qwiic/drivers/qwiic_button"]
+	path = qwiic/drivers/qwiic_button
 	url = https://github.com/sparkfun/Qwiic_Button_Py.git
