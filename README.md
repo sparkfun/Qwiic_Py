@@ -131,6 +131,8 @@ cd dist
 pip install sparkfun_qwiic_-<version>.tar.gz
 ```
 
+
+<!--
 Example Use
 --------------
 ```python
@@ -148,7 +150,7 @@ mydevice = qwiic.create_device(results[0][0])
 print(mydevice)
 >>	<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled object at 0x751fdab0>
 ```
-
+-->
 
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
