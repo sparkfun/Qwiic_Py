@@ -1,0 +1,17 @@
+{
+  "patterns": [
+    "qwiic_i2c/qwiic_i2c/{i2c_driver,circuitpy_i2c}.py",
+    "qwiic/drivers/**/*.py"
+  ],
+  "exclude": [
+    "**/docs/conf.py",
+    "**/setup.py",
+    "**/__init__.py"
+  ],
+  "mpy-cross": {
+    "flags": [
+      "-march=armv7m",
+      "-mno-unicode"
+    ]
+  }
+}
