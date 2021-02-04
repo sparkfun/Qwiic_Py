@@ -73,3 +73,6 @@
 [submodule "qwiic/drivers/qwiic_button"]
 	path = qwiic/drivers/qwiic_button
 	url = https://github.com/sparkfun/Qwiic_Button_Py.git
+[submodule "qwiic/drivers/qwiic_rfid"]
+	path = qwiic/drivers/qwiic_rfid
+	url = https://github.com/sparkfun/Qwiic_RFID_Py
