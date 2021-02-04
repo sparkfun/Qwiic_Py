@@ -2,7 +2,7 @@
 this directory contains limited support for the Qwiic_Py modules on micropython platforms
 
 ## supported platforms
-*** note:** currently only the RP2040 is supported. the distributed ```.mpy``` bytecode files have been built with flags that are specific to the RP2040. other platforms are not expected to work
+**note:** currently only the RP2040 is supported. the distributed ```.mpy``` bytecode files have been built with flags that are specific to the RP2040. other platforms are not expected to work
 (however the system is relatively flexible and adding support for other platforms in the future is a possibility)
 
 ## quick start
@@ -12,31 +12,46 @@ the ```/dist``` directory contains pre-compiled bytecode files. to use a driver 
 
 taget file | source | purpose
 -----------|--------|--------
-```__future__.mpy``` | ```dist/micropython/src/\_\_future\_\_.mpy``` | provides limited ```__future__``` module functionality
-```qwiic_i2c/__init__.mpy | dist/micropython/src/qwiic_i2c/__init__.mpy | module definition for ```import qwiic_i2c```
+```__future__.mpy``` | ```dist/micropython/src/__future__.mpy``` | provides limited ```__future__``` module functionality
+```qwiic_i2c/__init__.mpy``` | ```dist/micropython/src/qwiic_i2c/__init__.mpy``` | module definition for ```import qwiic_i2c```
 ```qwiic_i2c/i2c_driver.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy``` | defines an interface which driver modules utilize
 ```qwiic_i2c/micropython_rp2040_i2c.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy``` | this is the i2c driver that actually applies to the RP2040
+```qwiic_i2c/circuitpy_i2c.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy``` | needed b/c it is imported by ```__init__.mpy```
+```qwiic_i2c/linux_i2c.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/linux_i2c.mpy``` | needed b/c it is imported by ```__init__.mpy```
 
 
-here's a cheat sheet for [```rshell```](https://github.com/dhylands/rshell) commands to copy the prereq files over. execute these one at a time to avoid possible issues with ```rshell```.
+here's a cheat sheet for [```rshell```](https://github.com/dhylands/rshell) commands to copy the prereq files over.
+
+**note:** use the ```pico``` branch of rshell because:
+* it auto-connects to the pico board
+* it appears to solve some [issues](https://github.com/dhylands/rshell/issues/144)
+
+to do so you may need to use git. clone [rshell](https://github.com/dhylands/rshell) and switch to the ```pico``` branch. then run the main script like this:
+
+```./rshell/rshell/main.py -a```
+(the ```-a``` flag is very important)
+
 ```
-cd Qwiic_Py/micropython
-rshell -a
-connect serial /dev/cu.usbmodem0000000000001 115200
+cd Qwiic_Py
+./${PATH_TO_RSHELL}/rshell/main.py -a
+rm -rf /pyboard/qwiic_i2c
 mkdir /pyboard/qwiic_i2c
-cp dist/micropython/src/__future__.mpy /pyboard/__future__.mpy
-cp dist/micropython/src/qwiic_i2c/__init__.mpy /pyboard/qwiic_i2c/__init__.mpy
-cp dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy /pyboard/qwiic_i2c/i2c_driver.mpy
-cp dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy /pyboard/qwiic_i2c/micropython_rp2040_i2c.mpy
+cp micropython/dist/micropython/src/__future__.mpy /pyboard/__future__.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/__init__.mpy /pyboard/qwiic_i2c/__init__.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy /pyboard/qwiic_i2c/i2c_driver.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy /pyboard/qwiic_i2c/micropython_rp2040_i2c.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/linux_i2c.mpy /pyboard/qwiic_i2c/linux_i2c.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy /pyboard/qwiic_i2c/circuitpy_i2c.mpy
 ## 
 ```
 
 **using a driver**
+
 the drivers (located in ```Qwiic_Py/qwiic/drivers```) are interfaces to particular sensors, actuators, and other peripheral devices that depend solely on the ```qwiic_i2c``` interface. once the prerequisites are available on your target board you can copy the bytecode driver for the device you want to control. it should exist at the root of the target's filesystem so that other code (e.g. examples) can import it as expected. 
 
 here's an example of how to add a driver to your board, using the ```qwiic_adxl313``` module.
 ```
-cp dist/qwiic/drivers/qwiic_adxl313/qwiic_adxl313.mpy /pyboard/qwiic_adxl313.mpy
+cp micropython/dist/qwiic/drivers/qwiic_adxl313/qwiic_adxl313.mpy /pyboard/qwiic_adxl313.mpy
 ```
 
 you can now:
@@ -47,7 +62,7 @@ you can now:
 **using examples**
 
 ```
-cp dist/qwiic/drivers/qwiic_adxl313/examples/ex1_qwiic_adxl313_basic_readings.mpy /pyboard/ex1_qwiic_adxl313_basic_readings.mpy
+cp micropython/dist/qwiic/drivers/qwiic_adxl313/examples/ex1_qwiic_adxl313_basic_readings.mpy /pyboard/ex1_qwiic_adxl313_basic_readings.mpy
 ```
 
 you can now:
