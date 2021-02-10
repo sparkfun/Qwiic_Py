@@ -13,6 +13,7 @@ the ```/dist``` directory contains pre-compiled bytecode files. to use a driver 
 taget file | source | purpose
 -----------|--------|--------
 ```__future__.mpy``` | ```dist/micropython/src/__future__.mpy``` | provides limited ```__future__``` module functionality
+```board.mpy``` | ```dist/micropython/src/boards/${BOARDNAME}/board.mpy``` | provides board pin definitions of the Qwiic connector + i2c port
 ```qwiic_i2c/__init__.mpy``` | ```dist/micropython/src/qwiic_i2c/__init__.mpy``` | module definition for ```import qwiic_i2c```
 ```qwiic_i2c/i2c_driver.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy``` | defines an interface which driver modules utilize
 ```qwiic_i2c/micropython_rp2040_i2c.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy``` | this is the i2c driver that actually applies to the RP2040
@@ -31,17 +32,20 @@ to do so you may need to use git. clone [rshell](https://github.com/dhylands/rsh
 ```./rshell/rshell/main.py -a```
 (the ```-a``` flag is very important)
 
+**note:** the board directories are referred to the board name. this will change depending on which board you are using. we use ```${BOARDNAME}``` to indicate a variable that contains the board name, such as ```BOARDNAME=PiMicro```
+
 ```
 cd Qwiic_Py
 ./${PATH_TO_RSHELL}/rshell/main.py -a
-rm -rf /pyboard/qwiic_i2c
-mkdir /pyboard/qwiic_i2c
-cp micropython/dist/micropython/src/__future__.mpy /pyboard/__future__.mpy
-cp micropython/dist/qwiic_i2c/qwiic_i2c/__init__.mpy /pyboard/qwiic_i2c/__init__.mpy
-cp micropython/dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy /pyboard/qwiic_i2c/i2c_driver.mpy
-cp micropython/dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy /pyboard/qwiic_i2c/micropython_rp2040_i2c.mpy
-cp micropython/dist/qwiic_i2c/qwiic_i2c/linux_i2c.mpy /pyboard/qwiic_i2c/linux_i2c.mpy
-cp micropython/dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy /pyboard/qwiic_i2c/circuitpy_i2c.mpy
+rm -rf /${BOARDNAME}/qwiic_i2c
+mkdir /${BOARDNAME}/qwiic_i2c
+cp micropython/dist/micropython/src/__future__.mpy /${BOARDNAME}/__future__.mpy
+cp micropython/dist/micropython/src/boards/${BOARDNAME}/board.mpy /${BOARDNAME}/board.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/__init__.mpy /${BOARDNAME}/qwiic_i2c/__init__.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy /${BOARDNAME}/qwiic_i2c/i2c_driver.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy /${BOARDNAME}/qwiic_i2c/micropython_rp2040_i2c.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/linux_i2c.mpy /${BOARDNAME}/qwiic_i2c/linux_i2c.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy /${BOARDNAME}/qwiic_i2c/circuitpy_i2c.mpy
 ## 
 ```
 
@@ -51,7 +55,7 @@ the drivers (located in ```Qwiic_Py/qwiic/drivers```) are interfaces to particul
 
 here's an example of how to add a driver to your board, using the ```qwiic_adxl313``` module.
 ```
-cp micropython/dist/qwiic/drivers/qwiic_adxl313/qwiic_adxl313.mpy /pyboard/qwiic_adxl313.mpy
+cp micropython/dist/qwiic/drivers/qwiic_adxl313/qwiic_adxl313.mpy /${BOARDNAME}/qwiic_adxl313.mpy
 ```
 
 you can now:
@@ -62,13 +66,28 @@ you can now:
 **using examples**
 
 ```
-cp micropython/dist/qwiic/drivers/qwiic_adxl313/examples/ex1_qwiic_adxl313_basic_readings.mpy /pyboard/ex1_qwiic_adxl313_basic_readings.mpy
+cp micropython/dist/qwiic/drivers/qwiic_adxl313/examples/ex1_qwiic_adxl313_basic_readings.mpy /${BOARDNAME}/ex1_qwiic_adxl313_basic_readings.mpy
 ```
 
 you can now:
 ```
 >>> import ex1_qwiic_adxl313_basic_readings
 >>> ex1_qwiic_adxl313_basic_readings.runExample()
+```
+
+
+# scl // sda (micro rp2040)
+scl: 17
+sda: 16
+i2c0 - id
+
+```
+from machine import I2C
+from machine import Pin
+scl = Pin(17)
+sda = Pin(16)
+id = 0
+i2c = I2C(freq=400000, id=id, scl=scl, sda=sda)
 ```
 
 ## issues
