@@ -49,6 +49,9 @@ cp micropython/dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy /${BOARDNAME}/qwiic_i2
 ## 
 ```
 
+**shortcut:** using rshell's scripting feature (```-f FILENAME```) we can automate these steps. use the script that matches your desired boardname:
+```./${PATH_TO_RSHELL}/rshell/main.py -a -f micropython/tools/qwiic-mpy/push-drivers/${BOARDNAME}.rshell```
+
 **using a driver**
 
 the drivers (located in ```Qwiic_Py/qwiic/drivers```) are interfaces to particular sensors, actuators, and other peripheral devices that depend solely on the ```qwiic_i2c``` interface. once the prerequisites are available on your target board you can copy the bytecode driver for the device you want to control. it should exist at the root of the target's filesystem so that other code (e.g. examples) can import it as expected. 
@@ -74,12 +77,6 @@ you can now:
 >>> import ex1_qwiic_adxl313_basic_readings
 >>> ex1_qwiic_adxl313_basic_readings.runExample()
 ```
-
-
-# scl // sda (micro rp2040)
-scl: 17
-sda: 16
-i2c0 - id
 
 ```
 from machine import I2C
