@@ -2,7 +2,7 @@
   "patterns": [
     "qwiic_i2c/qwiic_i2c/*.py",
     "qwiic/drivers/**/*.py",
-    "micropython/src/__future__.py",
+    "micropython/src/*.py",
     "micropython/src/boards/**/*.py"
   ],
   "exclude": [

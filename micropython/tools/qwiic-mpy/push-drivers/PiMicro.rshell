@@ -2,8 +2,10 @@
 # to use with another board you must change the boardname in commands
 rm -rf /PiMicro/qwiic_i2c
 rm -f /PiMicro/__future__.mpy
+rm -f /PiMicro/enum.mpy
 mkdir /PiMicro/qwiic_i2c
 cp micropython/dist/micropython/src/__future__.mpy /PiMicro/__future__.mpy
+cp micropython/dist/micropython/src/enum.mpy /PiMicro/enum.mpy
 cp micropython/dist/micropython/src/boards/PiMicro/board.mpy /PiMicro/board.mpy
 cp micropython/dist/qwiic_i2c/qwiic_i2c/__init__.mpy /PiMicro/qwiic_i2c/__init__.mpy
 cp micropython/dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy /PiMicro/qwiic_i2c/i2c_driver.mpy

@@ -13,6 +13,7 @@ the ```/dist``` directory contains pre-compiled bytecode files. to use a driver 
 taget file | source | purpose
 -----------|--------|--------
 ```__future__.mpy``` | ```dist/micropython/src/__future__.mpy``` | provides limited ```__future__``` module functionality
+```enum.mpy``` | ```dist/micropython/src/enum.mpy``` | provides limited ```enum``` module functionality
 ```board.mpy``` | ```dist/micropython/src/boards/${BOARDNAME}/board.mpy``` | provides board pin definitions of the Qwiic connector + i2c port
 ```qwiic_i2c/__init__.mpy``` | ```dist/micropython/src/qwiic_i2c/__init__.mpy``` | module definition for ```import qwiic_i2c```
 ```qwiic_i2c/i2c_driver.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy``` | defines an interface which driver modules utilize
@@ -38,6 +39,8 @@ to do so you may need to use git. clone [rshell](https://github.com/dhylands/rsh
 cd Qwiic_Py
 ./${PATH_TO_RSHELL}/rshell/main.py -a
 rm -rf /${BOARDNAME}/qwiic_i2c
+rm -f /${BOARDNAME}/__future__.mpy
+rm -f /${BOARDNAME}/enum.mpy
 mkdir /${BOARDNAME}/qwiic_i2c
 cp micropython/dist/micropython/src/__future__.mpy /${BOARDNAME}/__future__.mpy
 cp micropython/dist/micropython/src/boards/${BOARDNAME}/board.mpy /${BOARDNAME}/board.mpy
