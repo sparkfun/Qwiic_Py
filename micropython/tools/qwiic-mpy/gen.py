@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
   parser.add_argument('-m', '--mpy-cross', dest='mpy_cross', required=True, help='path to mpy-cross executable')
   parser.add_argument('-r', '--root', dest='root', required=False, default='.', help='path to root of Qwiic_Py repo')
-  parser.add_argument('-d', '--dest', dest='dest', required=False, default='./micropython/dist', help='path to root folder ouf output - contents will be overwritten')
+  parser.add_argument('-d', '--dest', dest='dest', required=False, default='./micropython/dist', help='path to root folder of output - contents will be overwritten')
   parser.add_argument('-o', '--options', dest='options', required=False, default='./micropython/tools/qwiic-mpy/cfg.json', help='path to configuration json file')
   parser.add_argument('-c', '--clean', required=False, default=0, help='clean the output directory', action='store_true')
   parser.add_argument('-v', '--verbose', required=False, default=0, help='enable verbose output', action='store_true')
