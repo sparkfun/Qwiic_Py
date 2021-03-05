@@ -90,5 +90,20 @@ id = 0
 i2c = I2C(freq=400000, id=id, scl=scl, sda=sda)
 ```
 
+## generating precompiled .mpy files
+
+this package includes pre-compiled files for convenience. mking changes requires re-compiling the files using mpy-cross. the ```tools/qwiic-mpy/gen.py``` script is included to easily regenerate modified files.
+
+for complete usage details use the help menu
+
+```tools/qwiic-mpy/gen.py --help```
+
 ## issues
-there can be some trouble uploading certain binary files over rshell. these issues subsequently cascade into the ```qwiic_i2c``` module. as a temporary workaround a modified version of ```qwiic_i2c/__init__.py``` is used which only imports the RP2040 driver
+
+driver | level | description
+-------|-------|------------
+titan gps | error | the ```pynmea2``` module does not have a upy port
+micro oled | error | usage of the ```__file__``` keyword to find binary fonts fails and requires driver modification
+proximity | error | ```OSError 5``` occurs on reads
+tca9548a | error | the tca9548a does not comply with the driver as most other drivers are expected to work. because it is a single-register device it does not take an offset (commandCode) value for reads/writes. it is likely that a change to the api will be required to handle such cases. there is also an inconsistency with the tca9548a driver importing ```qwiic``` instead of ```qwiic_TCA9548A``` thus imparting a dependency on the full package
+
