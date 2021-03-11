@@ -1,26 +1,28 @@
 # micropython distribution of Qwiic_Py package
-this directory contains limited support for the Qwiic_Py modules on micropython platforms
+limited support for the Qwiic_Py modules on micropython platforms
 
-## supported platforms
-**note:** currently only the RP2040 is supported. the distributed ```.mpy``` bytecode files have been built with flags that are specific to the RP2040. other platforms are not expected to work
-(however the system is relatively flexible and adding support for other platforms in the future is a possibility)
+you may use pre-compiled ```*.mpy``` files to add Qwiic drivers / support to your micropython board. using the pre-compiled files saves RAM on systems with limited resources such as microcontrollers. ```*.mpy``` is a micropython specific format and will not work with regular Python.
+
+**supported boards**
+* [SparkFun Pro Micro - RP2040](https://www.sparkfun.com/products/17717)
 
 ## quick start
 
 **installing prerequisites**
 the ```/dist``` directory contains pre-compiled bytecode files. to use a driver your target board must have some prerequisite files onboard in a particular file structure:
 
-taget file | source | purpose
+target file | source | purpose
 -----------|--------|--------
 ```__future__.mpy``` | ```dist/micropython/src/__future__.mpy``` | provides limited ```__future__``` module functionality
 ```enum.mpy``` | ```dist/micropython/src/enum.mpy``` | provides limited ```enum``` module functionality
 ```board.mpy``` | ```dist/micropython/src/boards/${BOARDNAME}/board.mpy``` | provides board pin definitions of the Qwiic connector + i2c port
-```qwiic_i2c/__init__.mpy``` | ```dist/micropython/src/qwiic_i2c/__init__.mpy``` | module definition for ```import qwiic_i2c```
+```qwiic_i2c/__init__.mpy``` | ```dist/qwiic_i2c/__init__.mpy``` | module definition for ```import qwiic_i2c```
 ```qwiic_i2c/i2c_driver.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy``` | defines an interface which driver modules utilize
 ```qwiic_i2c/micropython_rp2040_i2c.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy``` | this is the i2c driver that actually applies to the RP2040
 ```qwiic_i2c/circuitpy_i2c.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy``` | needed b/c it is imported by ```__init__.mpy```
 ```qwiic_i2c/linux_i2c.mpy``` | ```dist/qwiic_i2c/qwiic_i2c/linux_i2c.mpy``` | needed b/c it is imported by ```__init__.mpy```
 
+**we will use *[rshell](https://github.com/dhylands/rshell)* to copy the files onto the board** (though you can use whatever methods you like)
 
 here's a cheat sheet for [```rshell```](https://github.com/dhylands/rshell) commands to copy the prereq files over.
 
@@ -33,11 +35,25 @@ to do so you may need to use git. clone [rshell](https://github.com/dhylands/rsh
 ```./rshell/rshell/main.py -a```
 (the ```-a``` flag is very important)
 
-**note:** the board directories are referred to the board name. this will change depending on which board you are using. we use ```${BOARDNAME}``` to indicate a variable that contains the board name, such as ```BOARDNAME=PiMicro```
+**note:** the on-board directories are referred to by the board name. this will change depending on which board you are using. we use ```${BOARDNAME}``` to indicate a variable that contains the board name, such as ```BOARDNAME=rp2040_promicro```
+
+### initial setup (repeat when core drivers are updated)
+
+**first**
+
+copy the appropriate ```board.py``` or ```board.mpy``` file exists on the board. you can use the precompiled bytecode to save memory or you can use the ```.py``` file in case you want to easily edit the file on-board.
+
+this configures the ```${BOARDNAME}``` as well as the default I2C bus settings for Qwiic (such as which pins and peripheral module to use)
+
+board files for supported boards are located within the ```micropython/src/boards``` directory. custom or 3rd party boards may require a specialized board file that you provide.
+
+**then**
+
+use the following commands (with appropriate variable substitutions) to upload the core drivers
 
 ```
 cd Qwiic_Py
-./${PATH_TO_RSHELL}/rshell/main.py -a
+./${PATH_TO_RSHELL}/r.py -a
 rm -rf /${BOARDNAME}/qwiic_i2c
 rm -f /${BOARDNAME}/__future__.mpy
 rm -f /${BOARDNAME}/enum.mpy
@@ -52,51 +68,55 @@ cp micropython/dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy /${BOARDNAME}/qwiic_i2
 ## 
 ```
 
-**shortcut:** using rshell's scripting feature (```-f FILENAME```) we can automate these steps. use the script that matches your desired boardname:
+**shortcut:** 
+
+using rshell's scripting feature (```-f FILENAME```) we can automate these steps. use the script that matches your desired boardname:
 ```./${PATH_TO_RSHELL}/rshell/main.py -a -f micropython/tools/qwiic-mpy/push-drivers/${BOARDNAME}.rshell```
 
-**using a driver**
+### using a driver
 
 the drivers (located in ```Qwiic_Py/qwiic/drivers```) are interfaces to particular sensors, actuators, and other peripheral devices that depend solely on the ```qwiic_i2c``` interface. once the prerequisites are available on your target board you can copy the bytecode driver for the device you want to control. it should exist at the root of the target's filesystem so that other code (e.g. examples) can import it as expected. 
 
 here's an example of how to add a driver to your board, using the ```qwiic_adxl313``` module.
+
+**rshell**
 ```
 cp micropython/dist/qwiic/drivers/qwiic_adxl313/qwiic_adxl313.mpy /${BOARDNAME}/qwiic_adxl313.mpy
 ```
 
 you can now:
+**repl**
 ```
 >>> import qwiic_adxl313
 ```
 
-**using examples**
+### using examples
 
+the examples import any necessary drivers which you should have already added by following the instructions above
+
+**rshell**
 ```
 cp micropython/dist/qwiic/drivers/qwiic_adxl313/examples/ex1_qwiic_adxl313_basic_readings.mpy /${BOARDNAME}/ex1_qwiic_adxl313_basic_readings.mpy
 ```
 
 you can now:
+**repl**
 ```
 >>> import ex1_qwiic_adxl313_basic_readings
 >>> ex1_qwiic_adxl313_basic_readings.runExample()
 ```
 
-```
-from machine import I2C
-from machine import Pin
-scl = Pin(17)
-sda = Pin(16)
-id = 0
-i2c = I2C(freq=400000, id=id, scl=scl, sda=sda)
-```
-
 ## generating precompiled .mpy files
 
-this package includes pre-compiled files for convenience. mking changes requires re-compiling the files using mpy-cross. the ```tools/qwiic-mpy/gen.py``` script is included to easily regenerate modified files.
+this package includes pre-compiled files for convenience. making changes requires re-compiling the files using mpy-cross. the ```tools/qwiic-mpy/mpygen.py``` script is included to easily regenerate modified files.
 
 for complete usage details use the help menu
 
-```tools/qwiic-mpy/gen.py --help```
+```tools/qwiic-mpy/mpygen.py --help```
+
+## supported platforms
+**note:** currently only the RP2040 is supported. the distributed ```.mpy``` bytecode files have been built with flags that are specific to the RP2040. other platforms are not expected to work
+(however the system is relatively flexible and adding support for other platforms in the future is a possibility)
 
 ## issues
 

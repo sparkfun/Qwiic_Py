@@ -45,7 +45,7 @@ def main ():
     verboseprint('\t', f)
   print('')
 
-  def include (p):
+  def include (p):    # use closure of 'exclude' for simple boolean check if a file can be included
     if p in exclude:
       return False
     return True
@@ -57,27 +57,27 @@ def main ():
   patterns = map(lambda p: os.path.join(args.root, p), expanded)
   for pattern in patterns:
     print('globbing pattern: ' + pattern)
-    included = filter(include, glob.iglob(pattern, recursive=True))
+    included = filter(include, glob.iglob(pattern, recursive=True))     # use 'include' function to filter out excluded files from glob pattern
 
     for src in included:
-      rel = os.path.relpath(src, os.path.commonpath([src, args.root]))
-      dependent = os.path.join(args.dest, rel)
-      dep_base, dep_ext = os.path.splitext(dependent)
-      dependent = dep_base + '.mpy'
-      enclosing_dir = os.path.dirname(dependent)
+      rel = os.path.relpath(src, os.path.commonpath([src, args.root]))  # relative path from root to src file
+      dependent = os.path.join(args.dest, rel)                          # dependent filepath (under construction from relative path)
+      dep_base, dep_ext = os.path.splitext(dependent)                   # intermediate var to help build dependent filepath
+      dependent = dep_base + '.mpy'                                     # dependent file path (think of 'target' file - this is the .mpy file we will generate from the src file)
+      enclosing_dir = os.path.dirname(dependent)                        # enclosing dir of dependent file
 
-      if not os.path.exists(enclosing_dir):
-        os.makedirs(enclosing_dir)
+      if not os.path.exists(enclosing_dir):                             
+        os.makedirs(enclosing_dir)                                      # mkdir -p
 
-      regen = True
-      if os.path.exists(dependent):
+      regen = True                                                      # assume regeneration is necessary
+      if os.path.exists(dependent):                                       # if dependent file exists
         src_mtime = os.path.getmtime(src)
         dependent_mtime = os.path.getmtime(dependent)
-        if dependent_mtime >= src_mtime:
-          regen = False
+        if dependent_mtime >= src_mtime:                                  # and is not older than the src file
+          regen = False                                                     # then we do not need to regen
 
-      if regen:
-        cmd = [args.mpy_cross]
+      if regen:                                                         # use the subprocess module to run the mpy-cross cross compiler on the src file to 
+        cmd = [args.mpy_cross]                                          # generate the target file according to config settings from the configuration file (loaded at startup)
         cmd.extend(cfg['mpy-cross']['flags'])
         cmd.extend([src])
         cmd.extend(['-o', dependent])
