@@ -79,3 +79,6 @@
 [submodule "qwiic/drivers/qwiic_soil_moisture_sensor"]
 	path = qwiic/drivers/qwiic_soil_moisture_sensor
 	url = https://github.com/sparkfun/Qwiic_Soil_Moisture_Sensor_Py
+[submodule "qwiic/drivers/qwiic_pir"]
+	path = qwiic/drivers/qwiic_pir
+	url = https://github.com/sparkfun/Qwiic_PIR_Py
