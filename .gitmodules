@@ -82,3 +82,6 @@
 [submodule "qwiic/drivers/qwiic_pir"]
 	path = qwiic/drivers/qwiic_pir
 	url = https://github.com/sparkfun/Qwiic_PIR_Py
+[submodule "qwiic/drivers/qwiic_kx13x"]
+	path = qwiic/drivers/qwiic_kx13x
+	url = https://github.com/sparkfun/Qwiic_KX13X_Py
