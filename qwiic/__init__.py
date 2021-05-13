@@ -302,6 +302,67 @@ def list_devices():
 
     return found_qwiic
 
+#-----------------------------------------------------------------------
+# list_available_drivers()
+#
+#   Return a list of tuples that define the available qwiic drivers/packages.
+#
+def list_available_drivers(device_address=None):
+    """
+        Returns a list of known drivers/packages for qwiic devices.
+
+        :param device_address: A list with an I2C address or addresses. If no value
+            was given, the I2C bus will be scanned and the address(es) of the
+            connected qwiic devices will be used.
+
+        :return: A list of qwiic drivers/packages associated with the address(es) in the
+            list. Each element of the list a tuple that contains the following values
+            (Device I2C Address, Device Name, Device Driver Class Name)
+        :rtype: list
+
+
+        :example:
+
+        >>> import qwiic
+        >>> qwiic.list_available_drivers([32])
+        [(32, 'Qwiic GPIO', 'QwiicGPIO'),
+        (32, 'Qwiic 4m Distance Sensor (ToF)', 'QwiicVL53L1X'),
+        (32, 'SparkFun Qwiic Joystick', 'QwiicJoystick')]
+        >>> qwiic.list_available_drivers([61,91])
+        [(61, 'Qwiic Micro OLED', 'QwiicMicroOled'),
+        (61, 'Qwiic 4m Distance Sensor (ToF)', 'QwiicVL53L1X'),
+        (91, 'Qwiic PCA9685', 'QwiicPCA9685'),
+        (91, 'Qwiic 4m Distance Sensor (ToF)', 'QwiicVL53L1X'),
+        (91, 'Qwiic CCS811', 'QwiicCcs811')]
+
+    """
+
+    if device_address is None:
+        device_address = list(range(0x08,0x77+1))
+
+
+    # What QWIIC devices do we know about -- what's defined in the package
+    qwiic_devs = _QwiicInternal.get_available_devices()
+    if not qwiic_devs:
+        return []
+
+    found_qwiic = []
+
+    # Match scan, with definition
+    for address in device_address:
+
+        # Make list of devices at address
+        if address in qwiic_devs.keys():
+            device_list = list(qwiic_devs[address])
+
+            # List all devices from address
+            for dev in device_list:
+                # make the return tuple
+                found_qwiic.append((address, dev.device_name, \
+                    dev.__name__))
+
+
+    return found_qwiic
 
 #-------------------
 # get_devices()
