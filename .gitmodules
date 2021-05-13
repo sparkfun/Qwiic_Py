@@ -85,3 +85,9 @@
 [submodule "qwiic/drivers/qwiic_kx13x"]
 	path = qwiic/drivers/qwiic_kx13x
 	url = https://github.com/sparkfun/Qwiic_KX13X_Py
+[submodule "qwiic/drivers/qwiic_oled_base"]
+	path = qwiic/drivers/qwiic_oled_base
+	url = https://github.com/sparkfun/Qwiic_OLED_Base_Py.git
+[submodule "qwiic/drivers/qwiic_oled_display"]
+	path = qwiic/drivers/qwiic_oled_display
+	url = https://github.com/sparkfun/Qwiic_OLED_Display_Py.git
