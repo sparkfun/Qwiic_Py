@@ -94,3 +94,6 @@
 [submodule "qwiic/drivers/qwiic_oled_display"]
 	path = qwiic/drivers/qwiic_oled_display
 	url = https://github.com/sparkfun/Qwiic_OLED_Display_Py.git
+[submodule "qwiic/drivers/qwiic_led_stick"]
+	path = qwiic/drivers/qwiic_led_stick
+	url = https://github.com/sparkfun/Qwiic_LED_Stick_Py
