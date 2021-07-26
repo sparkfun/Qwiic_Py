@@ -97,3 +97,6 @@
 [submodule "qwiic/drivers/qwiic_led_stick"]
 	path = qwiic/drivers/qwiic_led_stick
 	url = https://github.com/sparkfun/Qwiic_LED_Stick_Py
+[submodule "qwiic/drivers/qwiic_eeprom"]
+	path = qwiic/drivers/qwiic_eeprom
+	url = https://github.com/sparkfun/Qwiic_EEPROM_Py
