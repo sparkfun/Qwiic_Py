@@ -103,3 +103,6 @@
 [submodule "qwiic/drivers/qwiic_as6212"]
 	path = qwiic/drivers/qwiic_as6212
 	url = https://github.com/sparkfun/Qwiic_AS6212_Py
+[submodule "qwiic/drivers/qwiic_alphanumeric"]
+	path = qwiic/drivers/qwiic_alphanumeric
+	url = https://github.com/sparkfun/Qwiic_Alphanumeric_Py
