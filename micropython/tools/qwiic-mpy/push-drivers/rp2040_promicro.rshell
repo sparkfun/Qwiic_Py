@@ -1,0 +1,14 @@
+# this script assumes the board is called 'rp2040_promicro'
+# to use with another board you must change the boardname in commands
+rm -rf /rp2040_promicro/qwiic_i2c
+rm -f /rp2040_promicro/__future__.mpy
+rm -f /rp2040_promicro/enum.mpy
+mkdir /rp2040_promicro/qwiic_i2c
+cp micropython/dist/micropython/src/__future__.mpy /rp2040_promicro/__future__.mpy
+cp micropython/dist/micropython/src/enum.mpy /rp2040_promicro/enum.mpy
+cp micropython/dist/micropython/src/boards/rp2040_promicro/board.mpy /rp2040_promicro/board.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/__init__.mpy /rp2040_promicro/qwiic_i2c/__init__.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/i2c_driver.mpy /rp2040_promicro/qwiic_i2c/i2c_driver.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/micropython_rp2040_i2c.mpy /rp2040_promicro/qwiic_i2c/micropython_rp2040_i2c.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/linux_i2c.mpy /rp2040_promicro/qwiic_i2c/linux_i2c.mpy
+cp micropython/dist/qwiic_i2c/qwiic_i2c/circuitpy_i2c.mpy /rp2040_promicro/qwiic_i2c/circuitpy_i2c.mpy
