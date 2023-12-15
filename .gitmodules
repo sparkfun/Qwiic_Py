@@ -106,3 +106,6 @@
 [submodule "qwiic/drivers/qwiic_alphanumeric"]
 	path = qwiic/drivers/qwiic_alphanumeric
 	url = https://github.com/sparkfun/Qwiic_Alphanumeric_Py
+[submodule "qwiic/drivers/qwiic_large_oled"]
+	path = qwiic/drivers/qwiic_large_oled
+	url = https://github.com/sparkfun/Qwiic_Large_OLED_Py
