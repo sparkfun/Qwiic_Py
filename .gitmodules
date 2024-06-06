@@ -112,3 +112,6 @@
 [submodule "qwiic/drivers/qwiic_otos_py"]
 	path = qwiic/drivers/qwiic_otos_py
 	url = https://github.com/sparkfun/Qwiic_OTOS_Py
+[submodule "qwiic/drivers/qwiic_otos"]
+	path = qwiic/drivers/qwiic_otos
+	url = https://github.com/sparkfun/Qwiic_OTOS_Py
