@@ -1,0 +1,28 @@
+name: Build CI
+
+on: [pull_request, push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Python 3
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.x
+    - name: Versions
+      run: |
+        python3 --version
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Fetch correct submodule shas
+      run: git submodule foreach 'git fetch --tags --depth 1 origin $sha1 && git checkout -q $sha1'
+    - name: Install deps
+      run: |
+        sudo apt-get install -y gettext gawk
+        pip install -r requirements.txt
+    - name: Library version
+      run: git describe --dirty --always --tags
+    - name: Build assets
+      run: ./build.sh
