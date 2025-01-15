@@ -156,9 +156,11 @@ class _QwiicInternal:
 def _load_driver_classes():
 
     driver_dir = __file__.rsplit(os.sep, 1)[0] +  os.sep + "drivers"
+    driver_dir_linux = __file__.rsplit(os.sep, 1)[0] +  os.sep + "drivers_linux_only"
 
     try:
         driver_packages = os.listdir(driver_dir)
+        driver_packages += os.listdir(driver_dir_linux)
     except IOError:
         print("The qwiic drivers are not installed - please check your installation")
         return

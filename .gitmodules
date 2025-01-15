@@ -2,10 +2,10 @@
 	path = qwiic/drivers/qwiic_bme280
 	url = https://github.com/sparkfun/Qwiic_BME280_Py.git
 [submodule "drivers/qwiic_ccs811"]
-	path = qwiic/drivers/qwiic_ccs811
+	path = qwiic/drivers_linux_only/qwiic_ccs811
 	url = https://github.com/sparkfun/Qwiic_CCS811_Py.git
 [submodule "drivers/qwiic_mico_oled"]
-	path = qwiic/drivers/qwiic_micro_oled
+	path = qwiic/drivers_linux_only/qwiic_micro_oled
 	url = https://github.com/sparkfun/Qwiic_Micro_OLED_Py.git
 [submodule "drivers/qwiic_proximity"]
 	path = qwiic/drivers/qwiic_proximity
@@ -44,10 +44,10 @@
 	path = qwiic/drivers/qwiic_tca9548a
 	url = https://github.com/sparkfun/Qwiic_TCA9548A_Py.git
 [submodule "qwiic/drivers/qwiic_dual_encoder_reader"]
-	path = qwiic/drivers/qwiic_dual_encoder_reader
+	path = qwiic/drivers_linux_only/qwiic_dual_encoder_reader
 	url = https://github.com/sparkfun/Qwiic_Dual_Encoder_Reader_Py.git
 [submodule "qwiic/drivers/top_phat_button"]
-	path = qwiic/drivers/top_phat_button
+	path = qwiic/drivers_linux_only/top_phat_button
 	url = https://github.com/sparkfun/Top_pHAT_Button_Py
 [submodule "qwiic/drivers/qwiic_icm20948"]
 	path = qwiic/drivers/qwiic_icm20948
@@ -59,7 +59,7 @@
 	path = qwiic/drivers/qwiic_relay
 	url = https://github.com/sparkfun/Qwiic_Relay_Py.git
 [submodule "qwiic/drivers/ublox_gps"]
-	path = qwiic/drivers/ublox_gps
+	path = qwiic/drivers_linux_only/ublox_gps
 	url = https://github.com/sparkfun/qwiic_ublox_gps_py
 [submodule "qwiic/drivers/qwiic_serlcd"]
 	path = qwiic/drivers/qwiic_serlcd
@@ -68,7 +68,7 @@
 	path = qwiic/drivers/qwiic_gpio
 	url = https://github.com/sparkfun/Qwiic_GPIO_Py.git
 [submodule "qwiic/drivers/qwiic_adxl313"]
-	path = qwiic/drivers/qwiic_adxl313
+	path = qwiic/drivers_linux_only/qwiic_adxl313
 	url = https://github.com/sparkfun/Qwiic_ADXL313_Py
 [submodule "qwiic/drivers/qwiic_button"]
 	path = qwiic/drivers/qwiic_button
@@ -80,7 +80,7 @@
 	path = qwiic/drivers/qwiic_soil_moisture_sensor
 	url = https://github.com/sparkfun/Qwiic_Soil_Moisture_Sensor_Py
 [submodule "qwiic/drivers/qwiic_pir"]
-	path = qwiic/drivers/qwiic_pir
+	path = qwiic/drivers_linux_only/qwiic_pir
 	url = https://github.com/sparkfun/Qwiic_PIR_Py
 [submodule "qwiic/drivers/qwiic_sgp40"]
 	path = qwiic/drivers/qwiic_sgp40
@@ -92,22 +92,22 @@
 	path = qwiic/drivers/qwiic_oled_base
 	url = https://github.com/sparkfun/Qwiic_OLED_Base_Py.git
 [submodule "qwiic/drivers/qwiic_oled_display"]
-	path = qwiic/drivers/qwiic_oled_display
+	path = qwiic/drivers_linux_only/qwiic_oled_display
 	url = https://github.com/sparkfun/Qwiic_OLED_Display_Py.git
 [submodule "qwiic/drivers/qwiic_led_stick"]
-	path = qwiic/drivers/qwiic_led_stick
+	path = qwiic/drivers_linux_only/qwiic_led_stick
 	url = https://github.com/sparkfun/Qwiic_LED_Stick_Py
 [submodule "qwiic/drivers/qwiic_eeprom"]
-	path = qwiic/drivers/qwiic_eeprom
+	path = qwiic/drivers_linux_only/qwiic_eeprom
 	url = https://github.com/sparkfun/Qwiic_EEPROM_Py
 [submodule "qwiic/drivers/qwiic_as6212"]
-	path = qwiic/drivers/qwiic_as6212
+	path = qwiic/drivers_linux_only/qwiic_as6212
 	url = https://github.com/sparkfun/Qwiic_AS6212_Py
 [submodule "qwiic/drivers/qwiic_alphanumeric"]
 	path = qwiic/drivers/qwiic_alphanumeric
 	url = https://github.com/sparkfun/Qwiic_Alphanumeric_Py
 [submodule "qwiic/drivers/qwiic_large_oled"]
-	path = qwiic/drivers/qwiic_large_oled
+	path = qwiic/drivers_linux_only/qwiic_large_oled
 	url = https://github.com/sparkfun/Qwiic_Large_OLED_Py
 [submodule "qwiic/drivers/qwiic_otos"]
 	path = qwiic/drivers/qwiic_otos

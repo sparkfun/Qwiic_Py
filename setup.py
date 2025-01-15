@@ -51,6 +51,7 @@ setup_requires = ['sparkfun-qwiic-i2c']
 
 # Use the dir names of the submodules in the ./qwiic/drives directory
 sub_mods = os.listdir(here+os.sep+'qwiic/drivers')
+sub_mods += os.listdir(here+os.sep+'qwiic/drivers_linux_only')
 for daDriver in sub_mods:
     setup_requires.append('sparkfun-%s' % (daDriver.replace('_','-')))
 setup(
@@ -106,6 +107,6 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=['qwiic'],
-    package_data={ "qwiic" : ['drivers/**/*']},
+    package_data={ "qwiic" : ['drivers/**/*','drivers_linux_only/**/*']},
 
 )
