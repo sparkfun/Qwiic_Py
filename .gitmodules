@@ -86,7 +86,7 @@
 	path = qwiic/drivers/qwiic_sgp40
 	url = https://github.com/sparkfun/Qwiic_SGP40_Py
 [submodule "qwiic/drivers/qwiic_kx13x"]
-	path = qwiic/drivers/qwiic_kx13x
+	path = qwiic/drivers_linux_only/qwiic_kx13x
 	url = https://github.com/sparkfun/Qwiic_KX13X_Py
 [submodule "qwiic/drivers/qwiic_oled_base"]
 	path = qwiic/drivers/qwiic_oled_base
@@ -129,7 +129,7 @@
 	path = qwiic/drivers/qwiic_nau7802
 	url = https://github.com/sparkfun/Qwiic_NAU7802_Py.git
 [submodule "qwiic/drivers/qwiic_opt4048"]
-	path = qwiic/drivers/qwiic_opt4048
+	path = qwiic/drivers_linux_only/qwiic_opt4048
 	url = https://github.com/sparkfun/Qwiic_OPT4048_Py.git
 [submodule "qwiic/drivers/qwiic_ultrasonic"]
 	path = qwiic/drivers/qwiic_ultrasonic
