@@ -8,7 +8,7 @@
 	path = qwiic/drivers_linux_only/qwiic_micro_oled
 	url = https://github.com/sparkfun/Qwiic_Micro_OLED_Py.git
 [submodule "drivers/qwiic_proximity"]
-	path = qwiic/drivers/qwiic_proximity
+	path = qwiic/drivers_linux_only/qwiic_proximity
 	url = https://github.com/sparkfun/Qwiic_Proximity_Py.git
 [submodule "drivers/qwiic_scmd"]
 	path = qwiic/drivers/qwiic_scmd
