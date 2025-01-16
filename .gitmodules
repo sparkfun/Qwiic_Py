@@ -95,7 +95,7 @@
 	path = qwiic/drivers_linux_only/qwiic_oled_display
 	url = https://github.com/sparkfun/Qwiic_OLED_Display_Py.git
 [submodule "qwiic/drivers/qwiic_led_stick"]
-	path = qwiic/drivers_linux_only/qwiic_led_stick
+	path = qwiic/drivers/qwiic_led_stick
 	url = https://github.com/sparkfun/Qwiic_LED_Stick_Py
 [submodule "qwiic/drivers/qwiic_eeprom"]
 	path = qwiic/drivers_linux_only/qwiic_eeprom
@@ -113,3 +113,72 @@
 	path = qwiic/drivers/qwiic_otos
 	url = https://github.com/sparkfun/Qwiic_OTOS_Py
 
+[submodule "qwiic/drivers/qwiic_ism330dhcx"]
+	path = qwiic/drivers/qwiic_ism330dhcx
+	url = https://github.com/sparkfun/Qwiic_ISM330DHCX_Py.git
+[submodule "qwiic/drivers/qwiic_as7265x"]
+	path = qwiic/drivers/qwiic_as7265x
+	url = https://github.com/sparkfun/Qwiic_AS7265x_Py.git
+[submodule "qwiic/drivers/qwiic_as726x"]
+	path = qwiic/drivers/qwiic_as726x
+	url = https://github.com/sparkfun/Qwiic_AS726x_Py.git
+[submodule "qwiic/drivers/qwiic_bmp581"]
+	path = qwiic/drivers/qwiic_bmp581
+	url = https://github.com/sparkfun/Qwiic_BMP581_Py.git
+[submodule "qwiic/drivers/qwiic_fs3000"]
+	path = qwiic/drivers/qwiic_fs3000
+	url = https://github.com/sparkfun/Qwiic_FS3000_Py.git
+[submodule "qwiic/drivers/qwiic_mcp4725"]
+	path = qwiic/drivers/qwiic_mcp4725
+	url = https://github.com/sparkfun/Qwiic_MCP4725_Py.git
+[submodule "qwiic/drivers/qwiic_mcp9600"]
+	path = qwiic/drivers/qwiic_mcp9600
+	url = https://github.com/sparkfun/Qwiic_MCP9600_Py.git
+[submodule "qwiic/drivers/qwiic_rv8803"]
+	path = qwiic/drivers/qwiic_rv8803
+	url = https://github.com/sparkfun/Qwiic_RV-8803_Py.git
+[submodule "qwiic/drivers/qwiic_max1704x"]
+	path = qwiic/drivers/qwiic_max1704x
+	url = https://github.com/sparkfun/Qwiic_MAX1704X_Py.git
+[submodule "qwiic/drivers/qwiic_micropressure"]
+	path = qwiic/drivers/qwiic_micropressure
+	url = https://github.com/sparkfun/Qwiic_MicroPressure_Py.git
+[submodule "qwiic/drivers/qwiic_scd4x"]
+	path = qwiic/drivers/qwiic_scd4x
+	url = https://github.com/sparkfun/Qwiic_SCD4x_Py.git
+[submodule "qwiic/drivers/qwiic_tmp117"]
+	path = qwiic/drivers/qwiic_tmp117
+	url = https://github.com/sparkfun/Qwiic_TMP117_Py.git
+[submodule "qwiic/drivers/qwiic_vl53l5cx"]
+	path = qwiic/drivers/qwiic_vl53l5cx
+	url = https://github.com/sparkfun/Qwiic_VL53L5CX_Py.git
+[submodule "qwiic/drivers/qwiic_tmp102"]
+	path = qwiic/drivers/qwiic_tmp102
+	url = https://github.com/sparkfun/Qwiic_TMP102_Py.git
+[submodule "qwiic/drivers/qwiic_cap1203"]
+	path = qwiic/drivers/qwiic_cap1203
+	url = https://github.com/sparkfun/Qwiic_CAP1203_Py.git
+[submodule "qwiic/drivers/qwiic_lsm6dso"]
+	path = qwiic/drivers/qwiic_lsm6dso
+	url = https://github.com/sparkfun/Qwiic_LSM6DSO_Py.git
+[submodule "qwiic/drivers/qwiic_mmc5983ma"]
+	path = qwiic/drivers/qwiic_mmc5983ma
+	url = https://github.com/sparkfun/Qwiic_MMC5983MA_Py.git
+[submodule "qwiic/drivers/qwiic_nau7802"]
+	path = qwiic/drivers/qwiic_nau7802
+	url = https://github.com/sparkfun/Qwiic_NAU7802_Py.git
+[submodule "qwiic/drivers/qwiic_opt4048"]
+	path = qwiic/drivers/qwiic_opt4048
+	url = https://github.com/sparkfun/Qwiic_OPT4048_Py.git
+[submodule "qwiic/drivers/qwiic_ultrasonic"]
+	path = qwiic/drivers/qwiic_ultrasonic
+	url = https://github.com/sparkfun/Qwiic_Ultrasonic_Py.git
+[submodule "qwiic/drivers/qwiic_ens160"]
+	path = qwiic/drivers/qwiic_ens160
+	url = https://github.com/sparkfun/Qwiic_ENS160_Py.git
+[submodule "qwiic/drivers/qwiic_ads1015"]
+	path = qwiic/drivers/qwiic_ads1015
+	url = https://github.com/sparkfun/Qwiic_ADS1015_Py.git
+[submodule "qwiic/drivers/qwiic_veml6030"]
+	path = qwiic/drivers/qwiic_veml6030
+	url = https://github.com/sparkfun/Qwiic_VEML6030_Py.git
