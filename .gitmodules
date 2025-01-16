@@ -41,7 +41,7 @@
 	path = qwiic/drivers/qwiic_titan_gps
 	url = https://github.com/sparkfun/Qwiic_Titan_Gps_Py
 [submodule "qwiic/drivers/qwiic_tca9548a"]
-	path = qwiic/drivers/qwiic_tca9548a
+	path = qwiic/drivers_linux_only/qwiic_tca9548a
 	url = https://github.com/sparkfun/Qwiic_TCA9548A_Py.git
 [submodule "qwiic/drivers/qwiic_dual_encoder_reader"]
 	path = qwiic/drivers_linux_only/qwiic_dual_encoder_reader
