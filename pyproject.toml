@@ -42,5 +42,8 @@ packages = ["qwiic"]
 [tool.setuptools.package-data]
 qwiic = ["drivers/**/*", "drivers_linux_only/**/*"]
 
+[tool.setuptools.exclude-package-data]
+qwiic = ["*/docs/*"]
+
 [tool.setuptools.dynamic]
 dependencies = {file = "install_requirements.txt"}
