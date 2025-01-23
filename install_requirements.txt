@@ -1,1 +1,9 @@
 sparkfun-qwiic-serlcd
+sparkfun-qwiic-bme280
+sparkfun-qwiic-lsm6dso
+sparkfun-qwiic-keypad
+sparkfun-qwiic-sgp40
+sparkfun-qwiic-veml6030
+sparkfun-qwiic-soil-moisture-sensor
+sparkfun-qwiic-cap1203
+sparkfun-qwiic-ultrasonic
