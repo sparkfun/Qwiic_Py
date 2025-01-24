@@ -1,9 +1,11 @@
-sparkfun-qwiic-serlcd
-sparkfun-qwiic-bme280
-sparkfun-qwiic-lsm6dso
-sparkfun-qwiic-keypad
-sparkfun-qwiic-sgp40
-sparkfun-qwiic-veml6030
-sparkfun-qwiic-soil-moisture-sensor
-sparkfun-qwiic-cap1203
-sparkfun-qwiic-ultrasonic
+# Leaving these commented out for now as we have not yet deployed the corresponding PyPi packages
+# sparkfun-qwiic-serlcd
+# sparkfun-qwiic-i2c
+# sparkfun-qwiic-bme280
+# sparkfun-qwiic-lsm6dso
+# sparkfun-qwiic-keypad
+# sparkfun-qwiic-sgp40
+# sparkfun-qwiic-veml6030
+# sparkfun-qwiic-soil-moisture-sensor
+# sparkfun-qwiic-cap1203
+# sparkfun-qwiic-ultrasonic
