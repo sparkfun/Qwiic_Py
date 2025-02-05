@@ -1,4 +1,4 @@
-# Leaving these commented out for now as we have not yet deployed the corresponding PyPi packages
+# Leaving these commented out for now as we have not yet deployed the corresponding PyPi packages (however the  versions are available from test.pypi.org)
 # sparkfun-qwiic-serlcd
 # sparkfun-qwiic-i2c
 # sparkfun-qwiic-bme280
@@ -9,3 +9,34 @@
 # sparkfun-qwiic-soil-moisture-sensor
 # sparkfun-qwiic-cap1203
 # sparkfun-qwiic-ultrasonic
+# sparkfun-qwiic-joystick
+# sparkfun-qwiic-nau7802
+# sparkfun-qwiic-alphanumeric
+# sparkfun-qwiic-relay
+# sparkfun-qwiic-button
+# sparkfun-qwiic-mmc5983ma
+# sparkfun-qwiic-max3010x
+# sparkfun-qwiic-rfid
+# sparkfun-qwiic-led-stick
+# sparkfun-qwiic-twist
+# sparkfun-qwiic-otos
+# sparkfun-qwiic-kx13x
+# sparkfun-qwiic-icm20948
+# sparkfun-qwiic-scmd
+# sparkfun-qwiic-pca9685
+# sparkfun-qwiic-gpio
+# sparkfun-qwiic-fs3000
+# sparkfun-qwiic-micropressure
+# sparkfun-qwiic-as7265x
+# sparkfun-qwiic-as726x
+# sparkfun-qwiic-vl53l5cx
+# sparkfun-qwiic-rv-8803
+# sparkfun-qwiic-scd4x
+# sparkfun-qwiic-ads1015
+# sparkfun-qwiic-bmp581
+# sparkfun-qwiic-mcp4725
+# sparkfun-qwiic-mcp9600
+# sparkfun-qwiic-tmp102
+# sparkfun-qwiic-tmp117
+# sparkfun-qwiic-max1704x
+# sparkfun-qwiic-ens160
