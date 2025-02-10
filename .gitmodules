@@ -86,7 +86,7 @@
 	path = qwiic/drivers/qwiic_sgp40
 	url = https://github.com/sparkfun/Qwiic_SGP40_Py
 [submodule "qwiic/drivers/qwiic_kx13x"]
-	path = qwiic/drivers_linux_only/qwiic_kx13x
+	path = qwiic/drivers/qwiic_kx13x
 	url = https://github.com/sparkfun/Qwiic_KX13X_Py
 [submodule "qwiic/drivers/qwiic_oled_base"]
 	path = qwiic/drivers/qwiic_oled_base
@@ -176,3 +176,6 @@
 [submodule "qwiic/drivers/qwiic_ens160"]
 	path = qwiic/drivers/qwiic_ens160
 	url = https://github.com/sparkfun/qwiic_ens160_py.git
+[submodule "qwiic/drivers/qwiic_fs3000"]
+	path = qwiic/drivers/qwiic_fs3000
+	url = https://github.com/sparkfun/qwiic_fs3000_py.git
