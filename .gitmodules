@@ -41,7 +41,7 @@
 	path = qwiic/drivers/qwiic_titan_gps
 	url = https://github.com/sparkfun/Qwiic_Titan_Gps_Py
 [submodule "qwiic/drivers/qwiic_tca9548a"]
-	path = qwiic/drivers_linux_only/qwiic_tca9548a
+	path = qwiic/drivers/qwiic_tca9548a
 	url = https://github.com/sparkfun/Qwiic_TCA9548A_Py.git
 [submodule "qwiic/drivers/qwiic_dual_encoder_reader"]
 	path = qwiic/drivers_linux_only/qwiic_dual_encoder_reader
@@ -88,9 +88,6 @@
 [submodule "qwiic/drivers/qwiic_kx13x"]
 	path = qwiic/drivers/qwiic_kx13x
 	url = https://github.com/sparkfun/Qwiic_KX13X_Py
-[submodule "qwiic/drivers/qwiic_oled_base"]
-	path = qwiic/drivers/qwiic_oled_base
-	url = https://github.com/sparkfun/Qwiic_OLED_Base_Py.git
 [submodule "qwiic/drivers/qwiic_oled_display"]
 	path = qwiic/drivers_linux_only/qwiic_oled_display
 	url = https://github.com/sparkfun/Qwiic_OLED_Display_Py.git
@@ -179,3 +176,12 @@
 [submodule "qwiic/drivers/qwiic_fs3000"]
 	path = qwiic/drivers/qwiic_fs3000
 	url = https://github.com/sparkfun/qwiic_fs3000_py.git
+[submodule "qwiic/drivers/qwiic_oled"]
+	path = qwiic/drivers/qwiic_oled
+	url = https://github.com/sparkfun/qwiic_oled_base_py.git
+[submodule "qwiic/drivers/qwiic_ism330dhcx"]
+	path = qwiic/drivers/qwiic_ism330dhcx
+	url = https://github.com/sparkfun/qwiic_ism330dhcx_py.git
+[submodule "qwiic/drivers/qwiic_huskylens"]
+	path = qwiic/drivers/qwiic_huskylens
+	url = https://github.com/sparkfun/qwiic_huskylens_py.git
