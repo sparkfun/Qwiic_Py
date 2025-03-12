@@ -161,6 +161,8 @@ def _load_driver_classes():
     try:
         driver_packages = os.listdir(driver_dir)
         driver_packages += os.listdir(driver_dir_linux)
+        if "qwiic_i2c" in driver_packages:
+            driver_packages.remove("qwiic_i2c")
     except IOError:
         print("The qwiic drivers are not installed - please check your installation")
         return
@@ -185,6 +187,8 @@ def _load_driver_classes():
                 lname = class_name.lower()
                 for tmp in moduleItems:
                     if lname == tmp.lower():
+                        break
+                    elif tmp.lower().startswith(lname):
                         break
                     i = i + 1
 
