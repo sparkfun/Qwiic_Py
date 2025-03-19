@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sparkfun_qwiic"
-version='1.1.11'
+version='2.0.0'
 description="SparkFun Electronics qwiic library"
 authors = [{name = "SparkFun Electronics", email = "info@sparkfun.com"}]
 readme = "DESCRIPTION.rst" # could also have the readme itself if we prefer...
