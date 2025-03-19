@@ -4,9 +4,6 @@
 [submodule "drivers/qwiic_ccs811"]
 	path = qwiic/drivers_linux_only/qwiic_ccs811
 	url = https://github.com/sparkfun/Qwiic_CCS811_Py.git
-[submodule "drivers/qwiic_mico_oled"]
-	path = qwiic/drivers_linux_only/qwiic_micro_oled
-	url = https://github.com/sparkfun/Qwiic_Micro_OLED_Py.git
 [submodule "drivers/qwiic_proximity"]
 	path = qwiic/drivers_linux_only/qwiic_proximity
 	url = https://github.com/sparkfun/Qwiic_Proximity_Py.git
@@ -88,9 +85,6 @@
 [submodule "qwiic/drivers/qwiic_kx13x"]
 	path = qwiic/drivers/qwiic_kx13x
 	url = https://github.com/sparkfun/Qwiic_KX13X_Py
-[submodule "qwiic/drivers/qwiic_oled_display"]
-	path = qwiic/drivers_linux_only/qwiic_oled_display
-	url = https://github.com/sparkfun/Qwiic_OLED_Display_Py.git
 [submodule "qwiic/drivers/qwiic_led_stick"]
 	path = qwiic/drivers/qwiic_led_stick
 	url = https://github.com/sparkfun/Qwiic_LED_Stick_Py
@@ -103,9 +97,6 @@
 [submodule "qwiic/drivers/qwiic_alphanumeric"]
 	path = qwiic/drivers/qwiic_alphanumeric
 	url = https://github.com/sparkfun/Qwiic_Alphanumeric_Py
-[submodule "qwiic/drivers/qwiic_large_oled"]
-	path = qwiic/drivers_linux_only/qwiic_large_oled
-	url = https://github.com/sparkfun/Qwiic_Large_OLED_Py
 [submodule "qwiic/drivers/qwiic_otos"]
 	path = qwiic/drivers/qwiic_otos
 	url = https://github.com/sparkfun/Qwiic_OTOS_Py
@@ -125,9 +116,6 @@
 [submodule "qwiic/drivers/qwiic_nau7802"]
 	path = qwiic/drivers/qwiic_nau7802
 	url = https://github.com/sparkfun/Qwiic_NAU7802_Py.git
-[submodule "qwiic/drivers/qwiic_opt4048"]
-	path = qwiic/drivers_linux_only/qwiic_opt4048
-	url = https://github.com/sparkfun/Qwiic_OPT4048_Py.git
 [submodule "qwiic/drivers/qwiic_ultrasonic"]
 	path = qwiic/drivers/qwiic_ultrasonic
 	url = https://github.com/sparkfun/Qwiic_Ultrasonic_Py.git
