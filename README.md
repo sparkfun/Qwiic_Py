@@ -31,6 +31,7 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 * [Supported Platforms](#supported-platforms)
 * [Structure](#structure)
 * [Dependent Modules](#dependent-modules)
+* [MicroPython and CircuitPython](#micropython-and-circuitpython)
 * [Checkout Commands](#checkout-commands)
 * [Installation](#installation)
 * [Documentation](#documentation)
@@ -75,6 +76,10 @@ Qwiic_Py/
 
 ```
 
+Micropython and CircuitPython
+------------------
+The drivers in the [drivers directory](https://github.com/sparkfun/Qwiic_Py/tree/master/qwiic/drivers) are supported on Linux, MicroPython and CircuitPython. The drivers in the [drivers_linux_only directory](https://github.com/sparkfun/Qwiic_Py/tree/master/qwiic/drivers_linux_only) are currently only supported for Linux. To learn more about MicroPython and CircuitPython, and for install instructions for your specific driver, see the README file of each supported driver.
+
 Dependencies
 -------------
 The qwiic package depends on the qwiic I2C driver: 
@@ -102,55 +107,27 @@ git clone --recurse-submodules https://github.com/sparkfun/Qwiic_Py.git
 Installation
 -------------
 ### PyPi Installation
-This repository is hosted on PyPi as the [sparkfun-qwiic](https://pypi.org/project/sparkfun-qwiic/) package. On systems that support PyPi installation via pip, this package is installed using the following commands
-For all users (note: the user must have sudo privileges):
-```sh
-sudo pip install sparkfun-qwiic
-```
-For the current user:
-```sh
-pip install sparkfun-qwiic
-```
+This repository is hosted on PyPi as the [sparkfun-qwiic](https://pypi.org/project/sparkfun-qwiic/) package. 
 
-This process will also install all modules the qwiic package requires for operation, including the needed qwiic driver packages.
-### Local Installation
-To install, make sure the setuptools package is installed on the system.
+Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system and will install all the drivers in this package. **To install for MicroPython or CircuitPython, see the instructions in each driver's README.** 
 
-Direct installation at the command line:
+First, setup a virtual environment from a specific directory using venv:
 ```sh
-python setup.py install
+python3 -m venv ~/sparkfun_venv
 ```
 
-To build a package for use with pip:
+You can pass any path instead of ~/sparkfun_venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
+
+Next, install the qwiic package with:
 ```sh
-python setup.py sdist
- ```
-A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
+~/sparkfun_venv/bin/pip3 install sparkfun-qwiic
+```
+Now you should be able to run any example or custom python scripts that have `import qwiic` by running e.g.:
 ```sh
-cd dist
-pip install sparkfun_qwiic_-<version>.tar.gz
+~/sparkfun_venv/bin/python3 example_script.py
 ```
 
-
-<!--
-Example Use
---------------
-```python
-import qwiic
-		
-results = qwiic.list_devices()
-		
-print(results)
->>	[(61, 'Qwiic Micro OLED', 'QwiicMicroOled'), (91, 'Qwiic CCS811', 'QwiicCcs811'), 
->>	(96, 'Qwiic Proximity Sensor', 'QwiicProximity'), (119, 'Qwiic BME280', 'QwiicBme280')]
-
-# Create a Micro OLED driver object using the I2C address of the board.
-mydevice = qwiic.create_device(results[0][0])
-		
-print(mydevice)
->>	<qwiic_micro_oled.qwiic_micro_oled.QwiicMicroOled object at 0x751fdab0>
-```
--->
+This process will install all drivers and modules the qwiic package requires for operation. If you are only working with one driver, it is recommended to download that driver directly (see instructions in each driver's README) rather than from this large meta-package.
 
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
