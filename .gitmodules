@@ -173,3 +173,6 @@
 [submodule "qwiic/drivers/qwiic_huskylens"]
 	path = qwiic/drivers/qwiic_huskylens
 	url = https://github.com/sparkfun/qwiic_huskylens_py.git
+[submodule "qwiic/drivers/qwiic_as7343"]
+	path = qwiic/drivers/qwiic_as7343
+	url = https://github.com/sparkfun/qwiic_as7343_py.git
