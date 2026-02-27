@@ -176,3 +176,6 @@
 [submodule "qwiic/drivers/qwiic_as7343"]
 	path = qwiic/drivers/qwiic_as7343
 	url = https://github.com/sparkfun/qwiic_as7343_py.git
+[submodule "qwiic/drivers/qwiic_cy8cmbr3"]
+	path = qwiic/drivers/qwiic_cy8cmbr3
+	url = https://github.com/sparkfun/qwiic_cy8cmbr3_py.git
