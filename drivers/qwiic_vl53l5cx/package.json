@@ -1,0 +1,14 @@
+{
+    "urls": [
+      ["qwiic_vl53l5cx/qwiic_vl53l5cx.py", "github:sparkfun/Qwiic_VL53L5CX_Py/qwiic_vl53l5cx/qwiic_vl53l5cx.py"],
+      ["qwiic_vl53l5cx/__init__.py", "github:sparkfun/Qwiic_VL53L5CX_Py/qwiic_vl53l5cx/__init__.py"],
+      ["qwiic_vl53l5cx/vl53l5cx_bin/firmware.bin", "github:sparkfun/Qwiic_VL53L5CX_Py/qwiic_vl53l5cx/vl53l5cx_bin/firmware.bin"],
+      ["qwiic_vl53l5cx/vl53l5cx_bin/default_configuration.bin", "github:sparkfun/Qwiic_VL53L5CX_Py/qwiic_vl53l5cx/vl53l5cx_bin/default_configuration.bin"],
+      ["qwiic_vl53l5cx/vl53l5cx_bin/default_xtalk.bin", "github:sparkfun/Qwiic_VL53L5CX_Py/qwiic_vl53l5cx/vl53l5cx_bin/default_xtalk.bin"],
+      ["qwiic_vl53l5cx/vl53l5cx_bin/get_nvm_cmd.bin", "github:sparkfun/Qwiic_VL53L5CX_Py/qwiic_vl53l5cx/vl53l5cx_bin/get_nvm_cmd.bin"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

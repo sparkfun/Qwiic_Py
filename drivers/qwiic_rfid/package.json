@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_rfid.py", "github:sparkfun/Qwiic_RFID_Py/qwiic_rfid.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.1.1"
+}

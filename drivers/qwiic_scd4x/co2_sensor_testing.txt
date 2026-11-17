@@ -1,0 +1,276 @@
+Arduino Example 1:
+CO2(ppm):609	Temperature(C):23.1	Humidity(%RH):19.0
+.........
+CO2(ppm):603	Temperature(C):23.0	Humidity(%RH):19.2
+........
+CO2(ppm):597	Temperature(C):22.9	Humidity(%RH):19.3
+.........
+CO2(ppm):641	Temperature(C):22.8	Humidity(%RH):19.5
+........
+CO2(ppm):816	Temperature(C):22.8	Humidity(%RH):20.6
+.........
+CO2(ppm):1035	Temperature(C):22.9	Humidity(%RH):23.7
+........
+CO2(ppm):1099	Temperature(C):22.9	Humidity(%RH):24.1
+........
+CO2(ppm):1118	Temperature(C):22.8	Humidity(%RH):23.4
+.........
+CO2(ppm):1118	Temperature(C):22.8	Humidity(%RH):22.8
+........
+CO2(ppm):1115	Temperature(C):22.7	Humidity(%RH):22.3
+.........
+CO2(ppm):1108	Temperature(C):22.6	Humidity(%RH):22.1
+........
+CO2(ppm):1092	Temperature(C):22.5	Humidity(%RH):22.0
+.........
+CO2(ppm):1070	Temperature(C):22.5	Humidity(%RH):22.1
+
+
+Python Example 1:
+CO2(ppm): 571
+Temperature(C): 25.51964
+Humidity(%RH): 15.73944
+........
+CO2(ppm): 567
+Temperature(C): 25.31136
+Humidity(%RH): 15.91187
+.........
+CO2(ppm): 571
+Temperature(C): 25.11108
+Humidity(%RH): 16.008
+........
+CO2(ppm): 569
+Temperature(C): 24.9295
+Humidity(%RH): 16.23688
+.........
+CO2(ppm): 568
+Temperature(C): 24.76128
+Humidity(%RH): 16.29791
+........
+CO2(ppm): 475
+Temperature(C): 24.62242
+Humidity(%RH): 16.50085
+........
+CO2(ppm): 617
+Temperature(C): 24.45686
+Humidity(%RH): 18.12744
+.........
+CO2(ppm): 676
+Temperature(C): 24.3367
+Humidity(%RH): 18.62335
+........
+CO2(ppm): 876
+Temperature(C): 24.22722
+Humidity(%RH): 18.48907
+.........
+CO2(ppm): 1046
+Temperature(C): 24.13643
+Humidity(%RH): 20.61157
+........
+CO2(ppm): 1116
+Temperature(C): 24.01627
+Humidity(%RH): 21.16699
+........
+CO2(ppm): 1134
+Temperature(C): 23.92014
+Humidity(%RH): 20.65887
+.........
+CO2(ppm): 1133
+Temperature(C): 23.82668
+Humidity(%RH): 20.03021
+........
+CO2(ppm): 1128
+Temperature(C): 23.75992
+Humidity(%RH): 19.63806
+........
+CO2(ppm): 1100
+Temperature(C): 23.65845
+Humidity(%RH): 19.33289
+.........
+CO2(ppm): 1055
+Temperature(C): 23.58902
+Humidity(%RH): 19.02924
+
+
+
+Arduino Example 2:
+takes forever and eventually gives: 
+............................
+CO2(ppm):760	Temperature(C):23.9	Humidity(%RH):19.4
+
+Python Example 2:
+.....
+CO2(ppm): 594
+Temperature(C): 25.33005
+Humidity(%RH): 15.3656
+.............................
+CO2(ppm): 591
+Temperature(C): 23.73322
+Humidity(%RH): 16.71448
+.............................
+CO2(ppm): 582
+Temperature(C): 22.67845
+Humidity(%RH): 17.69714
+
+
+Arduino Example 3:
+......
+CO2(ppm):599	Temperature(C):24.5	Humidity(%RH):17.6
+........
+CO2(ppm):595	Temperature(C):24.4	Humidity(%RH):17.7
+........
+CO2(ppm):586	Temperature(C):24.3	Humidity(%RH):17.9
+
+Python Example 3:
+........
+CO2(ppm): 566
+Temperature(C): 24.67583
+Humidity(%RH): 16.37421
+........
+CO2(ppm): 571
+Temperature(C): 24.49959
+Humidity(%RH): 16.57562
+
+Arduino Example 4:
+.....
+CO2(ppm):680	Temperature(C):26.0	Humidity(%RH):17.2
+........
+CO2(ppm):674	Temperature(C):25.6	Humidity(%RH):17.3
+........
+CO2(ppm):664	Temperature(C):25.4	Humidity(%RH):17.5
+
+Ptyhon Example 4:
+..........
+CO2(ppm): 568
+Temperature(C): 26.22459
+Humidity(%RH): 15.15961
+........
+CO2(ppm): 573
+Temperature(C): 25.82138
+Humidity(%RH): 15.43274
+........
+CO2(ppm): 584
+Temperature(C): 25.58372
+Humidity(%RH): 15.68451
+.........
+CO2(ppm): 587
+Temperature(C): 25.37277
+Humidity(%RH): 15.95154
+
+
+Arduino Example 6:
+..
+Periodic measurement is disabled!
+Temperature offset is currently: 5.00
+Temperature offset is now: 5.00
+Sensor altitude is currently: 1000
+Sensor altitude is now: 1000
+setAmbientPressure was successful
+The sensor's serial number is: 0x71B76F073BF8
+Periodic measurements restarted!
+..........
+CO2(ppm):218	Temperature(C):24.7	Humidity(%RH):15.9
+
+......
+
+Python Example 6:
+Periodic measurements stopped
+Temperature offset is currently:  4.998779
+Temperature offset is now:  4.998779
+Sensor altitude is currently:  1000
+Sensor altitude is now:  1000
+Ambient pressure set
+The sensor's serial number is: 0x71B76F073BF8
+Periodic measurements restarted
+
+..........
+CO2(ppm): 413
+Temperature(C): 25.29266
+Humidity(%RH): 15.84167
+..........
+CO2(ppm): 267
+Temperature(C): 24.16313
+Humidity(%RH): 15.95001
+........
+CO2(ppm): 248
+Temperature(C): 24.13643
+Humidity(%RH): 16.2735
+........
+CO2(ppm): 238
+Temperature(C): 23.94951
+Humidity(%RH): 16.4566
+.........
+CO2(ppm): 230
+Temperature(C): 23.76793
+Humidity(%RH): 16.66412
+........
+CO2(ppm): 233
+Temperature(C): 23.56232
+Humidity(%RH): 16.94183
+........
+CO2(ppm): 235
+Temperature(C): 23.36205
+Humidity(%RH): 17.12494
+
+Arduino Example 7:
+The self test was successful
+Starting the factory reset. This will take 1200ms seconds to complete...
+The factory reset was successful
+
+Python example 7:
+Qwiic SCD4x Example 7 - Self Test and Factory Reset
+
+Periodic measurements stopped
+Starthing the self-test. This will take 10 seconds to complete...
+Self-test passed!
+Factory reset completed!
+
+
+Arduino Example 8:
+....
+CO2(ppm):741	Temperature(C):22.5	Humidity(%RH):20.4
+...
+Temperature(C):22.5	Humidity(%RH):20.6
+..........
+CO2(ppm):735	Temperature(C):22.5	Humidity(%RH):20.7
+...
+Temperature(C):22.5	Humidity(%RH):20.8
+..........
+CO2(ppm):722	Temperature(C):22.5	Humidity(%RH):20.8
+...
+Temperature(C):22.5	Humidity(%RH):20.8
+
+
+Python Example 8:
+..........
+CO2(ppm): 569
+Temperature(C): 22.37671
+Humidity(%RH): 18.54858
+..
+Temperature(C): 22.342
+Humidity(%RH): 18.53027
+..........
+CO2(ppm): 575
+Temperature(C): 22.32864
+Humidity(%RH): 18.56232
+..
+Temperature(C): 22.36603
+Humidity(%RH): 18.56842
+..........
+CO2(ppm): 566
+Temperature(C): 22.35535
+Humidity(%RH): 18.52722
+..
+Temperature(C): 22.39273
+Humidity(%RH): 18.51349
+.......
+
+Arduino Example 9:
+Sensor Type test
+Sensor determined to by of type: SCD41
+Entering loop, spinning...
+
+Python Example 9:
+Qwiic SCD4x Example 9 - Sensor Type
+
+Sensor type is SCD41

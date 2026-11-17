@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_keypad.py", "github:sparkfun/Qwiic_Keypad_Py/qwiic_keypad.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

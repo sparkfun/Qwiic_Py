@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_tmp117.py", "github:sparkfun/Qwiic_TMP117_Py/qwiic_tmp117.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "1.0.0"
+}

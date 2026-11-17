@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_mcp9600.py", "github:sparkfun/Qwiic_MCP9600_Py/qwiic_mcp9600.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

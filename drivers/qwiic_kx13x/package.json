@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_kx13x.py", "github:sparkfun/Qwiic_KX13X_Py/qwiic_kx13x.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

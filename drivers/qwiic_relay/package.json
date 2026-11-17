@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_relay.py", "github:sparkfun/Qwiic_Relay_Py/qwiic_relay.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "0.1.0"
+}

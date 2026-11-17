@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_scmd.py", "github:sparkfun/Qwiic_SCMD_Py/qwiic_scmd.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

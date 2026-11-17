@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_tca9548a.py", "github:sparkfun/Qwiic_TCA9548A_Py/qwiic_tca9548a.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

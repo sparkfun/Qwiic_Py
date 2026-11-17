@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_pca9685.py", "github:sparkfun/Qwiic_PCA9685_Py/qwiic_pca9685.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

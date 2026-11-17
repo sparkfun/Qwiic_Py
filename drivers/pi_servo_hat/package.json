@@ -1,0 +1,10 @@
+{
+    "urls": [
+      ["pi_servo_hat.py", "github:sparkfun/PiServoHat_Py/pi_servo_hat.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"],
+      ["github:sparkfun/Qwiic_PCA9685_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

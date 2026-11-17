@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_lsm6dso.py", "github:sparkfun/Qwiic_LSM6DSO_Py/qwiic_lsm6dso.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

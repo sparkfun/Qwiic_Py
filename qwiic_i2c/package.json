@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_i2c/__init__.py", "github:sparkfun/Qwiic_I2C_Py/qwiic_i2c/__init__.py"],
+        ["qwiic_i2c/i2c_driver.py", "github:sparkfun/Qwiic_I2C_Py/qwiic_i2c/i2c_driver.py"],        
+        ["qwiic_i2c/micropython_i2c.py", "github:sparkfun/Qwiic_I2C_Py/qwiic_i2c/micropython_i2c.py"]        
+    ],
+    "version": "2.0.0"
+}

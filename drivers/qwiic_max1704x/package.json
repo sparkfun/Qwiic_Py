@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_max1704x.py", "github:sparkfun/Qwiic_MAX1704X_Py/qwiic_max1704x.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

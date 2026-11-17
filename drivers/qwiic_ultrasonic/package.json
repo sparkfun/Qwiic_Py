@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_ultrasonic.py", "github:sparkfun/Qwiic_Ultrasonic_Py/qwiic_ultrasonic.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

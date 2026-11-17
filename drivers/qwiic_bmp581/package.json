@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_bmp581.py", "github:sparkfun/Qwiic_BMP581_Py/qwiic_bmp581.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

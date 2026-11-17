@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_mmc5983ma.py", "github:sparkfun/Qwiic_MMC5983MA_Py/qwiic_mmc5983ma.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

@@ -1,0 +1,11 @@
+{
+    "urls": [
+      ["qwiic_sgp40/__init__.py", "github:sparkfun/Qwiic_SGP40_Py/qwiic_sgp40/__init__.py"],
+      ["qwiic_sgp40/DFRobot_SGP40_VOCAlgorithm.py", "github:sparkfun/Qwiic_SGP40_Py/qwiic_sgp40/DFRobot_SGP40_VOCAlgorithm.py"],
+      ["qwiic_sgp40/qwiic_sgp40.py", "github:sparkfun/Qwiic_SGP40_Py/qwiic_sgp40/qwiic_sgp40.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

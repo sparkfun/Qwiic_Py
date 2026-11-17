@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_huskylens.py", "github:sparkfun/qwiic_huskylens_py/qwiic_huskylens.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.1"
+}

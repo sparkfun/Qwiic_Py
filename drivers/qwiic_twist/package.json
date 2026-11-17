@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_twist.py", "github:sparkfun/Qwiic_Twist_Py/qwiic_twist.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

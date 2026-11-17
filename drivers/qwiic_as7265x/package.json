@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_as7265x.py", "github:sparkfun/Qwiic_AS7265x_Py/qwiic_as7265x.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

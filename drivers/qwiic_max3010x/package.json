@@ -1,0 +1,11 @@
+{
+    "urls": [
+      ["qwiic_max3010x/__init__.py", "github:sparkfun/Qwiic_MAX3010x_Py/qwiic_max3010x/__init__.py"],
+      ["qwiic_max3010x/heart_rate.py", "github:sparkfun/Qwiic_MAX3010x_Py/qwiic_max3010x/heart_rate.py"],
+      ["qwiic_max3010x/qwiic_max3010x.py", "github:sparkfun/Qwiic_MAX3010x_Py/qwiic_max3010x/qwiic_max3010x.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

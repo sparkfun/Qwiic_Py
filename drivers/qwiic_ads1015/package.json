@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_ads1015.py", "github:sparkfun/Qwiic_ADS1015_Py/qwiic_ads1015.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

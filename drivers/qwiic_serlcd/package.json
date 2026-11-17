@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_serlcd.py", "github:sparkfun/Qwiic_SerLCD_Py/qwiic_serlcd.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}

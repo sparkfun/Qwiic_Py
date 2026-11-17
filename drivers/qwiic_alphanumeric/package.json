@@ -1,0 +1,9 @@
+{
+    "urls": [
+      ["qwiic_alphanumeric.py", "github:sparkfun/Qwiic_Alphanumeric_Py/qwiic_alphanumeric.py"]
+    ],
+    "deps": [
+      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+    ],
+    "version": "2.0.0"
+}
