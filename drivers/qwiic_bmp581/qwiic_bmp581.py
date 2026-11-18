@@ -45,7 +45,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -65,20 +66,20 @@ _AVAILABLE_I2C_ADDRESS = [0x47, 0x46]
 # OSR, ODR and pressure configuration structure
 class OsrOdrPressConfig(object):
     # Oversampling for temperature and pressure
-    kOversampling1x = 0x00
-    kOversampling2x = 0x01
-    kOversampling4x = 0x02
-    kOversampling8x = 0x03
-    kOversampling16x = 0x04
-    kOversampling32x = 0x05
-    kOversampling64x = 0x06
-    kOversampling128x = 0x07
+    OVERSAMPLING_1X = 0x00
+    OVERSAMPLING_2X = 0x01
+    OVERSAMPLING_4X = 0x02
+    OVERSAMPLING_8X = 0x03
+    OVERSAMPLING_16X = 0x04
+    OVERSAMPLING_32X = 0x05
+    OVERSAMPLING_64X = 0x06
+    OVERSAMPLING_128X = 0x07
 
     def __init__(self):
         # Oversampling 
         # Temperature and Pressure oversampling respectively
-        self.osrT = self.kOversampling1x
-        self.osrP = self.kOversampling1x
+        self.osrT = self.OVERSAMPLING_1X
+        self.osrP = self.OVERSAMPLING_1X
 
         # Enable Pressure (1 - enabled, 0 - disabled)
         self.pressEn = 0
@@ -89,21 +90,21 @@ class OsrOdrPressConfig(object):
 # OSR, ODR and pressure configuration structure
 class IirConfig(object):
     # IIR filter for temperature and pressure
-    kIirFilterBypass = 0x00
-    kIirFilterCoeff1 = 0x01
-    kIirFilterCoeff3 = 0x02
-    kIirFilterCoeff7 = 0x03
-    kIirFilterCoeff15 = 0x04
-    kIirFilterCoeff31 = 0x05
-    kIirFilterCoeff63 = 0x06
-    kIirFilterCoeff127 = 0x07
+    IIR_FILTER_BYPASS = 0x00
+    IIR_FILTER_COEFF_1 = 0x01
+    IIR_FILTER_COEFF_3 = 0x02
+    IIR_FILTER_COEFF_7 = 0x03
+    IIR_FILTER_COEFF_15 = 0x04
+    IIR_FILTER_COEFF_31 = 0x05
+    IIR_FILTER_COEFF_63 = 0x06
+    IIR_FILTER_COEFF_127 = 0x07
 
     def __init__(self):
         # Temperature IIR
-        self.setIirT = self.kIirFilterBypass
+        self.setIirT = self.IIR_FILTER_BYPASS
         
         # Pressure IIR
-        self.setIirP = self.kIirFilterBypass
+        self.setIirP = self.IIR_FILTER_BYPASS
         
         # Shadow IIR selection for temperature (1 - enabled, 0 - disabled)
         self.shdwSetIirT = 0
@@ -128,7 +129,7 @@ class OsrOdrEff(object):
         self.odrIsValid = 0
 
 # BMP5 interrupt source selection.
-class intSourceSelect(object):
+class IntSourceSelect(object):
     def __init__(self):
         # All of these are enables for the corresponding interrupt, (1 - enabled, 0 - disabled)
         self.intDrdy = 0
@@ -139,10 +140,10 @@ class intSourceSelect(object):
 # BMP5 Out-of-range pressure configuration.
 class OorPressConfiguration(object):
     # Pressure Out-of-range count limit
-    kOorCountLimit1 = 0x00
-    kOorCountLimit3 = 0x01
-    kOorCountLimit7 = 0x02
-    kOorCountLimit15 = 0x03
+    OOR_COUNT_LIMIT_1 = 0x00
+    OOR_COUNT_LIMIT_3 = 0x01
+    OOR_COUNT_LIMIT_7 = 0x02
+    OOR_COUNT_LIMIT_15 = 0x03
 
     def __init__(self):
         self.oorThrP = 0
@@ -157,32 +158,32 @@ class OorPressConfiguration(object):
 # BMP5 fifo configurations.
 class FifoConfig(object):
     # Possible fifo frame selections
-    kFifoNotEnabled = 1
-    kFifoTemperatureData = 2
-    kFifoPressureData = 3
-    kFifoPressTempData = 4
+    FIFO_NOT_ENABLED = 1
+    FIFO_TEMPERATURE_DATA = 2
+    FIFO_PRESSURE_DATA = 3
+    FIFO_PRESS_TEMP_DATA = 4
     
     # Possible fifo decimation(downsampling) selection
-    kFifoNoDownsampling = 0
-    kFifoDownsampling2x = 1
-    kFifoDownsampling4x = 2
-    kFifoDownsampling8x = 3
-    kFifoDownsampling16x = 4
-    kFifoDownsampling32x = 5
-    kFifoDownsampling64x = 6
-    kFifoDownsampling128x = 7
+    FIFO_NO_DOWNSAMPLING = 0
+    FIFO_DOWNSAMPLING_2X = 1
+    FIFO_DOWNSAMPLING_4X = 2
+    FIFO_DOWNSAMPLING_8X = 3
+    FIFO_DOWNSAMPLING_16X = 4
+    FIFO_DOWNSAMPLING_32X = 5
+    FIFO_DOWNSAMPLING_64X = 6
+    FIFO_DOWNSAMPLING_128X = 7
 
     # Possible fifo mode selection
-    kFifoModeStreaming = 0
-    kFifoModeStopOnFull = 1
+    FIFO_MODE_STREAMING = 0
+    FIFO_MODE_STOP_ON_FULL = 1
 
     def __init__(self):
         self.data = []
         self.length = 0
-        self.frameSel = self.kFifoNotEnabled
-        self.decSel = self.kFifoNoDownsampling
+        self.frameSel = self.FIFO_NOT_ENABLED
+        self.decSel = self.FIFO_NO_DOWNSAMPLING
         self.fifoCount = 0 # frame count
-        self.mode = self.kFifoModeStreaming
+        self.mode = self.FIFO_MODE_STREAMING
         self.threshold = 0
         self.setFifoIirT = 0 # Fifo IIR for temperature (1 - enabled, 0 - disabled)
         self.setFifoIirP = 0 # Fifo IIR for pressure (1 - enabled, 0 - disabled)
@@ -193,277 +194,278 @@ class QwiicBMP581(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Register definitions
-    kRegChipId = 0x01
-    kRegRevId = 0x02
-    kRegChipStatus = 0x11
-    kRegDriveConfig = 0x13
-    kRegIntConfig = 0x14
-    kRegIntSource = 0x15
-    kRegFifoConfig = 0x16
-    kRegFifoCount = 0x17
-    kRegFifoSel = 0x18
-    kRegTempDataXlsb = 0x1D
-    kRegTempDataLsb = 0x1E
-    kRegTempDataMsb = 0x1F
-    kRegPressDataXlsb = 0x20
-    kRegPressDataLsb = 0x21
-    kRegPressDataMsb = 0x22
-    kRegIntStatus = 0x27
-    kRegStatus = 0x28
-    kRegFifoData = 0x29
-    kRegNvmAddr = 0x2B
-    kRegNvmDataLsb = 0x2C
-    kRegNvmDataMsb = 0x2D
-    kRegDspConfig = 0x30
-    kRegDspIir = 0x31
-    kRegOorThrPLsb = 0x32
-    kRegOorThrPMsb = 0x33
-    kRegOorRange = 0x34
-    kRegOorConfig = 0x35
-    kRegOsrConfig = 0x36
-    kRegOdrConfig = 0x37
-    kRegOsrEff = 0x38
-    kRegCmd = 0x7E
+    REG_CHIP_ID = 0x01
+    REG_REV_ID = 0x02
+    REG_CHIP_STATUS = 0x11
+    REG_DRIVE_CONFIG = 0x13
+    REG_INT_CONFIG = 0x14
+    REG_INT_SOURCE = 0x15
+    REG_FIFO_CONFIG = 0x16
+    REG_FIFO_COUNT = 0x17
+    REG_FIFO_SEL = 0x18
+    REG_TEMP_DATA_XLSB = 0x1D
+    REG_TEMP_DATA_LSB = 0x1E
+    REG_TEMP_DATA_MSB = 0x1F
+    REG_PRESS_DATA_XLSB = 0x20
+    REG_PRESS_DATA_LSB = 0x21
+    REG_PRESS_DATA_MSB = 0x22
+    REG_INT_STATUS = 0x27
+    REG_STATUS = 0x28
+    REG_FIFO_DATA = 0x29
+    REG_NVM_ADDR = 0x2B
+    REG_NVM_DATA_LSB = 0x2C
+    REG_NVM_DATA_MSB = 0x2D
+    REG_DSP_CONFIG = 0x30
+    REG_DSP_IIR = 0x31
+    REG_OOR_THR_P_LSB = 0x32
+    REG_OOR_THR_P_MSB = 0x33
+    REG_OOR_RANGE = 0x34
+    REG_OOR_CONFIG = 0x35
+    REG_OSR_CONFIG = 0x36
+    REG_ODR_CONFIG = 0x37
+    REG_OSR_EFF = 0x38
+    REG_CMD = 0x7E
 
     # Power mode definitions
-    kPowerModeStandby = 0
-    kPowerModeNormal = 1
-    kPowerModeForced = 2
-    kPowerModeContinuous = 3
-    kPowerModeDeepStandby = 4
+    POWER_MODE_STANDBY = 0
+    POWER_MODE_NORMAL = 1
+    POWER_MODE_FORCED = 2
+    POWER_MODE_CONTINUOUS = 3
+    POWER_MODE_DEEP_STANDBY = 4
 
     # Masks and Shifts
     # Interrupt configurations
-    kIntModeMask = 0x01
-    kIntModeShift = 0
+    INT_MODE_MASK = 0x01
+    INT_MODE_SHIFT = 0
     
-    kIntPolMask = 0x02
-    kIntPolShift = 1
+    INT_POL_MASK = 0x02
+    INT_POL_SHIFT = 1
 
-    kIntOdMask = 0x04
-    kIntOdShift = 2
+    INT_OD_MASK = 0x04
+    INT_OD_SHIFT = 2
 
-    kIntEnMask = 0x08
-    kIntEnShift = 3
+    INT_EN_MASK = 0x08
+    INT_EN_SHIFT = 3
 
-    kIntDrdyEnMask = 0x01
-    kIntDrdyEnShift = 0
+    INT_DRDY_EN_MASK = 0x01
+    INT_DRDY_EN_SHIFT = 0
 
-    kIntFifoFullEnMask = 0x02
-    kIntFifoFullEnShift = 1
+    INT_FIFO_FULL_EN_MASK = 0x02
+    INT_FIFO_FULL_EN_SHIFT = 1
 
-    kIntFifoThresEnMask = 0x04
-    kIntFifoThresEnShift = 2
+    INT_FIFO_THRES_EN_MASK = 0x04
+    INT_FIFO_THRES_EN_SHIFT = 2
 
-    kIntOorPressEnMask = 0x08
-    kIntOorPressEnShift = 3
+    INT_OOR_PRESS_EN_MASK = 0x08
+    INT_OOR_PRESS_EN_SHIFT = 3
 
     # ODR configuration
-    kOdrMask = 0x7C
-    kOdrShift = 2
+    ODR_MASK = 0x7C
+    ODR_SHIFT = 2
 
     # OSR configurations
-    kTempOsMask = 0x07
-    kTempOsShift = 0
+    TEMP_OS_MASK = 0x07
+    TEMP_OS_SHIFT = 0
 
-    kPressOsMask = 0x38
-    kPressOsShift = 3
+    PRESS_OS_MASK = 0x38
+    PRESS_OS_SHIFT = 3
 
     # Pressure enable
-    kPressEnMask = 0x40
-    kPressEnShift = 6
+    PRESS_EN_MASK = 0x40
+    PRESS_EN_SHIFT = 6
 
     # IIR configurations
-    kSetIirTempMask = 0x07
-    kSetIirTempShift = 0
+    SET_IIR_TEMP_MASK = 0x07
+    SET_IIR_TEMP_SHIFT = 0
 
-    kSetIirPressMask = 0x38
-    kSetIirPressShift = 3
+    SET_IIR_PRESS_MASK = 0x38
+    SET_IIR_PRESS_SHIFT = 3
 
-    kOorSelIirPressMask = 0x80
-    kOorSelIirPressShift = 7
+    OOR_SEL_IIR_PRESS_MASK = 0x80
+    OOR_SEL_IIR_PRESS_SHIFT = 7
 
-    kShdwSetIirTempMask = 0x08
-    kShdwSetIirTempShift = 3
+    SHDW_SET_IIR_TEMP_MASK = 0x08
+    SHDW_SET_IIR_TEMP_SHIFT = 3
 
-    kShdwSetIirPressMask = 0x20
-    kShdwSetIirPressShift = 5
+    SHDW_SET_IIR_PRESS_MASK = 0x20
+    SHDW_SET_IIR_PRESS_SHIFT = 5
 
-    kSetFifoIirTempMask = 0x10
-    kSetFifoIirTempShift = 4
+    SET_FIFO_IIR_TEMP_MASK = 0x10
+    SET_FIFO_IIR_TEMP_SHIFT = 4
 
-    kSetFifoIirPressMask = 0x40
-    kSetFifoIirPressShift = 6
+    SET_FIFO_IIR_PRESS_MASK = 0x40
+    SET_FIFO_IIR_PRESS_SHIFT = 6
 
-    kIirFlushForcedEnMask = 0x04
-    kIirFlushForcedEnShift = 2
+    IIR_FLUSH_FORCED_EN_MASK = 0x04
+    IIR_FLUSH_FORCED_EN_SHIFT = 2
 
     # Effective OSR configurations and ODR valid status
-    kOsrTempEffMask = 0x07
-    kOsrTempEffShift = 0
+    OSR_TEMP_EFF_MASK = 0x07
+    OSR_TEMP_EFF_SHIFT = 0
 
-    kOsrPressEffMask = 0x38
-    kOsrPressEffShift = 3
+    OSR_PRESS_EFF_MASK = 0x38
+    OSR_PRESS_EFF_SHIFT = 3
 
-    kOdrIsValidMask = 0x80
-    kOdrIsValidShift = 7
+    ODR_IS_VALID_MASK = 0x80
+    ODR_IS_VALID_SHIFT = 7
 
     # Powermode
-    kPowermodeMask = 0x03
-    kPowermodeShift = 0
+    POWERMODE_MASK = 0x03
+    POWERMODE_SHIFT = 0
 
-    kDeepDisableMask = 0x80
-    kDeepDisableShift = 7
+    DEEP_DISABLE_MASK = 0x80
+    DEEP_DISABLE_SHIFT = 7
 
     # Fifo configurations
-    kFifoThresholdMask = 0x1F
-    kFifoThresholdShift = 0
+    FIFO_THRESHOLD_MASK = 0x1F
+    FIFO_THRESHOLD_SHIFT = 0
 
-    kFifoModeMask = 0x20
-    kFifoModeShift = 5
+    FIFO_MODE_MASK = 0x20
+    FIFO_MODE_SHIFT = 5
 
-    kFifoDecSelMask = 0x1C
-    kFifoDecSelShift = 2
+    FIFO_DEC_SEL_MASK = 0x1C
+    FIFO_DEC_SEL_SHIFT = 2
 
-    kFifoCountMask = 0x3F
-    kFifoCountShift = 0
+    FIFO_COUNT_MASK = 0x3F
+    FIFO_COUNT_SHIFT = 0
 
-    kFifoFrameSelMask = 0x03
-    kFifoFrameSelShift = 0
+    FIFO_FRAME_SEL_MASK = 0x03
+    FIFO_FRAME_SEL_SHIFT = 0
 
     # Out-of-range configuration
-    kOorThrPLsbMask = 0x0000FF
-    kOorThrPLsbShift = 0
+    OOR_THR_P_LSB_MASK = 0x0000FF
+    OOR_THR_P_LSB_SHIFT = 0
 
-    kOorThrPMsbMask = 0x00FF00
-    kOorThrPMsbShift = 0
+    OOR_THR_P_MSB_MASK = 0x00FF00
+    OOR_THR_P_MSB_SHIFT = 0
 
-    kOorThrPXmsbMask = 0x010000
-    kOorThrPXmsbShift = 16
+    OOR_THR_P_XMSB_MASK = 0x010000
+    OOR_THR_P_XMSB_SHIFT = 16
 
     # Macro to mask xmsb value of oor threshold from register(0x35) value
-    kOorThrPXmsbRegMask = 0x01
-    kOorThrPXmsbRegShift = 0
+    OOR_THR_P_XMSB_REG_MASK = 0x01
+    OOR_THR_P_XMSB_REG_SHIFT = 0
 
-    kOorCountLimitMask = 0xC0
-    kOorCountLimitShift = 6
+    OOR_COUNT_LIMIT_MASK = 0xC0
+    OOR_COUNT_LIMIT_SHIFT = 6
 
     # NVM configuration
-    kNvmAddrMask = 0x3F
-    kNvmAddrShift = 0
+    NVM_ADDR_MASK = 0x3F
+    NVM_ADDR_SHIFT = 0
 
-    kNvmProgEnMask = 0x40
-    kNvmProgEnShift = 6
+    NVM_PROG_EN_MASK = 0x40
+    NVM_PROG_EN_SHIFT = 6
 
-    kNvmDataLsbMask = 0x00FF
-    kNvmDataLsbShift = 0
+    NVM_DATA_LSB_MASK = 0x00FF
+    NVM_DATA_LSB_SHIFT = 0
 
-    kNvmDataMsbMask = 0xFF00
-    kNvmDataMsbShift = 0
+    NVM_DATA_MSB_MASK = 0xFF00
+    NVM_DATA_MSB_SHIFT = 0
 
     # Constant Value definitions
     # Delay definitions
-    kDelayUsSoftReset = 2000
-    kDelayUsStandby = 2500
-    kDelayUsNvmReadyRead = 800
-    kDelayUsNvmReadyWrite = 10000
+    DELAY_US_SOFT_RESET = 2000
+    DELAY_US_STANDBY = 2500
+    DELAY_US_NVM_READY_READ = 800
+    DELAY_US_NVM_READY_WRITE = 10000
 
     # Soft reset command
-    kSoftResetCmd = 0xB6
+    SOFT_RESET_CMD = 0xB6
 
     # NVM command
-    kNvmFirstCmd = 0x5D
-    kNvmReadEnableCmd = 0xA5
-    kNvmWriteEnableCmd = 0xA0
+    NVM_FIRST_CMD = 0x5D
+    NVM_READ_ENABLE_CMD = 0xA5
+    NVM_WRITE_ENABLE_CMD = 0xA0
 
     # Deepstandby enable/disable
-    kDeepEnabled = 0
-    kDeepDisabled = 1
+    DEEP_ENABLED = 0
+    DEEP_DISABLED = 1
 
     # General enable/disable
-    kEnable = 1
-    kDisable = 0
-    kError = -1
-    kNoError = 0
+    ENABLE = 1
+    DISABLE = 0
+    ERROR = -1
+    NO_ERROR = 0
 
     # ODR settings
-    kOdr240Hz = 0x00
-    kOdr218_5Hz = 0x01
-    kOdr199_1Hz = 0x02
-    kOdr179_2Hz = 0x03
-    kOdr160Hz = 0x04
-    kOdr149_3Hz = 0x05
-    kOdr140Hz = 0x06
-    kOdr129_8Hz = 0x07
-    kOdr120Hz = 0x08
-    kOdr110_1Hz = 0x09
-    kOdr100_2Hz = 0x0A
-    kOdr89_6Hz = 0x0B
-    kOdr80Hz = 0x0C
-    kOdr70Hz = 0x0D
-    kOdr60Hz = 0x0E
-    kOdr50Hz = 0x0F
-    kOdr45Hz = 0x10
-    kOdr40Hz = 0x11
-    kOdr35Hz = 0x12
-    kOdr30Hz = 0x13
-    kOdr25Hz = 0x14
-    kOdr20Hz = 0x15
-    kOdr15Hz = 0x16
-    kOdr10Hz = 0x17
-    kOdr05Hz = 0x18
-    kOdr04Hz = 0x19
-    kOdr03Hz = 0x1A
-    kOdr02Hz = 0x1B
-    kOdr01Hz = 0x1C
-    kOdr0_5Hz = 0x1D
-    kOdr0_250Hz = 0x1E
-    kOdr0_125Hz = 0x1F
+    ODR_240HZ = 0x00
+    ODR_218_5HZ = 0x01
+    ODR_199_1HZ = 0x02
+    ODR_179_2HZ = 0x03
+    ODR_160HZ = 0x04
+    ODR_149_3HZ = 0x05
+    ODR_140HZ = 0x06
+    ODR_129_8HZ = 0x07
+    ODR_120HZ = 0x08
+    ODR_110_1HZ = 0x09
+    ODR_100_2HZ = 0x0A
+    ODR_89_6HZ = 0x0B
+    ODR_80HZ = 0x0C
+    ODR_70HZ = 0x0D
+    ODR_60HZ = 0x0E
+    ODR_50HZ = 0x0F
+    ODR_45HZ = 0x10
+    ODR_40HZ = 0x11
+    ODR_35HZ = 0x12
+    ODR_30HZ = 0x13
+    ODR_25HZ = 0x14
+    ODR_20HZ = 0x15
+    ODR_15HZ = 0x16
+    ODR_10HZ = 0x17
+    ODR_05HZ = 0x18
+    ODR_04HZ = 0x19
+    ODR_03HZ = 0x1A
+    ODR_02HZ = 0x1B
+    ODR_01HZ = 0x1C
+    ODR_0_5HZ = 0x1D
+    ODR_0_250HZ = 0x1E
+    ODR_0_125HZ = 0x1F
 
     # Fifo frame configuration
-    kFifoEmpty = 0x7F
-    kFifoMaxThresholdPTMode = 0x0F
-    kFifoMaxThresholdPMode = 0x1F
+    FIFO_EMPTY = 0x7F
+    FIFO_MAX_THRESHOLD_PT_MODE = 0x0F
+    FIFO_MAX_THRESHOLD_P_MODE = 0x1F
 
     # Macro to bypass both iir_t and iir_p together
-    kIirBypass = 0xC0
+    IIR_BYPASS = 0xC0
 
     # Interrupt configurations
-    kIntModePulsed = 0
-    kIntModeLatched = 1
+    INT_MODE_PULSED = 0
+    INT_MODE_LATCHED = 1
 
-    kIntPolActiveLow = 0
-    kIntPolActiveHigh = 1
+    INT_POL_ACTIVE_LOW = 0
+    INT_POL_ACTIVE_HIGH = 1
 
-    kIntOdPushPull = 0
-    kIntOdOpenDrain = 1
+    INT_OD_PUSH_PULL = 0
+    INT_OD_OPEN_DRAIN = 1
 
     # NVM and Interrupt status asserted macros
-    kIntAssertedDrdy = 0x01
-    kIntAssertedFifoFull = 0x02
-    kIntAssertedFifoThres = 0x04
-    kIntAssertedPressureOor = 0x08
-    kIntAssertedPorSoftresetComplete = 0x10
-    kIntNvmRdy = 0x02
-    kIntNvmErr = 0x04
-    kIntNvmCmdErr = 0x08
+    INT_ASSERTED_DRDY = 0x01
+    INT_ASSERTED_FIFO_FULL = 0x02
+    INT_ASSERTED_FIFO_THRES = 0x04
+    INT_ASSERTED_PRESSURE_OOR = 0x08
+    INT_ASSERTED_POR_SOFTRESET_COMPLETE = 0x10
+    INT_NVM_RDY = 0x02
+    INT_NVM_ERR = 0x04
+    INT_NVM_CMD_ERR = 0x08
 
     # NVM addresses
-    kNvmStartAddr = 0x20
-    kNvmEndAddr = 0x22
+    NVM_START_ADDR = 0x20
+    NVM_END_ADDR = 0x22
 
     # Chip ID
-    kChipId = 0x50
+    CHIP_ID = 0x50
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -471,14 +473,8 @@ class QwiicBMP581(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
         
         self.osrOdrConfig = OsrOdrPressConfig()
         self.fifo = FifoConfig()
@@ -489,9 +485,7 @@ class QwiicBMP581(object):
 
         @return **bool** `True` if connected, otherwise `False`
         """
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -506,29 +500,29 @@ class QwiicBMP581(object):
         # Reset the sensor
         self.soft_reset()
         
-        chipId = self._i2c.read_byte(self.address, self.kRegChipId)
+        chip_id = self._i2c.read_byte(self.address, self.REG_CHIP_ID)
 
         if self._power_up_check() == False:
             return False
-        if self._validate_chip_id(chipId) == False:
+        if self._validate_chip_id(chip_id) == False:
             return False
         
         # Enable both pressure and temperature sensors
-        self.enable_press(self.kEnable)
+        self.enable_press(self.ENABLE)
 
         # Set to normal mode
-        self.set_power_mode(self.kPowerModeNormal)
+        self.set_power_mode(self.POWER_MODE_NORMAL)
         return True
     
     def enable_press(self, enable):
         """!
         Enables or disables the pressure sensor.
 
-        @param int enable: The value to set
+        @param enable: **int** The value to set
 
         Allowable values:
-            - `kEnable`
-            - `kDisable`
+            - `ENABLE`
+            - `DISABLE`
         """
         self.osrOdrConfig.pressEn = enable
         self.set_osr_odr_press_config()
@@ -537,11 +531,11 @@ class QwiicBMP581(object):
         """!
         Sets the output data rate of the sensor.
 
-        @param int odr: The output data rate to set
+        @param odr: **int** The output data rate to set
         """
         # check whether ODR is valid
-        if odr > self.kOdr0_125Hz:
-            return self.kError
+        if odr > self.ODR_0_125HZ:
+            return self.ERROR
 
         self.osrOdrConfig.odr = odr
         self.set_osr_odr_press_config()
@@ -550,11 +544,11 @@ class QwiicBMP581(object):
         """!
         Set the temperature and pressure oversampling multipliers.
 
-        @param OsrOdrPressConfig config: The configuration to set
+        @param config: **OsrOdrPressConfig** The configuration to set
         """
         # check whether OSR multipliers are valid
-        if config.osrT > config.kOversampling128x or config.osrP > config.kOversampling128x:
-            return self.kError
+        if config.osrT > config.OVERSAMPLING_128X or config.osrP > config.OVERSAMPLING_128X:
+            return self.ERROR
         
         self.osrOdrConfig.osrT = config.osrT
         self.osrOdrConfig.osrP = config.osrP
@@ -564,8 +558,8 @@ class QwiicBMP581(object):
         """!
         This API performs the soft reset of the sensor.
         """
-        self._i2c.write_byte(self.address, self.kRegCmd, self.kSoftResetCmd)
-        time.sleep(1e-6 * self.kDelayUsSoftReset)
+        self._i2c.write_byte(self.address, self.REG_CMD, self.SOFT_RESET_CMD)
+        self._i2c.delay_us(self.DELAY_US_SOFT_RESET)
 
     def get_osr_odr_press_config(self):
         """!
@@ -573,13 +567,13 @@ class QwiicBMP581(object):
 
         @return **OsrOdrPressConfig** The current oversampling and output data rate configuration
         """
-        osrConfig = self._i2c.read_byte(self.address, self.kRegOsrConfig)
+        osr_config = self._i2c.read_byte(self.address, self.REG_OSR_CONFIG)
 
         config = OsrOdrPressConfig()
-        config.osrT = (osrConfig & self.kTempOsMask) >> self.kTempOsShift
-        config.osrP = (osrConfig & self.kPressOsMask) >> self.kPressOsShift
-        config.pressEn = (osrConfig & self.kPressEnMask) >> self.kPressEnShift
-        config.odr = (osrConfig & self.kOdrMask) >> self.kOdrShift
+        config.osrT = (osr_config & self.TEMP_OS_MASK) >> self.TEMP_OS_SHIFT
+        config.osrP = (osr_config & self.PRESS_OS_MASK) >> self.PRESS_OS_SHIFT
+        config.pressEn = (osr_config & self.PRESS_EN_MASK) >> self.PRESS_EN_SHIFT
+        config.odr = (osr_config & self.ODR_MASK) >> self.ODR_SHIFT
 
         return config
     
@@ -591,17 +585,17 @@ class QwiicBMP581(object):
         NOTE: If ODR is set to a value higher than 5Hz then powermode is set as standby mode, 
         as ODR value greater than 5HZ without disabling deep-standby mode makes powermode invalid.
         """
-        if self.osrOdrConfig.odr < self.kOdr05Hz:
+        if self.osrOdrConfig.odr < self.ODR_05HZ:
             self._set_standby_mode()
         
-        regData = list(self._i2c.read_block(self.address, self.kRegOsrConfig, 2))
+        reg_data = list(self._i2c.read_block(self.address, self.REG_OSR_CONFIG, 2))
         
-        regData[0] = (regData[0] & ~self.kTempOsMask) | (self.osrOdrConfig.osrT << self.kTempOsShift)
-        regData[0] = (regData[0] & ~self.kPressOsMask) | (self.osrOdrConfig.osrP << self.kPressOsShift)
-        regData[0] = (regData[0] & ~self.kPressEnMask) | (self.osrOdrConfig.pressEn << self.kPressEnShift)
-        regData[1] = (regData[1] & ~self.kOdrMask) | (self.osrOdrConfig.odr << self.kOdrShift)
+        reg_data[0] = (reg_data[0] & ~self.TEMP_OS_MASK) | (self.osrOdrConfig.osrT << self.TEMP_OS_SHIFT)
+        reg_data[0] = (reg_data[0] & ~self.PRESS_OS_MASK) | (self.osrOdrConfig.osrP << self.PRESS_OS_SHIFT)
+        reg_data[0] = (reg_data[0] & ~self.PRESS_EN_MASK) | (self.osrOdrConfig.pressEn << self.PRESS_EN_SHIFT)
+        reg_data[1] = (reg_data[1] & ~self.ODR_MASK) | (self.osrOdrConfig.odr << self.ODR_SHIFT)
 
-        self._i2c.write_block(self.address, self.kRegOsrConfig, regData)
+        self._i2c.write_block(self.address, self.REG_OSR_CONFIG, reg_data)
 
     def get_iir_config(self):
         """!
@@ -609,15 +603,15 @@ class QwiicBMP581(object):
 
         @return **IirConfig** The current IIR configuration
         """
-        dspConfig = self._i2c.read_block(self.address, self.kRegDspConfig, 2)
+        dsp_config = self._i2c.read_block(self.address, self.REG_DSP_CONFIG, 2)
 
         config = IirConfig()
-        config.shdwSetIirT = (dspConfig[0] & self.kShdwSetIirTempMask) >> self.kShdwSetIirTempShift
-        config.shdwSetIirP = (dspConfig[0] & self.kShdwSetIirPressMask) >> self.kShdwSetIirPressShift
-        config.iirFlushForcedEn = (dspConfig[0] & self.kIirFlushForcedEnMask) >> self.kIirFlushForcedEnShift
+        config.shdwSetIirT = (dsp_config[0] & self.SHDW_SET_IIR_TEMP_MASK) >> self.SHDW_SET_IIR_TEMP_SHIFT
+        config.shdwSetIirP = (dsp_config[0] & self.SHDW_SET_IIR_PRESS_MASK) >> self.SHDW_SET_IIR_PRESS_SHIFT
+        config.iirFlushForcedEn = (dsp_config[0] & self.IIR_FLUSH_FORCED_EN_MASK) >> self.IIR_FLUSH_FORCED_EN_SHIFT
 
-        config.setIirT = (dspConfig[1] & self.kSetIirTempMask) >> self.kSetIirTempShift
-        config.setIirP = (dspConfig[1] & self.kSetIirPressMask) >> self.kSetIirPressShift
+        config.setIirT = (dsp_config[1] & self.SET_IIR_TEMP_MASK) >> self.SET_IIR_TEMP_SHIFT
+        config.setIirP = (dsp_config[1] & self.SET_IIR_PRESS_MASK) >> self.SET_IIR_PRESS_SHIFT
 
         return config
     
@@ -627,57 +621,57 @@ class QwiicBMP581(object):
 
         @return **int** The current power mode or -1 on error
         """
-        odrConfig = self._i2c.read_byte(self.address, self.kRegOdrConfig)
-        powerMode = (odrConfig & self.kPowermodeMask) >> self.kPowermodeShift
+        odr_config = self._i2c.read_byte(self.address, self.REG_ODR_CONFIG)
+        power_mode = (odr_config & self.POWERMODE_MASK) >> self.POWERMODE_SHIFT
         
-        if powerMode == self.kPowerModeStandby:
-            deepDis = (odrConfig & self.kDeepDisableMask) >> self.kDeepDisableShift
-            if deepDis == self.kDeepEnabled:
+        if power_mode == self.POWER_MODE_STANDBY:
+            deep_dis = (odr_config & self.DEEP_DISABLE_MASK) >> self.DEEP_DISABLE_SHIFT
+            if deep_dis == self.DEEP_ENABLED:
                 if self._check_deepstandby_mode():
-                    return self.kPowerModeDeepStandby
+                    return self.POWER_MODE_DEEP_STANDBY
                 else: 
-                    return self.kError
+                    return self.ERROR
             else:
-                return self.kPowerModeStandby
+                return self.POWER_MODE_STANDBY
             
-        if powerMode == self.kPowerModeNormal:
-            return self.kPowerModeNormal
-        if powerMode == self.kPowerModeForced:
-            return self.kPowerModeForced
-        if powerMode == self.kPowerModeContinuous:
-            return self.kPowerModeContinuous
+        if power_mode == self.POWER_MODE_NORMAL:
+            return self.POWER_MODE_NORMAL
+        if power_mode == self.POWER_MODE_FORCED:
+            return self.POWER_MODE_FORCED
+        if power_mode == self.POWER_MODE_CONTINUOUS:
+            return self.POWER_MODE_CONTINUOUS
         
-        return self.kError
+        return self.ERROR
     
-    def set_power_mode(self, powerMode):
+    def set_power_mode(self, power_mode):
         """!
         Sets the power mode of the device
 
-        @param int powerMode: The power mode to set
+        @param power_mode: **int** The power mode to set
 
-        Allowable powerMode values:
-            - `kPowerModeStandby`
-            - `kPowerModeNormal`
-            - `kPowerModeForced`
-            - `kPowerModeContinuous`
-            - `kPowerModeDeepStandby`
+        Allowable power_mode values:
+            - `POWER_MODE_STANDBY`
+            - `POWER_MODE_NORMAL`
+            - `POWER_MODE_FORCED`
+            - `POWER_MODE_CONTINUOUS`
+            - `POWER_MODE_DEEP_STANDBY`
         """
-        lastMode = self.get_power_mode()
+        last_mode = self.get_power_mode()
 
         # Device should be set to standby before transiting to
         # forced mode or normal mode or continous mode.
-        if lastMode != self.kPowerModeStandby:
-            self._direct_set_power_mode(self.kPowerModeStandby)
-            time.sleep(1e-6 * self.kDelayUsStandby)
+        if last_mode != self.POWER_MODE_STANDBY:
+            self._direct_set_power_mode(self.POWER_MODE_STANDBY)
+            self._i2c.delay_us(self.DELAY_US_STANDBY)
         
-        if powerMode == self.kPowerModeDeepStandby:
+        if power_mode == self.POWER_MODE_DEEP_STANDBY:
             self._set_deepstandby_mode()
-        # elif powerMode == self.kPowerModeStandby:
+        # elif power_mode == self.POWER_MODE_STANDBY:
             # Since switching between powermodes require sensor to be in standby mode
             # it is performed above. So it is not explicitly performed here.
             # pass
-        elif powerMode in [self.kPowerModeNormal, self.kPowerModeForced, self.kPowerModeContinuous]:
-            self._direct_set_power_mode(powerMode)
+        elif power_mode in [self.POWER_MODE_NORMAL, self.POWER_MODE_FORCED, self.POWER_MODE_CONTINUOUS]:
+            self._direct_set_power_mode(power_mode)
     
     def get_sensor_data(self):
         """!
@@ -688,13 +682,13 @@ class QwiicBMP581(object):
         """
         data = SensorData()
 
-        regData = self._i2c.read_block(self.address, self.kRegTempDataXlsb, 6)
+        reg_data = self._i2c.read_block(self.address, self.REG_TEMP_DATA_XLSB, 6)
         
-        raw_data_t = (regData[2] << 16) | (regData[1] << 8) | regData[0]
+        raw_data_t = (reg_data[2] << 16) | (reg_data[1] << 8) | reg_data[0]
         data.temperature = raw_data_t / 65536.0
 
         if self.osrOdrConfig.pressEn:
-            raw_data_p = (regData[5] << 16) | (regData[4] << 8) | regData[3]
+            raw_data_p = (reg_data[5] << 16) | (reg_data[4] << 8) | reg_data[3]
             data.pressure = raw_data_p / 64.0
         else:
             data.pressure = 0
@@ -707,12 +701,12 @@ class QwiicBMP581(object):
 
         @return **OsrOdrEff** The effective oversampling and output data rate configuration
         """
-        regData = self._i2c.read_block(self.address, self.kRegOsrEff, 1)
+        reg_data = self._i2c.read_block(self.address, self.REG_OSR_EFF, 1)
 
         eff = OsrOdrEff()
-        eff.osrTEff = (regData[0] & self.kOsrTempEffMask) >> self.kOsrTempEffShift
-        eff.osrPEff = (regData[0] & self.kOsrPressEffMask) >> self.kOsrPressEffShift
-        eff.odrIsValid = (regData[0] & self.kOdrIsValidMask) >> self.kOdrIsValidShift
+        eff.osrTEff = (reg_data[0] & self.OSR_TEMP_EFF_MASK) >> self.OSR_TEMP_EFF_SHIFT
+        eff.osrPEff = (reg_data[0] & self.OSR_PRESS_EFF_MASK) >> self.OSR_PRESS_EFF_SHIFT
+        eff.odrIsValid = (reg_data[0] & self.ODR_IS_VALID_MASK) >> self.ODR_IS_VALID_SHIFT
 
         return eff
 
@@ -724,107 +718,107 @@ class QwiicBMP581(object):
         as standby mode, as IIR with value other than bypass without disabling deep-standby mode makes powermode invalid.
         """
         
-        if (config.setIirT != config.kIirFilterBypass) or (config.setIirP != config.kIirFilterBypass):
+        if (config.setIirT != config.IIR_FILTER_BYPASS) or (config.setIirP != config.IIR_FILTER_BYPASS):
             self._set_standby_mode()
         
-        currPwrMode = self.get_power_mode()
+        curr_pwr_mode = self.get_power_mode()
 
-        if currPwrMode != self.kPowerModeStandby:
-            self.set_power_mode(self.kPowerModeStandby)
+        if curr_pwr_mode != self.POWER_MODE_STANDBY:
+            self.set_power_mode(self.POWER_MODE_STANDBY)
         
         self._direct_set_iir_config(config)
 
         # If previous mode is not standbymode return sensor to that previous mode
         # after setting iir configuration
-        if (currPwrMode != self.kPowerModeStandby) and (currPwrMode != self.kPowerModeDeepStandby): 
-            self.set_power_mode(currPwrMode)
+        if (curr_pwr_mode != self.POWER_MODE_STANDBY) and (curr_pwr_mode != self.POWER_MODE_DEEP_STANDBY): 
+            self.set_power_mode(curr_pwr_mode)
 
     def set_oor_configuration(self, config):
         """!
         This API sets the configuration for out-of-range pressure threshold, range
         count limit and IIR.
 
-        @param OorPressConfiguration config: The configuration to set
+        @param config: **OorPressConfiguration** The configuration to set
         """
 
         self._set_oor_iir_count_limit(config.oorSeliirP, config.oorCntLim)
 
         # Get the OOR Configurations
-        regData = list(self._i2c.read_block(self.address, self.kRegOorThrPLsb, 4))
+        reg_data = list(self._i2c.read_block(self.address, self.REG_OOR_THR_P_LSB, 4))
 
-        regData[0] = (regData[0] & ~self.kOorThrPLsbMask) | (config.oorThrP << self.kOorThrPLsbShift)
-        regData[1] = (regData[1] & ~self.kOorThrPMsbMask) | ( (config.oorThrP >> 8) << self.kOorThrPMsbShift)
-        regData[2] = config.oorRangeP
-        thresXMsb = (config.oorThrP & self.kOorThrPXmsbMask) >> self.kOorThrPXmsbShift
-        regData[3] = (regData[3] & ~self.kOorThrPXmsbRegMask) | thresXMsb
+        reg_data[0] = (reg_data[0] & ~self.OOR_THR_P_LSB_MASK) | (config.oorThrP << self.OOR_THR_P_LSB_SHIFT)
+        reg_data[1] = (reg_data[1] & ~self.OOR_THR_P_MSB_MASK) | ( (config.oorThrP >> 8) << self.OOR_THR_P_MSB_SHIFT)
+        reg_data[2] = config.oorRangeP
+        thres_x_msb = (config.oorThrP & self.OOR_THR_P_XMSB_MASK) >> self.OOR_THR_P_XMSB_SHIFT
+        reg_data[3] = (reg_data[3] & ~self.OOR_THR_P_XMSB_REG_MASK) | thres_x_msb
 
-        self._i2c.write_block(self.address, self.kRegOorThrPLsb, regData)
+        self._i2c.write_block(self.address, self.REG_OOR_THR_P_LSB, reg_data)
         
-    def configure_interrupt(self, intMode, intPol, intOd, intEn):
+    def configure_interrupt(self, int_mode, int_pol, int_od, int_en):
         """!
         This API is used to configure the interrupt settings.
 
-        @param int intMode: The interrupt mode to set
+        @param int_mode: **int** The interrupt mode to set
 
         Allowable values:
-            - `kIntModePulsed`
-            - `kIntModeLatched`
-        @param int intPol: The interrupt polarity to set
+            - `INT_MODE_PULSED`
+            - `INT_MODE_LATCHED`
+        @param int_pol: **int** The interrupt polarity to set
 
         Allowable values:
-            - `kIntPolActiveLow`
-            - `kIntPolActiveHigh`
-        @param int intOd: The interrupt output type to set
+            - `INT_POL_ACTIVE_LOW`
+            - `INT_POL_ACTIVE_HIGH`
+        @param int_od: **int** The interrupt output type to set
 
         Allowable values:
-            - `kIntOdPushPull`
-            - `kIntOdOpenDrain`
-        @param int intEn: The interrupt enable to set
+            - `INT_OD_PUSH_PULL`
+            - `INT_OD_OPEN_DRAIN`
+        @param int_en: **int** The interrupt enable to set
 
         Allowable values:
-            - `kEnable`
-            - `kDisable`
+            - `ENABLE`
+            - `DISABLE`
         """
         
-        regData = self._i2c.read_block(self.address, self.kRegIntConfig, 1)
+        reg_data = self._i2c.read_block(self.address, self.REG_INT_CONFIG, 1)
 
         # Any change between latched/pulsed mode has to be applied while interrupt is disabled
         # Step 1 : Turn off all INT sources (INT_SOURCE -> 0x00)
         # Step 2 : Read the INT_STATUS register to clear the status
         # Step 3 : Set the desired mode in INT_CONFIG.int_mode
         # Finally transfer the interrupt configurations 
-        self._i2c.write_byte(self.address, self.kRegIntSource, 0x00)
+        self._i2c.write_byte(self.address, self.REG_INT_SOURCE, 0x00)
 
-        intStatus = self._i2c.read_byte(self.address, self.kRegIntStatus)
+        int_status = self._i2c.read_byte(self.address, self.REG_INT_STATUS)
         
-        regData = (regData & ~self.kIntModeMask) | (intMode << self.kIntModeShift)
-        regData = (regData & ~self.kIntPolMask) | (intPol << self.kIntPolShift)
-        regData = (regData & ~self.kIntOdMask) | (intOd << self.kIntOdShift)
-        regData = (regData & ~self.kIntEnMask) | (intEn << self.kIntEnShift)
+        reg_data = (reg_data & ~self.INT_MODE_MASK) | (int_mode << self.INT_MODE_SHIFT)
+        reg_data = (reg_data & ~self.INT_POL_MASK) | (int_pol << self.INT_POL_SHIFT)
+        reg_data = (reg_data & ~self.INT_OD_MASK) | (int_od << self.INT_OD_SHIFT)
+        reg_data = (reg_data & ~self.INT_EN_MASK) | (int_en << self.INT_EN_SHIFT)
 
-        self._i2c.write_byte(self.address, self.kRegIntConfig, regData)
+        self._i2c.write_byte(self.address, self.REG_INT_CONFIG, reg_data)
     
     def int_source_select(self, select):
         """!
         This API is used to enable the interrupts(drdy interrupt, fifo full interrupt,
         fifo threshold enable and pressure data out of range interrupt).
 
-        @param intSourceSelect select: The interrupt source select to set
+        @param select: **IntSourceSelect** The interrupt source select to set
         """
-        regData = self._i2c.read_byte(self.address, self.kRegIntSource)
+        reg_data = self._i2c.read_byte(self.address, self.REG_INT_SOURCE)
 
-        regData = (regData & ~self.kIntDrdyEnMask) | (select.intDrdy << self.kIntDrdyEnShift)
-        regData = (regData & ~self.kIntFifoFullEnMask) | (select.intFifoFull << self.kIntFifoFullEnShift)
-        regData = (regData & ~self.kIntFifoThresEnMask) | (select.intFifoThres << self.kIntFifoThresEnShift)
-        regData = (regData & ~self.kIntOorPressEnMask) | (select.intOorPress << self.kIntOorPressEnShift)
+        reg_data = (reg_data & ~self.INT_DRDY_EN_MASK) | (select.intDrdy << self.INT_DRDY_EN_SHIFT)
+        reg_data = (reg_data & ~self.INT_FIFO_FULL_EN_MASK) | (select.intFifoFull << self.INT_FIFO_FULL_EN_SHIFT)
+        reg_data = (reg_data & ~self.INT_FIFO_THRES_EN_MASK) | (select.intFifoThres << self.INT_FIFO_THRES_EN_SHIFT)
+        reg_data = (reg_data & ~self.INT_OOR_PRESS_EN_MASK) | (select.intOorPress << self.INT_OOR_PRESS_EN_SHIFT)
 
-        self._i2c.write_byte(self.address, self.kRegIntSource, regData)
+        self._i2c.write_byte(self.address, self.REG_INT_SOURCE, reg_data)
     
     def get_interrupt_status(self):
         """!
         This API is used to get interrupt status.
         """
-        return self._i2c.read_byte(self.address, self.kRegIntStatus)
+        return self._i2c.read_byte(self.address, self.REG_INT_STATUS)
     
     def set_fifo_configuration(self, fifo):
         """!
@@ -833,45 +827,45 @@ class QwiicBMP581(object):
         If Fifo frame selection is enabled then powermode is set as standby mode, as fifo frame selection
         enabled without disabling deep-standby mode makes powermode invalid.
         """
-        if fifo.frameSel != fifo.kFifoNotEnabled:
+        if fifo.frameSel != fifo.FIFO_NOT_ENABLED:
             self._set_standby_mode()
         
         self._set_fifo_iir_config(fifo.setFifoIirT, fifo.setFifoIirP)
 
         # Get the FIFO Configurations
-        regData = list(self._i2c.read_byte(self.address, self.kRegFifoConfig))
+        reg_data = list(self._i2c.read_byte(self.address, self.REG_FIFO_CONFIG))
 
-        regData &= ~self.kFifoModeMask
-        regData |= fifo.mode << self.kFifoModeShift
+        reg_data &= ~self.FIFO_MODE_MASK
+        reg_data |= fifo.mode << self.FIFO_MODE_SHIFT
 
-        self._set_fifo_threshold(regData, fifo)
+        self._set_fifo_threshold(reg_data, fifo)
 
         # Set the fifo configurations
-        self._i2c.write_byte(self.address, self.kRegFifoConfig, regData)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CONFIG, reg_data)
 
-        regData = self._i2c.read_byte(self.address, self.kRegFifoSel)
+        reg_data = self._i2c.read_byte(self.address, self.REG_FIFO_SEL)
 
-        regData &= ~self.kFifoFrameSelMask
-        regData |= fifo.frameSel << self.kFifoFrameSelShift
-        regData &= ~self.kFifoDecSelMask
-        regData |= fifo.decimation << self.kFifoDecSelShift
+        reg_data &= ~self.FIFO_FRAME_SEL_MASK
+        reg_data |= fifo.frameSel << self.FIFO_FRAME_SEL_SHIFT
+        reg_data &= ~self.FIFO_DEC_SEL_MASK
+        reg_data |= fifo.decimation << self.FIFO_DEC_SEL_SHIFT
 
-        self._i2c.write_byte(self.address, self.kRegFifoSel, regData)
+        self._i2c.write_byte(self.address, self.REG_FIFO_SEL, reg_data)
 
     def get_fifo_len(self, fifo):
         """!
         This API is used to get the length of FIFO data available in the sensor.
 
-        @param FifoConfiguration fifo: The fifo configuration
+        @param fifo: **FifoConfiguration** The fifo configuration
         """
 
-        regData = self._i2c.read_byte(self.address, self.kRegFifoCount)
+        reg_data = self._i2c.read_byte(self.address, self.REG_FIFO_COUNT)
 
-        fifo.fifoCount = (regData & self.kFifoCountMask) >> self.kFifoCountShift
+        fifo.fifoCount = (reg_data & self.FIFO_COUNT_MASK) >> self.FIFO_COUNT_SHIFT
 
-        if (fifo.frameSel == fifo.kFifoTemperatureData) or (fifo.frameSel == fifo.kFifoPressureData):
+        if (fifo.frameSel == fifo.FIFO_TEMPERATURE_DATA) or (fifo.frameSel == fifo.FIFO_PRESSURE_DATA):
             return fifo.fifoCount  * 3
-        elif fifo.frameSel == fifo.kFifoPressTempData:
+        elif fifo.frameSel == fifo.FIFO_PRESS_TEMP_DATA:
             return fifo.fifoCount  * 6
         
         return 0
@@ -880,18 +874,18 @@ class QwiicBMP581(object):
         """!
         This API is used to read the FIFO data from the sensor.
 
-        @param FifoConfiguration fifo: The fifo configuration
+        @param fifo: **FifoConfiguration** The fifo configuration
         """
-        fifoLen = self.get_fifo_len(fifo)
+        fifo_len = self.get_fifo_len(fifo)
 
-        if fifo.length > fifoLen:
-            fifo.length = fifoLen
+        if fifo.length > fifo_len:
+            fifo.length = fifo_len
         
-        regData = self._i2c.read_block(self.address, self.kRegFifoData, fifo.length)
+        reg_data = self._i2c.read_block(self.address, self.REG_FIFO_DATA, fifo.length)
 
-        fifo.data[:] = list(regData)[:]
+        fifo.data[:] = list(reg_data)[:]
 
-    def extract_fifo_data(self, fifo, sensorData):
+    def extract_fifo_data(self, fifo, sensor_data):
         """!
         This API extract the temperature and/or pressure data from the fifo data which is
         already read from the fifo.
@@ -900,78 +894,78 @@ class QwiicBMP581(object):
         idx = 0
 
         for i in range(0, fifo.length):
-            res = self._unpack_sensor_data(sensorData[idx], i, fifo)
+            res = self._unpack_sensor_data(sensor_data[idx], i, fifo)
             if not res:
                 break
             idx += 1
 
-    def nvm_read(self, nvmAddr):
+    def nvm_read(self, nvm_addr):
         """!
         This API is used to perform NVM reads.
 
-        @param int nvmAddr: The NVM address to read
+        @param nvm_addr: **int** The NVM address to read
         """
-        currPwrMode = self._nvm_write_addr(nvmAddr, self.kDisable)
+        curr_pwr_mode = self._nvm_write_addr(nvm_addr, self.DISABLE)
 
-        self._i2c.write_byte(self.address, self.kRegCmd, self.kNvmFirstCmd)
-        self._i2c.write_byte(self.address, self.kRegCmd, self.kNvmReadEnableCmd)
-        time.sleep(1e-6 * self.kDelayUsNvmReadyRead)
+        self._i2c.write_byte(self.address, self.REG_CMD, self.NVM_FIRST_CMD)
+        self._i2c.write_byte(self.address, self.REG_CMD, self.NVM_READ_ENABLE_CMD)
+        self._i2c.delay_us(self.DELAY_US_NVM_READY_READ)
 
-        nvmData = self._get_nvm_data()
+        nvm_data = self._get_nvm_data()
 
-        if currPwrMode != self.kPowerModeStandby:
-            self.set_power_mode(currPwrMode)
+        if curr_pwr_mode != self.POWER_MODE_STANDBY:
+            self.set_power_mode(curr_pwr_mode)
         
-        return nvmData
+        return nvm_data
 
-    def nvm_write(self, nvmAddr, nvmWriteData):
-        currPwrMode = self._nvm_write_addr(nvmAddr, self.kEnable)
-        nvmData = list(self._i2c.read_block(self.address, self.kRegNvmDataLsb, 2))
+    def nvm_write(self, nvm_addr, nvm_write_data):
+        curr_pwr_mode = self._nvm_write_addr(nvm_addr, self.ENABLE)
+        nvm_data = list(self._i2c.read_block(self.address, self.REG_NVM_DATA_LSB, 2))
 
-        nvmData[0] = nvmWriteData & self.kNvmDataLsbMask
-        nvmData[1] = (nvmWriteData & self.kNvmDataMsbMask) >> 8
+        nvm_data[0] = nvm_write_data & self.NVM_DATA_LSB_MASK
+        nvm_data[1] = (nvm_write_data & self.NVM_DATA_MSB_MASK) >> 8
 
-        self._i2c.write_block(self.address, self.kRegNvmDataLsb, nvmData)
+        self._i2c.write_block(self.address, self.REG_NVM_DATA_LSB, nvm_data)
 
-        self._i2c.write_byte(self.address, self.kRegCmd, self.kNvmFirstCmd)
+        self._i2c.write_byte(self.address, self.REG_CMD, self.NVM_FIRST_CMD)
 
         # Write enable NVM command for user write sequence
-        regData = self.kNvmWriteEnableCmd
-        self._i2c.write_byte(self.address, self.kRegCmd, regData)
-        time.sleep(1e-6 * self.kDelayUsNvmReadyWrite)
+        reg_data = self.NVM_WRITE_ENABLE_CMD
+        self._i2c.write_byte(self.address, self.REG_CMD, reg_data)
+        self._i2c.delay_us(self.DELAY_US_NVM_READY_WRITE)
 
-        nvmStatus = self._get_nvm_status()
+        nvm_status = self._get_nvm_status()
 
-        if (nvmStatus & self.kIntNvmRdy) and not(nvmStatus & self.kIntNvmErr) and not(nvmStatus & self.kIntNvmCmdErr):
+        if (nvm_status & self.INT_NVM_RDY) and not(nvm_status & self.INT_NVM_ERR) and not(nvm_status & self.INT_NVM_CMD_ERR):
             # Reset NVM prog_en
-            # TODO: The below line looks strange to me, seems like regData is currently kNvmWriteEnableCmd from above
+            # TODO: The below line looks strange to me, seems like reg_data is currently NVM_WRITE_ENABLE_CMD from above
             #       and then we are clearing a bit that doesn't even exist in that command and then sending it.
             #       This is what the original code does, so I'll keep it for now, but might want to add this line before it:
-            # regData = self._i2c.read_byte(self.address, self.kRegNvmAddr)
-            regData = (regData & ~self.kNvmProgEnMask)
-            self._i2c.write_byte(self.address, self.kRegNvmAddr, regData)
+            # reg_data = self._i2c.read_byte(self.address, self.REG_NVM_ADDR)
+            reg_data = (reg_data & ~self.NVM_PROG_EN_MASK)
+            self._i2c.write_byte(self.address, self.REG_NVM_ADDR, reg_data)
 
-        if currPwrMode != self.kPowerModeStandby:
-            self.set_power_mode(currPwrMode)
+        if curr_pwr_mode != self.POWER_MODE_STANDBY:
+            self.set_power_mode(curr_pwr_mode)
 
     # Private Methods
     def _power_up_check(self):
         """!
         This internal API is used to validate the post power-up procedure. Not to be used outside of driver.
         """
-        nvmStatus = self._get_nvm_status()
-        if (nvmStatus & self.kIntNvmRdy) and not(nvmStatus & self.kIntNvmErr):
+        nvm_status = self._get_nvm_status()
+        if (nvm_status & self.INT_NVM_RDY) and not(nvm_status & self.INT_NVM_ERR):
             status = self.get_interrupt_status()
-            if status & self.kIntAssertedPorSoftresetComplete:
+            if status & self.INT_ASSERTED_POR_SOFTRESET_COMPLETE:
                 return True
         
         return False
     
-    def _validate_chip_id(self, chipId):
+    def _validate_chip_id(self, chip_id):
         """!
         This internal API is used to validate the chip id of the sensor. Not to be used outside of driver.
         """
-        if chipId == self.kChipId:
+        if chip_id == self.CHIP_ID:
             return True
         return False
 
@@ -982,16 +976,16 @@ class QwiicBMP581(object):
         @return **bool** `True` if in deepstandby mode, otherwise `False`
         """
 
-        fifoFrameSel = self._i2c.read_byte(self.address, self.kRegFifoSel)
-        fifoFrameSel = (fifoFrameSel & self.kFifoFrameSelMask) >> self.kFifoFrameSelShift
+        fifo_frame_sel = self._i2c.read_byte(self.address, self.REG_FIFO_SEL)
+        fifo_frame_sel = (fifo_frame_sel & self.FIFO_FRAME_SEL_MASK) >> self.FIFO_FRAME_SEL_SHIFT
 
-        osrConf = self.get_osr_odr_press_config()
-        iirConf = self.get_iir_config()
+        osr_conf = self.get_osr_odr_press_config()
+        iir_conf = self.get_iir_config()
 
         # As per datasheet odr should be less than 5Hz. But register value for 5Hz is less than 4Hz and so,
         # thus in this below condition odr is checked whether greater than 5Hz macro.
-        if (osrConf.odr > self.kOdr05Hz) and (fifoFrameSel == self.kDisable) \
-            and (iirConf.setIirT == iirConf.kIirFilterBypass) and (iirConf.setIirP == iirConf.kIirFilterBypass):
+        if (osr_conf.odr > self.ODR_05HZ) and (fifo_frame_sel == self.DISABLE) \
+            and (iir_conf.setIirT == iir_conf.IIR_FILTER_BYPASS) and (iir_conf.setIirP == iir_conf.IIR_FILTER_BYPASS):
             return True
         
         return False
@@ -1000,205 +994,206 @@ class QwiicBMP581(object):
         """!
         This function is used to set the device to deepstandby mode. Not to be used outside of driver.
         """
-        regData = self._i2c.read_byte(self.address, self.kRegOdrConfig)
+        reg_data = self._i2c.read_byte(self.address, self.REG_ODR_CONFIG)
 
-        regData &= ~self.kDeepDisableMask # Setting deep_dis = 0(BMP5_DEEP_ENABLED) enables the deep standby mode
+        reg_data &= ~self.DEEP_DISABLE_MASK # Setting deep_dis = 0(BMP5_DEEP_ENABLED) enables the deep standby mode
         
         # Set ODR less then 5Hz - ODR used is 1Hz
-        regData &= ~self.kOdrMask
-        regData |= self.kOdr01Hz << self.kOdrShift
+        reg_data &= ~self.ODR_MASK
+        reg_data |= self.ODR_01HZ << self.ODR_SHIFT
 
-        self._i2c.write_byte(self.address, self.kRegOdrConfig, regData)
+        self._i2c.write_byte(self.address, self.REG_ODR_CONFIG, reg_data)
 
-        regData = self._i2c.read_byte(self.address, self.kRegDspIir)
-        regData &= self.kIirBypass
+        reg_data = self._i2c.read_byte(self.address, self.REG_DSP_IIR)
+        reg_data &= self.IIR_BYPASS
 
-        self._i2c.write_byte(self.address, self.kRegDspIir, regData)
+        self._i2c.write_byte(self.address, self.REG_DSP_IIR, reg_data)
 
-        regData = self._i2c.read_byte(self.address, self.kRegFifoSel)
-        regData &= ~self.kFifoFrameSelMask
+        reg_data = self._i2c.read_byte(self.address, self.REG_FIFO_SEL)
+        reg_data &= ~self.FIFO_FRAME_SEL_MASK
 
-        self._i2c.write_byte(self.address, self.kRegFifoSel, regData)
+        self._i2c.write_byte(self.address, self.REG_FIFO_SEL, reg_data)
     
     def _set_standby_mode(self):
         """!
         This function is used to set the device to standby powermode when powermoide is deepstandby mode. Not to be used outside of driver.
         """
-        powerMode = self.get_power_mode()
-        if powerMode == self.kPowerModeDeepStandby:
-            self.set_power_mode(self.kPowerModeStandby)
+        power_mode = self.get_power_mode()
+        if power_mode == self.POWER_MODE_DEEP_STANDBY:
+            self.set_power_mode(self.POWER_MODE_STANDBY)
     
-    def _direct_set_power_mode(self, powerMode):
+    def _direct_set_power_mode(self, power_mode):
         """!
         Sets the power mode of the device. Not to be used outside of driver
 
-        @param int powerMode: The power mode to set
+        @param power_mode: **int** The power mode to set
 
-        Allowable powerMode values:
-            - `kPowerModeStandby`
-            - `kPowerModeNormal`
-            - `kPowerModeForced`
-            - `kPowerModeContinuous`
-            - `kPowerModeDeepStandby`
+        Allowable power_mode values:
+            - `POWER_MODE_STANDBY`
+            - `POWER_MODE_NORMAL`
+            - `POWER_MODE_FORCED`
+            - `POWER_MODE_CONTINUOUS`
+            - `POWER_MODE_DEEP_STANDBY`
         """
-        odrConfig = self._i2c.read_byte(self.address, self.kRegOdrConfig)
+        odr_config = self._i2c.read_byte(self.address, self.REG_ODR_CONFIG)
         
-        odrConfig &= ~self.kDeepDisableMask
-        odrConfig |= self.kDeepDisabled << self.kDeepDisableShift
+        odr_config &= ~self.DEEP_DISABLE_MASK
+        odr_config |= self.DEEP_DISABLED << self.DEEP_DISABLE_SHIFT
 
-        odrConfig &= ~self.kPowermodeMask
-        odrConfig |= powerMode << self.kPowermodeShift
+        odr_config &= ~self.POWERMODE_MASK
+        odr_config |= power_mode << self.POWERMODE_SHIFT
 
-        self._i2c.write_byte(self.address, self.kRegOdrConfig, odrConfig)
+        self._i2c.write_byte(self.address, self.REG_ODR_CONFIG, odr_config)
 
     def _direct_set_iir_config(self, config):
         """!
         Sets the IIR for temperature and pressure. Not to be used outside of driver.
         """
-        regData = list(self._i2c.read_block(self.address, self.kRegDspConfig, 2))
+        reg_data = list(self._i2c.read_block(self.address, self.REG_DSP_CONFIG, 2))
 
-        regData[0] &= ~self.kShdwSetIirTempMask
-        regData[0] |= config.shdwSetIirT << self.kShdwSetIirTempShift
+        reg_data[0] &= ~self.SHDW_SET_IIR_TEMP_MASK
+        reg_data[0] |= config.shdwSetIirT << self.SHDW_SET_IIR_TEMP_SHIFT
 
-        regData[0] &= ~self.kShdwSetIirPressMask
-        regData[0] |= config.shdwSetIirP << self.kShdwSetIirPressShift
+        reg_data[0] &= ~self.SHDW_SET_IIR_PRESS_MASK
+        reg_data[0] |= config.shdwSetIirP << self.SHDW_SET_IIR_PRESS_SHIFT
 
-        regData[0] &= ~self.kIirFlushForcedEnMask
-        regData[0] |= config.iirFlushForcedEn << self.kIirFlushForcedEnShift
+        reg_data[0] &= ~self.IIR_FLUSH_FORCED_EN_MASK
+        reg_data[0] |= config.iirFlushForcedEn << self.IIR_FLUSH_FORCED_EN_SHIFT
 
-        regData[1] &= ~self.kSetIirTempMask
-        regData[1] |= config.setIirT << self.kSetIirTempShift
+        reg_data[1] &= ~self.SET_IIR_TEMP_MASK
+        reg_data[1] |= config.setIirT << self.SET_IIR_TEMP_SHIFT
 
-        regData[1] &= ~self.kSetIirPressMask
-        regData[1] |= config.setIirP << self.kSetIirPressShift
+        reg_data[1] &= ~self.SET_IIR_PRESS_MASK
+        reg_data[1] |= config.setIirP << self.SET_IIR_PRESS_SHIFT
 
-        self._i2c.write_block(self.address, self.kRegDspIir, regData)
+        self._i2c.write_block(self.address, self.REG_DSP_IIR, reg_data)
 
-    def _set_oor_iir_count_limit(self, setOorIirP, setCountLimit):
+    def _set_oor_iir_count_limit(self, set_oor_iir_p, set_count_limit):
         """!
         This internal API sets the IIR configuration and count limit of OOR pressure.
         """
-        currPwrMode = self.get_power_mode()
+        curr_pwr_mode = self.get_power_mode()
 
         # OOR IIR configuration and count limit is writable only during STANDBY mode(as per datasheet)
-        if currPwrMode != self.kPowerModeStandby:
-            self.set_power_mode(self.kPowerModeStandby)
+        if curr_pwr_mode != self.POWER_MODE_STANDBY:
+            self.set_power_mode(self.POWER_MODE_STANDBY)
         
         # Get OOR pressure IIR configuration
-        regData = self._i2c.read_byte(self.address, self.kRegDspConfig)
+        reg_data = self._i2c.read_byte(self.address, self.REG_DSP_CONFIG)
 
-        regData &= ~self.kOorSelIirPressMask
-        regData |= setOorIirP << self.kOorSelIirPressShift
-        self._i2c.write_byte(self.address, self.kRegDspConfig, regData)
+        reg_data &= ~self.OOR_SEL_IIR_PRESS_MASK
+        reg_data |= set_oor_iir_p << self.OOR_SEL_IIR_PRESS_SHIFT
+        self._i2c.write_byte(self.address, self.REG_DSP_CONFIG, reg_data)
 
-        regData = self._i2c.read_byte(self.address, self.kRegOorConfig)
+        reg_data = self._i2c.read_byte(self.address, self.REG_OOR_CONFIG)
 
-        regData &= ~self.kOorCountLimitMask
-        regData |= setCountLimit << self.kOorCountLimitShift
+        reg_data &= ~self.OOR_COUNT_LIMIT_MASK
+        reg_data |= set_count_limit << self.OOR_COUNT_LIMIT_SHIFT
 
-        self._i2c.write_byte(self.address, self.kRegOorConfig, regData)
+        self._i2c.write_byte(self.address, self.REG_OOR_CONFIG, reg_data)
 
         # If previous mode is not standbymode return sensor to that previous mode
         # after setting oor iir configuration and count limit
-        if (currPwrMode != self.kPowerModeStandby) and (currPwrMode != self.kPowerModeDeepStandby): 
-            self.set_power_mode(currPwrMode)
+        if (curr_pwr_mode != self.POWER_MODE_STANDBY) and (curr_pwr_mode != self.POWER_MODE_DEEP_STANDBY): 
+            self.set_power_mode(curr_pwr_mode)
 
-    def _set_fifo_iir_config(self, setFifoIirT, setFifoIirP):
+    def _set_fifo_iir_config(self, set_fifo_iir_t, set_fifo_iir_p):
         """!
         Sets the configuration for IIR of fifo. Not to be used outside of driver.
         """
-        currPwrMode = self.get_power_mode()
+        curr_pwr_mode = self.get_power_mode()
 
         # Fifo IIR configuration is writable only during STANDBY mode(as per datasheet)
-        if currPwrMode != self.kPowerModeStandby:
-            self.set_power_mode(self.kPowerModeStandby)
+        if curr_pwr_mode != self.POWER_MODE_STANDBY:
+            self.set_power_mode(self.POWER_MODE_STANDBY)
         
-        regData = self._i2c.read_byte(self.address, self.kRegDspConfig)
+        reg_data = self._i2c.read_byte(self.address, self.REG_DSP_CONFIG)
 
-        regData &= ~self.kSetFifoIirTempMask
-        regData |= setFifoIirT << self.kSetFifoIirTempShift
-        regData &= ~self.kSetFifoIirPressMask
-        regData |= setFifoIirP << self.kSetFifoIirPressShift
+        reg_data &= ~self.SET_FIFO_IIR_TEMP_MASK
+        reg_data |= set_fifo_iir_t << self.SET_FIFO_IIR_TEMP_SHIFT
+        reg_data &= ~self.SET_FIFO_IIR_PRESS_MASK
+        reg_data |= set_fifo_iir_p << self.SET_FIFO_IIR_PRESS_SHIFT
 
-        self._i2c.write_byte(self.address, self.kRegDspConfig, regData)
+        self._i2c.write_byte(self.address, self.REG_DSP_CONFIG, reg_data)
 
         # If previous mode is not standbymode return sensor to that previous mode
         # after setting fifo iir configuration
-        if (currPwrMode != self.kPowerModeStandby) and (currPwrMode != self.kPowerModeDeepStandby): 
-            self.set_power_mode(currPwrMode)
+        if (curr_pwr_mode != self.POWER_MODE_STANDBY) and (curr_pwr_mode != self.POWER_MODE_DEEP_STANDBY): 
+            self.set_power_mode(curr_pwr_mode)
         
-    def _set_fifo_threshold(self, regData, fifo):
+    def _set_fifo_threshold(self, reg_data, fifo):
         """!
         This internal API is used to set fifo threshold based on the frame type selected. Not to be used outside of driver.
 
-        @param FifoConfiguration fifo: The fifo configuration
+        @param reg_data: **list of int** The FIFO configuration register bytes, updated in place
+        @param fifo: **FifoConfiguration** The fifo configuration
 
-        return: kNoError on success, kError on failure
+        @return **int** NO_ERROR on success, ERROR on failure
         """
-        if (fifo.frameSel == fifo.kFifoTemperatureData) or (fifo.frameSel == fifo.kFifoPressureData):
-            if fifo.threshold <= self.kFifoMaxThresholdPMode:
-                regData[0] = (regData[0] & ~self.kFifoThresholdMask) | ( fifo.threshold << self.kFifoThresholdShift)
+        if (fifo.frameSel == fifo.FIFO_TEMPERATURE_DATA) or (fifo.frameSel == fifo.FIFO_PRESSURE_DATA):
+            if fifo.threshold <= self.FIFO_MAX_THRESHOLD_P_MODE:
+                reg_data[0] = (reg_data[0] & ~self.FIFO_THRESHOLD_MASK) | ( fifo.threshold << self.FIFO_THRESHOLD_SHIFT)
             else:
-                return self.kError
+                return self.ERROR
 
-        elif (fifo.frameSel == fifo.kFifoPressTempData):
-            if fifo.threshold <= self.kFifoMaxThresholdPTMode:
-                regData[0] = (regData[0] & ~self.kFifoThresholdMask) | ( fifo.threshold << self.kFifoThresholdShift)
+        elif (fifo.frameSel == fifo.FIFO_PRESS_TEMP_DATA):
+            if fifo.threshold <= self.FIFO_MAX_THRESHOLD_PT_MODE:
+                reg_data[0] = (reg_data[0] & ~self.FIFO_THRESHOLD_MASK) | ( fifo.threshold << self.FIFO_THRESHOLD_SHIFT)
             else:
-                return self.kError
+                return self.ERROR
         
-        return self.kNoError
+        return self.NO_ERROR
 
-    def _unpack_sensor_data(self, sensorData, dataIndex, fifo):
+    def _unpack_sensor_data(self, sensor_data, data_index, fifo):
         """!
-        This internal API is used to unpack the FIFO data and store it in the sensorData parameter
+        This internal API is used to unpack the FIFO data and store it in the sensor_data parameter
 
-        @param SensorData sensorData: The sensor data
-        @param int dataIndex: The data index
-        @param FifoConfiguration fifo: The fifo configuration
+        @param sensor_data: **SensorData** The sensor data
+        @param data_index: **int** The data index
+        @param fifo: **FifoConfiguration** The fifo configuration
 
         @return  True on success, False on failure/frame empty
         
         """
         res = True 
-        if fifo.frameSel == fifo.kFifoTemperatureData:
-            if not ((fifo.data[dataIndex] == self.kFifoEmpty) and (fifo.data[dataIndex + 1] == self.kFifoEmpty) and (fifo.data[dataIndex + 2] == self.kFifoEmpty)):
-                rawDataT = (fifo.data[dataIndex + 2] << 16) | (fifo.data[dataIndex + 1] << 8) | fifo.data[dataIndex]
+        if fifo.frameSel == fifo.FIFO_TEMPERATURE_DATA:
+            if not ((fifo.data[data_index] == self.FIFO_EMPTY) and (fifo.data[data_index + 1] == self.FIFO_EMPTY) and (fifo.data[data_index + 2] == self.FIFO_EMPTY)):
+                raw_data_t = (fifo.data[data_index + 2] << 16) | (fifo.data[data_index + 1] << 8) | fifo.data[data_index]
                 
-                sensorData.temperature = rawDataT / 65536.0
-                sensorData.pressure = 0.0
-                dataIndex += 3
+                sensor_data.temperature = raw_data_t / 65536.0
+                sensor_data.pressure = 0.0
+                data_index += 3
             else:
-                dataIndex = fifo.length
+                data_index = fifo.length
                 res = False
 
-        if fifo.frameSel == fifo.kFifoPressureData:
-            if not ((fifo.data[dataIndex] == self.kFifoEmpty) and (fifo.data[dataIndex + 1] == self.kFifoEmpty) and (fifo.data[dataIndex + 2] == self.kFifoEmpty)):
-                rawDataP = (fifo.data[dataIndex + 2] << 16) | (fifo.data[dataIndex + 1] << 8) | fifo.data[dataIndex]
+        if fifo.frameSel == fifo.FIFO_PRESSURE_DATA:
+            if not ((fifo.data[data_index] == self.FIFO_EMPTY) and (fifo.data[data_index + 1] == self.FIFO_EMPTY) and (fifo.data[data_index + 2] == self.FIFO_EMPTY)):
+                raw_data_p = (fifo.data[data_index + 2] << 16) | (fifo.data[data_index + 1] << 8) | fifo.data[data_index]
                 
-                sensorData.pressure = rawDataP / 64.0
-                sensorData.temperature = 0.0
-                dataIndex += 3
+                sensor_data.pressure = raw_data_p / 64.0
+                sensor_data.temperature = 0.0
+                data_index += 3
             else:
-                dataIndex = fifo.length
+                data_index = fifo.length
                 res = False
 
-        if fifo.frameSel == fifo.kFifoPressTempData:
-            if not ((fifo.data[dataIndex] == self.kFifoEmpty) and (fifo.data[dataIndex + 1] == self.kFifoEmpty) and (fifo.data[dataIndex + 2] == self.kFifoEmpty) \
-                and (fifo.data[dataIndex + 3] == self.kFifoEmpty) and (fifo.data[dataIndex + 4] == self.kFifoEmpty) and (fifo.data[dataIndex + 5] == self.kFifoEmpty)):
-                rawDataT = (fifo.data[dataIndex + 2] << 16) | (fifo.data[dataIndex + 1] << 8) | fifo.data[dataIndex]
-                rawDataP = (fifo.data[dataIndex + 5] << 16) | (fifo.data[dataIndex + 4] << 8) | fifo.data[dataIndex + 3]
+        if fifo.frameSel == fifo.FIFO_PRESS_TEMP_DATA:
+            if not ((fifo.data[data_index] == self.FIFO_EMPTY) and (fifo.data[data_index + 1] == self.FIFO_EMPTY) and (fifo.data[data_index + 2] == self.FIFO_EMPTY) \
+                and (fifo.data[data_index + 3] == self.FIFO_EMPTY) and (fifo.data[data_index + 4] == self.FIFO_EMPTY) and (fifo.data[data_index + 5] == self.FIFO_EMPTY)):
+                raw_data_t = (fifo.data[data_index + 2] << 16) | (fifo.data[data_index + 1] << 8) | fifo.data[data_index]
+                raw_data_p = (fifo.data[data_index + 5] << 16) | (fifo.data[data_index + 4] << 8) | fifo.data[data_index + 3]
 
-                sensorData.temperature = rawDataT / 65536.0
-                sensorData.pressure = rawDataP / 64.0
-                dataIndex += 6
+                sensor_data.temperature = raw_data_t / 65536.0
+                sensor_data.pressure = raw_data_p / 64.0
+                data_index += 6
             else:
-                dataIndex = fifo.length
+                data_index = fifo.length
                 res = False
         
         else:
-            sensorData.pressure = 0.0
-            sensorData.temperature = 0.0
+            sensor_data.pressure = 0.0
+            sensor_data.temperature = 0.0
         
         return res
 
@@ -1206,59 +1201,58 @@ class QwiicBMP581(object):
         """!
         This API is used to get the status of NVM data. Not to be used outside of driver.
         """
-        return self._i2c.read_byte(self.address, self.kRegStatus)
+        return self._i2c.read_byte(self.address, self.REG_STATUS)
 
     def _get_nvm_data(self):
         """!
         This internal API is used to read the nvm data
         """
-        nvmStatus = self._get_nvm_status()
+        nvm_status = self._get_nvm_status()
 
-        if (nvmStatus & self.kIntNvmRdy) and (not(nvmStatus & self.kIntNvmErr)) and (not(nvmStatus & self.kIntNvmCmdErr)):
-            nvmData = self._i2c.read_block(self.address, self.kRegNvmDataLsb, 2)
-            return (nvmData[1] << 8) | nvmData[0]
+        if (nvm_status & self.INT_NVM_RDY) and (not(nvm_status & self.INT_NVM_ERR)) and (not(nvm_status & self.INT_NVM_CMD_ERR)):
+            nvm_data = self._i2c.read_block(self.address, self.REG_NVM_DATA_LSB, 2)
+            return (nvm_data[1] << 8) | nvm_data[0]
 
-        return self.kError
+        return self.ERROR
 
-    def _set_nvm_addr(self, nvmAddr, progEn):
+    def _set_nvm_addr(self, nvm_addr, prog_en):
         """!
         This internal API is used to set the nvm address and prog_enable based on NVM read/write selected.
 
-        @param int nvmAddr: The NVM address to set
-        @param int progEn: The program enable
+        @param nvm_addr: **int** The NVM address to set
+        @param prog_en: **int** The program enable
 
         Allowable values:
-            - `kEnable`
-            - `kDisable`
+            - `ENABLE`
+            - `DISABLE`
         """
-        nvmStatus = self._get_nvm_status()
+        nvm_status = self._get_nvm_status()
         
-        if nvmStatus & self.kIntNvmRdy:
-            regData = self._i2c.read_byte(self.address, self.kRegNvmAddr)
-            regData = (regData & ~self.kNvmAddrMask) | (nvmAddr << self.kNvmAddrShift)
-            regData &= ~self.kNvmProgEnMask
-            if progEn == self.kEnable:
-                regData |= progEn << self.kNvmProgEnShift
+        if nvm_status & self.INT_NVM_RDY:
+            reg_data = self._i2c.read_byte(self.address, self.REG_NVM_ADDR)
+            reg_data = (reg_data & ~self.NVM_ADDR_MASK) | (nvm_addr << self.NVM_ADDR_SHIFT)
+            reg_data &= ~self.NVM_PROG_EN_MASK
+            if prog_en == self.ENABLE:
+                reg_data |= prog_en << self.NVM_PROG_EN_SHIFT
             
-            self._i2c.write_byte(self.address, self.kRegNvmAddr, regData)
+            self._i2c.write_byte(self.address, self.REG_NVM_ADDR, reg_data)
 
-    def _nvm_write_addr(self, nvmAddr, progEn):
+    def _nvm_write_addr(self, nvm_addr, prog_en):
         """!
         This internal API is used to write the nvm data. Not to be used outside of driver.
 
-        @param int nvmAddr: The NVM address to write
-        @param int progEn: The program enable
-        @param int currPwrMode: The current power mode
+        @param nvm_addr: **int** The NVM address to write
+        @param prog_en: **int** The program enable
 
         @return  The new power mode
         
         """
-        currPwrMode = self.kError
+        curr_pwr_mode = self.ERROR
 
-        if (nvmAddr >= self.kNvmStartAddr) and (nvmAddr <= self.kNvmEndAddr):
-            currPwrMode = self.get_power_mode()
-            if currPwrMode != self.kPowerModeStandby:
-                self.set_power_mode(self.kPowerModeStandby)
-            self._set_nvm_addr(nvmAddr, progEn)
+        if (nvm_addr >= self.NVM_START_ADDR) and (nvm_addr <= self.NVM_END_ADDR):
+            curr_pwr_mode = self.get_power_mode()
+            if curr_pwr_mode != self.POWER_MODE_STANDBY:
+                self.set_power_mode(self.POWER_MODE_STANDBY)
+            self._set_nvm_addr(nvm_addr, prog_en)
         
-        return currPwrMode
+        return curr_pwr_mode

@@ -38,9 +38,9 @@
 
 import qwiic_ens160
 import sys
-from time import sleep
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	# TODO Replace template and title
 	print("\nQwiic ENS160 Example 6 - Burn In\n")
 
@@ -48,7 +48,7 @@ def runExample():
 	myEns = qwiic_ens160.QwiicENS160()
 
 	# Check if it's connected
-	if myEns.is_connected() == False:
+	if not myEns.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
@@ -56,13 +56,13 @@ def runExample():
 	# Initialize the device
 	myEns.begin()
 
-	myEns.set_operating_mode(myEns.kOpModeReset)
+	myEns.set_operating_mode(myEns.OP_MODE_RESET)
 
-	sleep(0.1)
+	qwiic_i2c.delay_ms(100)
 
 	# Set to standard operation
-	# Others include kOpModeDeepSleep and kOpModeIdle
-	myEns.set_operating_mode(myEns.kOpModeStandard)
+	# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
+	myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
 
 	# There are four values here: 
 	# 0 - Operating ok: Standard Operation
@@ -77,20 +77,20 @@ def runExample():
 	warming_up = True
 	while warming_up:
 		print("Waiting for the device to warm up...")
-		ensStatus = myEns.get_flags()
+		ens_status = myEns.get_flags()
 
-		print(str(ensStatus))
+		print(str(ens_status))
 	
-		if (ensStatus == myEns.kValidityFlagStartUp) or (ensStatus == myEns.kValidityFlagNormal):
+		if (ens_status == myEns.VALIDITY_FLAG_START_UP) or (ens_status == myEns.VALIDITY_FLAG_NORMAL):
 			print("ENS160 is warmed up! ")
 			warming_up = False
 
-		if ensStatus == myEns.kValidityFlagInvalid: 
+		if ens_status == myEns.VALIDITY_FLAG_INVALID: 
 			print("Invalid Ouput...Freezing.")
 			while True: 
 				pass
 		
-		sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 	# Now enter main loop
 	while True:
@@ -100,12 +100,12 @@ def runExample():
 			print("CO2 concentration (ppm): ", myEns.get_eco2())
 			print("\n------------------------\n")
 		
-		sleep(0.2)
+		qwiic_i2c.delay_ms(200)
 
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

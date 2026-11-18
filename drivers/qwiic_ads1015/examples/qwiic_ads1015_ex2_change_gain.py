@@ -47,9 +47,9 @@
 
 import qwiic_ads1015
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic ADS1015 Example 2 - Change Gain\n")
 
 	# Create instance of device
@@ -64,16 +64,16 @@ def runExample():
 	# Initialize the device
 	myAds.begin()
 
-	myAds.set_gain(myAds.kConfigPga1)
+	myAds.set_gain(myAds.CONFIG_PGA_1)
 
 	while True:
 		channel_A3 = myAds.get_single_ended(3)
 		print("A3: ", channel_A3)
-		time.sleep(0.050)
+		qwiic_i2c.delay_ms(50)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example 2")
 		sys.exit(0)

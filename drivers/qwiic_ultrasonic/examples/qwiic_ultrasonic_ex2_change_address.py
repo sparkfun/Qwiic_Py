@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_ultrasonic_ex2_basic_readings.py
+# qwiic_ultrasonic_ex2_change_address.py
 #
 # Demosntrates how to change the address of the Qwiic Ultrasonic Sensor
 #-------------------------------------------------------------------------------
@@ -35,23 +35,22 @@
 
 import qwiic_ultrasonic
 import sys
-import time
-
+import qwiic_i2c
 # Here we set the device address. Note that an older version of the Qwiic
 # Ultrasonic firmware used a default address of 0x00. If yours uses 0x00,
 # you'll need to change the address below. It is also recommended to run
 # Example 2 to change the address to the new default.
-deviceAddress = qwiic_ultrasonic.QwiicUltrasonic.kDefaultAddress
-# deviceAddress = 0x00
+device_address = qwiic_ultrasonic.QwiicUltrasonic.DEFAULT_ADDRESS
+# device_address = 0x00
 
-def runExample():
-	print("\nQwiic Ultrasonic Example 1 - Basic Readings\n")
+def run_example():
+	print("\nQwiic Ultrasonic Example 2 - Change Address\n")
 
 	# Create instance of device
-	my_ultrasonic = qwiic_ultrasonic.QwiicUltrasonic(address=deviceAddress)
+	my_ultrasonic = qwiic_ultrasonic.QwiicUltrasonic(address=device_address)
 
 	# Check if it's connected
-	if my_ultrasonic.is_connected() == False:
+	if not my_ultrasonic.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
@@ -60,8 +59,8 @@ def runExample():
 	my_ultrasonic.begin()
 
 	# Repeat until the address has been successfully changed
-	addressChanged = False
-	while not addressChanged:
+	address_changed = False
+	while not address_changed:
 		# Print instructions
 		print()
 		print("Please enter a new address for the sensor.")
@@ -70,29 +69,29 @@ def runExample():
 		print()
 
 		# Read input from user
-		newAddress = input("New address: ")
+		new_address = input("New address: ")
 
 		try:
 			# Parse input using int() function
-			newAddress = int(newAddress, 16)
+			new_address = int(new_address, 16)
 
-			print("Parsed address:", hex(newAddress))
+			print("Parsed address:", hex(new_address))
 
 			# Check if the address is valid
-			if newAddress < my_ultrasonic.kMinAddress or newAddress > my_ultrasonic.kMaxAddress:
+			if new_address < my_ultrasonic.MIN_ADDRESS or new_address > my_ultrasonic.MAX_ADDRESS:
 				print("Invalid address!")
 				continue
 
 			# Address is valid, attempt to change it on the device
-			result = my_ultrasonic.change_address(newAddress)
+			result = my_ultrasonic.change_address(new_address)
 
 			# Check whether the address was changed successfully
-			if result == False:
+			if not result:
 				print("Failed to change address!")
 				continue
 			
 			# Success, we're done here!
-			addressChanged = True
+			address_changed = True
 
 		except ValueError:
 			print("Invalid address format!")
@@ -100,7 +99,7 @@ def runExample():
 	print("Address changed successfully! Continuing...")
 
 	# Wait a moment so user can read the messages
-	time.sleep(1)
+	qwiic_i2c.delay_ms(1000)
 
 	# Loop forever
 	while True:
@@ -112,11 +111,11 @@ def runExample():
 		print("Distance (mm):", distance)
 
 		# Wait a bit
-		time.sleep(0.1)
+		qwiic_i2c.delay_ms(100)
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

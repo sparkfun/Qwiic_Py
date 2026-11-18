@@ -51,6 +51,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in teh class definition
 # as class variables, making them available without having to create a class instance.
 # This allows higher level logic to rapidly create an index of qwiic devices at
@@ -78,8 +80,7 @@ class QwiicRFID(object):
 
     @param address: The I2C address to use for the device.
                         If not provied, the default address is  used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The RFID device object.
     """
@@ -101,22 +102,18 @@ class QwiicRFID(object):
     TIME_ARRAY = [None] * MAX_TAG_STORAGE
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver == None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c == None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ------------------------------------
     # is_connected()
@@ -128,7 +125,7 @@ class QwiicRFID(object):
 
         @return **void** True if the device is connected, otherwise False.
         """
-        return self._i2c.isDeviceConnected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # -------------------------------------
     # begin()
@@ -269,7 +266,7 @@ class QwiicRFID(object):
         if new_address < 0x07 or new_address > 0x78:
             return False
         
-        self._i2c.writeByte(self.address, self.ADDRESS_LOCATION, new_address)
+        self._i2c.write_byte(self.address, self.ADDRESS_LOCATION, new_address)
         
         self.address = new_address
 
@@ -290,7 +287,7 @@ class QwiicRFID(object):
 
         # What is read from the buffer is immediately converted to a string and 
         # concatenated onto the temporary variable.
-        _temp_tag_list = self._i2c.readBlock(self.address, 0, 10)
+        _temp_tag_list = self._i2c.read_block(self.address, 0, 10)
         
         for i in range(0, 6):
             _temp_tag_str += str(_temp_tag_list[i])
@@ -331,7 +328,7 @@ class QwiicRFID(object):
         
             # What is read from the buffer is immediately converted to a string and 
             # concatenated onto the temporary variable.
-            _temp_tag_list = self._i2c.readBlock(self.address, 0, 10)
+            _temp_tag_list = self._i2c.read_block(self.address, 0, 10)
         
             for j in range(0, 6):
                 _temp_tag_str += str(_temp_tag_list[j])

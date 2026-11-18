@@ -52,7 +52,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 #-----------------------------------------------------------------------------
 
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion 
 # as class variables, making them avilable without having to create a class instance.
@@ -68,20 +69,19 @@ _DEFAULT_NAME = "Qwiic ADXL313"
 _AVAILABLE_I2C_ADDRESS = [0x1D, 0x53]
 
 # define our valid chip IDs
-_validChipIDs = [0xCB]
+_VALID_CHIP_IDS = [0xCB]
 
 # define the class that encapsulates the device being created. All information associated with this
 # device is encapsulated by this class. The device class should be the only value exported 
 # from this module.
 
-class QwiicAdxl313(object):
+class QwiicADXL313(object):
 	"""
-	QwiicAdxl313
+	QwiicADXL313
 
 		:param address: The I2C address to use for the device. 
 						If not provided, the default address is used.
-		:param i2c_driver: An existing i2c driver object. If not provided 
-						a driver object is created. 
+		:param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 		:return: The ADXL313 device object.
 		:rtype: Object
 	"""
@@ -203,36 +203,29 @@ class QwiicAdxl313(object):
 	z = 0
 
 	# Constructor
-	def __init__(self, address=None, i2c_driver=None):
+	def __init__(self, address=None, i2c_bus=None):
 
+		# The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+		address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 		# Did the user specify an I2C address?
 		self.address = address if address != None else self.available_addresses[0]
 
-		# load the I2C driver if one isn't provided
-
-		if i2c_driver == None:
-			self._i2c = qwiic_i2c.getI2CDriver()
-			if self._i2c == None:
-				print("Unable to load I2C driver for this platform.")
-				return
-		else:
-			self._i2c = i2c_driver
+		# Use the given I2C bus, or the platform's default bus
+		self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
 	# ----------------------------------
-	# isConnected()
+	# is_connected()
 	#
 	# Is an actual board connected to our system?
 
-	def isConnected(self):
+	def is_connected(self):
 		""" 
-			Determine if a device is conntected to the system..
+			Determine if a device is connected to the system.
 
 			:return: True if the device is connected, otherwise False.
 			:rtype: bool
 		"""
-		return qwiic_i2c.isDeviceConnected(self.address)
-
-	connected = property(isConnected)
+		return qwiic_i2c.is_device_connected(self.address)
 
 	# ----------------------------------
 	# begin()
@@ -246,9 +239,8 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		# are we who we need to be?
-		chipID = self._i2c.readByte(self.address, self.AGB0_REG_WHO_AM_I)
-		if not chipID in _validChipIDs:
-			print("Invalid Chip ID: 0x%.2X" % chipID)
+		chip_id = self._i2c.read_byte(self.address, self.AGB0_REG_WHO_AM_I)
+		if not chip_id in _VALID_CHIP_IDS:
 			return False
 
 		return True
@@ -264,86 +256,86 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_POWER_CTL, self.ADXL313_MEASURE_BIT, False)
+		return self.set_register_bit(self.ADXL313_POWER_CTL, self.ADXL313_MEASURE_BIT, False)
 
 	# ----------------------------------
-	# measureModeOn()
+	# measure_mode_on()
 	#
 	# sets the measure bit, putting decive in measure mode, ready for reading data
-	def measureModeOn(self):
+	def measure_mode_on(self):
 		""" 
 			sets the measure bit, putting decive in measure mode, ready for reading data
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_POWER_CTL, self.ADXL313_MEASURE_BIT, True)
+		return self.set_register_bit(self.ADXL313_POWER_CTL, self.ADXL313_MEASURE_BIT, True)
 
 	# ----------------------------------
-	# dataReady()
+	# data_ready()
 	#
 	# Reads INT Source register, returns dataready bit status (0 or 1)
-	def dataReady(self):
+	def data_ready(self):
 		""" 
 			Reads INT Source register, returns dataready bit status (0 or 1)
 
 			:return: Status of dataready bit within the int source register
 			:rtype: bool
 		"""
-		return self.getRegisterBit(self.ADXL313_INT_SOURCE, self.ADXL313_INT_DATA_READY_BIT)
+		return self.get_register_bit(self.ADXL313_INT_SOURCE, self.ADXL313_INT_DATA_READY_BIT)
 
 	# ----------------------------------
-	# setRegisterBit()
+	# set_register_bit()
 	#
 	# Sets or clears bit of specified register
-	def setRegisterBit(self, regAddress, bitPos, state):
+	def set_register_bit(self, reg_address, bit_pos, state):
 		""" 
 			Sets or clears bit of specified register
 
-            :param regAddress: The address of the register you'd like to affect.
-            :param bitPos: The specific bit of the register you'd like to affect.
+            :param reg_address: The address of the register you'd like to affect.
+            :param bit_pos: The specific bit of the register you'd like to affect.
             :param state: The condition of the bit you'd like to set/clear (0 or 1).
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		_register = self._i2c.readByte(self.address, regAddress)
+		_register = self._i2c.read_byte(self.address, reg_address)
 		if(state):
-			_register |= (1 << bitPos) # Forces nth Bit of _register to 1. Other Bits Unchanged.
+			_register |= (1 << bit_pos) # Forces nth Bit of _register to 1. Other Bits Unchanged.
 		else:
-			_register &= ~(1 << bitPos) # Forces nth Bit of _register to 0. Other Bits Unchanged.
-		self._i2c.writeByte(self.address, regAddress, _register)
+			_register &= ~(1 << bit_pos) # Forces nth Bit of _register to 0. Other Bits Unchanged.
+		self._i2c.write_byte(self.address, reg_address, _register)
 		return True        
 
 	# ----------------------------------
-	# getRegisterBit()
+	# get_register_bit()
 	#
 	# gets the bit status of specified register
-	def getRegisterBit(self, regAddress, bitPos):
+	def get_register_bit(self, reg_address, bit_pos):
 		""" 
 			Gets the bit status of specified register
 
-            :param regAddress: The address of the register you'd like to read
-            :param bitPos: The specific bit of the register you'd like to read
+            :param reg_address: The address of the register you'd like to read
+            :param bit_pos: The specific bit of the register you'd like to read
 
 			:return: Status of bit spcified within the register (0 or 1)
 			:rtype: bool
 		"""
-		_register = self._i2c.readByte(self.address, regAddress)
-		return ((_register >> bitPos) & 1)  
+		_register = self._i2c.read_byte(self.address, reg_address)
+		return ((_register >> bit_pos) & 1)  
 
 	# ----------------------------------
-	# readAccel()
+	# read_accel()
 	#
 	# Reads Acceleration into Three Class Variables:  x, y and z
-	def readAccel(self):
+	def read_accel(self):
 		""" 
 			Reads Acceleration into Three Class Variables:  x, y and z
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		buff = self._i2c.readBlock(self.address, self.ADXL313_DATA_X0, self.ADXL313_TO_READ)
+		buff = self._i2c.read_block(self.address, self.ADXL313_DATA_X0, self.ADXL313_TO_READ)
 		self.x = ((buff[1] << 8) | buff[0])
 		self.y = ((buff[3] << 8) | buff[2])
 		self.z = ((buff[5] << 8) | buff[4])
@@ -360,17 +352,17 @@ class QwiicAdxl313(object):
 		return True    
 
 	# ----------------------------------
-	# getRange()
+	# get_range()
 	#
 	# Reads the current range setting on the device
-	def getRange(self):
+	def get_range(self):
 		""" 
 			Reads the current range setting on the device
 
 			:return: range setting of the device (from in DATA_FORMAT register)
 			:rtype: float
 		"""
-		_register = self._i2c.readByte(self.address, regAddress)
+		_register = self._i2c.read_byte(self.address, self.ADXL313_DATA_FORMAT)
 		_range = (_register & 0b00000011)
 		range_val = 0.1 # float, so we can handle the 0.5 range value
 
@@ -388,10 +380,10 @@ class QwiicAdxl313(object):
 		return range_val
 
 	# ----------------------------------
-	# setRange()
+	# set_range()
 	#
 	# Sets the range setting on the device
-	def setRange(self, new_range):
+	def set_range(self, new_range):
 		""" 
 			Sets the range setting on the device
 
@@ -400,20 +392,20 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		_register = self._i2c.readByte(self.address, self.ADXL313_DATA_FORMAT)
+		_register = self._i2c.read_byte(self.address, self.ADXL313_DATA_FORMAT)
 		to_write = new_range
 		to_write |= (_register & 0b11101100)
-		self._i2c.writeByte(self.address, self.ADXL313_DATA_FORMAT, to_write)
+		self._i2c.write_byte(self.address, self.ADXL313_DATA_FORMAT, to_write)
 		return True
 
 	# ----------------------------------
-	# autosleepOn()
+	# autosleep_on()
 	#
 	# Turns Autosleep on.
 	# note, prior to calling this, 
 	# you will need to set THRESH_INACT and TIME_INACT.
 	# set the link bit, to "link" activity and inactivity sensing
-	def autosleepOn(self):
+	def autosleep_on(self):
 		""" 
 			Turns Autosleep on.
 
@@ -421,17 +413,17 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		# set the link bit, to "link" activity and inactivity sensing
-		self.setRegisterBit(self.ADXL313_POWER_CTL, self.ADXL313_LINK_BIT, True)
+		self.set_register_bit(self.ADXL313_POWER_CTL, self.ADXL313_LINK_BIT, True)
 
 		# set the autosleep
-		self.setRegisterBit(self.ADXL313_POWER_CTL, self.ADXL313_AUTOSLEEP_BIT, True)
+		self.set_register_bit(self.ADXL313_POWER_CTL, self.ADXL313_AUTOSLEEP_BIT, True)
 		return True
 
 	# ----------------------------------
-	# autosleepOff()
+	# autosleep_off()
 	#
 	# Turns Autosleep off
-	def autosleepOff(self):
+	def autosleep_off(self):
 		""" 
 			Turns Autosleep off.
 
@@ -439,14 +431,14 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		# clear the autosleep bit
-		self.setRegisterBit(self.ADXL313_POWER_CTL, self.ADXL313_AUTOSLEEP_BIT, False)
+		self.set_register_bit(self.ADXL313_POWER_CTL, self.ADXL313_AUTOSLEEP_BIT, False)
 		return True		
 
 	# ----------------------------------
-	# setActivityX()
+	# set_activity_x()
 	#
 	# Enalbes or disables X axis participattion in activity detection
-	def setActivityX(self, state):
+	def set_activity_x(self, state):
 		""" 
 			Enalbes or disables X axis participattion in activity detection
 			:param state: 1 = enabled, 0 = disabled
@@ -454,13 +446,13 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_ACT_INACT_CTL, 6, state)
+		return self.set_register_bit(self.ADXL313_ACT_INACT_CTL, 6, state)
 	
 	# ----------------------------------
-	# setActivityY()
+	# set_activity_y()
 	#
 	# Enalbes or disables Y axis participattion in activity detection
-	def setActivityY(self, state):
+	def set_activity_y(self, state):
 		""" 
 			Enalbes or disables Y axis participattion in activity detection
 			:param state: 1 = enabled, 0 = disabled
@@ -468,13 +460,13 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_ACT_INACT_CTL, 5, state)
+		return self.set_register_bit(self.ADXL313_ACT_INACT_CTL, 5, state)
 
 	# ----------------------------------
-	# setActivityZ()
+	# set_activity_z()
 	#
 	# Enalbes or disables Z axis participattion in activity detection
-	def setActivityZ(self, state):
+	def set_activity_z(self, state):
 		""" 
 			Enalbes or disables Z axis participattion in activity detection
 			:param state: 1 = enabled, 0 = disabled
@@ -482,13 +474,13 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_ACT_INACT_CTL, 4, state)		
+		return self.set_register_bit(self.ADXL313_ACT_INACT_CTL, 4, state)		
 
 	# ----------------------------------
-	# setInactivityX()
+	# set_inactivity_x()
 	#
 	# Enalbes or disables X axis participattion in inactivity detection
-	def setInactivityX(self, state):
+	def set_inactivity_x(self, state):
 		""" 
 			Enalbes or disables X axis participattion in inactivity detection
 			:param state: 1 = enabled, 0 = disabled
@@ -496,13 +488,13 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_ACT_INACT_CTL, 2, state)
+		return self.set_register_bit(self.ADXL313_ACT_INACT_CTL, 2, state)
 	
 	# ----------------------------------
-	# setInactivityY()
+	# set_inactivity_y()
 	#
 	# Enalbes or disables Y axis participattion in inactivity detection
-	def setInactivityY(self, state):
+	def set_inactivity_y(self, state):
 		""" 
 			Enalbes or disables Y axis participattion in inactivity detection
 			:param state: 1 = enabled, 0 = disabled
@@ -510,13 +502,13 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_ACT_INACT_CTL, 1, state)
+		return self.set_register_bit(self.ADXL313_ACT_INACT_CTL, 1, state)
 
 	# ----------------------------------
-	# setInactivityZ()
+	# set_inactivity_z()
 	#
 	# Enalbes or disables Z axis participattion in inactivity detection
-	def setInactivityZ(self, state):
+	def set_inactivity_z(self, state):
 		""" 
 			Enalbes or disables Z axis participattion in inactivity detection
 			:param state: 1 = enabled, 0 = disabled
@@ -524,10 +516,10 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_ACT_INACT_CTL, 0, state)		
+		return self.set_register_bit(self.ADXL313_ACT_INACT_CTL, 0, state)		
 
 	# ----------------------------------
-	# setActivityThreshold()
+	# set_activity_threshold()
 	#
 	# Sets the Threshold Value for Detecting Activity.
 	# Data Format is Unsigned, so the Magnitude of the Activity Event is Compared
@@ -535,33 +527,33 @@ class QwiicAdxl313(object):
 	# The Scale Factor is 62.5mg/LSB.
 	# Value of 0 may Result in Undesirable Behavior if the Activity Interrupt Enabled.
 	# It Accepts a Maximum Value of 255.
-	def setActivityThreshold(self, activityThreshold):
+	def set_activity_threshold(self, activity_threshold):
 		""" 
 			Sets the Threshold Value for Detecting Activity.
-			:param activityThreshold: 0-255
+			:param activity_threshold: 0-255
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		activityThreshold = self.limit(activityThreshold)
-		self._i2c.writeByte(self.address, self.ADXL313_THRESH_ACT, activityThreshold)
+		activity_threshold = self.limit(activity_threshold)
+		self._i2c.write_byte(self.address, self.ADXL313_THRESH_ACT, activity_threshold)
 		return True		
 
 	# ----------------------------------
-	# getActivityThreshold()
+	# get_activity_threshold()
 	#
 	# Gets the Threshold Value for Detecting Activity.
-	def getActivityThreshold(self):
+	def get_activity_threshold(self):
 		""" 
 			Gets the Threshold Value for Detecting Activity.
 
 			:return: activity detection theshold
 			:rtype: byte
 		"""
-		return self._i2c.readByte(self.address, self.ADXL313_THRESH_ACT)			
+		return self._i2c.read_byte(self.address, self.ADXL313_THRESH_ACT)			
 
 	# ----------------------------------
-	# setInactivityThreshold()
+	# set_inactivity_threshold()
 	#
 	# Sets the Threshold Value for Detecting Inactivity.
 	# Data Format is Unsigned, so the Magnitude of the Inactivity Event is Compared
@@ -569,33 +561,33 @@ class QwiicAdxl313(object):
 	# The Scale Factor is 62.5mg/LSB.
 	# Value of 0 may Result in Undesirable Behavior if the Inactivity Interrupt Enabled.
 	# It Accepts a Maximum Value of 255.
-	def setInactivityThreshold(self, inactivityThreshold):
+	def set_inactivity_threshold(self, inactivity_threshold):
 		""" 
 			Sets the Threshold Value for Detecting Inactivity.
-			:param inactivityThreshold: 0-255
+			:param inactivity_threshold: 0-255
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		inactivityThreshold = self.limit(inactivityThreshold)
-		self._i2c.writeByte(self.address, self.ADXL313_THRESH_INACT, inactivityThreshold)
+		inactivity_threshold = self.limit(inactivity_threshold)
+		self._i2c.write_byte(self.address, self.ADXL313_THRESH_INACT, inactivity_threshold)
 		return True		
 
 	# ----------------------------------
-	# getInactivityThreshold()
+	# get_inactivity_threshold()
 	#
 	# Gets the Threshold Value for Detecting Inactivity.
-	def getInactivityThreshold(self):
+	def get_inactivity_threshold(self):
 		""" 
 			Gets the Threshold Value for Detecting Inactivity.
 
 			:return: inactivity detection theshold
 			:rtype: byte
 		"""
-		return self._i2c.readByte(self.address, self.ADXL313_THRESH_INACT)			
+		return self._i2c.read_byte(self.address, self.ADXL313_THRESH_INACT)			
 
 	# ----------------------------------
-	# setTimeInactivity()
+	# set_time_inactivity()
 	#
 	# Sets time requirement below inactivity threshold to detect inactivity
 	# Contains an Unsigned Time Value Representing the Amount of Time that
@@ -604,30 +596,30 @@ class QwiicAdxl313(object):
 	# Uses Filtered Output Data* unlike other Interrupt Functions
 	# Scale Factor is 1sec/LSB.
 	# Value Must Be Between 0 and 255.
-	def setTimeInactivity(self, timeInactivity):
+	def set_time_inactivity(self, time_inactivity):
 		""" 
 			Sets time requirement below inactivity threshold to detect inactivity
-			:param timeInactivity: 0-255
+			:param time_inactivity: 0-255
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		timeInactivity = self.limit(timeInactivity)
-		self._i2c.writeByte(self.address, self.ADXL313_TIME_INACT, timeInactivity)
+		time_inactivity = self.limit(time_inactivity)
+		self._i2c.write_byte(self.address, self.ADXL313_TIME_INACT, time_inactivity)
 		return True		
 
 	# ----------------------------------
-	# getTimeInactivity()
+	# get_time_inactivity()
 	#
 	# Gets time requirement below inactivity threshold to detect inactivity
-	def getTimeInactivity(self):
+	def get_time_inactivity(self):
 		""" 
 			Gets time requirement below inactivity threshold to detect inactivity
 
 			:return: inactivity detection time requirement
 			:rtype: byte
 		"""
-		return self._i2c.readByte(self.address, self.ADXL313_TIME_INACT)			
+		return self._i2c.read_byte(self.address, self.ADXL313_TIME_INACT)			
 
 	def limit(self, num, minimum=1, maximum=255):
 		"""
@@ -648,55 +640,55 @@ class QwiicAdxl313(object):
 		return num		
 
 	# ----------------------------------
-	# setInterruptMapping()
+	# set_interrupt_mapping()
 	#
 	# Maps the desired interrupt bit (from intsource) to the desired hardware interrupt pin
-	def setInterruptMapping(self, interruptBit, interruptPin):
+	def set_interrupt_mapping(self, interrupt_bit, interrupt_pin):
 		""" 
 			Maps the desired interrupt bit (from intsource) to the desired hardware interrupt pin
-			:param interrruptBit: the desired int bit you'd like to map
-			:param interruptPin: ADXL313_INT1_PIN or ADXL313_INT2_PIN
+			:param interrupt_bit: the desired int bit you'd like to map
+			:param interrupt_pin: ADXL313_INT1_PIN or ADXL313_INT2_PIN
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_INT_MAP, interruptBit, interruptPin)	
+		return self.set_register_bit(self.ADXL313_INT_MAP, interrupt_bit, interrupt_pin)	
 
 
 	# ----------------------------------
-	# isInterruptEnabled()
+	# is_interrupt_enabled()
 	#
 	# Get status of whether an interrupt is enabled or disabled.
-	def isInterruptEnabled(self, interruptBit):
+	def is_interrupt_enabled(self, interrupt_bit):
 		""" 
 			Get status of whether an interrupt is enabled or disabled.
-			:param interrruptBit: the desired int bit you'd like to read
+			:param interrupt_bit: the desired int bit you'd like to read
 
 			:return: Returns true if the interrupt bit is enabled, otherwise false
 			:rtype: bool
 		"""
-		return self.getRegisterBit(self.ADXL313_INT_ENABLE, interruptBit)			
+		return self.get_register_bit(self.ADXL313_INT_ENABLE, interrupt_bit)			
 
 	# ----------------------------------
-	# setInterrupt()
+	# set_interrupt()
 	#
 	# Sets the enable bit (0 or 1) for one desired int inside the ADXL313_INT_ENABLE register
-	def setInterrupt(self, interruptBit, state):
+	def set_interrupt(self, interrupt_bit, state):
 		""" 
 			Sets the enable bit (0 or 1) for one desired int inside the ADXL313_INT_ENABLE register
-			:param interrruptBit: the desired int bit you'd like to change
+			:param interrupt_bit: the desired int bit you'd like to change
 			:param state: 1 = enabled, 0 = disabled
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		return self.setRegisterBit(self.ADXL313_INT_ENABLE, interruptBit, state)	
+		return self.set_register_bit(self.ADXL313_INT_ENABLE, interrupt_bit, state)	
 
 	# ----------------------------------
-	# ActivityINT()
+	# activity_int()
 	#
 	# Enables or disables the activity interrupt
-	def ActivityINT(self, state):
+	def activity_int(self, state):
 		""" 
 			Enables or disables the activity interrupt
 			
@@ -706,15 +698,15 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		if state:
-			return self.setInterrupt(self.ADXL313_INT_ACTIVITY_BIT, 1)
+			return self.set_interrupt(self.ADXL313_INT_ACTIVITY_BIT, 1)
 		else:
-			return self.setInterrupt(self.ADXL313_INT_ACTIVITY_BIT, 0)
+			return self.set_interrupt(self.ADXL313_INT_ACTIVITY_BIT, 0)
 
 	# ----------------------------------
-	# InactivityINT()
+	# inactivity_int()
 	#
 	# Enables or disables the inactivity interrupt
-	def InactivityINT(self, state):
+	def inactivity_int(self, state):
 		""" 
 			Enables or disables the inactivity interrupt
 			:param state: 1 = enabled, 0 = disabled
@@ -723,15 +715,15 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		if state:
-			return self.setInterrupt(self.ADXL313_INT_INACTIVITY_BIT, 1)
+			return self.set_interrupt(self.ADXL313_INT_INACTIVITY_BIT, 1)
 		else:
-			return self.setInterrupt(self.ADXL313_INT_INACTIVITY_BIT, 0)		
+			return self.set_interrupt(self.ADXL313_INT_INACTIVITY_BIT, 0)		
 
 	# ----------------------------------
-	# DataReadyINT()
+	# data_ready_int()
 	#
 	# Enables or disables the dataready interrupt
-	def DataReadyINT(self, state):
+	def data_ready_int(self, state):
 		""" 
 			Enables or disables the dataready interrupt
 			:param state: 1 = enabled, 0 = disabled
@@ -740,15 +732,15 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		if state:
-			return self.setInterrupt(self.ADXL313_INT_DATA_READY_BIT, 1)
+			return self.set_interrupt(self.ADXL313_INT_DATA_READY_BIT, 1)
 		else:
-			return self.setInterrupt(self.ADXL313_INT_DATA_READY_BIT, 0)				
+			return self.set_interrupt(self.ADXL313_INT_DATA_READY_BIT, 0)				
 
 	# ----------------------------------
-	# WatermarkINT()
+	# watermark_int()
 	#
 	# Enables or disables the watermark interrupt
-	def WatermarkINT(self, state):
+	def watermark_int(self, state):
 		""" 
 			Enables or disables the watermark interrupt
 			:param state: 1 = enabled, 0 = disabled
@@ -757,15 +749,15 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		if state:
-			return self.setInterrupt(self.ADXL313_INT_WATERMARK_BIT, 1)
+			return self.set_interrupt(self.ADXL313_INT_WATERMARK_BIT, 1)
 		else:
-			return self.setInterrupt(self.ADXL313_INT_WATERMARK_BIT, 0)					
+			return self.set_interrupt(self.ADXL313_INT_WATERMARK_BIT, 0)					
 
 	# ----------------------------------
-	# OverrunINT()
+	# overrun_int()
 	#
 	# Enables or disables the overrun interrupt
-	def OverrunINT(self, state):
+	def overrun_int(self, state):
 		""" 
 			Enables or disables the overrun interrupt
 			:param state: 1 = enabled, 0 = disabled
@@ -774,32 +766,32 @@ class QwiicAdxl313(object):
 			:rtype: bool
 		"""
 		if state:
-			return self.setInterrupt(self.ADXL313_INT_OVERRUN_BIT, 1)
+			return self.set_interrupt(self.ADXL313_INT_OVERRUN_BIT, 1)
 		else:
-			return self.setInterrupt(self.ADXL313_INT_OVERRUN_BIT, 0)								
+			return self.set_interrupt(self.ADXL313_INT_OVERRUN_BIT, 0)								
 
 
 	# ----------------------------------
-	# getFifoMode()
+	# get_fifo_mode()
 	#
 	# Get the current FIFO mode (0=bypass,1=fifo,2=stream,3=trigger)
-	def getFifoMode(self):
+	def get_fifo_mode(self):
 		""" 
 			Get the current FIFO mode (0=bypass,1=fifo,2=stream,3=trigger)
 
 			:return: FIFO mode (0=bypass,1=fifo,2=stream,3=trigger)
 			:rtype: byte
 		"""
-		_register = self._i2c.readByte(self.address, self.ADXL313_FIFO_CTL)
+		_register = self._i2c.read_byte(self.address, self.ADXL313_FIFO_CTL)
 		mode = (_register & 0b11000000) # mask all the other bits [0:5]
 		mode = (mode >> 6)
 		return mode
 
 	# ----------------------------------
-	# setFifoMode(self, mode)
+	# set_fifo_mode(self, mode)
 	#
 	# Set FIFO mode (0=bypass,1=fifo,2=stream,3=trigger)
-	def setFifoMode(self, mode):
+	def set_fifo_mode(self, mode):
 		""" 
 			Set FIFO mode
 
@@ -808,32 +800,32 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		_register = self._i2c.readByte(self.address, self.ADXL313_FIFO_CTL) # read entire FIFO_CTRL reg
+		_register = self._i2c.read_byte(self.address, self.ADXL313_FIFO_CTL) # read entire FIFO_CTRL reg
 		_register &= 0b00111111 # clear current mode bits
 		_register |= (mode << 6) # set the desired mode bits into our "write regiter variable"
-		self._i2c.writeByte(self.address, self.ADXL313_FIFO_CTL, _register) # write it!
+		self._i2c.write_byte(self.address, self.ADXL313_FIFO_CTL, _register) # write it!
 		return True
 
 	# ----------------------------------
-	# getFifoSamplesThreshhold()
+	# get_fifo_samples_threshold()
 	#
 	# Get FIFO samples threshold (0-32)
-	def getFifoSamplesThreshhold(self):
+	def get_fifo_samples_threshold(self):
 		""" 
 			Get FIFO samples threshold (0-32)
 
 			:return: FIFO samples threshold (0-32)
 			:rtype: byte
 		"""
-		_register = self._i2c.readByte(self.address, self.ADXL313_FIFO_CTL)
+		_register = self._i2c.read_byte(self.address, self.ADXL313_FIFO_CTL)
 		samples = (_register & 0b00011111) # mask all the other bits we don't need [5:7]
 		return samples
 
 	# ----------------------------------
-	# setFifoSamplesThreshhold()
+	# set_fifo_samples_threshold()
 	#
 	# Set FIFO samples threshold (0-32)
-	def setFifoSamplesThreshhold(self, samples):
+	def set_fifo_samples_threshold(self, samples):
 		""" 
 			Set FIFO samples threshold (0-32)
 
@@ -842,55 +834,55 @@ class QwiicAdxl313(object):
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		_register = self._i2c.readByte(self.address, self.ADXL313_FIFO_CTL) # read entire FIFO_CTRL reg
+		_register = self._i2c.read_byte(self.address, self.ADXL313_FIFO_CTL) # read entire FIFO_CTRL reg
 		_register &= 0b11100000 # clear current sample threshhold bits [0:4]
 		_register |= samples # set the desired sample threshhold bits into our "write regiter variable"
-		self._i2c.writeByte(self.address, self.ADXL313_FIFO_CTL, _register) # write it!
+		self._i2c.write_byte(self.address, self.ADXL313_FIFO_CTL, _register) # write it!
 		return True
 
 	# ----------------------------------
-	# getFifoEntriesAmount()
+	# get_fifo_entries_amount()
 	#
 	# Get FIFO entries amount (0-32)
-	def getFifoEntriesAmount(self):
+	def get_fifo_entries_amount(self):
 		""" 
 			Get FIFO entries amount (0-32)
 
 			:return: FIFO entries amount (0-32)
 			:rtype: byte
 		"""
-		_register = self._i2c.readByte(self.address, self.ADXL313_FIFO_STATUS) 
+		_register = self._i2c.read_byte(self.address, self.ADXL313_FIFO_STATUS) 
 		entries = (_register & 0b00111111) # mask all the other bits we don't need [6:7]
 		return entries
 
 	# ----------------------------------
-	# clearFifo()
+	# clear_fifo()
 	#
 	# Clears all FIFO data by bypassing FIFO and re-entering previous mode
-	def clearFifo(self):
+	def clear_fifo(self):
 		""" 
 			Clears all FIFO data by bypassing FIFO and re-entering previous mode
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		mode = self.getFifoMode() # get current mode, so we can return it here later
-		self.setFifoMode(self.ADXL313_FIFO_MODE_BYPASS) # sets mode to bypass temporarily to clear contents
-		self.setFifoMode(mode) # return mode to previous selection
+		mode = self.get_fifo_mode() # get current mode, so we can return it here later
+		self.set_fifo_mode(self.ADXL313_FIFO_MODE_BYPASS) # sets mode to bypass temporarily to clear contents
+		self.set_fifo_mode(mode) # return mode to previous selection
 		return True
 
 	# ----------------------------------
-	# updateIntSourceStatuses()
+	# update_int_source_statuses()
 	#
 	# Reads int Source Register once and updates all individual calss statuses
-	def updateIntSourceStatuses(self):
+	def update_int_source_statuses(self):
 		""" 
 			Reads int Source Register once and updates all individual calss statuses
 
 			:return: Returns true of the function was completed, otherwise False.
 			:rtype: bool
 		"""
-		_register = self._i2c.readByte(self.address, self.ADXL313_INT_SOURCE)
+		_register = self._i2c.read_byte(self.address, self.ADXL313_INT_SOURCE)
 		self.ADXL313_INTSOURCE_DATAREADY = ((_register >> self.ADXL313_INT_DATA_READY_BIT) & 1)
 		self.ADXL313_INTSOURCE_ACTIVITY = ((_register >> self.ADXL313_INT_ACTIVITY_BIT) & 1)
 		self.ADXL313_INTSOURCE_INACTIVITY = ((_register >> self.ADXL313_INT_INACTIVITY_BIT) & 1)
@@ -901,30 +893,27 @@ class QwiicAdxl313(object):
 	# ----------------------------------
 	# Lower Power definitions
 	# 
-	def isLowPower(self):
-		return getRegisterBit(self.ADXL313_BW_RATE, 4)
+	def is_low_power(self):
+		return self.get_register_bit(self.ADXL313_BW_RATE, 4)
 
-	def lowPowerOn(self):
-		return self.setRegisterBit(self.ADXL313_BW_RATE, 4, True)
+	def low_power_on(self):
+		return self.set_register_bit(self.ADXL313_BW_RATE, 4, True)
 
-	def lowPowerOff(self):
-		return self.setRegisterBit(self.ADXL313_BW_RATE, 4, False)
+	def low_power_off(self):
+		return self.set_register_bit(self.ADXL313_BW_RATE, 4, False)
 
-	def setLowPower(self, state):
+	def set_low_power(self, state):
 		if(state):
-			self.lowPowerOn()
+			self.low_power_on()
 		else:
-			self.lowPowerOff()
+			self.low_power_off()
 
-	lowPower = property(isLowPower, setLowPower)
 
 	# ----------------------------------
 	# Bandwidth definitions
 	# 
-	def setBandwidth(self, bw):
-		self._i2c.writeByte(self.address, self.ADXL313_BW_RATE, bw)
+	def set_bandwidth(self, bw):
+		self._i2c.write_byte(self.address, self.ADXL313_BW_RATE, bw)
 
-	def getBandwidth(self):
-		return self._i2c.readByte(self.address, self.ADXL313_BW_RATE)
-
-	bandwidth = property(getBandwidth, setBandwidth)
+	def get_bandwidth(self):
+		return self._i2c.read_byte(self.address, self.ADXL313_BW_RATE)

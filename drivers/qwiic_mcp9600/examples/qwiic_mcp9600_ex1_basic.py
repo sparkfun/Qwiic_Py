@@ -35,40 +35,40 @@
 
 import qwiic_mcp9600
 import sys
-import time 
+import qwiic_i2c
 
-def runExample():
+def run_example():
 
 	print("\nQwiic MCP9600 Example 1 - Basic Readings\n")
 
 	# Create instance of device
-	myThermo = qwiic_mcp9600.QwiicMCP9600()
+	my_thermo = qwiic_mcp9600.QwiicMCP9600()
 
 	# Check if it's connected
-	if myThermo.is_connected() == False:
+	if not my_thermo.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myThermo.begin()
+	my_thermo.begin()
 
 	while True:
-		if myThermo.available():
+		if my_thermo.available():
 			# Read temperatures
-			thermocouple_temp = myThermo.get_thermocouple_temp()
-			ambient_temp = myThermo.get_ambient_temp()
-			temp_delta = myThermo.get_temp_delta()
+			thermocouple_temp = my_thermo.get_thermocouple_temp()
+			ambient_temp = my_thermo.get_ambient_temp()
+			temp_delta = my_thermo.get_temp_delta()
 
 			# Print temperatures
 			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C")
 			
 		# Delay to avoid hammering the I2C bus
-		time.sleep(0.02)
+		qwiic_i2c.delay_ms(20)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

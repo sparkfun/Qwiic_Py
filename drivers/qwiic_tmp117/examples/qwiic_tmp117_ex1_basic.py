@@ -37,9 +37,9 @@
 
 import qwiic_tmp117
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic TMP117 Example 1 - Basic Readings\n")
 
 	# Create instance of device
@@ -61,11 +61,11 @@ def runExample():
 			print("Temperature in Celsius:", tempC)
 			print("Temperature in Fahrenheit:", tempF)
 		
-		time.sleep(0.5)
+		qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

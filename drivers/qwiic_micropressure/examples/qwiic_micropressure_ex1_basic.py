@@ -35,22 +35,21 @@
 
 import qwiic_micropressure
 import sys
-import time
-
-def runExample():
+import qwiic_i2c
+def run_example():
 	print("\nQwiic MicroPressure Example 1 - Basic Readings\n")
 
 	# Create instance of device
-	myMicroPressure = qwiic_micropressure.QwiicMicroPressure()
+	my_micro_pressure = qwiic_micropressure.QwiicMicroPressure()
 
 	# Check if it's connected
-	if myMicroPressure.is_connected() == False:
+	if not my_micro_pressure.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myMicroPressure.begin()
+	my_micro_pressure.begin()
 
 	while True:
 		# The micropressure sensor outputs pressure readings in pounds per square inch (PSI).
@@ -59,20 +58,20 @@ def runExample():
 		#  atmospheres.
 
 		# Get the pressure
-		print("Pressure(PSI): ", myMicroPressure.read_pressure())
-		print("Pressure(Pa): ", myMicroPressure.read_pressure(myMicroPressure.kPressurePa))
-		print("Pressure(kPa): ", myMicroPressure.read_pressure(myMicroPressure.kPressureKpa))
-		print("Pressure(Torr): ", myMicroPressure.read_pressure(myMicroPressure.kPressureTorr))
-		print("Pressure(InHg): ", myMicroPressure.read_pressure(myMicroPressure.kPressureInHg))
-		print("Pressure(Atm): ", myMicroPressure.read_pressure(myMicroPressure.kPressureAtm))
-		print("Pressure(Bar): ", myMicroPressure.read_pressure(myMicroPressure.kPressureBar))
+		print("Pressure(PSI): ", my_micro_pressure.read_pressure())
+		print("Pressure(Pa): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_PA))
+		print("Pressure(kPa): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_KPA))
+		print("Pressure(Torr): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_TORR))
+		print("Pressure(InHg): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_INHG))
+		print("Pressure(Atm): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_ATM))
+		print("Pressure(Bar): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_BAR))
 
 		# Wait a bit before reading again
-		time.sleep(0.500)
+		qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example 1")
 		sys.exit(0)

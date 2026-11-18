@@ -37,7 +37,7 @@
 import qwiic_as7265x
 import sys
 
-def runExample():
+def run_example():
     print("\nQwiic Spectral Triad Example 2 - Readings With LEDs\n")
 
     print("Point the Triad away and press a key to begin with illumination...")
@@ -87,7 +87,7 @@ def runExample():
 
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example")
         sys.exit(0)

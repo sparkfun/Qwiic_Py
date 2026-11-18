@@ -39,34 +39,34 @@
 # ==================================================================================
 
 import qwiic_gpio
-import time
+import qwiic_i2c
 import sys
 
 
-def runExample():
+def run_example():
 
     print("\nSparkFun Qwiic GPIO Example 2b\n")
-    myGPIO = qwiic_gpio.QwiicGPIO()
+    my_gpio = qwiic_gpio.QwiicGPIO()
 
-    if myGPIO.isConnected() == False:
+    if not my_gpio.is_connected():
         print("The Qwiic GPIO isn't connected to the system. Please check your connection",
               file=sys.stderr)
         return
 
-    myGPIO.begin()
-    myGPIO.pinModePort( [myGPIO.GPIO_IN] * myGPIO.NUM_GPIO ) # pass in a list of 8 GPIO_IN values
+    my_gpio.begin()
+    my_gpio.pin_mode_port( [my_gpio.GPIO_IN] * my_gpio.NUM_GPIO ) # pass in a list of 8 GPIO_IN values
 
     while True:
-        portValues = myGPIO.digitalReadPort()
+        port_values = my_gpio.digital_read_port()
 
-        for i in range(myGPIO.NUM_GPIO):
-            print("GPIO " + str(i) + ": " + ("HIGH" if portValues[i] == myGPIO.GPIO_HI else "LOW") )
+        for i in range(my_gpio.NUM_GPIO):
+            print("GPIO " + str(i) + ": " + ("HIGH" if port_values[i] == my_gpio.GPIO_HI else "LOW") )
 
-        time.sleep(.25)
+        qwiic_i2c.delay_ms(250)
 
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example 2b")
         sys.exit(0)

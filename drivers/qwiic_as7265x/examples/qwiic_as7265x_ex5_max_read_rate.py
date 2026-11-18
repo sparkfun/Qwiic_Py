@@ -37,7 +37,7 @@
 import qwiic_as7265x
 import sys
 
-def runExample():
+def run_example():
     print("\nQwiic Spectral Triad Example 5 - Max Read Rate\n")
 
     # Create instance of device
@@ -55,7 +55,7 @@ def runExample():
         return
     
     # All 6 channels on all devices
-    myAS7265x.set_measurement_mode(myAS7265x.kMeasurementMode6ChanContinuous)
+    myAS7265x.set_measurement_mode(myAS7265x.MEASUREMENT_MODE_6CHAN_CONTINUOUS)
 
     # 0 seems to cause the sensors to read very slowly
     # 1 is the fastest
@@ -66,9 +66,9 @@ def runExample():
     myAS7265x.disable_indicator()
 
     # Rather than toggle the LEDs with each measurment, turn all on all the time
-    myAS7265x.enable_bulb(myAS7265x.kLedWhite)
-    myAS7265x.enable_bulb(myAS7265x.kLedIr)
-    myAS7265x.enable_bulb(myAS7265x.kLedUv)
+    myAS7265x.enable_bulb(myAS7265x.LED_WHITE)
+    myAS7265x.enable_bulb(myAS7265x.LED_IR)
+    myAS7265x.enable_bulb(myAS7265x.LED_UV)
 
     print("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W,K,L")
 
@@ -102,7 +102,7 @@ def runExample():
 
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example")
         sys.exit(0)

@@ -35,21 +35,21 @@
 
 import qwiic_bmp581
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
-	print("\nQwiic Template Example 1 - Basic Readings\n")
+def run_example():
+	print("\nQwiic BMP581 Example 1 - Basic Readings\n")
 
 	# Create instance of device
 	myBMP581 = qwiic_bmp581.QwiicBMP581()
 
 	# Check if it's connected
-	if myBMP581.is_connected() == False:
+	if not myBMP581.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	if myBMP581.begin() == False:
+	if not myBMP581.begin():
 		print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
 		return
 	
@@ -61,11 +61,11 @@ def runExample():
 		print("Pressure (Pa): ", data.pressure)
 
 		# Only print every second
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

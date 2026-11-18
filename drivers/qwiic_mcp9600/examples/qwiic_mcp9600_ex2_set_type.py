@@ -38,67 +38,67 @@
 
 import qwiic_mcp9600
 import sys
-import time 
+import qwiic_i2c
 
 # Change the type of the thermocouple here!
-therm_type = qwiic_mcp9600.QwiicMCP9600.kTypeS
+therm_type = qwiic_mcp9600.QwiicMCP9600.TYPE_S
 # Other options are:
-	# qwiic_mcp9600.QwiicMCP9600.kTypeK
-	# qwiic_mcp9600.QwiicMCP9600.kTypeJ
-	# qwiic_mcp9600.QwiicMCP9600.kTypeT
-	# qwiic_mcp9600.QwiicMCP9600.kTypeN
-	# qwiic_mcp9600.QwiicMCP9600.kTypeE
-	# qwiic_mcp9600.QwiicMCP9600.kTypeB
-	# qwiic_mcp9600.QwiicMCP9600.kTypeR
+	# qwiic_mcp9600.QwiicMCP9600.TYPE_K
+	# qwiic_mcp9600.QwiicMCP9600.TYPE_J
+	# qwiic_mcp9600.QwiicMCP9600.TYPE_T
+	# qwiic_mcp9600.QwiicMCP9600.TYPE_N
+	# qwiic_mcp9600.QwiicMCP9600.TYPE_E
+	# qwiic_mcp9600.QwiicMCP9600.TYPE_B
+	# qwiic_mcp9600.QwiicMCP9600.TYPE_R
 
-def runExample():
+def run_example():
 
 	print("\nQwiic MCP9600 Example 2 - Set Type\n")
 
 	# Create instance of device
-	myThermo = qwiic_mcp9600.QwiicMCP9600()
+	my_thermo = qwiic_mcp9600.QwiicMCP9600()
 
 	# Check if it's connected
-	if myThermo.is_connected() == False:
+	if not my_thermo.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myThermo.begin()
+	my_thermo.begin()
 	
 	# Change the thermocouple type being used
 	print("Changing thermocouple type!")
-	myThermo.set_thermocouple_type(therm_type)
+	my_thermo.set_thermocouple_type(therm_type)
 
-	got_type = myThermo.get_thermocouple_type()
+	got_type = my_thermo.get_thermocouple_type()
 	if got_type == therm_type:
 		print("Thermocouple type set successfully!")
 	else:
 		print("Failed to set thermocouple type! Wanted type:", therm_type, "but got type:", got_type)
 		return
 
-	if myThermo.get_thermocouple_type() == therm_type:
+	if my_thermo.get_thermocouple_type() == therm_type:
 		print("Thermocouple type set successfully!")
 	else:
 		print("Failed to set thermocouple type!")
 
 	while True:
-		if myThermo.available():
+		if my_thermo.available():
 			# Read temperatures
-			thermocouple_temp = myThermo.get_thermocouple_temp()
-			ambient_temp = myThermo.get_ambient_temp()
-			temp_delta = myThermo.get_temp_delta()
+			thermocouple_temp = my_thermo.get_thermocouple_temp()
+			ambient_temp = my_thermo.get_ambient_temp()
+			temp_delta = my_thermo.get_temp_delta()
 
 			# Print temperatures
 			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C")
 			
 		# Delay to avoid hammering the I2C bus
-		time.sleep(0.02)
+		qwiic_i2c.delay_ms(20)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

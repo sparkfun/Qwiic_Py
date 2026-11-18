@@ -34,10 +34,10 @@
 #===============================================================================
 
 import qwiic_veml6030
-import time
+import qwiic_i2c
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic Ambient Light Sensor Example 4 - Power Saving\n")
 
 	# Create instance of device
@@ -78,7 +78,7 @@ def runExample():
 	# Loop forever
 	while True:
 		# Wait for the refresh time specified in page 9 of the datasheet
-		time.sleep(4.1)
+		qwiic_i2c.delay_ms(4100)
 
 		# Get light measured by sensor in lux
 		ambient_light = light_sensor.read_light()
@@ -88,7 +88,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

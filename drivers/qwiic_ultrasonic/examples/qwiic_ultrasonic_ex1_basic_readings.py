@@ -35,23 +35,22 @@
 
 import qwiic_ultrasonic
 import sys
-import time
-
+import qwiic_i2c
 # Here we set the device address. Note that an older version of the Qwiic
 # Ultrasonic firmware used a default address of 0x00. If yours uses 0x00,
 # you'll need to change the address below. It is also recommended to run
 # Example 2 to change the address to the new default.
-deviceAddress = qwiic_ultrasonic.QwiicUltrasonic.kDefaultAddress
-# deviceAddress = 0x00
+device_address = qwiic_ultrasonic.QwiicUltrasonic.DEFAULT_ADDRESS
+# device_address = 0x00
 
-def runExample():
+def run_example():
 	print("\nQwiic Ultrasonic Example 1 - Basic Readings\n")
 
 	# Create instance of device
-	my_ultrasonic = qwiic_ultrasonic.QwiicUltrasonic(address=deviceAddress)
+	my_ultrasonic = qwiic_ultrasonic.QwiicUltrasonic(address=device_address)
 
 	# Check if it's connected
-	if my_ultrasonic.is_connected() == False:
+	if not my_ultrasonic.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
@@ -69,11 +68,11 @@ def runExample():
 		print("Distance (mm):", distance)
 
 		# Wait a bit
-		time.sleep(0.1)
+		qwiic_i2c.delay_ms(100)
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

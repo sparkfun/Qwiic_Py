@@ -50,11 +50,10 @@ New to qwiic? Take a look at the entire [SparkFun Qwiic Ecosystem](https://www.s
 """
 # ----------------------------------------------------------------------
 
-import math
-import time
-import qwiic_i2c
-import smbus2
 import struct
+import qwiic_i2c
+
+__version__ = "3.0.0"
 
 _DEFAULT_NAME = "Qwiic EEPROM"
 
@@ -66,8 +65,7 @@ class QwiicEEPROM(object):
 
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided a
-                        a driver object is created.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         :return: The GPIo device object.
         :rtype: Object
     """
@@ -85,25 +83,21 @@ class QwiicEEPROM(object):
     I2C_BUFFER_LENGTH = 32
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
-        self.address = address if address != None else self.available_addresses[0]
+        self.address = address if address is not None else self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver == None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c == None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ------------------------------------------------------------------
     # is_connected(i2c_address)
     #
     # Is an actual board connected to our system?
-    def is_connected(self, i2c_address = 255):
+    def is_connected(self, i2c_address = None):
         """
             Determine if a Qwiic EEPROM device is connected to the system
 
@@ -111,9 +105,9 @@ class QwiicEEPROM(object):
             :return: True if the device is connected, false otherwise.
             :rtype: bool
         """
-        if i2c_address == 255:
-            i2c_address = self.address       
-        return qwiic_i2c.isDeviceConnected(i2c_address)
+        if i2c_address is None:
+            i2c_address = self.address
+        return qwiic_i2c.is_device_connected(i2c_address)
     
     # ------------------------------------------------------------------
     # begin()
@@ -168,7 +162,7 @@ class QwiicEEPROM(object):
     # is_busy(i2c_address)
     #
     # Returns true if the device is not answering (currently writing).
-    def is_busy(self, i2c_address = 255):
+    def is_busy(self, i2c_address = None):
         """
             Returns true if the device is not answering (currently writing).
 
@@ -176,7 +170,7 @@ class QwiicEEPROM(object):
             :return: True if the IC is busy, false otherwise
             :rtype: bool
         """
-        if i2c_address == 255:
+        if i2c_address is None:
             i2c_address = self.address
 
         if self.is_connected(i2c_address) == True:
@@ -291,10 +285,10 @@ class QwiicEEPROM(object):
         self.poll_for_write_complete = False
 
     # ------------------------------------------------------------------
-    # set_I2C_buffer_size(buff_size)
+    # set_i2c_buffer_size(buff_size)
     #
     # Set the size of the TX buffer
-    def set_I2C_buffer_size(self, buff_size):
+    def set_i2c_buffer_size(self, buff_size):
         """
             Set the size of the TX buffer
             
@@ -305,10 +299,10 @@ class QwiicEEPROM(object):
         self.I2C_BUFFER_LENGTH = buff_size
         
     # ------------------------------------------------------------------
-    # get_I2C_buffer_size()
+    # get_i2c_buffer_size()
     #
     # Return the size of the TX buffer
-    def get_I2C_buffer_size(self):
+    def get_i2c_buffer_size(self):
         """
             Return the size of the TX buffer
 
@@ -348,11 +342,9 @@ class QwiicEEPROM(object):
         num_bytes = 4   # Default to 32-bit integer
         read_list = self.read(eeprom_location, num_bytes) 
         
-        # Convert list of bytes into one big int
-        # First, cast list into "bytes" type
-        int_bytes = bytes(read_list)
-        # Then, conver to int
-        int_val = int.from_bytes(int_bytes, "big", signed=True)
+        # Convert list of bytes into one big-endian signed int
+        # (struct, because MicroPython's int.from_bytes() has no 'signed')
+        int_val = struct.unpack('>i', bytes(read_list))[0]
         
         return int_val
     
@@ -397,8 +389,7 @@ class QwiicEEPROM(object):
         read_list = self.read(eeprom_location, string_length)
         
         # Convert a list of byte back into the string
-        byte_string = bytearray(read_list)
-        decoded_string = byte_string.decode()
+        decoded_string = bytes(read_list).decode()
         
         return decoded_string
     
@@ -406,13 +397,13 @@ class QwiicEEPROM(object):
     # read(eeprom_location, amt_to_read)
     #
     # Bulk read from EEPROM.
-    # Handles breaking up read amt into 32 byte chunks (can be overidden with set_I2C_buffer_size())
+    # Handles breaking up read amt into 32 byte chunks (can be overidden with set_i2c_buffer_size())
     # Handles a read that straddles the 512kbit barrier    
     def read(self, eeprom_location, num_bytes):
         """
             Bulk read from EEPROM.
             Handles breaking up read amt into 32 byte chunks (can be 
-            overidden with set_I2C_buffer_size()
+            overidden with set_i2c_buffer_size()
             Handles a read that straddles the 512kbit barrier
             
             :param eeprom_location: address of EEPROM to start reading from
@@ -446,13 +437,13 @@ class QwiicEEPROM(object):
             # See if EEPROM is available or still writing to a previous request
             if self.poll_for_write_complete == True:
                 while self.is_busy(i2c_address) == True:
-                    time.sleep(0.001) # This shortens the amount of time waiting between writes but hammers the I2C bus
+                    self._i2c.delay_ms(1) # This shortens the amount of time waiting between writes but hammers the I2C bus
             
-            eeprom_address_MSB = (eeprom_location + received) >> 8
-            eeprom_address_LSB = (eeprom_location + received) & 0xFF
+            eeprom_address_msb = (eeprom_location + received) >> 8
+            eeprom_address_lsb = (eeprom_location + received) & 0xFF
         
-            write_list = [eeprom_address_MSB, eeprom_address_LSB]
-            read_list = list(self._i2c.__i2c_rdwr__(i2c_address, write_list, amt_to_read))
+            write_list = [eeprom_address_msb, eeprom_address_lsb]
+            read_list = list(self._i2c.read_block(i2c_address, write_list, amt_to_read))
             
             data_list.extend(read_list)
             
@@ -490,8 +481,8 @@ class QwiicEEPROM(object):
             :rtype: Void
         """
         # Convert int to a list of bytes
-        num_bytes = 4 # Defaulting to 32-bit int
-        list_int = list(int_to_write.to_bytes(num_bytes, "big", signed=True))
+        # (struct, because MicroPython's int.to_bytes() has no 'signed')
+        list_int = list(struct.pack('>i', int_to_write))
         
         self.write(eeprom_location, list_int)
     
@@ -588,24 +579,24 @@ class QwiicEEPROM(object):
             # See if EEPROM is available or still writing a previous request
             if self.poll_for_write_complete == True:
                 while self.is_busy(i2c_address) == True:   # Poll device
-                    time.sleep(0.001) # This shortens the amount of time waiting between writes but hammers the I2C bus
+                    self._i2c.delay_ms(1) # This shortens the amount of time waiting between writes but hammers the I2C bus
             
-            eeprom_address_MSB = (eeprom_location + int(recorded)) >> 8
-            eeprom_address_LSB = (eeprom_location + int(recorded)) & 0xFF
-            temp_write_list = [eeprom_address_LSB]
+            eeprom_address_msb = (eeprom_location + int(recorded)) >> 8
+            eeprom_address_lsb = (eeprom_location + int(recorded)) & 0xFF
+            temp_write_list = [eeprom_address_lsb]
             
             for x in range(0, int(amt_to_write)):
                 temp_write_list.append(int(data_list[int(recorded) + x]))
             
             # Now, set up the full write
-            self._i2c.writeBlock(i2c_address, eeprom_address_MSB, temp_write_list)
+            self._i2c.write_block(i2c_address, eeprom_address_msb, temp_write_list)
                 
             # Increment "recorded" counter
             recorded = recorded + amt_to_write
 
             if self.poll_for_write_complete == False:
-                time.sleep(self.page_write_time_ms / 1000) # Delay the amount of time to record a page
+                self._i2c.delay_ms(self.page_write_time_ms) # Delay the amount of time to record a page
             
             # Need to hard-code this delay in because if code falls into the is_busy() call above
             # error messages are printed to the command line when pinging the i2c address when it's busy
-            time.sleep(0.005)
+            self._i2c.delay_ms(5)

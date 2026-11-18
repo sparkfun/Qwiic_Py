@@ -42,39 +42,38 @@
 
 import qwiic_otos
 import sys
-import time
 
-def runExample():
+def run_example():
     print("\nQwiic OTOS Example 7 - Get Version\n")
 
     # Create instance of device
-    myOtos = qwiic_otos.QwiicOTOS()
+    my_otos = qwiic_otos.QwiicOTOS()
 
     # Check if it's connected
-    if myOtos.is_connected() == False:
+    if not my_otos.is_connected():
         print("The device isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
 
     # Initialize the device
-    myOtos.begin()
+    my_otos.begin()
 
     # Get the hardware and firmware version
-    (hwVersion, fwVersion) = myOtos.getVersionInfo()
+    (hw_version, fw_version) = my_otos.get_version_info()
 
     # Extract the major and minor version numbers
-    hwMajor = (hwVersion >> 4) & 0x0F
-    hwMinor = hwVersion & 0x0F
-    fwMajor = (fwVersion >> 4) & 0x0F
-    fwMinor = fwVersion & 0x0F
+    hw_major = (hw_version >> 4) & 0x0F
+    hw_minor = hw_version & 0x0F
+    fw_major = (fw_version >> 4) & 0x0F
+    fw_minor = fw_version & 0x0F
 
     # Print the hardware and firmware version
-    print("OTOS Hardware Version: v{}.{}".format(hwMajor, hwMinor))
-    print("OTOS Firmware Version: v{}.{}".format(fwMajor, fwMinor))
+    print("OTOS Hardware Version: v{}.{}".format(hw_major, hw_minor))
+    print("OTOS Firmware Version: v{}.{}".format(fw_major, fw_minor))
 
 if __name__ == '__main__':
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example")
         sys.exit(0)

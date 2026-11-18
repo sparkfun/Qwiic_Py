@@ -47,45 +47,45 @@
 
 import qwiic_otos
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
     print("\nQwiic OTOS Example 6 - Standard Deviation\n")
 
     # Create instance of device
-    myOtos = qwiic_otos.QwiicOTOS()
+    my_otos = qwiic_otos.QwiicOTOS()
 
     # Check if it's connected
-    if myOtos.is_connected() == False:
+    if not my_otos.is_connected():
         print("The device isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
 
     # Initialize the device
-    myOtos.begin()
+    my_otos.begin()
 
     print("Ensure the OTOS is flat and stationary during calibration!")
     for i in range(5, 0, -1):
         print("Calibrating in %d seconds..." % i)
-        time.sleep(1)
+        qwiic_i2c.delay_ms(1000)
 
     print("Calibrating IMU...")
 
     # Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    myOtos.calibrateImu()
+    my_otos.calibrate_imu()
 
     # Reset the tracking algorithm - this resets the position to the origin,
     # but can also be used to recover from some rare tracking errors
-    myOtos.resetTracking()
+    my_otos.reset_tracking()
 
     # Main loop
     while True:
         # Read the position like normal. This example can be extended to include
         # velocity and acceleration, which have been omitted for simplicity, but
         # can be added by uncommenting the code below
-        pos = myOtos.getPosition()
-        # vel = myOtos.getVelocity()
-        # acc = myOtos.getAcceleration()
+        pos = my_otos.get_position()
+        # vel = my_otos.get_velocity()
+        # acc = my_otos.get_acceleration()
 
         # Read the standard deviation of the tracking. Note that these values are
         # just the square root of the diagonal elements of the covariance matrices
@@ -96,44 +96,44 @@ def runExample():
         # statistical error (eg. improper calibration, or tilting the OTOS to not
         # be flat against the tracking surface). These are provided primarily for
         # anyone wanting to perform sensor fusion with additional sensors.
-        posStdDev = myOtos.getPositionStdDev()
-        # velStdDev = myOtos.getVelocityStdDev()
-        # accStdDev = myOtos.getAccelerationStdDev()
+        pos_std_dev = my_otos.get_position_std_dev()
+        # vel_std_dev = my_otos.get_velocity_std_dev()
+        # acc_std_dev = my_otos.get_acceleration_std_dev()
 
         # These values can instead be burst read out in chunks:
-        # (pos, vel, acc) = myOtos.getPosVelAcc()
-        # (posStdDev, velStdDev, accStdDev) = myOtos.getPosVelAccStdDev()
+        # (pos, vel, acc) = my_otos.get_pos_vel_acc()
+        # (pos_std_dev, vel_std_dev, acc_std_dev) = my_otos.get_pos_vel_acc_std_dev()
         
         # Or burst read them all at once:
-        # (pos, vel, acc, posStdDev, velStdDev, accStdDev) = myOtos.getPosVelAccAndStdDev()
+        # (pos, vel, acc, pos_std_dev, vel_std_dev, acc_std_dev) = my_otos.get_pos_vel_acc_and_std_dev()
 
         # Print position and standard deviation
         print()
         print("Position:")
-        print("X (Inches): {} +/- {}".format(pos.x, posStdDev.x))
-        print("Y (Inches): {} +/- {}".format(pos.y, posStdDev.y))
-        print("Heading (Degrees): {} +/- {}".format(pos.h, posStdDev.h))
+        print("X (Inches): {} +/- {}".format(pos.x, pos_std_dev.x))
+        print("Y (Inches): {} +/- {}".format(pos.y, pos_std_dev.y))
+        print("Heading (Degrees): {} +/- {}".format(pos.h, pos_std_dev.h))
 
         # Print velocity and standard deviation
         # print()
         # print("Velocity:")
-        # print("X (Inches/sec): {} +/- {}".format(vel.x, velStdDev.x))
-        # print("Y (Inches/sec): {} +/- {}".format(vel.y, velStdDev.y))
-        # print("Heading (Degrees/sec): {} +/- {}".format(vel.h, velStdDev.h))
+        # print("X (Inches/sec): {} +/- {}".format(vel.x, vel_std_dev.x))
+        # print("Y (Inches/sec): {} +/- {}".format(vel.y, vel_std_dev.y))
+        # print("Heading (Degrees/sec): {} +/- {}".format(vel.h, vel_std_dev.h))
 
         # Print acceleration and standard deviation
         # print()
         # print("Acceleration:")
-        # print("X (Inches/sec^2): {} +/- {}".format(acc.x, accStdDev.x))
-        # print("Y (Inches/sec^2): {} +/- {}".format(acc.y, accStdDev.y))
-        # print("Heading (Degrees/sec^2): {} +/- {}".format(acc.h, accStdDev.h))
+        # print("X (Inches/sec^2): {} +/- {}".format(acc.x, acc_std_dev.x))
+        # print("Y (Inches/sec^2): {} +/- {}".format(acc.y, acc_std_dev.y))
+        # print("Heading (Degrees/sec^2): {} +/- {}".format(acc.h, acc_std_dev.h))
 
         # Wait a bit so we don't spam the port
-        time.sleep(0.5)
+        qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example")
         sys.exit(0)

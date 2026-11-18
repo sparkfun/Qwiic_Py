@@ -5,7 +5,7 @@
 #   This example shows how to output ADC values on one single-ended channel (A3).
 #   It will also print out the voltage of the reading in mV.
 #   Note, the conversion multiplier needs to be corrected for gain settings,
-#   And this is done automatically in the library, using .getMultiplier(),
+#   And this is done automatically in the library, using get_multiplier(),
 #   as shown below.
   
 #   *at gain setting of 1, like in this example (and 3.3V VCC), 0-3.3V will read 0-1652.
@@ -42,9 +42,9 @@
 
 import qwiic_ads1015
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic ADS1015 Example 6 - Display Millivolts\n")
 
 	myAds = qwiic_ads1015.QwiicADS1015()
@@ -57,7 +57,7 @@ def runExample():
 
 	myAds.begin()
 
-	myAds.set_gain(myAds.kConfigPga1)
+	myAds.set_gain(myAds.CONFIG_PGA_1)
 
 	while True:
 		channel_A3 = myAds.get_single_ended(3)
@@ -65,14 +65,14 @@ def runExample():
 		
 		# Get the multiplier for the gain setting
 		multiplier = myAds.get_multiplier()
-		# The private variable _multiplierToVolts is auto-updated each time setGain is called
+		# The private variable _multiplierToVolts is auto-updated each time set_gain() is called
 		print(channel_A3 * multiplier, "mV")
 
-		time.sleep(0.050)
+		qwiic_i2c.delay_ms(50)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example 6")
 		sys.exit(0)

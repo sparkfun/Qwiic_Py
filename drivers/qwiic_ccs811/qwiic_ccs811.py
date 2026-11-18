@@ -59,23 +59,22 @@ This package can be used in conjunction with the overall [SparkFun qwiic Python 
 New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 """
-from __future__ import print_function, division
-
-import time
 import math
 import sys
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 #======================================================================
 # NOTE: For Raspberry Pi
 #======================================================================
 # For this sensor to work on the Raspberry Pi, I2C clock stretching
-# must be enabled.
+# must be enabled, by slowing the I2C clock down.
 #
 # To do this:
-#   - Login as root to the target Raspberry Pi
-#   - Open the file /boot/config.txt in your favorite editor (vi, nano ...etc)
-#   - Scroll down until the bloct that contains the following is found:
+#   - Open the file /boot/firmware/config.txt (/boot/config.txt before
+#     Raspberry Pi OS Bookworm) as root in your favorite editor (vi, nano ...etc)
+#   - Scroll down until the block that contains the following is found:
 #           dtparam=i2c_arm=on
 #           dtparam=i2s=on
 #           dtparam=spi=on
@@ -85,77 +84,54 @@ import qwiic_i2c
 #
 #   - Save the file
 #   - Reboot the raspberry pi
+#
+# QwiicCCS811.is_rpi_i2c_baudrate_ok() checks this setting.
 #======================================================================
-def __checkIsOnRPi():
 
-    # Are we on a Pi? First Linux?
+# Boot config files, newest Raspberry Pi OS location first
+_RPI_BOOT_CONFIG_FILES = ("/boot/firmware/config.txt", "/boot/config.txt")
 
+def _is_on_rpi():
+    """!
+    Are we running on Linux on a Raspberry Pi?
+
+    @return **bool** True on a Raspberry Pi
+    """
     if sys.platform not in ('linux', 'linux2'):
         return False
 
     # we can find out if we are on a RPI by looking at the contents
-    # of /proc/device-tree/compatable
-
+    # of /proc/device-tree/compatible
     try:
-        with open('/proc/device-tree/compatible', 'r') as fCompat:
-
-            systype = fCompat.read()
-
-            return systype.find('raspberrypi') != -1
-    except IOError:
+        with open('/proc/device-tree/compatible', 'r') as f_compat:
+            return f_compat.read().find('raspberrypi') != -1
+    except OSError:
         return False
 
-# check if stretching is set if on a rpi
-#
-def _checkForRPiI2CClockStretch():
+def _rpi_i2c_baudrate_ok(config_text):
+    """!
+    Check the i2c_arm_baudrate setting in the text of a Raspberry Pi boot config file
 
-    #are we on a rpi?
-    if not __checkIsOnRPi():
-        return
+    @param config_text: Contents of config.txt
 
-    # read the boot config file and see if the clock stretch param is set
-    try:
-        with open('/boot/config.txt') as fConfig:
+    @return **bool** True if the first i2c_arm_baudrate setting is uncommented and <= 10000
+    """
+    for line in config_text.split('\n'):
+        if line.find('i2c_arm_baudrate') == -1:
+            continue
 
-            strConfig = fConfig.read()
-            for line in strConfig.split('\n'):
-                if line.find('i2c_arm_baudrate') == -1:
-                    continue
+        # start with a comment?
+        if line.strip().startswith('#'):
+            return False
 
-                # start with a comment?
-                if line.strip().startswith('#'):
-                    break
+        # is the value <= 10000
+        params = line.split('=')
+        try:
+            return int(params[-1].split('#')[0].strip()) <= 10000
+        except ValueError:
+            return False
 
-                # is the value less <= 10000
-                params = line.split('=')
-                if int(params[-1]) <= 10000:
-                    # Stretching is enabled and set correctly.
-                    return
-
-                break
-    except IOError:
-        pass
-
-    # if we are here, then we are on a Raspberry Pi and Clock Stretching isn't
-    # set correctly.
-    # Print out a message!
-
-    print("""
-============================================================================
- NOTE:
-
- For the CCS811 sensor to work on the Raspberry Pi, I2C clock stretching
- must be enabled.
-
- The following line must be added to the file /boot/config.txt
-
-    dtparam=i2c_arm_baudrate=10000
-
- For more information, see the note at:
-          https://github.com/sparkfun/Qwiic_CCS811_Py
-============================================================================
-        """)
-
+    return False
 
 #======================================================================
 # Define the device name and I2C addresses. These are set in the class defintion
@@ -190,14 +166,13 @@ CSS811_APP_START = 0xF4
 CSS811_SW_RESET = 0xFF
 
 
-class QwiicCcs811(object):
+class QwiicCCS811(object):
     """
-    QwiicCccs811
+    QwiicCCS811
 
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         :return: The Ccs811 device object.
         :rtype: Object
     """
@@ -213,43 +188,26 @@ class QwiicCcs811(object):
     SENSOR_INTERNAL_ERROR   = 3
     SENSOR_GENERIC_ERROR    = 4
 
-    _RPiCheck = False
+    def __init__(self, address=None, i2c_bus=None):
 
-    def __init__(self, address=None, i2c_driver=None):
-
-
-        # As noted above, to run this device on a Raspberry Pi,
-        # clock streching is needed.
-        #
-        # Lets check if it's enabled. This is done only once in
-        # the session
-        if not QwiicCcs811._RPiCheck:
-            _checkForRPiI2CClockStretch()
-            QwiicCcs811._RPiCheck = True
-
-
-
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
-
-        self.address = address if address is not None else self.available_addresses[0]
-
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
+        if address in self.available_addresses:
+            self.address = address
         else:
-            self._i2c = i2c_driver
+            self.address = self.available_addresses[0]
+
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # qir quality values returned from the sensor
-        self.refResistance = 10000.
+        self.ref_resistance = 10000.
         self._resistance = 0.0
-        self._TVOC = 0
-        self._CO2 = 0
-        self.vrefCounts = 0
-        self.ntcCounts = 0
+        self._tvoc = 0
+        self._co2 = 0
+        self.vref_counts = 0
+        self.ntc_counts = 0
         self._temperature =  0.0
 
     # ----------------------------------
@@ -259,31 +217,57 @@ class QwiicCcs811(object):
 
     def is_connected(self):
         """
-            Determine if a CCS811 device is conntected to the system..
+            Determine if a CCS811 device is connected to the system.
 
             :return: True if the device is connected, otherwise False.
             :rtype: bool
 
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
+        return qwiic_i2c.is_device_connected(self.address)
 
-    connected = property(is_connected)
+    # ----------------------------------
+    # is_rpi_i2c_baudrate_ok()
+    #
+    # On a Raspberry Pi, is the I2C clock slow enough for the CCS811?
+    @staticmethod
+    def is_rpi_i2c_baudrate_ok():
+        """
+            The CCS811 stretches the I2C clock, which the Raspberry Pi only
+            handles if the I2C clock is slowed down with
+            dtparam=i2c_arm_baudrate=10000 in /boot/firmware/config.txt
+            (/boot/config.txt before Raspberry Pi OS Bookworm).
+
+            :return: False on a Raspberry Pi whose boot config doesn't set
+                i2c_arm_baudrate to 10000 or less, otherwise True.
+            :rtype: bool
+
+        """
+        if not _is_on_rpi():
+            return True
+
+        for filename in _RPI_BOOT_CONFIG_FILES:
+            try:
+                with open(filename) as f_config:
+                    return _rpi_i2c_baudrate_ok(f_config.read())
+            except OSError:
+                pass
+
+        return False
     # ----------------------------------
     # begin()
     #
     # Initialize the system/validate the board.
     def begin(self):
         """
-            Initialize the operation of the Ccs811 module
+            Initialize the operation of the CCS811 module
 
-            :return: Returns SENSOR_SUCCESS on success, SENSOR_ID_ERROR on bad chip ID
-                or SENSOR_INTERNAL_ERROR.
-            :rtype: integer
+            :return: True if successful, False on a bad chip ID or a sensor error.
+            :rtype: bool
 
         """
 
         # wait for sensor to come up...
-        time.sleep(.1)
+        self._i2c.delay_ms(100)
 
         # found it's best to reset the device the try to check chipid.
         # If the chip is in a bad state, the ID returns 0xFF and needs
@@ -291,22 +275,21 @@ class QwiicCcs811(object):
 
         data = [0x11, 0xE5, 0x72, 0x8A] # Reset key
 
-        self._i2c.writeBlock(self.address, CSS811_SW_RESET, data)
+        self._i2c.write_block(self.address, CSS811_SW_RESET, data)
 
-        time.sleep(.5)
+        self._i2c.delay_ms(500)
 
         # are we who we need to be?
-        chipID = self._i2c.readByte(self.address, CSS811_HW_ID)
-        if chipID not in _validChipIDs:
-            print("Invalid Chip ID: 0x%.2X" % chipID)
-            return self.SENSOR_ID_ERROR
+        chip_id = self._i2c.read_byte(self.address, CSS811_HW_ID)
+        if chip_id not in _validChipIDs:
+            return False
 
         if self.check_status_error() or not self.app_valid():
-            return self.SENSOR_INTERNAL_ERROR
+            return False
 
-        self._i2c.writeCommand(self.address, CSS811_APP_START)
+        self._i2c.write_byte(self.address, None, CSS811_APP_START)
 
-        return self.set_drive_mode(1)  # read every second
+        return self.set_drive_mode(1) == self.SENSOR_SUCCESS  # read every second
 
     #****************************************************************************#
     #
@@ -325,13 +308,13 @@ class QwiicCcs811(object):
 
         """
 
-        data = self._i2c.readBlock(self.address, CSS811_ALG_RESULT_DATA, 4)
+        data = self._i2c.read_block(self.address, CSS811_ALG_RESULT_DATA, 4)
 
         #  Data ordered:
         #  co2MSB, co2LSB, tvocMSB, tvocLSB
 
-        self._CO2 = (data[0] << 8) | data[1]
-        self._TVOC = (data[2] << 8) | data[3]
+        self._co2 = (data[0] << 8) | data[1]
+        self._tvoc = (data[2] << 8) | data[3]
         return self.SENSOR_SUCCESS
 
     #----------------------------------------------------
@@ -345,7 +328,7 @@ class QwiicCcs811(object):
 
         """
         # return the status bit
-        value = self._i2c.readByte(self.address, CSS811_STATUS)
+        value = self._i2c.read_byte(self.address, CSS811_STATUS)
 
         return value & 1 << 0
 
@@ -361,8 +344,8 @@ class QwiicCcs811(object):
         """
 
         try:
-            value = self._i2c.readByte(self.address, CSS811_STATUS)
-        except IOError:
+            value = self._i2c.read_byte(self.address, CSS811_STATUS)
+        except OSError:
             value = 0  # This will return 0
 
         return value & 1 << 3 != 0
@@ -379,8 +362,8 @@ class QwiicCcs811(object):
         """
 
         try:
-            value = self._i2c.readByte(self.address, CSS811_STATUS)
-        except IOError:
+            value = self._i2c.read_byte(self.address, CSS811_STATUS)
+        except OSError:
             value = 0  # This will return 0
 
         return value & 1 << 4 != 0
@@ -395,13 +378,12 @@ class QwiicCcs811(object):
 
         """
         try:
-            value = self._i2c.readByte(self.address, CSS811_ERROR_ID)
-        except IOError:
+            value = self._i2c.read_byte(self.address, CSS811_ERROR_ID)
+        except OSError:
             value = 0xFF
 
         return value  # Send all errors in the event of communication error
 
-    error_register = property(get_error_register)
 
     # Returns the baseline value
     # Used for telling sensor what 'clean' air is
@@ -417,8 +399,8 @@ class QwiicCcs811(object):
 
         """
         try:
-            value = self._i2c.readWord(self.address, CSS811_BASELINE)
-        except IOError:
+            value = self._i2c.read_word(self.address, CSS811_BASELINE)
+        except OSError:
             value = 0
 
         return value
@@ -436,11 +418,10 @@ class QwiicCcs811(object):
         data[0] = (input_val >> 8) & 0x00FF
         data[1] = input_val & 0x00FF
 
-        self._i2c.writeWord(self.address, CSS811_BASELINE, input_val)
+        self._i2c.write_word(self.address, CSS811_BASELINE, input_val)
 
         return self.SENSOR_SUCCESS
 
-    baseline = property(get_baseline, set_baseline)
     #----------------------------------------------------
     # Enable the nINT signal
     def enable_interrupts(self):
@@ -452,10 +433,10 @@ class QwiicCcs811(object):
             :rtype: integer
 
         """
-        value = self._i2c.readByte(self.address, CSS811_MEAS_MODE)
+        value = self._i2c.read_byte(self.address, CSS811_MEAS_MODE)
         value |= (1 << 3) #Set INTERRUPT bit
 
-        self._i2c.writeByte(self.address, CSS811_MEAS_MODE, value)
+        self._i2c.write_byte(self.address, CSS811_MEAS_MODE, value)
 
         return self.SENSOR_SUCCESS
 
@@ -470,10 +451,10 @@ class QwiicCcs811(object):
             :rtype: integer
 
         """
-        value = self._i2c.readByte(self.address, CSS811_MEAS_MODE)
+        value = self._i2c.read_byte(self.address, CSS811_MEAS_MODE)
         value &= (~(1 << 3) ) & 0xFF  #Set INTERRUPT bit. Just want first Byte
 
-        self._i2c.writeByte(self.address, CSS811_MEAS_MODE, value)
+        self._i2c.write_byte(self.address, CSS811_MEAS_MODE, value)
 
         return self.SENSOR_SUCCESS
 
@@ -498,24 +479,24 @@ class QwiicCcs811(object):
         if mode > 4:
             mode = 4 # sanitize input
 
-        value = self._i2c.readByte(self.address, CSS811_MEAS_MODE)
+        value = self._i2c.read_byte(self.address, CSS811_MEAS_MODE)
 
         value &= (~(0b00000111 << 4)) & 0xFF  # Clear DRIVE_MODE bits. Just 1st byte
         value |= (mode << 4)  #Mask in mode
 
-        self._i2c.writeByte(self.address, CSS811_MEAS_MODE, value)
+        self._i2c.write_byte(self.address, CSS811_MEAS_MODE, value)
 
         return self.SENSOR_SUCCESS
 
     #----------------------------------------------------
     ## Given a temp and humidity, write this data to the CSS811 for better compensation
     ## This function expects the humidity and temp to come in as floats
-    def set_environmental_data(self, relativeHumidity, temperature):
+    def set_environmental_data(self, relative_humidity, temperature):
         """
             Given a temp and humidity, write this data to the CSS811 for better compensation
             This function expects the humidity and temp to come in as floats
 
-            :param relativeHumidity: The relativity Humity for the sensor to use
+            :param relative_humidity: The relativity Humity for the sensor to use
             :param temperature: The temperature for the sensor to use
 
             :return: one of the SENSOR_ return codes.
@@ -528,42 +509,42 @@ class QwiicCcs811(object):
             return self.SENSOR_GENERIC_ERROR
 
         # Check for invalid humidity
-        if relativeHumidity < 0 or relativeHumidity > 100:
+        if relative_humidity < 0 or relative_humidity > 100:
             return self.SENSOR_GENERIC_ERROR
 
-        rH = int(relativeHumidity * 1000) # 42.348 becomes 42348
+        r_h = int(relative_humidity * 1000) # 42.348 becomes 42348
         temp = int(temperature * 1000) # 23.2 becomes 23200
 
-        envData = bytearray(4)
+        env_data = bytearray(4)
 
         # Split value into 7-bit integer and 9-bit fractional
 
         # Incorrect way from datasheet.
-        # envData[0] = ((rH % 1000) / 100) > 7 ? (rH / 1000 + 1) << 1 : (rH / 1000) << 1;
-        # envData[1] = 0; # CCS811 only supports increments of 0.5 so bits 7-0 will always be zero
-        # if (((rH % 1000) / 100) > 2 && (((rH % 1000) / 100) < 8))
+        # env_data[0] = ((r_h % 1000) / 100) > 7 ? (r_h / 1000 + 1) << 1 : (r_h / 1000) << 1;
+        # env_data[1] = 0; # CCS811 only supports increments of 0.5 so bits 7-0 will always be zero
+        # if (((r_h % 1000) / 100) > 2 && (((r_h % 1000) / 100) < 8))
         # {
-        #   envData[0] |= 1; # Set 9th bit of fractional to indicate 0.5%
+        #   env_data[0] |= 1; # Set 9th bit of fractional to indicate 0.5%
         # }
 
         # Correct rounding. See issue 8:
         #           https://github.com/sparkfun/Qwiic_BME280_CCS811_Combo/issues/8
-        envData[0] = (rH + 250) // 500
-        envData[1] = 0 # CCS811 only supports increments of 0.5 so bits 7-0 will always be zero
+        env_data[0] = (r_h + 250) // 500
+        env_data[1] = 0 # CCS811 only supports increments of 0.5 so bits 7-0 will always be zero
 
         temp += 25000 # Add the 25C offset
         # Split value into 7-bit integer and 9-bit fractional
-        # envData[2] = ((temp % 1000) / 100) > 7 ? (temp / 1000 + 1) << 1 : (temp / 1000) << 1;
-        # envData[3] = 0;
+        # env_data[2] = ((temp % 1000) / 100) > 7 ? (temp / 1000 + 1) << 1 : (temp / 1000) << 1;
+        # env_data[3] = 0;
         # if (((temp % 1000) / 100) > 2 && (((temp % 1000) / 100) < 8))
         # {
-        #   envData[2] |= 1;  # Set 9th bit of fractional to indicate 0.5C
+        #   env_data[2] |= 1;  # Set 9th bit of fractional to indicate 0.5C
         # }
 
         # Correct rounding
-        envData[2] = (temp + 250) // 500
-        envData[3] = 0
-        self._i2c.writeBlock(self.address, CSS811_ENV_DATA, envData)
+        env_data[2] = (temp + 250) // 500
+        env_data[3] = 0
+        self._i2c.write_block(self.address, CSS811_ENV_DATA, env_data)
 
         return self.SENSOR_SUCCESS
 
@@ -577,7 +558,7 @@ class QwiicCcs811(object):
 
         """
 
-        self.refResistance = input_val
+        self.ref_resistance = input_val
 
     def get_reference_resistance(self):
         """
@@ -587,9 +568,8 @@ class QwiicCcs811(object):
             :rtype: integer
 
         """
-        return self.refResistance
+        return self.ref_resistance
 
-    referance_resistance = property(get_reference_resistance, set_reference_resistance)
 
     #----------------------------------------------------
     def read_ntc(self):
@@ -604,20 +584,19 @@ class QwiicCcs811(object):
 
         """
 
-        data = self._i2c.readBlock(self.address, CSS811_NTC, 4)
+        data = self._i2c.read_block(self.address, CSS811_NTC, 4)
 
-        self.vrefCounts = (data[0] << 8) | data[1]
+        self.vref_counts = (data[0] << 8) | data[1]
 
-        self.ntcCounts = (data[2] << 8) | data[3]
+        self.ntc_counts = (data[2] << 8) | data[3]
 
-        self._resistance = self.ntcCounts * self.refResistance / float(self.vrefCounts)
+        self._resistance = self.ntc_counts * self.ref_resistance / float(self.vref_counts)
 
 
         # Code from Milan Malesevic and Zoran Stupic, 2011,
         # Modified by Max Mayfield,
         if self._resistance == 0:
             # we had an error of some sorts. Log 0 is not a happy value
-            print("Error - Invalid received from sensor")
             return 1
 
         self._temperature = math.log(int(self._resistance))
@@ -637,9 +616,8 @@ class QwiicCcs811(object):
             :rtype: float
 
         """
-        return self._TVOC
+        return self._tvoc
 
-    TVOC = property(get_tvoc)
 
     #----------------------------------------------------
     # CO2 Value
@@ -651,9 +629,8 @@ class QwiicCcs811(object):
             :rtype: float
 
         """
-        return self._CO2
+        return self._co2
 
-    CO2 = property(get_co2)
     #----------------------------------------------------
     # Resistance Value
     def get_resistance(self):
@@ -666,7 +643,6 @@ class QwiicCcs811(object):
         """
         return self._resistance
 
-    resistance = property(get_resistance)
     #----------------------------------------------------
     # Temperature Value
     def get_temperature(self):
@@ -678,5 +654,3 @@ class QwiicCcs811(object):
 
         """
         return self._temperature
-
-    temperature = property(get_temperature)

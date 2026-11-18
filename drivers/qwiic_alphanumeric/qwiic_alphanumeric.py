@@ -54,8 +54,9 @@ New to qwiic? Take a look at the entire [SparkFun Qwiic Ecosystem](https://www.s
 """
 # ---------------------------------------------------------------------------------
 
-import time
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 _DEFAULT_NAME = "Qwiic Alphanumeric"
 
@@ -68,8 +69,7 @@ class QwiicAlphanumeric(object):
 
     @param address: The I2C address to use for the device.
                     If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided a
-                    a driver is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return  The 
     """
@@ -232,25 +232,21 @@ class QwiicAlphanumeric(object):
     colon_on_off = 0    # Tracks the on/off state of the colon segment
     blink_rate = ALPHA_BLINK_RATE_NOBLINK   # Tracks the current blinking status
 
-    display_RAM = [0] * 16 * 4
+    display_ram = [0] * 16 * 4
     display_content = [' '] * (4 * 4 + 1)
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver == None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c == None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
     
     # ---------------------------------------------------------------------------------
     # begin(address_left, address_left_center, address_right_center, address_right)
@@ -265,7 +261,7 @@ class QwiicAlphanumeric(object):
 
         @param address_display_one: I2C address of first display
         @param address_display_two: I2C address of the second display
-        @param address_dispplay_three: I2C address of the third display
+        @param address_display_three: I2C address of the third display
         @param address_display_four: I2C address of the fourth display
 
         @return **bool** Returns true if a Qwiic Alphanumeric is connected to the system.
@@ -289,7 +285,7 @@ class QwiicAlphanumeric(object):
         for i in range(1, self.number_of_displays + 1):
             if self.is_connected(i) == False:
                 return False
-            time.sleep(0.01)
+            self._i2c.delay_ms(10)
         
         if self.initialize() == False:
             return False
@@ -298,16 +294,19 @@ class QwiicAlphanumeric(object):
             return False
         
         self.display_content[4 * 4] = '\0'  # Terminate the array because we are doing direct prints
+
+        return True
     
     # ---------------------------------------------------------------------------------
     # is_connected(display_number)
     #
     # Check if there are acutal boards connected to the system
-    def is_connected(self, display_number):
+    def is_connected(self, display_number=1):
         """!
-        Check that dispplays are responding on the I2C bus.
+        Check that displays are responding on the I2C bus.
 
-        @param display_number: The number of the display on the bus
+        @param display_number: The number of the display on the bus (1 to 4).
+            Defaults to the first display.
 
         @return **bool** True if the device is connected, false otherwise.
         """
@@ -315,9 +314,9 @@ class QwiicAlphanumeric(object):
         
         # The LED driver IC sometimes fails to respond. This attempts multiple times before giving up.
         for x in range(0, tries_before_giveup):
-            if self._i2c.isDeviceConnected(self.look_up_display_address(display_number)) == True:
+            if self._i2c.is_device_connected(self.look_up_display_address(display_number)) == True:
                 return True
-            time.sleep(0.01)
+            self._i2c.delay_ms(10)
         return False
 
     # ---------------------------------------------------------------------------------
@@ -401,8 +400,8 @@ class QwiicAlphanumeric(object):
         """
         data_to_write = self.ALPHA_CMD_SYSTEM_SETUP | 1 # Enable system clock  bit
 
-        status = self.write_RAM_byte(self.look_up_display_address(display_number), data_to_write)
-        time.sleep(0.001)   # Allow display to start
+        status = self.write_ram_byte(self.look_up_display_address(display_number), data_to_write)
+        self._i2c.delay_ms(1)   # Allow display to start
 
         return status
 
@@ -421,7 +420,7 @@ class QwiicAlphanumeric(object):
         """
         data_to_write = self.ALPHA_CMD_SYSTEM_SETUP | 0 # Standby mode
 
-        return self.write_RAM(self.look_up_display_address(display_number), data_to_write)
+        return self.write_ram(self.look_up_display_address(display_number), data_to_write)
 
     # ---------------------------------------------------------------------------------
     # look_up_display_address(display_number)
@@ -457,9 +456,9 @@ class QwiicAlphanumeric(object):
 
         @return **bool** True if display was updated correctly, false otherwise
         """
-        # Clear the display_RAM array
+        # Clear the display_ram array
         for i in range(0, 16 * self.number_of_displays):
-            self.display_RAM[i] = 0
+            self.display_ram[i] = 0
         
         # Reset digit position
         self.digit_position = 0
@@ -507,7 +506,7 @@ class QwiicAlphanumeric(object):
             duty = 0
         
         data_to_write = self.ALPHA_CMD_DIMMING_SETUP | duty
-        return self.write_RAM_byte(self.look_up_display_address(display_number), data_to_write)
+        return self.write_ram_byte(self.look_up_display_address(display_number), data_to_write)
 
     # ---------------------------------------------------------------------------------
     # set_blink_rate(rate)
@@ -557,7 +556,7 @@ class QwiicAlphanumeric(object):
             blink_rate = self.ALPHA_BLINK_RATE_NOBLINK
         
         data_to_write = self.ALPHA_CMD_DISPLAY_SETUP | (blink_rate << 1) | self.display_on_off
-        return self.write_RAM_byte(self.look_up_display_address(display_number), data_to_write)
+        return self.write_ram_byte(self.look_up_display_address(display_number), data_to_write)
     
     # ---------------------------------------------------------------------------------
     # display_on_single(display_number)
@@ -607,7 +606,7 @@ class QwiicAlphanumeric(object):
             self.display_on_off = self.ALPHA_DISPLAY_OFF
         
         data_to_write = self.ALPHA_CMD_DISPLAY_SETUP | (self.blink_rate << 1) | self.display_on_off
-        return self.write_RAM_byte(self.look_up_display_address(display_number), data_to_write)
+        return self.write_ram_byte(self.look_up_display_address(display_number), data_to_write)
     
     # ---------------------------------------------------------------------------------
     # display_on()
@@ -701,8 +700,8 @@ class QwiicAlphanumeric(object):
             self.decimal_on_off = self.ALPHA_DECIMAL_OFF
             dat = 0x00
         
-        self.display_RAM[adr + (display_number - 1) * 16] &= 0xFE
-        self.display_RAM[adr + (display_number - 1) * 16] |= dat
+        self.display_ram[adr + (display_number - 1) * 16] &= 0xFE
+        self.display_ram[adr + (display_number - 1) * 16] |= dat
         return self.update_display()
     
     # ---------------------------------------------------------------------------------
@@ -795,8 +794,8 @@ class QwiicAlphanumeric(object):
             self.colon_on_off = self.ALPHA_COLON_OFF
             dat = 0x00
         
-        self.display_RAM[adr + (display_number - 1) * 16] &= 0xFE
-        self.display_RAM[adr + (display_number - 1) * 16] |= dat
+        self.display_ram[adr + (display_number - 1) * 16] &= 0xFE
+        self.display_ram[adr + (display_number - 1) * 16] |= dat
         return self.update_display()
 
     # ---------------------------------------------------------------------------------
@@ -882,7 +881,7 @@ class QwiicAlphanumeric(object):
 
         dat = 1 << row
 
-        self.display_RAM[adr] = self.display_RAM[adr] | dat
+        self.display_ram[adr] = self.display_ram[adr] | dat
 
     # ---------------------------------------------------------------------------------
     # illuminate_char(segments_to_turn_on, digit)
@@ -952,7 +951,7 @@ class QwiicAlphanumeric(object):
 
         @return **bool** true if update_display() is successful, false otherwise
         """
-        # Clear the display_RAM array
+        # Clear the display_ram array
         self.clear()
         
         self.digit_position = 0
@@ -977,10 +976,10 @@ class QwiicAlphanumeric(object):
     # ---------------------------------------------------------------------------------
     # update_display()
     #
-    # Push the contents of display_RAM out to the various displays in 16 byte chunks
+    # Push the contents of display_ram out to the various displays in 16 byte chunks
     def update_display(self):
         """!
-        Push the contents of display_RAM out on to the various displays in 16 byte chunks
+        Push the contents of display_ram out on to the various displays in 16 byte chunks
 
         @return **bool** true if displays are updated successfully, false otherwise.
         """
@@ -988,7 +987,7 @@ class QwiicAlphanumeric(object):
 
         for i in range(1, self.number_of_displays + 1):
             
-            if self.write_RAM(self.look_up_display_address(i), 0, self.display_RAM[(i-1)*16:(i*16)-1]) == False:
+            if self.write_ram(self.look_up_display_address(i), 0, self.display_ram[(i-1)*16:(i*16)-1]) == False:
                 status = False
         
         return status
@@ -1056,10 +1055,10 @@ class QwiicAlphanumeric(object):
         self.print(temp)
 
     # ---------------------------------------------------------------------------------
-    # write_RAM(address, reg, buff)
+    # write_ram(address, reg, buff)
     #
     # write LED updates to the RAM of the LED driver IC
-    def write_RAM(self, address, reg, buff):
+    def write_ram(self, address, reg, buff):
         """!
         Write LED updates to the RAM of the LED driver IC
 
@@ -1079,7 +1078,19 @@ class QwiicAlphanumeric(object):
 
         self.is_connected(display_num)
 
-        self._i2c.writeBlock(address, reg, buff)
-    
-    def write_RAM_byte(self, address, data_to_write):
-        self._i2c.writeCommand(address, data_to_write)
+        self._i2c.write_block(address, reg, buff)
+
+    # ---------------------------------------------------------------------------------
+    # write_ram_byte(address, data_to_write)
+    #
+    # Write a single command byte to the LED driver IC
+    def write_ram_byte(self, address, data_to_write):
+        """!
+        Write a single command byte to the LED driver IC
+
+        @param address: I2C address of the display
+        @param data_to_write: the command byte to write
+
+        @return **bool** true if the byte has been written successfully, false otherwise.
+        """
+        self._i2c.write_byte(address, None, data_to_write)

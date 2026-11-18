@@ -18,14 +18,14 @@
 #   with a desired resolution for the cold and hot junctions respectively. 
 
 #   Cold Junction Possible Resolutions:
-#   kAmbientResolutionZeroPoint0625   -> Configures the ambient (cold) junction to measure in increments of 0.0625ºC
-#   kAmbientResolutionZeroPoint25     -> Configures the ambient (cold) junction to measure in increments of 0.25ºC
+#   AMBIENT_RESOLUTION_ZERO_POINT_0625   -> Configures the ambient (cold) junction to measure in increments of 0.0625ºC
+#   AMBIENT_RESOLUTION_ZERO_POINT_25     -> Configures the ambient (cold) junction to measure in increments of 0.25ºC
 
 #   Hot Junction Possible Resolutions: 
-#   kThermocoupleResolution18Bit  -> Reads the hot junction ADC to 18 bits, or 2µV
-#   kThermocoupleResolution16Bit  -> Reads the hot junction ADC to 16 bits, or 8µV
-#   kThermocoupleResolution14Bit  -> Reads the hot junction ADC to 14 bits, or 32µV
-#   kThermocoupleResolution12Bit  -> Reads the hot junction ADC to 12 bits, or 128µV
+#   THERMOCOUPLE_RESOLUTION_18_BIT  -> Reads the hot junction ADC to 18 bits, or 2µV
+#   THERMOCOUPLE_RESOLUTION_16_BIT  -> Reads the hot junction ADC to 16 bits, or 8µV
+#   THERMOCOUPLE_RESOLUTION_14_BIT  -> Reads the hot junction ADC to 14 bits, or 32µV
+#   THERMOCOUPLE_RESOLUTION_12_BIT  -> Reads the hot junction ADC to 12 bits, or 128µV
 
 #   It's worth noting that since the thermocouple that serves as the hot junction is arbitrary, we can't provide a 
 #   specification on how many degrees Celcius precision you will get for a given ADC resolution. 
@@ -62,48 +62,48 @@
 
 import qwiic_mcp9600
 import sys
-import time 
+import qwiic_i2c
 
 # Change the Resolutions here!
-ambientResolution = qwiic_mcp9600.QwiicMCP9600.kAmbientResolutionZeroPoint0625
-thermocoupleResolution = qwiic_mcp9600.QwiicMCP9600.kThermocoupleResolution14Bit
+ambient_resolution = qwiic_mcp9600.QwiicMCP9600.AMBIENT_RESOLUTION_ZERO_POINT_0625
+thermocouple_resolution = qwiic_mcp9600.QwiicMCP9600.THERMOCOUPLE_RESOLUTION_14_BIT
 
-def runExample():
+def run_example():
 
 	print("\nQwiic MCP9600 Example 4 - Set Resolution\n")
 
 	# Create instance of device
-	myThermo = qwiic_mcp9600.QwiicMCP9600()
+	my_thermo = qwiic_mcp9600.QwiicMCP9600()
 
 	# Check if it's connected
-	if myThermo.is_connected() == False:
+	if not my_thermo.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myThermo.begin()
+	my_thermo.begin()
 	
 	# Set the resolution on the ambient (cold) junction
-	myThermo.set_ambient_resolution(ambientResolution)
-	myThermo.set_thermocouple_resolution(thermocoupleResolution)
+	my_thermo.set_ambient_resolution(ambient_resolution)
+	my_thermo.set_thermocouple_resolution(thermocouple_resolution)
 	
 	while True:
-		if myThermo.available():
+		if my_thermo.available():
 			# Read temperatures
-			thermocouple_temp = myThermo.get_thermocouple_temp()
-			ambient_temp = myThermo.get_ambient_temp()
-			temp_delta = myThermo.get_temp_delta()
+			thermocouple_temp = my_thermo.get_thermocouple_temp()
+			ambient_temp = my_thermo.get_ambient_temp()
+			temp_delta = my_thermo.get_temp_delta()
 
 			# Print temperatures
 			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C")
 			
 		# Delay to avoid hammering the I2C bus
-		time.sleep(0.02)
+		qwiic_i2c.delay_ms(20)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

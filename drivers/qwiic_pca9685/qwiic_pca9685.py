@@ -50,14 +50,14 @@
 qwiic_pca9685
 ===============
 Python module for the `SparkFun Pi Servo HAT <https://www.sparkfun.com/products/14328>` and `SparkFun Servo pHAT for Raspberry Pi <https://www.sparkfun.com/products/15316>`
-This package should be used in conjunction with the i2c_driver package contained in the `SparkFun qwiic Python Package <https://github.com/sparkfun/Qwiic_Py>`
+This package should be used in conjunction with the i2c_bus package contained in the `SparkFun qwiic Python Package <https://github.com/sparkfun/Qwiic_Py>`
 """
 
 # Load Necessary Modules:
 #----------------------------------------------
-import time						# Time access and conversion package
-import math						# Basic math package
 import qwiic_i2c				# I2C bus driver package
+
+__version__ = "3.0.0"
 
 # Device Name:
 #----------------------------------------------
@@ -103,13 +103,13 @@ leaving a maximum of 62 addresses.
 _AVAILABLE_I2C_ADDRESS = list(range(0x40,0x7F+1))		# Full Address List
 
 # Special Use Addresses:
-_gcAddr =		0x00 	# General Call address for software reset
-_acAddr =		0x70	# All Call address- used for modifications to
+_GC_ADDR =		0x00 	# General Call address for software reset
+_AC_ADDR =		0x70	# All Call address- used for modifications to
 						# multiple PCA9685 chips regardless of their
 						# I2C address set by hardware pins (A0 to A5).
-_subAddr_1 =	0x71	# 1110 001X or 0xE2 (7-bit)
-_subAddr_2 =	0x72	# 1110 010X or 0xE4 (7-bit)
-_subAddr_3 =	0x74	# 1110 100X or 0xE8 (7-bit)
+_SUB_ADDR_1 =	0x71	# 1110 001X or 0xE2 (7-bit)
+_SUB_ADDR_2 =	0x72	# 1110 010X or 0xE4 (7-bit)
+_SUB_ADDR_3 =	0x74	# 1110 100X or 0xE8 (7-bit)
 
 
 # Software Reset "Address":
@@ -245,11 +245,11 @@ channels.
 NOTE: The first address in this list is considered the default PWM
 channel for the device.
 
-The variable 'pwm_channels' can be modified for chip sets with similar
+The variable 'PWM_CHANNELS' can be modified for chip sets with similar
 operations.
 """
-pwm_channels = 16
-_AVAILABLE_PWM_CHANNELS = list(range(pwm_channels))		# Full List of PWM Channels
+PWM_CHANNELS = 16
+_AVAILABLE_PWM_CHANNELS = list(range(PWM_CHANNELS))		# Full List of PWM Channels
 
 
 # SparkFun PCA9685 Class/Object
@@ -257,17 +257,16 @@ _AVAILABLE_PWM_CHANNELS = list(range(pwm_channels))		# Full List of PWM Channels
 class QwiicPCA9685(object):
 	"""!
 		SparkFunPCA9685
-	Initialise the PCA9685 chip at ``address`` with ``i2c_driver``.
+	Initialise the PCA9685 chip at ``address`` with ``i2c_bus``.
 
 		@param address: The I2C address to use for the device.
 							If not provided, the default address is
 							used.
-		@param i2c_driver: An existing i2c driver object. If not
-							provided a driver object is created.
+		@param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
 		@return **Bool** Constructor Initialization
 							True-	Successful
-							False-	Issue loading I2C driver
+							False-	Issue loading I2C bus
 		"""
 	#----------------------------------------------
 	# Device Name:
@@ -283,45 +282,28 @@ class QwiicPCA9685(object):
 
 	#----------------------------------------------
 	# Constructor
-	def __init__(self, address = None, debug = None, i2c_driver = None):
+	def __init__(self, address = None, i2c_bus = None):
 		"""!
 		This method initializes the class object. If no 'address' or
-		'i2c_driver' are inputted or 'None' is specified, the method will
+		'i2c_bus' are inputted or 'None' is specified, the method will
 		use the defaults.
 
 		@param address: The I2C address to use for the device.
 							If not provided, the method will default to
 							the first address in the
 							'available_addresses' list.
-								Default = 0x40
-		@param debug: Designated whether or not to print debug
-							statements.
-							0-	Don't print debug statements
-							1-	Print debug statements
-		@param i2c_driver: An existing i2c driver object. If not
-							provided a driver object is created from the
-							'qwiic_i2c' I2C driver of the SparkFun Qwiic
-							library.
+							Default = 0x40
+		@param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 		"""
+		# The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+		address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
 		# Did the user specify an I2C address?
 		# Defaults to 0x40 if unspecified.
-		self.address = address if address != None else self.available_addresses[0]
+		self.address = address if address is not None else self.available_addresses[0]
 
-		# Load the I2C driver if one isn't provided
-		if i2c_driver == None:
-			self._i2c = qwiic_i2c.getI2CDriver()
-			if self._i2c == None:
-				print("Unable to load I2C driver for this platform.")
-				return
-		else:
-			self._i2c = i2c_driver
-
-		# Do you want debug statements?
-		if debug == None:
-			self.debug = 0	# Debug Statements Disabled
-		else:
-			self.debug = debug	# Debug Statements Enabled (1)
+		# Use the given I2C bus, or the platform's default bus
+		self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
 
 #=======================================================================
@@ -330,7 +312,7 @@ class QwiicPCA9685(object):
 
 	#----------------------------------------------
 	# Reads the value of a specific bit in the byte
-	def __readBit__(self, byte, bit_number):
+	def _read_bit(self, byte, bit_number):
 		"""!
 		This method returns the value of a specific bit in a byte.
 
@@ -350,9 +332,6 @@ class QwiicPCA9685(object):
 				returns: 1
 		"""
 		if (bit_number < 0) or (bit_number > 7):
-			# Debug Message: 
-			if self.debug == 1:
-				print("Bit number is outside the bounds of a byte")
 			return 0
 
 		# Returns the value of the bit
@@ -361,7 +340,7 @@ class QwiicPCA9685(object):
 
 	#----------------------------------------------
 	# Writes a value to a specific bit in the byte
-	def __writeBit__(self, byte, bit_number, value):
+	def _write_bit(self, byte, bit_number, value):
 		"""!
 		This method modifies a specific bit in a byte, with a specified
 		value.
@@ -389,15 +368,9 @@ class QwiicPCA9685(object):
 				Binary:	0000 0010
 		"""
 		if value not in [0, 1]:
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Value must be 0 or 1.")
 			return byte
 		
 		if bit_number < 0 or bit_number > 7:
-			# Debug Message: 
-			if self.debug == 1:
-				print("Bit number is outside the bounds of a byte.")
 			return byte
 			
 		# Returns modified byte
@@ -407,7 +380,7 @@ class QwiicPCA9685(object):
 	# Checks I2C connection
 	def is_connected(self):
 		"""!
-		This method checks if the "i2c_driver" can connect to the device
+		This method checks if the "i2c_bus" can connect to the device
 		at the specified or default address.
 
 		@return **Bool** Device Connection
@@ -415,7 +388,7 @@ class QwiicPCA9685(object):
 					False-	Can't find device
 		"""
 
-		return qwiic_i2c.isDeviceConnected(self.address)
+		return qwiic_i2c.is_device_connected(self.address)
 
 
 	#----------------------------------------------
@@ -437,22 +410,19 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
-		if addr_bit == None:				# If no input for addr_bit, sets to ALLCALL
+		if addr_bit is None:				# If no input for addr_bit, sets to ALLCALL
 			get_addr_bit = 0				# ALLCALL bit
 		elif addr_bit < 0 or addr_bit > 3:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid addr_bit input. Selecting ALLCALL bit.")
 			get_addr_bit = 0				# ALLCALL bit
 		else:								# Use input 'addr_bit'
 			get_addr_bit = addr_bit
 
 		# Reads specified address bit in MODE1.
-		addrMode = self.__readBit__(mode1, get_addr_bit)
+		addr_mode = self._read_bit(mode1, get_addr_bit)
 
-		return addrMode
+		return addr_mode
 
 	#----------------------------------------------
 	# Writes Value to Address Bits
@@ -473,28 +443,22 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		# Checks for valid input
 		if addr_bit < 0 or addr_bit > 3:
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid addr_bit input.")
 			return #False
 		else:							# Use input 'addr_bit'
 			set_addr_bit = addr_bit
 
 		if value != 0 and value != 1:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input.")
 			return #False
 		else:							# Use input 'value'
 			set_value = value
 
 		# Writes to specified address bit in MODE1.
-		addrMode = self.__writeBit__(mode1, set_addr_bit, set_value)
-		self._i2c.writeByte(self.address, MODE1, addrMode)
+		addr_mode = self._write_bit(mode1, set_addr_bit, set_value)
+		self._i2c.write_byte(self.address, MODE1, addr_mode)
 
 	
 	#----------------------------------------------
@@ -510,14 +474,14 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		sleep_bit = 4 # Fifth bit in register
 
 		# Reads SLEEP bit in MODE1.
-		sleepMode = self.__readBit__(mode1, sleep_bit)
+		sleep_mode = self._read_bit(mode1, sleep_bit)
 
-		return sleepMode
+		return sleep_mode
 
 	#----------------------------------------------
 	# Writes Value to SLEEP Bit
@@ -531,23 +495,20 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		sleep_bit = 4 # Fifth bit in register
 
-		if value == None:				# If no input value, sets to default value
+		if value is None:				# If no input value, sets to default value
 			set_value = 1				# Default
 		elif value != 0 and value != 1:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Setting to default value (1 = Low Power Mode; Oscillator Off).")
 			set_value = 1				# Default
 		else:							# Use input 'value'
 			set_value = value
 		
 		# Writes 'value' to the SLEEP bit in the MODE 1 register
-		sleepMode = self.__writeBit__(mode1, sleep_bit, set_value)
-		self._i2c.writeByte(self.address, MODE1, sleepMode)
+		sleep_mode = self._write_bit(mode1, sleep_bit, set_value)
+		self._i2c.write_byte(self.address, MODE1, sleep_mode)
 
 
 	#----------------------------------------------
@@ -563,14 +524,14 @@ class QwiicPCA9685(object):
 		"""
 
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		ai_bit = 5 # Sixth bit in register
 
 		# Reads AI bit in MODE1.
-		aiMode = self.__readBit__(mode1, ai_bit)
+		ai_mode = self._read_bit(mode1, ai_bit)
 
-		return aiMode
+		return ai_mode
 
 
 	#----------------------------------------------
@@ -586,23 +547,20 @@ class QwiicPCA9685(object):
 		"""
 
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		ai_bit = 5 # Sixth bit in register
 
-		if value == None:				# If no input value, sets to default value
+		if value is None:				# If no input value, sets to default value
 			set_value = 0				# Default
 		elif value != 0 and value != 1:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Setting to default value (0- Auto-Increment Disabled).")
 			set_value = 0				# Default
 		else:							# Use input 'value'
 			set_value = value
 
 		# Writes 'value' to the AI bit in the MODE 1 register
-		aiMode = self.__writeBit__(mode1, ai_bit, set_value)
-		self._i2c.writeByte(self.address, MODE1, aiMode)
+		ai_mode = self._write_bit(mode1, ai_bit, set_value)
+		self._i2c.write_byte(self.address, MODE1, ai_mode)
 
 
 	#----------------------------------------------
@@ -627,14 +585,14 @@ class QwiicPCA9685(object):
 		"""
 
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		extclk_bit = 6 # Seventh bit in register
 
 		# Reads EXTCLK bit in MODE1.
-		extclkMode = self.__readBit__(mode1, extclk_bit)
+		extclk_mode = self._read_bit(mode1, extclk_bit)
 
-		return extclkMode
+		return extclk_mode
 
 
 	#----------------------------------------------
@@ -649,15 +607,15 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Reads MODE 1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		rs_bit = 7 # Eighth bit in register
 
 		# Reads the RESTART bit from the MODE 1 register
-		rsMode = self.__readBit__(mode1, rs_bit)
+		rs_mode = self._read_bit(mode1, rs_bit)
 
 		# Returns the RESTART bit value
-		return rsMode
+		return rs_mode
 
 	#----------------------------------------------
 	# Writes Value to RESTART Mode Bit
@@ -677,23 +635,14 @@ class QwiicPCA9685(object):
 		"""
 
 		# Reads MODE 1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		rs_bit = 7 # Eighth bit in register
 
-		if value == None:				# If no input value
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input.")
-			# value = 0 # Default
-		elif value != 0 and value != 1:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input.")
-			# value = 0 # Default
-		else:
-			rsMode = self.__writeBit__(mode1, rs_bit, value)
-			self._i2c.writeByte(self.address, MODE1, rsMode)
+		# Writes only a valid value (0 or 1); otherwise leaves the bit as is
+		if value == 0 or value == 1:
+			rs_mode = self._write_bit(mode1, rs_bit, value)
+			self._i2c.write_byte(self.address, MODE1, rs_mode)
 
 		# Returns RESTART bit value
 		return self.get_restart_bit()
@@ -716,15 +665,15 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		# outne0_bit = 0 # First bit in register
 		# outne1_bit = 1 # Second bit in register
 
 		# Reads OUTNE bits in MODE2.
 		outne_bits = mode2 & 3
-		# outne0 = self.__readBit__(mode2, outne0_bit)
-		# outne1 = self.__readBit__(mode2, outne1_bit)
+		# outne0 = self._read_bit(mode2, outne0_bit)
+		# outne1 = self._read_bit(mode2, outne1_bit)
 		# outne_bits  = outne0 << 1 | outne1
 
 		return outne_bits
@@ -750,20 +699,14 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		outne0_bit = 0 # First bit in register
 		outne1_bit = 1 # Second bit in register
 
-		if value == None:				# If no input value
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Set bit value.")
+		if value is None:				# If no input value
 			return False
 		elif value < 0 or value > 3:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Value outside bounds.")
 			return False
 		else:							# Use input 'value'
 			set_value = value
@@ -773,9 +716,9 @@ class QwiicPCA9685(object):
 		outne1_val = (set_value & (1 << outne1_bit)) >> outne1_bit
 
 		# Writes to 'values' OUTNE bits in MODE2.
-		outne_temp = self.__writeBit__(mode2, outne0_bit, outne0_val)
-		outne_byte = self.__writeBit__(outne_temp, outne1_bit, outne1_val)
-		self._i2c.writeByte(self.address, MODE2, outne_byte)
+		outne_temp = self._write_bit(mode2, outne0_bit, outne0_val)
+		outne_byte = self._write_bit(outne_temp, outne1_bit, outne1_val)
+		self._i2c.write_byte(self.address, MODE2, outne_byte)
 
 		return True
 
@@ -795,14 +738,14 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		outdrv_bit = 2 # Third bit in register
 
 		# Reads OUTDRV bit in MODE2.
-		outdrvMode = self.__readBit__(mode2, outdrv_bit)
+		outdrv_mode = self._read_bit(mode2, outdrv_bit)
 
-		return outdrvMode
+		return outdrv_mode
 
 	#----------------------------------------------
 	# Writes Value to OUTDRV Bits
@@ -819,26 +762,20 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		outdrv_bit = 2 # Third bit in register
 
-		if value == None:				# If no input value
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Set bit value.")
+		if value is None:				# If no input value
 			return False
 		elif value != 0 and value != 1:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Value outside bounds.")
 			return False
 		else:							# Use input 'value'
 			set_value = value
 		
 		# Writes 'value' to the OUTDRV bit in the MODE 2 register
-		outdrvMode = self.__writeBit__(mode2, outdrv_bit, set_value)
-		self._i2c.writeByte(self.address, MODE2, outdrvMode)
+		outdrv_mode = self._write_bit(mode2, outdrv_bit, set_value)
+		self._i2c.write_byte(self.address, MODE2, outdrv_mode)
 
 
 	#----------------------------------------------
@@ -863,14 +800,14 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		och_bit = 3 # Forth bit in register
 
 		# Reads OCH bit in MODE2.
-		ochMode = self.__readBit__(mode2, och_bit)
+		och_mode = self._read_bit(mode2, och_bit)
 
-		return ochMode
+		return och_mode
 
 	#----------------------------------------------
 	# Writes Value to OCH Bits
@@ -894,26 +831,20 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		och_bit = 3 # Forth bit in register
 
-		if value == None:				# If no input value
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Set bit value.")
+		if value is None:				# If no input value
 			return False
 		elif value != 0 and value != 1:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Value outside bounds.")
 			return False
 		else:							# Use input 'value'
 			set_value = value
 		
 		# Writes 'value' to the OCH bit in the MODE 2 register
-		ochMode = self.__writeBit__(mode2, och_bit, set_value)
-		self._i2c.writeByte(self.address, MODE2, ochMode)
+		och_mode = self._write_bit(mode2, och_bit, set_value)
+		self._i2c.write_byte(self.address, MODE2, och_mode)
 
 
 	#----------------------------------------------
@@ -930,14 +861,14 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		invrt_bit = 4 # Fifth bit in register
 
 		# Reads INVRT bit in MODE2.
-		invrtMode = self.__readBit__(mode2, invrt_bit)
+		invrt_mode = self._read_bit(mode2, invrt_bit)
 
-		return invrtMode
+		return invrt_mode
 
 	#----------------------------------------------
 	# Writes Value to INVRT bit
@@ -953,26 +884,20 @@ class QwiicPCA9685(object):
 		"""
 		
 		# Read MODE2 register
-		mode2 = self._i2c.readByte(self.address, MODE2)
+		mode2 = self._i2c.read_byte(self.address, MODE2)
 
 		invrt_bit = 4 # Fifth bit in register
 
-		if value == None:				# If no input value
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Set bit value.")
+		if value is None:				# If no input value
 			return False
 		elif value != 0 and value != 1:	# Checks for valid input
-			# Debug Message: 
-			if self.debug == 1:
-				print("Invalid value input. Value outside bounds.")
 			return False
 		else:							# Use input 'value'
 			set_value = value
 		
 		# Writes 'value' to the INVRT bit in the MODE 2 register
-		invrtMode = self.__writeBit__(mode2, invrt_bit, set_value)
-		self._i2c.writeByte(self.address, MODE2, invrtMode)
+		invrt_mode = self._write_bit(mode2, invrt_bit, set_value)
+		self._i2c.write_byte(self.address, MODE2, invrt_mode)
 
 
 	#----------------------------------------------
@@ -1003,27 +928,23 @@ class QwiicPCA9685(object):
 
 		# Did the user specify a PWM channel?
 		# Defaults to channel 0 if unspecified.
-		self.channel = channel if channel != None else self.available_pwm_channels[0]
+		self.channel = channel if channel is not None else self.available_pwm_channels[0]
 
-		channel_ON_L = LED0_ON_L + 4 * channel
-		channel_OFF_L = LED0_OFF_L + 4 * channel
+		channel_on_l = LED0_ON_L + 4 * channel
+		channel_off_l = LED0_OFF_L + 4 * channel
 
 		# Enable word read/writes if not enabled
 		if self.get_auto_increment_bit() != 1:
 			self.set_auto_increment_bit(1)
 
-		if on_off == None:
+		if on_off is None:
 			return False
 		elif on_off == 0:
-			register = channel_OFF_L
+			register = channel_off_l
 		elif on_off == 1:
-			register = channel_ON_L
+			register = channel_on_l
 
-		value = self._i2c.readWord(self.address, register)
-
-		# Debug Message: 
-		if self.debug == 1:
-			print("Stored value is: %s" % value)
+		value = self._i2c.read_word(self.address, register)
 
 		return value
 
@@ -1059,30 +980,26 @@ class QwiicPCA9685(object):
 
 		# Did the user specify a PWM channel?
 		# Defaults to channel 0 if unspecified.
-		self.channel = channel if channel != None else self.available_pwm_channels[0]
+		self.channel = channel if channel is not None else self.available_pwm_channels[0]
 
-		channel_ON_L = LED0_ON_L + 4 * channel
-		channel_OFF_L = LED0_OFF_L + 4 * channel
+		channel_on_l = LED0_ON_L + 4 * channel
+		channel_off_l = LED0_OFF_L + 4 * channel
 
 		# Enable word read/writes if not enabled
 		if self.get_auto_increment_bit() != 1:
 			self.set_auto_increment_bit(1)
 
 		if value < 0 or 4095 < value:
-			# Debug Message: 
-			if self.debug == 1:
-				print("Error: Invalid input. Value out of bounds (Range = 0 - 4095).")
-			# raise Exception("Error: Invalid input. Value out of bounds (Range = 0 - 4095). Entered value: %s" % value)
 			return False
 
-		if on_off == None:
+		if on_off is None:
 			return False
 		elif on_off == 0:
-			register = channel_OFF_L
+			register = channel_off_l
 		elif on_off == 1:
-			register = channel_ON_L
+			register = channel_on_l
 
-		self._i2c.writeWord(self.address, register, value)
+		self._i2c.write_word(self.address, register, value)
 		return True
 
 
@@ -1140,7 +1057,7 @@ class QwiicPCA9685(object):
 		should be interpreted as an "SWRST Call Abort".
 		"""
 		
-		self._i2c.writeCommand(_gcAddr, _SWRST)
+		self._i2c.write_byte(_GC_ADDR, None, _SWRST)
 
 
 	#----------------------------------------------
@@ -1151,7 +1068,7 @@ class QwiicPCA9685(object):
 		register.)
 		"""
 		
-		self._i2c.writeByte(self.address, MODE1, 0x00)
+		self._i2c.write_byte(self.address, MODE1, 0x00)
 
 
 	#----------------------------------------------
@@ -1172,18 +1089,8 @@ class QwiicPCA9685(object):
 		200Hz).
 		"""
 		# Reads value in PRE_SCALE register.
-		prescale = self._i2c.readByte(self.address, PRE_SCALE)
+		prescale = self._i2c.read_byte(self.address, PRE_SCALE)
 				
-		# Debug Message: 
-		if self.debug == 1:
-			# Print Pre-Scale Value
-			print("Prescale value = %s" % prescale)
-			
-			# Calculate frequency based off internal clock frequency (default)
-			est_frequency = float((25*10**6)/((prescale + 1)*4096))
-			
-			# Print Equivalent Frequency
-			print("Est. frequency = %s Hz (*Based on internal clock value)" % int(est_frequency))
 
 		return prescale
 
@@ -1206,33 +1113,34 @@ class QwiicPCA9685(object):
 							Range: 24 to 1526 Hz
 		@param ext: External Clock Frequency (Hz)
 							Default = None; uses internal clock
-							frequency (25 MHz)
+							frequency (25 MHz). Required once the EXTCLK
+							pin is enabled.
 
 		@return **Bool** Function Operation
 					True-	Successful
-					False-	Issue in Execution
+					False-	Invalid frequency or external clock, or
+							the EXTCLK pin is enabled and 'ext' is
+							None. Nothing is written.
 
 		PWM Frequency Range:	24 Hz to 1526 Hz or (0x03 to 0xFF,
 		Default: 0x1E = 200Hz)
 		Internal Clock:			25 MHz (Default)
 		"""
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 
-		if frequency == None:
+		if frequency is None:
 			# Set default frequency (200 Hz)
-			pwmPreScale = 0x1E # Default
+			pwm_pre_scale = 0x1E # Default
 
 		elif frequency < 24 or 1526 < frequency: # Checks for valid input
-			print("Invalid frequency input. Setting to the default value (200 Hz)")
 			return False
 		
 		else:
 			# 
-			if ext != None:
+			if ext is not None:
 				if 50 * 10**6 < ext: # Checks for valid input
-					print("Invalid external clock frequency input.")
 					return False
 				else:
 					# Uses user input
@@ -1243,30 +1151,25 @@ class QwiicPCA9685(object):
 				# EXTCLK bit:
 				# 	0 = Internal Clock (Default)
 				# 	1 = External Clock Pin
-				extMode = self.get_extclock_bit()
+				ext_mode = self.get_extclock_bit()
 
-				if extMode == 1:
-					print("External clock pin enabled.")						# Notifies users external clock is used	
-					osc_clock = input("Enter external clock frequency (Hz): ")	# Prompts user input
-					# return False
-				elif extMode == 0:
+				if ext_mode == 1:
+					# The external clock frequency is unknown: pass it as 'ext'
+					return False
+				else:
 					osc_clock = 25 * 10**6 # 25 MHz (Default)
-				# else:
-				# 	print("Error reading EXTCLK bit from MODE1 register.")
-				# 	return False
 
-		
 		# Calculate prescale value
-		pwmPreScale = round(float(osc_clock/(4096*frequency))) - 1
+		pwm_pre_scale = round(float(osc_clock/(4096*frequency))) - 1
 		
 		# Writes 1 to SLEEP bit in MODE1 register.
 		self.set_sleep_bit(1)
 
 		# Writes prescale value to PRE_SCALE register.
-		self._i2c.writeByte(self.address, PRE_SCALE, pwmPreScale)	
+		self._i2c.write_byte(self.address, PRE_SCALE, pwm_pre_scale)	
 		
 		# Resets MODE1 register to the original value.
-		self._i2c.writeByte(self.address, MODE1, mode1)
+		self._i2c.write_byte(self.address, MODE1, mode1)
 
 		return True
 
@@ -1303,8 +1206,6 @@ class QwiicPCA9685(object):
 		if self.get_restart_bit() == 1:
 			# Writes logic 1 to clear the RESTART bit in the MODE 1 register
 			self.write_restart_bit(1)
-		else:
-			print("Restart bit already set to 0")
 
 		# Returns RESTART bit value
 		return self.get_restart_bit()
@@ -1341,12 +1242,10 @@ class QwiicPCA9685(object):
 			self.set_sleep_bit(0)
 				
 			# Allow time for the oscillator to stabilize (1ms)
-			time.sleep( 10**(-3))
+			self._i2c.delay_ms(1)
 
 			# Writes logic 1 to RESTART bit
 			self.write_restart_bit(1)
-		else:
-			print("RESTART bit logic 0; not in sleep mode.")
 		
 		# Returns RESTART bit value
 		return self.get_restart_bit()
@@ -1370,7 +1269,7 @@ class QwiicPCA9685(object):
 		"""
 
 		# Read MODE1 register
-		mode1 = self._i2c.readByte(self.address, MODE1)
+		mode1 = self._i2c.read_byte(self.address, MODE1)
 
 		sleep_bit = 4	# Fifth bit in register
 		extclk_bit = 6	# Seventh bit in register
@@ -1382,4 +1281,4 @@ class QwiicPCA9685(object):
 		# external clock can be active during the switch because the
 		# SLEEP bit is set.
 		extclk = mode1 | (1 << sleep_bit) | (1 << extclk_bit)	# Sets SLEEP and EXTCLK bits to 1
-		self._i2c.writeByte(self.address, MODE1, extclk)		# Sets SLEEP and EXTCLK bits to 1
+		self._i2c.write_byte(self.address, MODE1, extclk)		# Sets SLEEP and EXTCLK bits to 1

@@ -46,6 +46,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -66,107 +68,108 @@ class QwiicENS160(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # ENS160 register map
-    kRegPartId = 0x00
-    kRegOpMode = 0x10
-    kRegConfig = 0x11
-    kRegCommand = 0x12
-    kRegTempIn = 0x13
-    kRegRhIn = 0x15
-    kRegDeviceStatus = 0x20
-    kRegDataAqi = 0x21
-    kRegDataTvoc = 0x22
-    kRegDataEtoh = 0x22 
-    kRegDataEco2 = 0x24
-    kRegDataT = 0x30
-    kRegDataRh = 0x32
-    kRegDataMisr = 0x38
-    kRegGPRWrite0 = 0x40
-    kRegGPRWrite1 = 0x41
-    kRegGPRWrite2 = 0x42
-    kRegGPRWrite3 = 0x43
-    kRegGPRWrite4 = 0x44
-    kRegGPRWrite5 = 0x45
-    kRegGPRWrite6 = 0x46
-    kRegGPRWrite7 = 0x47
-    kRegGPRRead0 = 0x48
-    kRegGPRRead1 = 0x49
-    kRegGPRRead2 = 0x4A
-    kRegGPRRead3 = 0x4B
-    kRegGPRRead4 = 0x4C 
-    kRegGPRRead5 = 0x4D
-    kRegGPRRead6 = 0x4E
-    kRegGPRRead7 = 0x4F
+    REG_PART_ID = 0x00
+    REG_OP_MODE = 0x10
+    REG_CONFIG = 0x11
+    REG_COMMAND = 0x12
+    REG_TEMP_IN = 0x13
+    REG_RH_IN = 0x15
+    REG_DEVICE_STATUS = 0x20
+    REG_DATA_AQI = 0x21
+    REG_DATA_TVOC = 0x22
+    REG_DATA_ETOH = 0x22 
+    REG_DATA_ECO2 = 0x24
+    REG_DATA_T = 0x30
+    REG_DATA_RH = 0x32
+    REG_DATA_MISR = 0x38
+    REG_GPR_WRITE_0 = 0x40
+    REG_GPR_WRITE_1 = 0x41
+    REG_GPR_WRITE_2 = 0x42
+    REG_GPR_WRITE_3 = 0x43
+    REG_GPR_WRITE_4 = 0x44
+    REG_GPR_WRITE_5 = 0x45
+    REG_GPR_WRITE_6 = 0x46
+    REG_GPR_WRITE_7 = 0x47
+    REG_GPR_READ_0 = 0x48
+    REG_GPR_READ_1 = 0x49
+    REG_GPR_READ_2 = 0x4A
+    REG_GPR_READ_3 = 0x4B
+    REG_GPR_READ_4 = 0x4C 
+    REG_GPR_READ_5 = 0x4D
+    REG_GPR_READ_6 = 0x4E
+    REG_GPR_READ_7 = 0x4F
 
     # ENS160 defines and masks
-    kPartId = 0x0160
+    PART_ID = 0x0160
 
     # Possible Operating Mode defines/masks
     # Default = 0x00
-    kOpModeDeepSleep = 0x00
-    kOpModeIdle = 0x01
-    kOpModeStandard = 0x02
-    kOpModeReset = 0xF0
+    OP_MODE_DEEP_SLEEP = 0x00
+    OP_MODE_IDLE = 0x01
+    OP_MODE_STANDARD = 0x02
+    OP_MODE_RESET = 0xF0
     
     # Config defines/masks
     # Default = 0x00
-    kShiftConfigIntPol = 6  # INTn pin polarity 0: active low, 1: active high
-    kShiftConfigIntCfg = 5  # INTn Pin Drive (INT_CFG) 0: open drain, 1: push/pull
-    kShiftConfigIntGPR = 3  # INTn assert on new data in GPR reg (INTGPR)
-    kShiftConfigIntDat = 1  # INTn pin assert on new data in DATA reg (INTDAT)
-    kShiftConfigIntEn = 0   # INTn enable
+    SHIFT_CONFIG_INT_POL = 6  # INTn pin polarity 0: active low, 1: active high
+    SHIFT_CONFIG_INT_CFG = 5  # INTn Pin Drive (INT_CFG) 0: open drain, 1: push/pull
+    SHIFT_CONFIG_INT_GPR = 3  # INTn assert on new data in GPR reg (INTGPR)
+    SHIFT_CONFIG_INT_DAT = 1  # INTn pin assert on new data in DATA reg (INTDAT)
+    SHIFT_CONFIG_INT_EN = 0   # INTn enable
     
-    kMaskConfigIntPol = 0b1 << kShiftConfigIntPol
-    kMaskConfigIntCfg = 0b1 << kShiftConfigIntCfg
-    kMaskConfigIntGPR = 0b1 << kShiftConfigIntGPR
-    kMaskConfigIntDat = 0b1 << kShiftConfigIntDat
-    kMaskConfigIntEn = 0b1 << kShiftConfigIntEn
+    MASK_CONFIG_INT_POL = 0b1 << SHIFT_CONFIG_INT_POL
+    MASK_CONFIG_INT_CFG = 0b1 << SHIFT_CONFIG_INT_CFG
+    MASK_CONFIG_INT_GPR = 0b1 << SHIFT_CONFIG_INT_GPR
+    MASK_CONFIG_INT_DAT = 0b1 << SHIFT_CONFIG_INT_DAT
+    MASK_CONFIG_INT_EN = 0b1 << SHIFT_CONFIG_INT_EN
 
     # Command defines/masks
     # All commands must be issued when device is idle.
-    kCommandNop = 0x00
+    COMMAND_NOP = 0x00
     # Get Firwmware App Version - version is placed in General Purpose Read Registers as follows:
     # GPR_READ04 - Version (Major)
     # GPR_READ05 - Version (Minor)
     # GPR_READ06 - Version (Release)
-    kCommandGetAppVer = 0x0E
-    kCommandClearGPR = 0xCC
+    COMMAND_GET_APP_VER = 0x0E
+    COMMAND_CLEAR_GPR = 0xCC
 
     # DeviceStatus defines/masks
-    kShiftDeviceStatusStatAs = 7 # indicates an OPMODE is running
-    kShiftDeviceStatusStatEr = 6 # indicates an error
-    kShiftDeviceStatusValidityFlag = 2 # 0: normal, 1: warm-up, 2: initial start-up, 3: invalid
-    kShiftDeviceStatusNewDat = 1 # new data available on DATA_x regs
-    kShiftDeviceStatusNewGpr = 0  # new data available on GPR_READx regs
+    SHIFT_DEVICE_STATUS_STAT_AS = 7 # indicates an OPMODE is running
+    SHIFT_DEVICE_STATUS_STAT_ER = 6 # indicates an error
+    SHIFT_DEVICE_STATUS_VALIDITY_FLAG = 2 # 0: normal, 1: warm-up, 2: initial start-up, 3: invalid
+    SHIFT_DEVICE_STATUS_NEW_DAT = 1 # new data available on DATA_x regs
+    SHIFT_DEVICE_STATUS_NEW_GPR = 0  # new data available on GPR_READx regs
 
-    kMaskDeviceStatusStatAs = 0b1 << kShiftDeviceStatusStatAs
-    kMaskDeviceStatusStatEr = 0b1 << kShiftDeviceStatusStatEr
-    kMaskDeviceStatusValidityFlag = 0b11 << kShiftDeviceStatusValidityFlag
-    kMaskDeviceStatusNewDat = 0b1 << kShiftDeviceStatusNewDat
-    kMaskDeviceStatusNewGpr = 0b1 << kShiftDeviceStatusNewGpr
+    MASK_DEVICE_STATUS_STAT_AS = 0b1 << SHIFT_DEVICE_STATUS_STAT_AS
+    MASK_DEVICE_STATUS_STAT_ER = 0b1 << SHIFT_DEVICE_STATUS_STAT_ER
+    MASK_DEVICE_STATUS_VALIDITY_FLAG = 0b11 << SHIFT_DEVICE_STATUS_VALIDITY_FLAG
+    MASK_DEVICE_STATUS_NEW_DAT = 0b1 << SHIFT_DEVICE_STATUS_NEW_DAT
+    MASK_DEVICE_STATUS_NEW_GPR = 0b1 << SHIFT_DEVICE_STATUS_NEW_GPR
 
-    kValidityFlagNormal = 0
-    kValidityFlagWarmUp = 1
-    kValidityFlagStartUp = 2
-    kValidityFlagInvalid = 3
+    VALIDITY_FLAG_NORMAL = 0
+    VALIDITY_FLAG_WARM_UP = 1
+    VALIDITY_FLAG_START_UP = 2
+    VALIDITY_FLAG_INVALID = 3
 
     # DataAqi defines/masks
-    kShiftDataAqiUba = 0 # Air quality index according to UBA
+    SHIFT_DATA_AQI_UBA = 0 # Air quality index according to UBA
 
-    kMaskDataAqiUba = 0b11 << kShiftDataAqiUba
+    MASK_DATA_AQI_UBA = 0b11 << SHIFT_DATA_AQI_UBA
 
     # DataMisr defines/masks
     # Gives calculated checksum of "DATA_" registers
-    kPoly = 0x1D #  0b00011101 = x^8+x^4+x^3+x^2+x^0 (x^8 is implicit)
+    POLY = 0x1D #  0b00011101 = x^8+x^4+x^3+x^2+x^0 (x^8 is implicit)
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -174,14 +177,8 @@ class QwiicENS160(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     def is_connected(self):
         """!
@@ -190,14 +187,12 @@ class QwiicENS160(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        if(self._i2c.isDeviceConnected(self.address) == False):
+        if not self._i2c.is_device_connected(self.address):
             return False
 
         prodid = self.get_unique_id()
 
-        return prodid == self.kPartId
-
-    connected = property(is_connected)
+        return prodid == self.PART_ID
 
     def begin(self):
         """!
@@ -217,12 +212,12 @@ class QwiicENS160(object):
         Sets the operating mode: Deep Sleep (0x00), Idle (0x01), Standard (0x02),
         Reset (0xF0)
 
-        @param int val: The desired operating mode to set
+        @param val: **int** The desired operating mode to set
         """
-        if (val > self.kOpModeReset) or (val < self.kOpModeDeepSleep):
+        if (val > self.OP_MODE_RESET) or (val < self.OP_MODE_DEEP_SLEEP):
             return False
         
-        self._i2c.write_byte(self.address, self.kRegOpMode, val)
+        self._i2c.write_byte(self.address, self.REG_OP_MODE, val)
 
         return True
     
@@ -233,7 +228,7 @@ class QwiicENS160(object):
 
         @return **int** The current operating mode
         """
-        return self._i2c.read_byte(self.address, self.kRegOpMode)
+        return self._i2c.read_byte(self.address, self.REG_OP_MODE)
     
     def get_app_ver(self):
         """!
@@ -243,14 +238,14 @@ class QwiicENS160(object):
         """
 
         old_mode = self.get_operating_mode()
-        self.set_operating_mode(self.kOpModeIdle)
-        self._i2c.write_byte(self.address, self.kRegCommand, self.kCommandClearGPR)
-        self._i2c.write_byte(self.address, self.kRegCommand, self.kCommandGetAppVer)
+        self.set_operating_mode(self.OP_MODE_IDLE)
+        self._i2c.write_byte(self.address, self.REG_COMMAND, self.COMMAND_CLEAR_GPR)
+        self._i2c.write_byte(self.address, self.REG_COMMAND, self.COMMAND_GET_APP_VER)
 
         while not self.check_gpr_status():
             pass
 
-        version_bytes = self._i2c.read_block(self.address, self.kRegGPRRead4, 3)
+        version_bytes = self._i2c.read_block(self.address, self.REG_GPR_READ_4, 3)
 
         version = version_bytes[0]
         version |= version_bytes[1] << 8
@@ -266,7 +261,7 @@ class QwiicENS160(object):
 
         @return **int** Part Id
         """
-        id_bytes = self._i2c.read_block(self.address, self.kRegPartId, 2) 
+        id_bytes = self._i2c.read_block(self.address, self.REG_PART_ID, 2) 
 
         id = id_bytes[0]
         id |= id_bytes[1] << 8
@@ -277,42 +272,42 @@ class QwiicENS160(object):
         """!
         Changes all of the settings within the interrupt configuration register
 
-        @param int val: The desired configuration settings.
+        @param val: **int** The desired configuration settings.
         """
 
-        self._i2c.write_byte(self.address, self.kRegConfig, val)
+        self._i2c.write_byte(self.address, self.REG_CONFIG, val)
 
     def enable_interrupt(self, enable=True):
         """!
         Enables the interrupt.
 
-        @param bool enable: Turns on or off the interrupt
+        @param enable: **bool** Turns on or off the interrupt
         """
 
-        newConfig = self._i2c.read_byte(self.address, self.kRegConfig)
+        new_config = self._i2c.read_byte(self.address, self.REG_CONFIG)
 
-        newConfig &= ~self.kMaskConfigIntEn
+        new_config &= ~self.MASK_CONFIG_INT_EN
 
         if enable:
-            newConfig |= self.kMaskConfigIntEn
+            new_config |= self.MASK_CONFIG_INT_EN
 
-        self._i2c.write_byte(self.address, self.kRegConfig, newConfig)
+        self._i2c.write_byte(self.address, self.REG_CONFIG, new_config)
 
-    def set_interrupt_polarity(self, activeHigh = True):
+    def set_interrupt_polarity(self, active_high = True):
         """!
         Changes the polarity of the interrupt: active high or active low. By default
         this value is set to zero or active low.
 
-        @param bool activeHigh: Changes active state of interrupt from high to low.
+        @param active_high: **bool** Changes active state of interrupt from high to low.
         """
-        newConfig = self._i2c.read_byte(self.address, self.kRegConfig)
+        new_config = self._i2c.read_byte(self.address, self.REG_CONFIG)
 
-        newConfig &= ~self.kMaskConfigIntPol
+        new_config &= ~self.MASK_CONFIG_INT_POL
 
-        if activeHigh:
-            newConfig |= self.kMaskConfigIntPol
+        if active_high:
+            new_config |= self.MASK_CONFIG_INT_POL
         
-        self._i2c.write_byte(self.address, self.kRegConfig, newConfig)
+        self._i2c.write_byte(self.address, self.REG_CONFIG, new_config)
     
     def get_interrupt_polarity(self):
         """!
@@ -320,99 +315,99 @@ class QwiicENS160(object):
 
         @return **int** Interrupt polarity (0: active low, 1: active high)
         """
-        currentConfig = self._i2c.read_byte(self.address, self.kRegConfig)
+        current_config = self._i2c.read_byte(self.address, self.REG_CONFIG)
 
-        intPol = currentConfig & self.kMaskConfigIntPol
+        int_pol = current_config & self.MASK_CONFIG_INT_POL
 
-        return (intPol >> self.kShiftConfigIntPol)
+        return (int_pol >> self.SHIFT_CONFIG_INT_POL)
     
-    def set_interrupt_drive(self, pushPull = True):
+    def set_interrupt_drive(self, push_pull = True):
         """!
         Changes the pin drive of the interrupt: open drain (default) to push/pull
 
-        @param bool pushPull: Changes the drive of the pin.
+        @param push_pull: **bool** Changes the drive of the pin.
         """
-        newConfig = self._i2c.read_byte(self.address, self.kRegConfig)
+        new_config = self._i2c.read_byte(self.address, self.REG_CONFIG)
         
-        newConfig &= ~self.kMaskConfigIntCfg
+        new_config &= ~self.MASK_CONFIG_INT_CFG
 
-        if pushPull:
-            newConfig |= self.kMaskConfigIntCfg
+        if push_pull:
+            new_config |= self.MASK_CONFIG_INT_CFG
         
-        self._i2c.write_byte(self.address, self.kRegConfig, newConfig)
+        self._i2c.write_byte(self.address, self.REG_CONFIG, new_config)
 
     def set_data_interrupt(self, enable):
         """!
         Routes the data ready signal to the interrupt pin.
 
-        @param bool enable: enables or disables data ready on
+        @param enable: **bool** enables or disables data ready on
         """
-        newConfig = self._i2c.read_byte(self.address, self.kRegConfig)
+        new_config = self._i2c.read_byte(self.address, self.REG_CONFIG)
         
-        newConfig &= ~self.kMaskConfigIntDat
+        new_config &= ~self.MASK_CONFIG_INT_DAT
 
         if enable:
-            newConfig |= self.kMaskConfigIntDat
+            new_config |= self.MASK_CONFIG_INT_DAT
         
-        self._i2c.write_byte(self.address, self.kRegConfig, newConfig)
+        self._i2c.write_byte(self.address, self.REG_CONFIG, new_config)
     
     def set_gpr_interrupt(self, enable):
         """!
         Routes the general purporse read register signal to the interrupt pin.
 
-        @param bool enable: whether to turn on or off general purpose read
+        @param enable: **bool** whether to turn on or off general purpose read
         """
-        newConfig = self._i2c.read_byte(self.address, self.kRegConfig)
+        new_config = self._i2c.read_byte(self.address, self.REG_CONFIG)
 
-        newConfig &= ~self.kMaskConfigIntGPR
+        new_config &= ~self.MASK_CONFIG_INT_GPR
 
         if enable:
-            newConfig |= self.kMaskConfigIntGPR
+            new_config |= self.MASK_CONFIG_INT_GPR
 
-        self._i2c.write_byte(self.address, self.kRegConfig, newConfig)
+        self._i2c.write_byte(self.address, self.REG_CONFIG, new_config)
     
     # ////////////////////////////////////////////////////////////////////////////////
     # Temperature and Humidity Compensation
     #
 
-    def set_temp_compensation(self, tempKelvin):
+    def set_temp_compensation(self, temp_kelvin):
         """!
         The ENS160 can use temperature data to help give more accurate sensor data.
 
-        @param float tempKelvin: The given temperature in Kelvin
+        @param temp_kelvin: **float** The given temperature in Kelvin
         """
         
-        tempVal = [None] * 2
-        kelvinConversion = int(tempKelvin * 64); # convert value - fixed equation pg. 29 of datasheet
-        tempVal[0] = (kelvinConversion & 0x00FF)
-        tempVal[1] = ( (kelvinConversion & 0xFF00) >> 8)
+        temp_val = [None] * 2
+        kelvin_conversion = int(temp_kelvin * 64) # convert value - fixed equation pg. 29 of datasheet
+        temp_val[0] = (kelvin_conversion & 0x00FF)
+        temp_val[1] = ( (kelvin_conversion & 0xFF00) >> 8)
 
-        self._i2c.write_block(self.address, self.kRegTempIn, tempVal)
+        self._i2c.write_block(self.address, self.REG_TEMP_IN, temp_val)
 
-    def set_temp_compensation_celsius(self, tempCelsius):
+    def set_temp_compensation_celsius(self, temp_celsius):
         """!
         The ENS160 can use temperature data to help give more accurate sensor data.
 
-        @param float tempCelsius: The given temperature in Celsius
+        @param temp_celsius: **float** The given temperature in Celsius
         """
 
-        kelvinConversion = tempCelsius + 273.15
-        self.set_temp_compensation(kelvinConversion)
+        kelvin_conversion = temp_celsius + 273.15
+        self.set_temp_compensation(kelvin_conversion)
 
     def set_rh_compensation(self, humidity):
         """!
         The ENS160 can use relative Humidiy data to help give more accurate sensor data.
 
-        @param float humidity: The given relative humidity
+        @param humidity: **float** The given relative humidity
         """
         
-        humidityConversion = int(humidity * 512) # convert value - fixed equation pg. 29 in datasheet.
+        humidity_conversion = int(humidity * 512) # convert value - fixed equation pg. 29 in datasheet.
         
-        tempVal = [None] * 2
-        tempVal[0] = (humidityConversion & 0x00FF)
-        tempVal[1] = ( (humidityConversion & 0xFF00) >> 8)
+        temp_val = [None] * 2
+        temp_val[0] = (humidity_conversion & 0x00FF)
+        temp_val[1] = ( (humidity_conversion & 0xFF00) >> 8)
 
-        self._i2c.write_block(self.address, self.kRegRhIn, tempVal)
+        self._i2c.write_block(self.address, self.REG_RH_IN, temp_val)
 
     # ////////////////////////////////////////////////////////////////////////////////
     # Device Status
@@ -426,11 +421,11 @@ class QwiicENS160(object):
         @return **bool** Whether NEWDAT bit is high
         """
 
-        currentStatus = self._i2c.read_byte(self.address, self.kRegDeviceStatus)
+        current_status = self._i2c.read_byte(self.address, self.REG_DEVICE_STATUS)
         
-        currentStatus &= self.kMaskDeviceStatusNewDat
+        current_status &= self.MASK_DEVICE_STATUS_NEW_DAT
 
-        if currentStatus == self.kMaskDeviceStatusNewDat:
+        if current_status == self.MASK_DEVICE_STATUS_NEW_DAT:
             return True
 
         return False
@@ -443,11 +438,11 @@ class QwiicENS160(object):
 
         @return **bool** Whether NEWGPR bit is high
         """
-        currentStatus = self._i2c.read_byte(self.address, self.kRegDeviceStatus)
+        current_status = self._i2c.read_byte(self.address, self.REG_DEVICE_STATUS)
         
-        currentStatus &= self.kMaskDeviceStatusNewGpr
+        current_status &= self.MASK_DEVICE_STATUS_NEW_GPR
 
-        if currentStatus == self.kMaskDeviceStatusNewGpr:
+        if current_status == self.MASK_DEVICE_STATUS_NEW_GPR:
             return True
 
         return False
@@ -459,9 +454,9 @@ class QwiicENS160(object):
         @return **int** The current status flag (0: normal, 1: warm-up, 2: initial start-up, 3: invalid)
         """
         
-        currentStatus = self._i2c.read_byte(self.address, self.kRegDeviceStatus)
+        current_status = self._i2c.read_byte(self.address, self.REG_DEVICE_STATUS)
 
-        flags = (currentStatus & self.kMaskDeviceStatusValidityFlag) >> self.kShiftDeviceStatusValidityFlag
+        flags = (current_status & self.MASK_DEVICE_STATUS_VALIDITY_FLAG) >> self.SHIFT_DEVICE_STATUS_VALIDITY_FLAG
         
         return flags
 
@@ -472,11 +467,11 @@ class QwiicENS160(object):
 
         @return **bool** Whether NEWGPR bit is high
         """
-        currentStatus = self._i2c.read_byte(self.address, self.kRegDeviceStatus)
+        current_status = self._i2c.read_byte(self.address, self.REG_DEVICE_STATUS)
         
-        currentStatus &= self.kMaskDeviceStatusStatAs
+        current_status &= self.MASK_DEVICE_STATUS_STAT_AS
 
-        if currentStatus == self.kMaskDeviceStatusStatAs:
+        if current_status == self.MASK_DEVICE_STATUS_STAT_AS:
             return True
 
         return False
@@ -487,11 +482,11 @@ class QwiicENS160(object):
 
         @return **bool** Whether an OpMode error is selected
         """
-        currentStatus = self._i2c.read_byte(self.address, self.kRegDeviceStatus)
+        current_status = self._i2c.read_byte(self.address, self.REG_DEVICE_STATUS)
         
-        currentStatus &= self.kMaskDeviceStatusStatEr
+        current_status &= self.MASK_DEVICE_STATUS_STAT_ER
 
-        if currentStatus == self.kMaskDeviceStatusStatEr:
+        if current_status == self.MASK_DEVICE_STATUS_STAT_ER:
             return True
 
         return False
@@ -511,11 +506,11 @@ class QwiicENS160(object):
 
         @return **int** Qir Quality Index
         """
-        currentDataAqi = self._i2c.read_byte(self.address, self.kRegDataAqi)
+        current_data_aqi = self._i2c.read_byte(self.address, self.REG_DATA_AQI)
         
-        aqiUba = currentDataAqi & self.kMaskDataAqiUba
+        aqi_uba = current_data_aqi & self.MASK_DATA_AQI_UBA
 
-        return (aqiUba >> self.kShiftDataAqiUba)
+        return (aqi_uba >> self.SHIFT_DATA_AQI_UBA)
 
 
     def get_tvoc(self):
@@ -525,10 +520,10 @@ class QwiicENS160(object):
         @return **int** Total Volatile Organic Compounds in ppb
         """
         
-        tvocBytes = self._i2c.read_block(self.address, self.kRegDataTvoc, 2)
+        tvoc_bytes = self._i2c.read_block(self.address, self.REG_DATA_TVOC, 2)
 
-        tvoc = tvocBytes[0]
-        tvoc |= tvocBytes[1] << 8
+        tvoc = tvoc_bytes[0]
+        tvoc |= tvoc_bytes[1] << 8
 
         return tvoc
 
@@ -541,10 +536,10 @@ class QwiicENS160(object):
         @return **int** Ethanol concentration in ppb
         """
         
-        ethanolBytes = self._i2c.read_block(self.address, self.kRegDataEtoh, 2)
+        ethanol_bytes = self._i2c.read_block(self.address, self.REG_DATA_ETOH, 2)
 
-        ethanol = ethanolBytes[0]
-        ethanol |= ethanolBytes[1] << 8
+        ethanol = ethanol_bytes[0]
+        ethanol |= ethanol_bytes[1] << 8
 
         return ethanol
 
@@ -556,10 +551,10 @@ class QwiicENS160(object):
         @return **int** CO2 concentration in ppm
         """
         
-        ecoBytes = self._i2c.read_block(self.address, self.kRegDataEco2, 2)
+        eco_bytes = self._i2c.read_block(self.address, self.REG_DATA_ECO2, 2)
 
-        eco = ecoBytes[0]
-        eco |= ecoBytes[1] << 8
+        eco = eco_bytes[0]
+        eco |= eco_bytes[1] << 8
 
         return eco
         
@@ -571,12 +566,12 @@ class QwiicENS160(object):
         @return **float** Temperature compensation in Kelvin
         """
         
-        tempBytes = self._i2c.read_block(self.address, self.kRegDataT, 2)
+        temp_bytes = self._i2c.read_block(self.address, self.REG_DATA_T, 2)
 
-        tempConversion = tempBytes[0]
-        tempConversion |= tempBytes[1] << 8
+        temp_conversion = temp_bytes[0]
+        temp_conversion |= temp_bytes[1] << 8
 
-        temperature = float(tempConversion) / 64.0 # Formula as described on pg. 32 of datasheet.
+        temperature = float(temp_conversion) / 64.0 # Formula as described on pg. 32 of datasheet.
 
         return temperature
 
@@ -599,10 +594,10 @@ class QwiicENS160(object):
         @return **float** Relative Humidty
         """
 
-        rhBytes = self._i2c.read_block(self.address, self.kRegDataRh, 2)
+        rh_bytes = self._i2c.read_block(self.address, self.REG_DATA_RH, 2)
 
-        rh = rhBytes[0]
-        rh |= rhBytes[1] << 8
+        rh = rh_bytes[0]
+        rh |= rh_bytes[1] << 8
 
         return rh / 512.0 # Formula as described on pg. 33 of datasheet.
     
@@ -614,10 +609,10 @@ class QwiicENS160(object):
         @return **float** Raw Resistance
         """
 
-        resBytes = self._i2c.read_block(self.address, self.kRegGPRRead6, 2)
+        res_bytes = self._i2c.read_block(self.address, self.REG_GPR_READ_6, 2)
 
-        res = resBytes[0]
-        res |= resBytes[1] << 8
+        res = res_bytes[0]
+        res |= res_bytes[1] << 8
 
         resistance = 2 ** (res / 2048) # Formula as described on page 13 of datasheet.
 

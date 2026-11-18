@@ -68,10 +68,9 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 """
 #-----------------------------------------------------------------------------
-import struct
-import time
-
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
@@ -138,11 +137,11 @@ def map(x, in_min, in_max, out_min, out_max):
     """!
     Map a value from one range to another
 
-    @param float x: The value to be mapped
-    @param float in_min: Minimum of input range
-    @param float in_max: Maximum of input range
-    @param float out_min: Minimum of output range
-    @param float out_max: Maximum of output range
+    @param x: **float** The value to be mapped
+    @param in_min: **float** Minimum of input range
+    @param in_max: **float** Maximum of input range
+    @param out_min: **float** Minimum of output range
+    @param out_max: **float** Maximum of output range
     @return **int** The value scaled to the new range
     """
     return int((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)
@@ -151,37 +150,30 @@ def map(x, in_min, in_max, out_min, out_max):
 # device is encapsulated by this class. The device class should be the only value exported
 # from this module.
 
-class QwiicSerlcd(object):
+class QwiicSerLCD(object):
     """!
     This class implements the basic functions of the Qwiic SerLCD device via the I2C bus.
     """
     # Constructor
     device_name = _DEFAULT_NAME
     available_addresses = _AVAILABLE_I2C_ADDRESS
-    _displayControl = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF
-    _displayMode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT
+    _display_control = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF
+    _display_mode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
-        @return: **Object** The QwiicSerlcd device object.
+        @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address is not None else self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     def is_connected(self):
         """!
@@ -190,9 +182,7 @@ class QwiicSerlcd(object):
         @return **bool** True if the device is connected, otherwise False.
         """
         # Another possible comment could be @retval bool True: Device is connected. above
-        return qwiic_i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return qwiic_i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -200,15 +190,18 @@ class QwiicSerlcd(object):
 
         @return **bool** Returns true if the initialization was successful, otherwise False.
         """
-        # set default settings, as defined in constructor
-        result0 = self.specialCommand(LCD_DISPLAYCONTROL | self._displayControl)
-        time.sleep(1)
-        result1 = self.specialCommand(LCD_ENTRYMODESET | self._displayMode)
-        time.sleep(1)
-        result2 = self.clearScreen()
-        time.sleep(1)
+        if not self.is_connected():
+            return False
 
-        return (bool(result0) & bool(result1) & bool(result2))
+        # set default settings, as defined in constructor
+        self.special_command(LCD_DISPLAYCONTROL | self._display_control)
+        self._i2c.delay_ms(1000)
+        self.special_command(LCD_ENTRYMODESET | self._display_mode)
+        self._i2c.delay_ms(1000)
+        self.clear_screen()
+        self._i2c.delay_ms(1000)
+
+        return True
 
     def print(self, string):
         """!
@@ -219,41 +212,32 @@ class QwiicSerlcd(object):
             @return **bool** Returns True if the I2C writes were successful, otherwise False.
         """
         for c in string:
-                if self._i2c.writeCommand(self.address, ord(c)) == False:
-                        return False
-                time.sleep(0.01)
+            self._i2c.write_byte(self.address, None, ord(c))
+            self._i2c.delay_ms(10)
         return True
 
-    def clearScreen(self):
+    def clear_screen(self):
         """!
             Sends the command to clear the screen
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        result = self.command(CLEAR_COMMAND)
-        time.sleep(0.01)
-        return result
+        self.command(CLEAR_COMMAND)
+        self._i2c.delay_ms(10)
 
     def home(self):
         """!
             Send the home command to the display. This returns the cursor
             to the beginning of the display, without clearing
             the display.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        result = self.specialCommand(LCD_RETURNHOME)
-        time.sleep(0.01)
-        return result
+        self.special_command(LCD_RETURNHOME)
+        self._i2c.delay_ms(10)
 
-    def setCursor(self, col, row):
+    def set_cursor(self, col, row):
         """!
             Set the cursor position to a particular column and row.
 
-            @param int col: The column position (0-19)
-            @param int row: The row position (0-3)
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param col: **int** The column position (0-19)
+            @param row: **int** The row position (0-3)
         """
         row_offsets = [0x00, 0x40, 0x14, 0x54]
 
@@ -265,41 +249,36 @@ class QwiicSerlcd(object):
         command = LCD_SETDDRAMADDR | (col + row_offsets[row])
 
         # send the complete bytes (special command + command)
-        return self._i2c.writeByte(self.address, SPECIAL_COMMAND, command)
+        self._i2c.write_byte(self.address, SPECIAL_COMMAND, command)
 
-    def setContrast(self, contrast):
+    def set_contrast(self, contrast):
         """!
             Set the contrast of the LCD screen (0-255)
 
-            @param int contrast: The new contrast value (0-255)
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param contrast: **int** The new contrast value (0-255)
         """
         # To set the contrast we need to send 3 bytes:
         # (1) SETTINGS_COMMAND
         # (2) CONTRAST_COMMAND
         # (3) contrast value
         #
-        # To do this, we are going to use writeBlock(),
+        # To do this, we are going to use write_block(),
         # so we need our "block of bytes" to include
         # CONTRAST_COMMAND and contrast value
 
         block = [CONTRAST_COMMAND, contrast]
 
         # send the complete bytes (address, settings command , contrast command, contrast value)
-        result = self._i2c.writeBlock(self.address, SETTING_COMMAND, block)
-        time.sleep(0.01)
-        return result
+        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._i2c.delay_ms(10)
 
-    def setBacklight(self, r, g, b):
+    def set_backlight(self, r, g, b):
         """!
             Set the brightness of each backlight (red, green, blue)
 
-            @param int red: The new red brightness value (0-255)
-            @param int green: The new green brightness value (0-255)
-            @param int blue: The new blue brightness value (0-255)
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param r: **int** The new red brightness value (0-255)
+            @param g: **int** The new green brightness value (0-255)
+            @param b: **int** The new blue brightness value (0-255)
         """
         # To set the backlight values, we are going to send 10 bytes
         # They will all live in a list called "block"
@@ -313,9 +292,9 @@ class QwiicSerlcd(object):
         blue = 188 + map(b, 0, 255, 0, 29)
 
         # Turn display off to hide confirmation messages
-        self._displayControl &= ~LCD_DISPLAYON
+        self._display_control &= ~LCD_DISPLAYON
         block[0] = SPECIAL_COMMAND
-        block[1] = (LCD_DISPLAYCONTROL | self._displayControl)
+        block[1] = (LCD_DISPLAYCONTROL | self._display_control)
 
         # Set the red, green and blue values
         block[2] = SETTING_COMMAND
@@ -326,164 +305,131 @@ class QwiicSerlcd(object):
         block[7] = blue
 
         # Turn display back on and end
-        self._displayControl |= LCD_DISPLAYON
+        self._display_control |= LCD_DISPLAYON
         block[8] = SPECIAL_COMMAND
-        block[9] = (LCD_DISPLAYCONTROL | self._displayControl)
+        block[9] = (LCD_DISPLAYCONTROL | self._display_control)
 
         # send the complete bytes (address, settings command , contrast command, contrast value)
-        result = self._i2c.writeBlock(self.address, SETTING_COMMAND, block)
-        time.sleep(0.05)
-        return result
+        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._i2c.delay_ms(50)
 
-    def specialCommand(self, command, count = 1):
+    def special_command(self, command, count = 1):
         """!
             Send one (or multiple) special commands to the display.
             Used by other functions.
 
-            @param int command: Command to send (a single byte)
-            @param int count: Number of times to send the command (if omitted, then default is once)
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param command: **int** Command to send (a single byte)
+            @param count: **int** Number of times to send the command (if omitted, then default is once)
         """
         for i in range(0, count):
             # send the complete bytes (special command + command)
-            result = self._i2c.writeByte(self.address, SPECIAL_COMMAND, command)
-        time.sleep(0.05)
-        return result
+            self._i2c.write_byte(self.address, SPECIAL_COMMAND, command)
+        self._i2c.delay_ms(50)
 
     def command(self, command):
         """!
             Send one setting command to the display.
             Used by other functions.
 
-            @param int command: Command to send (a single byte)
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param command: **int** Command to send (a single byte)
         """
-        result = self._i2c.writeByte(self.address, SETTING_COMMAND, command)
-        time.sleep(0.01)
-        return result
+        self._i2c.write_byte(self.address, SETTING_COMMAND, command)
+        self._i2c.delay_ms(10)
 
-    def moveCursorLeft(self, count = 1):
+    def move_cursor_left(self, count = 1):
         """!
             Move the cursor one or more characters to the left.
 
-            @param int count: Number of character spaces you'd like to move
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param count: **int** Number of character spaces you'd like to move
         """
-        return self.specialCommand(LCD_CURSORSHIFT | LCD_CURSORMOVE | LCD_MOVELEFT, count)
+        self.special_command(LCD_CURSORSHIFT | LCD_CURSORMOVE | LCD_MOVELEFT, count)
 
-    def moveCursorRight(self, count = 1):
+    def move_cursor_right(self, count = 1):
         """!
             Move the cursor one or more characters to the right.
 
-            @param int count: Number of character spaces you'd like to move
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param count: **int** Number of character spaces you'd like to move
         """
-        return self.specialCommand(LCD_CURSORSHIFT | LCD_CURSORMOVE | LCD_MOVERIGHT, count)
+        self.special_command(LCD_CURSORSHIFT | LCD_CURSORMOVE | LCD_MOVERIGHT, count)
 
     def cursor(self):
         """!
             Turn the underline cursor on.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl |= LCD_CURSORON
-        return self.specialCommand(LCD_DISPLAYCONTROL | self._displayControl)
+        self._display_control |= LCD_CURSORON
+        self.special_command(LCD_DISPLAYCONTROL | self._display_control)
 
-    def noCursor(self):
+    def no_cursor(self):
         """!
             Turn the underline cursor off.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl &= ~LCD_CURSORON
-        return self.specialCommand(LCD_DISPLAYCONTROL | self._displayControl)
+        self._display_control &= ~LCD_CURSORON
+        self.special_command(LCD_DISPLAYCONTROL | self._display_control)
 
     def blink(self):
         """!
             Turn the blink cursor on.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl |= LCD_BLINKON
-        return self.specialCommand(LCD_DISPLAYCONTROL | self._displayControl)
+        self._display_control |= LCD_BLINKON
+        self.special_command(LCD_DISPLAYCONTROL | self._display_control)
 
-    def noBlink(self):
+    def no_blink(self):
         """!
             Turn the blink cursor off.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl &= ~LCD_BLINKON
-        return self.specialCommand(LCD_DISPLAYCONTROL | self._displayControl)
+        self._display_control &= ~LCD_BLINKON
+        self.special_command(LCD_DISPLAYCONTROL | self._display_control)
 
-    def scrollDisplayLeft(self, count = 1):
+    def scroll_display_left(self, count = 1):
         """!
             Scroll the display one or multiple characters to the left, without changing the text.
 
-            @param int count: Number of character spaces you'd like to scroll
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param count: **int** Number of character spaces you'd like to scroll
         """
-        return self.specialCommand(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT, count)
+        self.special_command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT, count)
 
-    def scrollDisplayRight(self, count = 1):
+    def scroll_display_right(self, count = 1):
         """!
             Scroll the display one or multiple characters to the right, without changing the text.
 
-            @param int count: Number of character spaces you'd like to scroll
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param count: **int** Number of character spaces you'd like to scroll
         """
-        return self.specialCommand(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT, count)
+        self.special_command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT, count)
 
     def autoscroll(self):
         """!
             Turn autoscrolling on. This will right-justify text from the cursor.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl |= LCD_ENTRYSHIFTINCREMENT
-        return self.specialCommand(LCD_ENTRYMODESET | self._displayControl)
+        self._display_control |= LCD_ENTRYSHIFTINCREMENT
+        self.special_command(LCD_ENTRYMODESET | self._display_control)
 
-    def noAutoscroll(self):
+    def no_autoscroll(self):
         """!
             Turn autoscrolling off.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl &= ~LCD_ENTRYSHIFTINCREMENT
-        return self.specialCommand(LCD_ENTRYMODESET | self._displayControl)
+        self._display_control &= ~LCD_ENTRYSHIFTINCREMENT
+        self.special_command(LCD_ENTRYMODESET | self._display_control)
 
-    def leftToRight(self):
+    def left_to_right(self):
         """!
             Set the text to flow from left to right.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl |= LCD_ENTRYLEFT
-        return self.specialCommand(LCD_ENTRYMODESET | self._displayControl)
+        self._display_control |= LCD_ENTRYLEFT
+        self.special_command(LCD_ENTRYMODESET | self._display_control)
 
-    def rightToLeft(self):
+    def right_to_left(self):
         """!
             Set the text to flow from right to left
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl &= ~LCD_ENTRYLEFT
-        return self.specialCommand(LCD_ENTRYMODESET | self._displayControl)
+        self._display_control &= ~LCD_ENTRYLEFT
+        self.special_command(LCD_ENTRYMODESET | self._display_control)
 
-    def createChar(self, location, charmap):
+    def create_char(self, location, charmap):
         """!
             Create a custom character
 
-            @param int location: character number 0 to 7
-            @param list of int charmap: byte array for character
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param location: **int** character number 0 to 7
+            @param charmap: **list of int** byte array for character
         """
         location &= 0x7 # we only have 8 locations 0-7
 
@@ -498,52 +444,42 @@ class QwiicSerlcd(object):
             block[i] = charmap[i-1]
 
         # send the complete bytes (address, settings command , write char command (includes location), charmap)
-        result = self._i2c.writeBlock(self.address, SETTING_COMMAND, block)
-        time.sleep(0.05)
-        return result
+        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._i2c.delay_ms(50)
 
-    def writeChar(self, location):
+    def write_char(self, location):
         """!
             Write a custom character to the display
 
-            @param int location: character number 0 to 7
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param location: **int** character number 0 to 7
         """
         location &= 0x7 # we only have 8 locations 0-7
 
         # send command
-        result = self.command(35 + location)
-        time.sleep(0.05)
-        return result
+        self.command(35 + location)
+        self._i2c.delay_ms(50)
 
     def display(self):
         """!
             Turn the display on quickly.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl |= LCD_DISPLAYON
-        return self.specialCommand(LCD_DISPLAYCONTROL | self._displayControl)
+        self._display_control |= LCD_DISPLAYON
+        self.special_command(LCD_DISPLAYCONTROL | self._display_control)
 
-    def noDisplay(self):
+    def no_display(self):
         """!
             Turn the display off quickly.
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
-        self._displayControl &= ~LCD_DISPLAYON
-        return self.specialCommand(LCD_DISPLAYCONTROL | self._displayControl)
+        self._display_control &= ~LCD_DISPLAYON
+        self.special_command(LCD_DISPLAYCONTROL | self._display_control)
 
-    def setFastBacklight(self, r, g, b):
+    def set_fast_backlight(self, r, g, b):
         """!
             Set backlight with no LCD messages or delays
 
-            @param int r: red backlight value 0-255
-            @param int g: green backlight value 0-255
-            @param int b: blue backlight value 0-255
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param r: **int** red backlight value 0-255
+            @param g: **int** green backlight value 0-255
+            @param b: **int** blue backlight value 0-255
         """
         # create a block of data bytes to send to the screen
         # This will include the SET_RGB_COMMAND, and three bytes of backlight values
@@ -555,77 +491,59 @@ class QwiicSerlcd(object):
         block[3] = b
 
         # send the complete bytes (address, settings command , rgb command , red byte, green byte, blue byte)
-        result = self._i2c.writeBlock(self.address, SETTING_COMMAND, block)
-        time.sleep(0.01)
-        return result
+        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._i2c.delay_ms(10)
 
-    def enableSystemMessages(self):
+    def enable_system_messages(self):
         """!
             Enable system messages
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
         # send command
-        result = self.command(ENABLE_SYSTEM_MESSAGE_DISPLAY)
-        time.sleep(0.01)
-        return result
+        self.command(ENABLE_SYSTEM_MESSAGE_DISPLAY)
+        self._i2c.delay_ms(10)
 
-    def disableSystemMessages(self):
+    def disable_system_messages(self):
         """!
             Disable system messages
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
         # send command
-        result = self.command(DISABLE_SYSTEM_MESSAGE_DISPLAY)
-        time.sleep(0.01)
-        return result
+        self.command(DISABLE_SYSTEM_MESSAGE_DISPLAY)
+        self._i2c.delay_ms(10)
 
-    def enableSplash(self):
+    def enable_splash(self):
         """!
             Enable splash screen at power on
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
         # send command
-        result = self.command(ENABLE_SPLASH_DISPLAY)
-        time.sleep(0.01)
-        return result
+        self.command(ENABLE_SPLASH_DISPLAY)
+        self._i2c.delay_ms(10)
 
-    def disableSplash(self):
+    def disable_splash(self):
         """!
             Disable splash screen at power on
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
         # send command
-        result = self.command(DISABLE_SPLASH_DISPLAY)
-        time.sleep(0.01)
-        return result
+        self.command(DISABLE_SPLASH_DISPLAY)
+        self._i2c.delay_ms(10)
 
-    def saveSplash(self):
+    def save_splash(self):
         """!
             Save the current display as the splash
             Saves whatever is currently being displayed into EEPROM
             This will be displayed at next power on as the splash screen
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
         """
         # send command
-        result = self.command(SAVE_CURRENT_DISPLAY_AS_SPLASH)
-        time.sleep(0.01)
-        return result
+        self.command(SAVE_CURRENT_DISPLAY_AS_SPLASH)
+        self._i2c.delay_ms(10)
 
-    def setAddress(self, new_addr):
+    def set_address(self, new_addr):
         """!
             Change the I2C Address. 0x72 is the default.
             Note that this change is persistent. If anything
             goes wrong you may need to do a hardware reset
             to unbrick the display.
 
-            @param int new_addr: new i2c address
-
-            @return **bool** Returns True if the I2C write was successful, otherwise False.
+            @param new_addr: **int** new i2c address
         """
         # create a block of data bytes to send to the screen
         # This will include the ADDRESS_COMMAND, and the new address byte value.
@@ -635,7 +553,6 @@ class QwiicSerlcd(object):
         block[1] = new_addr
 
         # send the complete bytes (address, settings command , address command , new_addr byte)
-        result = self._i2c.writeBlock(self.address, SETTING_COMMAND, block)
-        time.sleep(0.05)
+        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._i2c.delay_ms(50)
         self.address = new_addr # update our own address, so we can still talk to the display
-        return result

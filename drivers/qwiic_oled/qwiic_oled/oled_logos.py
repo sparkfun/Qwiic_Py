@@ -65,7 +65,7 @@ def add_logo(screenbuffer=None):
     # D7 D7.............D7  ----
     if screenbuffer is None:
         #return blank_screenbuffer = [0x00]*int(LCDWIDTH*LCDHEIGHT/8 + 1) #Blank Screen Area in bytes (Total Pixels/8 + 1)
-        print("Error: No input for screen buffer")
+        raise ValueError("add_logo: no screen buffer given")
     elif len(screenbuffer) == 1024:
         # screenbuffer[:] = [0x00]*len(screenbuffer) #Blank Screen Area in bytes = buffersize
 

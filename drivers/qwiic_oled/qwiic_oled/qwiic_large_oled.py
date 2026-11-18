@@ -52,10 +52,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 """
 
-import math
 import qwiic_i2c
-
-from qwiic_oled import QwiicOledBase
+from .qwiic_oled_base import QwiicOLEDBase
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
@@ -71,14 +69,13 @@ _AVAILABLE_I2C_ADDRESS = [0x3D, 0x3C]
 _LCDWIDTH            = 128
 _LCDHEIGHT           = 64
 
-class QwiicLargeOled(QwiicOledBase):
+class QwiicLargeOLED(QwiicOLEDBase):
     """
-    QwiicLargeOled
+    QwiicLargeOLED
 
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         :return: The OLED Display device object.
         :rtype: Object
     """
@@ -87,10 +84,12 @@ class QwiicLargeOled(QwiicOledBase):
     device_name         =_DEFAULT_NAME
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address is not None else self.available_addresses[0]
 
         # Instantiate OLED Display Driver - Base Class
-        super().__init__(address, _LCDWIDTH, _LCDHEIGHT, i2c_driver)
+        super().__init__(address, i2c_bus, _LCDWIDTH, _LCDHEIGHT)

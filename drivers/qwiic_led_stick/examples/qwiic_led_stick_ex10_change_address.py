@@ -40,12 +40,12 @@
 # Example 10
 
 import qwiic_led_stick
-import time
+import qwiic_i2c
 import sys
 
 def run_example():
     # Change this to whatever the i2c address currently is
-    old_address = qwiic_led_stick._QWIIC_LED_STICK_DEFAULT_ADDRESS
+    old_address = qwiic_led_stick.QwiicLEDStick.available_addresses[0]
 
     print("\nSparkFun Qwiic LED Stick Example 10")
     my_stick = qwiic_led_stick.QwiicLEDStick(old_address)
@@ -71,7 +71,7 @@ def run_example():
         if my_stick.change_address(new_address) == True:
             print("\nAddress successfully changed!")
         # Check that the Qwiic LED Stick acknowledges on the new address
-        time.sleep(0.02)
+        qwiic_i2c.delay_ms(20)
         if my_stick.begin() == False:
             print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
             file=sys.stderr)

@@ -35,9 +35,8 @@
 
 import qwiic_rv8803
 import sys
-import time
 
-def runExample():
+def run_example():
 	print("\nQwiic RV8803 Example 6 - Fine Tuning\n")
 
 	# Create instance of device
@@ -55,7 +54,7 @@ def runExample():
 	# We now must measure the frequency on the Clock Out carefully to calibrate our crystal. To start generating a signal on Clock Out, tie CLKOE High.
  	# Change measuredFrequency accordingly, note that you can only correct +/-7.6288 ppm
 	myRTC.set_calibration_offset(0) # zero out any previous calibration
-	myRTC.set_clock_out_timer_frequency(myRTC.kClockOutFrequency1Hz) # set the clock out to 1Hz square wave
+	myRTC.set_clock_out_timer_frequency(myRTC.CLOCK_OUT_FREQUENCY_1HZ) # set the clock out to 1Hz square wave
 	measuredFrequency = 1.0000012 # measured frequency in HZ (CHANGE THIS TO YOUR MEASURED VALUE)
 	newPPM = (measuredFrequency - 1) * 1000000 # Calculate PPM difference between measuredFrequency and our desired 1 Hz wave
 	# myRTC.set_calibration_offset(newPPM) # Uncomment this line after you have changed the value of measuredFrequency to load the new calibration into the RTC
@@ -69,7 +68,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

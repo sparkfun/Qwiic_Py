@@ -43,32 +43,32 @@
 
 import qwiic_otos
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
     print("\nQwiic OTOS Example 4 - Set Offsets and Position\n")
 
     # Create instance of device
-    myOtos = qwiic_otos.QwiicOTOS()
+    my_otos = qwiic_otos.QwiicOTOS()
 
     # Check if it's connected
-    if myOtos.is_connected() == False:
+    if not my_otos.is_connected():
         print("The device isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
 
     # Initialize the device
-    myOtos.begin()
+    my_otos.begin()
 
     print("Ensure the OTOS is flat and stationary during calibration!")
     for i in range(5, 0, -1):
         print("Calibrating in %d seconds..." % i)
-        time.sleep(1)
+        qwiic_i2c.delay_ms(1000)
 
     print("Calibrating IMU...")
 
     # Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    myOtos.calibrateImu()
+    my_otos.calibrate_imu()
 
     # Assuming you've mounted your sensor to a robot and it's not centered,
     # you can specify the offset for the sensor relative to the center of the
@@ -82,38 +82,38 @@ def runExample():
     # would be {-5, 10, -90}. These can be any value, even the angle can be
     # tweaked slightly to compensate for imperfect mounting (eg. 1.3 degrees).
     offset = qwiic_otos.Pose2D(-5, 10, -90)
-    myOtos.setOffset(offset)
+    my_otos.set_offset(offset)
 
     # Reset the tracking algorithm - this resets the position to the origin,
     # but can also be used to recover from some rare tracking errors
-    myOtos.resetTracking()
+    my_otos.reset_tracking()
 
     # After resetting the tracking, the OTOS will report that the robot is at
     # the origin. If your robot does not start at the origin, or you have
     # another source of location information (eg. vision odometry), you can set
     # the OTOS location to match and it will continue to track from there.
-    currentPosition = qwiic_otos.Pose2D(0, 0, 0)
-    myOtos.setPosition(currentPosition)
+    current_position = qwiic_otos.Pose2D(0, 0, 0)
+    my_otos.set_position(current_position)
 
     # Main loop
     while True:
         # Get the latest position, which includes the x and y coordinates, plus
         # the heading angle
-        myPosition = myOtos.getPosition()
+        my_position = my_otos.get_position()
 
         # Print measurement
         print()
         print("Position:")
-        print("X (Inches): {}".format(myPosition.x))
-        print("Y (Inches): {}".format(myPosition.y))
-        print("Heading (Degrees): {}".format(myPosition.h))
+        print("X (Inches): {}".format(my_position.x))
+        print("Y (Inches): {}".format(my_position.y))
+        print("Heading (Degrees): {}".format(my_position.h))
 
         # Wait a bit so we don't spam the serial port
-        time.sleep(0.5)
+        qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example")
         sys.exit(0)

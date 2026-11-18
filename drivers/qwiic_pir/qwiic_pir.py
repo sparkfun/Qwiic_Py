@@ -46,8 +46,9 @@ New to qwiic? Take a look at the entire [SparkFun Qwiic Ecosystem](https://www.s
 """
 #-----------------------------------------------------------------------------------
 
-import math
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class definition
 # as class variables, making them available without having to create a class instance.
@@ -75,8 +76,7 @@ class QwiicPIR(object):
         
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         :return: The GPIO device object.
         :rtype: Object
     """
@@ -122,19 +122,15 @@ class QwiicPIR(object):
     removed_is_full = 0
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
-        # Did the user specify an I2C address?
-        self.address = address if address != None else self.available_addresses[0]
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
+        # Use address if provided, otherwise pick the default
+        self.address = address if address is not None else self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver == None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c == None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else: 
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # -----------------------------------------------
     # is_connected()
@@ -147,7 +143,7 @@ class QwiicPIR(object):
             :return: True if the device is connected, otherwise False.
             :rtype: bool
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
+        return qwiic_i2c.is_device_connected(self.address)
     
     # ------------------------------------------------
     # begin()
@@ -161,10 +157,10 @@ class QwiicPIR(object):
             :return: Returns true if the intialization was successful, otherwise False.
             :rtype: bool
         """
-        if self.is_connected() == True:
-            id = self._i2c.readByte(self.address, self.ID)
+        if self.is_connected():
+            chip_id = self._i2c.read_byte(self.address, self.ID)
             
-            if id == self.DEV_ID:
+            if chip_id == self.DEV_ID:
                 return True
         
         return False
@@ -182,15 +178,15 @@ class QwiicPIR(object):
             :return: 16 bytes version number
             :rtype: int
         """
-        version = self._i2c.readByte(self.address, self.FIRMWARE_MAJOR) << 8
-        version |= self._i2c.readByte(self.address, self.FIRMWARE_MINOR)
+        version = self._i2c.read_byte(self.address, self.FIRMWARE_MAJOR) << 8
+        version |= self._i2c.read_byte(self.address, self.FIRMWARE_MINOR)
         return version
 
     # -------------------------------------------------
-    # set_I2C_address(new_address)
+    # set_i2c_address(new_address)
     #
     # Configures the attached device to attach to the I2C bus using the specified address
-    def set_I2C_address(self, new_address):
+    def set_i2c_address(self, new_address):
         """
             Change the I2C address of the Qwiic PIR
             
@@ -203,16 +199,16 @@ class QwiicPIR(object):
             return False
         
         # Write new address to the I2C address register of the Qwiic PIR
-        self._i2c.writeByte(self.address, self.I2C_ADDRESS, new_address)
+        self._i2c.write_byte(self.address, self.I2C_ADDRESS, new_address)
 
-        # Check if the write was successful
+        # Talk to the device at its new address from now on
         self.address = new_address
     
     # ---------------------------------------------------
-    # get_I2C_address()
+    # get_i2c_address()
     #
     # Returns the I2C address of the device
-    def get_I2C_address(self):
+    def get_i2c_address(self):
         """
             Returns the current I2C address of the Qwiic PIR
             
@@ -233,7 +229,7 @@ class QwiicPIR(object):
             :rtype: bool
         """
         # Read the PIR status register
-        pir_status = self._i2c.readByte(self.address, self.EVENT_STATUS)
+        pir_status = self._i2c.read_byte(self.address, self.EVENT_STATUS)
         # Convert to binary and clear all bits but raw_object_detected
         self.raw_object_detected = int(pir_status) & ~(0xFE) 
         # Return raw_object_detected as a bool
@@ -252,7 +248,7 @@ class QwiicPIR(object):
             :rtype: bool
         """
         # Read the PIR status register
-        pir_status = self._i2c.readByte(self.address, self.EVENT_STATUS)
+        pir_status = self._i2c.read_byte(self.address, self.EVENT_STATUS)
         # Convert to binary and clear all bits but object_detect
         self.object_detect = int(pir_status) & ~(0xF7)
         # Shift object_detect bit to zero position
@@ -272,7 +268,7 @@ class QwiicPIR(object):
             :rtype: bool
         """
         # Read the PIR status register
-        pir_status = self._i2c.readByte(self.address, self.EVENT_STATUS)
+        pir_status = self._i2c.read_byte(self.address, self.EVENT_STATUS)
         # Convert to binary and clear all bits but object_remove
         self.object_remove = int(pir_status) & ~(0xFB)
         # Shift object_remove to the zero bit
@@ -291,7 +287,7 @@ class QwiicPIR(object):
             :return: debounce time in milliseconds
             :rtype: int
         """
-        time_list = self._i2c.readBlock(self.address, self.EVENT_DEBOUNCE_TIME, 2)
+        time_list = self._i2c.read_block(self.address, self.EVENT_DEBOUNCE_TIME, 2)
         # Convert list of bytes to time in milliseconds
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2)
         return time
@@ -314,7 +310,7 @@ class QwiicPIR(object):
         if time > 0xFFFF:
             time = 0xFFFF
         # Then write two bytes
-        self._i2c.writeWord(self.address, self.EVENT_DEBOUNCE_TIME, time)
+        self._i2c.write_word(self.address, self.EVENT_DEBOUNCE_TIME, time)
 
     # -------------------------------------------------------
     # enable_interrupt()
@@ -330,7 +326,7 @@ class QwiicPIR(object):
         """
         self.interrupt_enable = 1
         # Write the new interrupt configure byte
-        self._i2c.writeByte(self.address, self.INTERRUPT_CONFIG, self.interrupt_enable)
+        self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, self.interrupt_enable)
     
     # -------------------------------------------------------
     # disable_interrupt()
@@ -346,7 +342,7 @@ class QwiicPIR(object):
         """
         self.interrupt_enable = 0
         # Write the new interrupt configure byte
-        self._i2c.writeByte(self.address, self.INTERRUPT_CONFIG, self.interrupt_enable)
+        self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, self.interrupt_enable)
 
     # -------------------------------------------------------
     # available()
@@ -361,7 +357,7 @@ class QwiicPIR(object):
             :rtye: bool
         """
         # First, read EVENT_STATUS register
-        pir_status = self._i2c.readByte(self.address, self.EVENT_STATUS)
+        pir_status = self._i2c.read_byte(self.address, self.EVENT_STATUS)
         # Convert to binary and clear all bits but the event_available bit
         self.event_available = int(pir_status) & ~(0xFD)
         # Shift event_availble to the zero bit
@@ -383,11 +379,11 @@ class QwiicPIR(object):
             :rtype: Void
         """
         # First, read EVENT_STATUS register
-        pir_status = self._i2c.readByte(self.address, self.EVENT_STATUS)
+        pir_status = self._i2c.read_byte(self.address, self.EVENT_STATUS)
         # Convert to binary and clear bits 1, 2, and 3
         pir_status = int(pir_status) & ~(0x0E)
         # Write to EVENT_STATUS register
-        self._i2c.writeByte(self.address, self.EVENT_STATUS, pir_status)
+        self._i2c.write_byte(self.address, self.EVENT_STATUS, pir_status)
         # Update variables
         self.object_remove = 0
         self.objected_detect = 0
@@ -423,7 +419,7 @@ class QwiicPIR(object):
             :rtype: bool
         """
         # First, read the DETECTED_QUEUE_STATUS register
-        detected_queue_stat = self._i2c.readByte(self.address, self.DETECTED_QUEUE_STATUS)
+        detected_queue_stat = self._i2c.read_byte(self.address, self.DETECTED_QUEUE_STATUS)
         # Convert to binary and clear all bits but is_full
         self.detected_is_full = int(detected_queue_stat) & ~(0xFB)
         # Shift detected_is_full bit to zero position
@@ -444,7 +440,7 @@ class QwiicPIR(object):
             :rtype: bool
         """
         # First, read the DETECTED_QUEUE_STATUS register
-        detected_queue_stat = self._i2c.readByte(self.address, self.DETECTED_QUEUE_STATUS)
+        detected_queue_stat = self._i2c.read_byte(self.address, self.DETECTED_QUEUE_STATUS)
         # Convert to binary and clear all bits but is_empty
         self.detected_is_empty = int(detected_queue_stat) & ~(0xFD)
         # Shift detected_is_empty to the zero bit
@@ -466,7 +462,7 @@ class QwiicPIR(object):
             :return: DETECTED_QUEUE_FRONT
             :rtype: int
         """
-        time_list = self._i2c.readBlock(self.address, self.DETECTED_QUEUE_FRONT, 4)
+        time_list = self._i2c.read_block(self.address, self.DETECTED_QUEUE_FRONT, 4)
         # Convert list of bytes to a time in milliseconds
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6)
         return time
@@ -485,7 +481,7 @@ class QwiicPIR(object):
             :return: DETECTED_QUEUE_BACK
             :rtype: int
         """
-        time_list = self._i2c.readBlock(self.address, self.DETECTED_QUEUE_BACK, 4)
+        time_list = self._i2c.read_block(self.address, self.DETECTED_QUEUE_BACK, 4)
         # Convert the list of bytes into milliseconds
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6)
         return time
@@ -507,11 +503,11 @@ class QwiicPIR(object):
         # Get the time in milliseconds since the PIR was first detect
         temp_data = self.time_since_first_detect()
         # Read DETECTED_QUEUE_STATUS register
-        detected_queue_stat = self._i2c.readByte(self.address, self.DETECTED_QUEUE_STATUS)
+        detected_queue_stat = self._i2c.read_byte(self.address, self.DETECTED_QUEUE_STATUS)
         # Set detected_pop_request bit to 1
         self.detected_pop_request = 1
         detected_queue_stat = detected_queue_stat | (self.detected_pop_request)
-        self._i2c.writeByte(self.address, self.DETECTED_QUEUE_STATUS, detected_queue_stat)
+        self._i2c.write_byte(self.address, self.DETECTED_QUEUE_STATUS, detected_queue_stat)
         return temp_data
     
     # -------------------------------------------------------
@@ -527,7 +523,7 @@ class QwiicPIR(object):
             :rtype: bool
         """
         # First, read the REMOVED_QUEUE_STATUS register
-        removed_queue_stat = self._i2c.readByte(self.address, self.REMOVED_QUEUE_STATUS)
+        removed_queue_stat = self._i2c.read_byte(self.address, self.REMOVED_QUEUE_STATUS)
         # Convert to binary and clear all bits but is_full
         self.removed_is_full = int(removed_queue_stat) & ~(0xFB)
         # Shift removed_is_full to the zero bit
@@ -548,7 +544,7 @@ class QwiicPIR(object):
             :rtype: bool
         """
         # First, read the REMOVED_QUEUE_STATUS register
-        removed_queue_stat = self._i2c.readByte(self.address, self.REMOVED_QUEUE_STATUS)
+        removed_queue_stat = self._i2c.read_byte(self.address, self.REMOVED_QUEUE_STATUS)
         # Convert to binary and clear all bits but is_empty
         self.removed_is_empty = int(removed_queue_stat) & ~(0xFD)
         # Shift removed_is_empty to the zero bit
@@ -570,7 +566,7 @@ class QwiicPIR(object):
             :return: REMOVED_QUEUE_FRONT
             :rtype: int
         """
-        time_list = self._i2c.readBlock(self.address, self.REMOVED_QUEUE_FRONT, 4)
+        time_list = self._i2c.read_block(self.address, self.REMOVED_QUEUE_FRONT, 4)
         # Convert list of bytes to time in milliseconds
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6)
         return time
@@ -589,7 +585,7 @@ class QwiicPIR(object):
             :return: REMOVED_QUEUE_BACK
             :rtype: int
         """
-        time_list = self._i2c.readBlock(self.address, self.REMOVED_QUEUE_BACK, 4)
+        time_list = self._i2c.read_block(self.address, self.REMOVED_QUEUE_BACK, 4)
         # Convert list of bytes into time in milliseconds
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6)
         return time
@@ -611,9 +607,9 @@ class QwiicPIR(object):
         # Get the time in milliseconds since the PIR was first remove
         temp_data = self.time_since_first_remove()
         # Read REMOVED_QUEUE_STATUS register
-        removed_queue_stat = self._i2c.readByte(self.address, self.REMOVED_QUEUE_STATUS)
+        removed_queue_stat = self._i2c.read_byte(self.address, self.REMOVED_QUEUE_STATUS)
         # Set removed_pop_request bit to 1
         self.removed_pop_request = 1
         removed_queue_stat = removed_queue_stat | (self.removed_pop_request)
-        self._i2c.writeByte(self.address, self.REMOVED_QUEUE_STATUS, removed_queue_stat)
+        self._i2c.write_byte(self.address, self.REMOVED_QUEUE_STATUS, removed_queue_stat)
         return temp_data

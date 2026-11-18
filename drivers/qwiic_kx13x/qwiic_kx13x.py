@@ -55,7 +55,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 #-----------------------------------------------------------------------------
 import qwiic_i2c
-from time import sleep
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
@@ -91,8 +92,7 @@ class QwiicKX13XCore(object):
 
     @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The KX13X device object.
     """
@@ -146,7 +146,7 @@ class QwiicKX13XCore(object):
     # 0x0E - 0x11 Reserved
     KX13X_COTR             = 0x12
     KX13X_WHO_AM_I         = 0x13
-    KXI3X_TSCP             = 0x14
+    KX13X_TSCP             = 0x14
     KX13X_TSPP             = 0x15
     KX13X_INS1             = 0x16
     KX13X_INS2             = 0x17
@@ -237,20 +237,15 @@ class QwiicKX13XCore(object):
 
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = self.available_addresses[0] if address is None else address
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
         
         self.raw_output_data = AccelerationData(0,0,0)
 
@@ -261,30 +256,23 @@ class QwiicKX13XCore(object):
 
     def is_connected(self):
         """!
-        Determine if a KX13X device is conntected to the system..
+        Determine if a KX13X device is connected to the system.
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return qwiic_i2c.is_device_connected(self.address)
 
     # ----------------------------------
-    # begin()
+    # begin_core()
     #
-    # Initialize the system/validate the board.
-    def beginCore(self):
+    # Read the chip ID; begin() in QwiicKX132 and QwiicKX134 checks it.
+    def begin_core(self):
         """!
-        Initialize the operation of the KX13X module
+        Read the WHO_AM_I register of the KX13X module
 
-        @return **bool** Returns true of the initializtion was successful, otherwise False.
+        @return **int** The chip ID: 0x3D for the KX132, 0x46 for the KX134
         """
-        # are we who we need to be?
-        chipID = self._i2c.readByte(self.address, self.KX13X_WHO_AM_I)
-        if chipID not in _WHO_AM_I:
-            print("Invalid Chip ID: 0x" % chipID)
-
-        return chipID
+        return self._i2c.read_byte(self.address, self.KX13X_WHO_AM_I)
 
     def initialize(self, settings = DEFAULT_SETTINGS):
         """!
@@ -301,18 +289,18 @@ class QwiicKX13XCore(object):
         self.enable_accel(False)
 
         if settings == self.DEFAULT_SETTINGS:
-            self._i2c.writeByte(self.address, self.KX13X_CNTL1, self.DEFAULT_SETTINGS)
+            self._i2c.write_byte(self.address, self.KX13X_CNTL1, self.DEFAULT_SETTINGS)
         elif settings == self.INT_SETTINGS:
             self.set_interrupt_pin(True, 1)
             self.route_hardware_interrupt(self.HI_DATA_READY)
-            self._i2c.writeByte(self.address, self.KX13X_CNTL1, self.INT_SETTINGS)
+            self._i2c.write_byte(self.address, self.KX13X_CNTL1, self.INT_SETTINGS)
         elif settings == self.SOFT_INT_SETTINGS:
-            self._i2c.writeByte(self.address, self.KX13X_CNTL1, self.INT_SETTINGS)
+            self._i2c.write_byte(self.address, self.KX13X_CNTL1, self.INT_SETTINGS)
         elif settings == self.BUFFER_SETTINGS:
             self.set_interrupt_pin(True, 1)
             self.route_hardware_interrupt(self.HI_BUFFER_FULL)
-            self.set_buffer_operation(self.BUFFER_MODE_FIFO, self.BUFFER_16BIT_SAMPLES)
-            self._i2c.writeByte(self.address, self.KX13X_CNTL1, self.INT_SETTINGS)
+            self.set_buffer_operation_and_resolution(self.BUFFER_MODE_FIFO, self.BUFFER_16BIT_SAMPLES)
+            self._i2c.write_byte(self.address, self.KX13X_CNTL1, self.INT_SETTINGS)
         # Space fore more default settings
 
     def run_command_test(self):
@@ -321,12 +309,12 @@ class QwiicKX13XCore(object):
 
         @return **bool** Returns true upon successful test, and false otherwise.
         """
-        reg_val = self._i2c.readByte(self.address, self.KX13X_CNTL2)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_CNTL2)
         reg_val &= 0xBF
         reg_val |= (1 << 6)
-        self._i2c.writeByte(self.address, self.KX13X_CNTL2 , reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_CNTL2 , reg_val)
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_COTR)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_COTR)
         if reg_val == self.COTR_POS_STATE:
             return True
         else:
@@ -345,16 +333,10 @@ class QwiicKX13XCore(object):
         if enable != True and enable != False:
             return False
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_CNTL1)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_CNTL1)
         reg_val &= 0x7F
         reg_val |= (enable << 7)
-        self._i2c.writeByte(self.address, self.KX13X_CNTL1 , reg_val)
-
-    def accel_control(self, enable=True):
-        """!
-        Same as above enable_accel(), but with a different name to preserve backwards compatibility
-        """
-        self.enable_accel(enable)
+        self._i2c.write_byte(self.address, self.KX13X_CNTL1 , reg_val)
 
     def get_accel_state(self):
         """!
@@ -362,7 +344,7 @@ class QwiicKX13XCore(object):
 
         @return **int** Returns bit indicating the accelerometers power state.
         """
-        reg_val = self._i2c.readByte(self.address, self.KX13X_CNTL1)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_CNTL1)
         return (reg_val & 0x80) >> 7
 
     def set_range(self, kx13x_range):
@@ -387,10 +369,10 @@ class QwiicKX13XCore(object):
         if kx13x_range < 0 or kx13x_range > 3:
             return False
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_CNTL1)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_CNTL1)
         reg_val &= 0xE7
         reg_val |= (kx13x_range << 3)
-        self._i2c.writeByte(self.address, self.KX13X_CNTL1 , reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_CNTL1 , reg_val)
 
 
     def set_output_data_rate(self, rate):
@@ -408,10 +390,10 @@ class QwiicKX13XCore(object):
         accel_state = self.get_accel_state()
         self.enable_accel(False)
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_ODCNTL)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_ODCNTL)
         reg_val &= 0x40
         reg_val |= rate
-        self._i2c.writeByte(self.address, self.KX13X_ODCNTL , reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_ODCNTL , reg_val)
         self.enable_accel(accel_state)
 
 
@@ -422,11 +404,9 @@ class QwiicKX13XCore(object):
         @return **float** Accelerometer's data rate in hertz.
         """
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_ODCNTL)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_ODCNTL)
         reg_val &= 0x40
         return (0.78 * (2 * reg_val))
-
-    output_data_rate = property(get_output_data_rate, set_output_data_rate)
 
     def set_interrupt_pin(self, enable, polarity = 0, pulse_width = 0,
                           latch_control = False):
@@ -457,10 +437,10 @@ class QwiicKX13XCore(object):
 
         combined_arguments = (pulse_width << 6) | (enable << 5) | (polarity << 4) | (latch_control << 3)
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_INC1)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_INC1)
         reg_val &= 0x07
         reg_val |= combined_arguments
-        self._i2c.writeByte(self.address, self.KX13X_INC1 , reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_INC1 , reg_val)
 
     def route_hardware_interrupt(self, rdr, pin = 1):
         """!
@@ -483,11 +463,11 @@ class QwiicKX13XCore(object):
         self.enable_accel(False)
 
         if pin == 1:
-            self._i2c.writeByte(self.address, self.KX13X_INC4 , rdr)
+            self._i2c.write_byte(self.address, self.KX13X_INC4 , rdr)
             self.enable_accel(accel_state)
             return True
         else:
-            self._i2c.writeByte(self.address, self.KX13X_INC6 , rdr)
+            self._i2c.write_byte(self.address, self.KX13X_INC6 , rdr)
             self.enable_accel(accel_state)
             return True
     
@@ -505,25 +485,25 @@ class QwiicKX13XCore(object):
             return False
         
         # Same bit for both pins
-        kIenReadyBitMask = 0b1 << 5
+        ien_ready_bit_mask = 0b1 << 5
             
         if pin == 1:
-            reg_val = self._i2c.readByte(self.address, self.KX13X_INC1)
+            reg_val = self._i2c.read_byte(self.address, self.KX13X_INC1)
             
-            reg_val &= ~kIenReadyBitMask
+            reg_val &= ~ien_ready_bit_mask
             if (enable):
-                reg_val |= kIenReadyBitMask
+                reg_val |= ien_ready_bit_mask
 
-            self._i2c.writeByte(self.address, self.KX13X_INC1, reg_val)
+            self._i2c.write_byte(self.address, self.KX13X_INC1, reg_val)
     
         if pin == 2:
-            reg_val = self._i2c.readByte(self.address, self.KX13X_INC5)
+            reg_val = self._i2c.read_byte(self.address, self.KX13X_INC5)
             
-            reg_val &= ~kIenReadyBitMask
+            reg_val &= ~ien_ready_bit_mask
             if (enable):
-                reg_val |= kIenReadyBitMask
+                reg_val |= ien_ready_bit_mask
 
-            self._i2c.writeByte(self.address, self.KX13X_INC5, reg_val)
+            self._i2c.write_byte(self.address, self.KX13X_INC5, reg_val)
         
         return True
 
@@ -534,7 +514,7 @@ class QwiicKX13XCore(object):
 
         @return No return value.
         """
-        self._i2c.readByte(self.address, self.KX13X_INT_REL)
+        self._i2c.read_byte(self.address, self.KX13X_INT_REL)
 
     def data_ready(self):
         """!
@@ -543,18 +523,12 @@ class QwiicKX13XCore(object):
         @return **bool** Returns true if data is ready to be read and false
             otherwise.
         """
-        reg_val = self._i2c.readByte(self.address, self.KX13X_INS2)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_INS2)
         if reg_val & 0x10:
             return True
         else:
             return False
     
-    def data_trigger(self):
-        """!
-        Same as above data_ready(), but with a different name to preserve backwards compatibility
-        """
-        return self.data_ready()
-
     def set_buffer_threshold(self, threshold):
         """!
         Sets how many samples are stored in the buffer.
@@ -566,14 +540,14 @@ class QwiicKX13XCore(object):
         if threshold < 2 or threshold > 171:
             return False
 
-        resolution = self._i2c.readByte(self.address, self.KX13X_BUF_CNTL2)
+        resolution = self._i2c.read_byte(self.address, self.KX13X_BUF_CNTL2)
         resolution &= 0x40
         resolution = resolution >> 6
 
         if threshold > 86 and resolution == 1: # At 16bit resolution - max samples: 86
             threshold == 86
 
-        self._i2c.writeByte(self.address, self.KX13X_BUF_CNTL1, threshold)
+        self._i2c.write_byte(self.address, self.KX13X_BUF_CNTL1, threshold)
 
     def set_buffer_operation_and_resolution(self, operation_mode, resolution=True):
         """!
@@ -596,24 +570,18 @@ class QwiicKX13XCore(object):
 
         combined_arguments = (resolution << 6) | operation_mode
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_BUF_CNTL2)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_BUF_CNTL2)
         reg_val &= 0xBC
         reg_val |= combined_arguments
-        self._i2c.writeByte(self.address, self.KX13X_BUF_CNTL2 , reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_BUF_CNTL2 , reg_val)
     
-    def set_buffer_operation(self, operation_mode, resolution):
-        """!
-        Same as above set_buffer_operation_and_resolution(), but with a different name to preserve backwards compatibility
-        """
-        self.set_buffer_operation_and_resolution(operation_mode, resolution)
-
     def enable_buffer_and_interrupt(self, enable = True, enable_interrupt = True):
         """!
         Enables the buffer and whether the buffer triggers an interrupt
             when full.
 
         @param enable: Enables the buffer.
-        @param enable: Enables the buffer's interrupt.
+        @param enable_interrupt: Enables the buffer's interrupt.
 
         @return **bool** Returns false if an incorrect argument is given.
 
@@ -626,21 +594,21 @@ class QwiicKX13XCore(object):
 
         combined_arguments = (enable << 7) | (enable_interrupt << 5)
 
-        reg_val = self._i2c.readByte(self.address, self.KX13X_BUF_CNTL2)
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_BUF_CNTL2)
         reg_val &= 0x5F
         reg_val |= combined_arguments
-        self._i2c.writeByte(self.address, self.KX13X_BUF_CNTL2 , reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_BUF_CNTL2 , reg_val)
 
     def get_raw_accel_data(self):
         """!
         Retrieves the raw register values representing accelerometer data.
 
             Note: this method does not check if the registers contain valid data.
-            The user needs to do that externally by calling dataReady
+            The user needs to do that externally by calling data_ready()
             or using the INT pins to indicate that data is ready.
         """
 
-        accel_data = self._i2c.readBlock(self.address, self.KX13X_XOUT_L, self.TOTAL_ACCEL_DATA_16BIT)
+        accel_data = self._i2c.read_block(self.address, self.KX13X_XOUT_L, self.TOTAL_ACCEL_DATA_16BIT)
         
         ux = (accel_data[self.XMSB] << 8) | accel_data[self.XLSB]
         uy = (accel_data[self.YMSB] << 8) | accel_data[self.YLSB]
@@ -658,44 +626,44 @@ class QwiicKX13XCore(object):
         self.raw_output_data.y = uy
         self.raw_output_data.z = uz
 
-    def get_raw_accel_buffer_data(self, sixteenBit = -1):
+    def get_raw_accel_buffer_data(self, sixteen_bit = -1):
         """!
         Retrieves the raw buffer values representing accelerometer data.
 
-            If sixteenBit is -1 (the default), the code reads the Buffer Control Register 2 bres
+            If sixteen_bit is -1 (the default), the code reads the Buffer Control Register 2 bres
             bit to determine if the buffer data is 8-bit or 16-bit. You can speed up the code
-            by setting sixteenBit to: 0 for 8-bit data; 1 for 16-bit data.
+            by setting sixteen_bit to: 0 for 8-bit data; 1 for 16-bit data.
 
             Note: theis method does not check if the buffer contains valid data.
-            The user needs to do that externally by calling getSampleLevel
+            The user needs to do that externally by calling get_sample_level()
             or using the INT pins to indicate that data is ready.
 
         @return **bool** Returns false if an incorrect argument is given.
         """
-        if sixteenBit > 1 or sixteenBit < -1:
+        if sixteen_bit > 1 or sixteen_bit < -1:
             return False
         
-        if sixteenBit == -1:
+        if sixteen_bit == -1:
             # Need to manually check the resolution
-            reg_val = self._i2c.readByte(self.address, self.KX13X_BUF_CNTL2)
+            reg_val = self._i2c.read_byte(self.address, self.KX13X_BUF_CNTL2)
 
-            kBresMask = 1 << 6
-            if reg_val & kBresMask:
-                sixteenBit = 1
+            bres_mask = 1 << 6
+            if reg_val & bres_mask:
+                sixteen_bit = 1
             else:
-                sixteenBit = 0
+                sixteen_bit = 0
 
-        if sixteenBit == 1:
+        if sixteen_bit == 1:
             # 16 bit data
-            accel_data = self._i2c.readBlock(self.address, self.KX13X_BUF_READ, self.TOTAL_ACCEL_DATA_16BIT)
+            accel_data = self._i2c.read_block(self.address, self.KX13X_BUF_READ, self.TOTAL_ACCEL_DATA_16BIT)
             
             ux = (accel_data[self.XMSB] << 8) | accel_data[self.XLSB]
             uy = (accel_data[self.YMSB] << 8) | accel_data[self.YLSB]
             uz = (accel_data[self.ZMSB] << 8) | accel_data[self.ZLSB]
 
-        if sixteenBit == 0:
+        if sixteen_bit == 0:
             # 8 bit data
-            accel_data = self._i2c.readBlock(self.address, self.KX13X_BUF_READ, self.TOTAL_ACCEL_DATA_8BIT)
+            accel_data = self._i2c.read_block(self.address, self.KX13X_BUF_READ, self.TOTAL_ACCEL_DATA_8BIT)
             
             ux = (accel_data[0] << 8)
             uy = (accel_data[1] << 8)
@@ -740,19 +708,19 @@ class QwiicKX13XCore(object):
         
         self.enable_accel(False)
 
-        self._i2c.writeByte(self.address, 0x7F, 0x00)
-        self._i2c.writeByte(self.address, self.KX13X_CNTL2, 0x00)
-        self._i2c.writeByte(self.address, self.KX13X_CNTL2, 0x80)
+        self._i2c.write_byte(self.address, 0x7F, 0x00)
+        self._i2c.write_byte(self.address, self.KX13X_CNTL2, 0x00)
+        self._i2c.write_byte(self.address, self.KX13X_CNTL2, 0x80)
 
         # Wait for the SRST bit to be cleared. Reset takes about 2ms. Timeout if we still see the SRST bit set after 10ms.
-        sleep(0.003)
+        self._i2c.delay_ms(3)
         reset_read_tries = 0
         while reset_read_tries < 10:
-            if self._i2c.readByte(self.address, self.KX13X_CNTL2) & 0x80 == 0:
+            if self._i2c.read_byte(self.address, self.KX13X_CNTL2) & 0x80 == 0:
                 return True
 
             reset_read_tries += 1
-            sleep(0.001)
+            self._i2c.delay_ms(1)
         
         return False
     
@@ -763,14 +731,14 @@ class QwiicKX13XCore(object):
         @param enable: True to enable the data engine, False to disable it.
         """
 
-        kDataReadyBitMask = 0b1 << 5
-        reg_val = self._i2c.readByte(self.address, self.KX13X_CNTL1)
+        data_ready_bit_mask = 0b1 << 5
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_CNTL1)
         
-        reg_val &= ~kDataReadyBitMask
+        reg_val &= ~data_ready_bit_mask
         if (enable):
-            reg_val |= kDataReadyBitMask
+            reg_val |= data_ready_bit_mask
 
-        self._i2c.writeByte(self.address, self.KX13X_CNTL1, reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_CNTL1, reg_val)
     
     def enable_tap_engine(self,enable=True):
         """!
@@ -779,14 +747,14 @@ class QwiicKX13XCore(object):
         @param enable: True to enable the tap engine, False to disable it.
         """
 
-        kTapEngineBitMask = 0b1 << 2
-        reg_val = self._i2c.readByte(self.address, self.KX13X_CNTL1)
+        tap_engine_bit_mask = 0b1 << 2
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_CNTL1)
         
-        reg_val &= ~kTapEngineBitMask
+        reg_val &= ~tap_engine_bit_mask
         if (enable):
-            reg_val |= kTapEngineBitMask
+            reg_val |= tap_engine_bit_mask
 
-        self._i2c.writeByte(self.address, self.KX13X_CNTL1, reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_CNTL1, reg_val)
     
     def enable_direct_tap_interrupt(self, enable=True):
         """!
@@ -795,14 +763,14 @@ class QwiicKX13XCore(object):
         @param enable: True to enable the direct tap interrupt, False to disable it.
         """
 
-        kDirectTapInterruptBitMask = 0b1 << 0
-        reg_val = self._i2c.readByte(self.address, self.KX13X_TDTRC)
+        direct_tap_interrupt_bit_mask = 0b1 << 0
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_TDTRC)
         
-        reg_val &= ~kDirectTapInterruptBitMask
+        reg_val &= ~direct_tap_interrupt_bit_mask
         if (enable):
-            reg_val |= kDirectTapInterruptBitMask
+            reg_val |= direct_tap_interrupt_bit_mask
 
-        self._i2c.writeByte(self.address, self.KX13X_TDTRC, reg_val)
+        self._i2c.write_byte(self.address, self.KX13X_TDTRC, reg_val)
 
 
     def tap_detected(self):
@@ -813,14 +781,14 @@ class QwiicKX13XCore(object):
         @return True if a tap has been detected, False otherwise.
         """
 
-        kTapDetectedShift = 2
-        kTapDetectedMask = 0b11 << 2
-        reg_val = self._i2c.readByte(self.address, self.KX13X_INS2)
+        tap_detected_shift = 2
+        tap_detected_mask = 0b11 << 2
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_INS2)
         
-        tap_result = (reg_val & kTapDetectedMask) >> kTapDetectedShift
+        tap_result = (reg_val & tap_detected_mask) >> tap_detected_shift
 
-        kSingleTapStatusResult = 0x01
-        return tap_result == kSingleTapStatusResult
+        single_tap_status_result = 0x01
+        return tap_result == single_tap_status_result
 
     def get_direction(self):
         """!
@@ -828,7 +796,7 @@ class QwiicKX13XCore(object):
             the direction of the detected tap.
         """
 
-        return self._i2c.readByte(self.address, self.KX13X_INS1)
+        return self._i2c.read_byte(self.address, self.KX13X_INS1)
     
     def unknown_tap(self):
         """!
@@ -837,14 +805,14 @@ class QwiicKX13XCore(object):
             case this function will return true. good for error checking.
         """
             
-        kTapDetectedShift = 2
-        kTapDetectedMask = 0b11 << 2
-        reg_val = self._i2c.readByte(self.address, self.KX13X_INS2)
+        tap_detected_shift = 2
+        tap_detected_mask = 0b11 << 2
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_INS2)
         
-        tap_result = (reg_val & kTapDetectedMask) >> kTapDetectedShift
+        tap_result = (reg_val & tap_detected_mask) >> tap_detected_shift
 
-        kUnknownTapStatusResult = 0x03
-        return tap_result == kUnknownTapStatusResult
+        unknown_tap_status_result = 0x03
+        return tap_result == unknown_tap_status_result
     
     def double_tap_detected(self):
         """!
@@ -852,14 +820,14 @@ class QwiicKX13XCore(object):
             a double tap has been detected.
         """
 
-        kTapDetectedShift = 2
-        kTapDetectedMask = 0b11 << 2
-        reg_val = self._i2c.readByte(self.address, self.KX13X_INS2)
+        tap_detected_shift = 2
+        tap_detected_mask = 0b11 << 2
+        reg_val = self._i2c.read_byte(self.address, self.KX13X_INS2)
         
-        tap_result = (reg_val & kTapDetectedMask) >> kTapDetectedShift
+        tap_result = (reg_val & tap_detected_mask) >> tap_detected_shift
 
-        kDoubleTapStatusResult = 0x02
-        return tap_result == kDoubleTapStatusResult
+        double_tap_status_result = 0x02
+        return tap_result == double_tap_status_result
 
     def get_sample_level(self):
         """!
@@ -885,8 +853,10 @@ class QwiicKX132(QwiicKX13XCore):
     CONV_8G =  .0002441407513657033
     CONV_16G = .0004882811975463118
 
-    def __init__(self, address = None, i2c_driver = None):
-        super().__init__(address, i2c_driver)
+    def __init__(self, address = None, i2c_bus = None):
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
+        super().__init__(address, i2c_bus)
         self.kx132_accel = AccelerationData(0,0,0)
 
     def begin(self):
@@ -897,8 +867,8 @@ class QwiicKX132(QwiicKX13XCore):
         @return **bool** Returns true if WHO_AM_I value is the correct one and
             false otherwise.
         """
-        chipID = self.beginCore()
-        if chipID == self.KX132_WHO_AM_I:
+        chip_id = self.begin_core()
+        if chip_id == self.KX132_WHO_AM_I:
             return True
         else:
             return False
@@ -915,7 +885,7 @@ class QwiicKX132(QwiicKX13XCore):
             Converts raw acceleration data according to the range setting and
                 stores it
             """
-            accel_range = self._i2c.readByte(self.address, self.KX13X_CNTL1)
+            accel_range = self._i2c.read_byte(self.address, self.KX13X_CNTL1)
             accel_range &= 0x18
             accel_range = accel_range >> 3
 
@@ -950,8 +920,10 @@ class QwiicKX134(QwiicKX13XCore):
     CONV_32G = .000976523950926236762
     CONV_64G = .001953125095370342112
 
-    def __init__(self, address = None, i2c_driver = None):
-        super().__init__(address, i2c_driver)
+    def __init__(self, address = None, i2c_bus = None):
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
+        super().__init__(address, i2c_bus)
         self.kx134_accel = AccelerationData(0,0,0)
 
     def begin(self):
@@ -962,8 +934,8 @@ class QwiicKX134(QwiicKX13XCore):
         @return **bool** Returns true if WHO_AM_I value is the correct one and
             false otherwise.
         """
-        chipID = self.beginCore()
-        if chipID == self.KX134_WHO_AM_I:
+        chip_id = self.begin_core()
+        if chip_id == self.KX134_WHO_AM_I:
             return True
         else:
             return False
@@ -980,7 +952,7 @@ class QwiicKX134(QwiicKX13XCore):
         Converts raw acceleration data according to the range setting and
             stores it
         """
-        accel_range = self._i2c.readByte(self.address, self.KX13X_CNTL1)
+        accel_range = self._i2c.read_byte(self.address, self.KX13X_CNTL1)
         accel_range &= 0x18
         accel_range = accel_range >> 3
 

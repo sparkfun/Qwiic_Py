@@ -35,16 +35,16 @@
 
 import qwiic_mmc5983ma
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic MMC5983MA Example 1 - Basic Readings\n")
 
 	# Create instance of device
 	my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
 
 	# Check if it's connected
-	if my_mag.is_connected() == False:
+	if not my_mag.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
@@ -69,11 +69,11 @@ def runExample():
 		print()
 
 		# Delay for a moment
-		time.sleep(0.1)
+		qwiic_i2c.delay_ms(100)
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

@@ -35,16 +35,16 @@
 
 import qwiic_mmc5983ma
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic MMC5983MA Example 2 - Calibration\n")
 
 	# Create instance of device
 	my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
 
 	# Check if it's connected
-	if my_mag.is_connected() == False:
+	if not my_mag.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
@@ -57,13 +57,13 @@ def runExample():
 	print("magnetization can persist in the MMC5983MA, even through power cycles.")
 	print()
 	print("Beginning in 10 seconds...")
-	time.sleep(10)
+	qwiic_i2c.delay_ms(10000)
 
 	# Loop forever
 	while True:
 		# Loop for 10 seconds
-		t0 = time.time()
-		while (time.time() - t0) < 10:
+		t0 = qwiic_i2c.ticks_ms()
+		while qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), t0) < 10000:
 			# Read each axis one by one, or all together
 			# x = my_mag.get_measurement_x_gauss()
 			# y = my_mag.get_measurement_y_gauss()
@@ -75,13 +75,13 @@ def runExample():
 			print("Y: %f" % y)
 			print("Z: %f" % z)
 
-			print("Re-calibrating in", int(t0 + 10 - time.time()), "seconds...")
+			print("Re-calibrating in", (10000 - qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), t0)) // 1000, "seconds...")
 			
 			# Extra space to keep numbers separate
 			print()
 
 			# Delay for a moment
-			time.sleep(0.1)
+			qwiic_i2c.delay_ms(100)
 		
 		# Time to calibrate! If the sensor was exposed to a strong magnetic
 		# field, a residual magnetization can persist even through power cycles.
@@ -94,11 +94,11 @@ def runExample():
 		# Print calibration offsets and wait 5 seconds for user to read
 		print("Calibration complete! New offsets:")
 		print(my_mag.get_offsets())
-		time.sleep(5)
+		qwiic_i2c.delay_ms(5000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

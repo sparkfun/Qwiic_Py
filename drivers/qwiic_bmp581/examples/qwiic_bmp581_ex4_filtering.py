@@ -35,21 +35,21 @@
 
 import qwiic_bmp581
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
-	print("\nQwiic Template Example 4 - Filtering\n")
+def run_example():
+	print("\nQwiic BMP581 Example 4 - Filtering\n")
 
 	# Create instance of device
 	myBMP581 = qwiic_bmp581.QwiicBMP581()
 
 	# Check if it's connected
-	if myBMP581.is_connected() == False:
+	if not myBMP581.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	if myBMP581.begin() == False:
+	if not myBMP581.begin():
 		print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
 		return
 	
@@ -59,11 +59,11 @@ def runExample():
     # By default, both filter coefficients are set to 0 (no filtering). We can smooth
     # out the measurements by increasing the coefficients with this function
 	config = qwiic_bmp581.IirConfig()
-	config.setIirT = config.kIirFilterCoeff127 # Set filter coefficient for temperature
-	config.setIirP = config.kIirFilterCoeff127 # Set filter coefficient for pressure
-	config.shdwSetIirT = myBMP581.kEnable # Store filtered data in data registers
-	config.shdwSetIirP = myBMP581.kEnable # Store filtered data in data registers
-	config.iirFlushForcedEn = myBMP581.kDisable # Disable filter in forced mode
+	config.setIirT = config.IIR_FILTER_COEFF_127 # Set filter coefficient for temperature
+	config.setIirP = config.IIR_FILTER_COEFF_127 # Set filter coefficient for pressure
+	config.shdwSetIirT = myBMP581.ENABLE # Store filtered data in data registers
+	config.shdwSetIirP = myBMP581.ENABLE # Store filtered data in data registers
+	config.iirFlushForcedEn = myBMP581.DISABLE # Disable filter in forced mode
 
 	myBMP581.set_iir_config(config)
 
@@ -73,11 +73,11 @@ def runExample():
 		print("Pressure (Pa): ", data.pressure)
 
 		# Print every 100ms to see the filtering in action
-		time.sleep(0.100)
+		qwiic_i2c.delay_ms(100)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

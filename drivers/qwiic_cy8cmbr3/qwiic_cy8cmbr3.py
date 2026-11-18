@@ -46,6 +46,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -66,270 +68,263 @@ class QwiicCY8CMBR3(object):
     # Set default name and I2C address(es)
     device_name         = _DEFAULT_NAME
     available_addresses = _AVAILABLE_I2C_ADDRESS
-    default_address = _AVAILABLE_I2C_ADDRESS[0]
+    DEFAULT_ADDRESS = _AVAILABLE_I2C_ADDRESS[0]
 
     # Register Map
-    kRegSensorEn = 0x00
-    kRegFssEn = 0x02
-    kRegToggleEn = 0x04
-    kRegLedOnEn = 0x06
-    kRegSensitivity0 = 0x08
-    kRegSensitivity1 = 0x09
-    kRegSensitivity2 = 0x0A
-    kRegSensitivity3 = 0x0B
-    kRegBaseThreshold0 = 0x0C
-    kRegBaseThreshold1 = 0x0D
-    kRegFingerThreshold2 = 0x0E
-    kRegFingerThreshold3 = 0x0F
-    kRegFingerThreshold4 = 0x10
-    kRegFingerThreshold5 = 0x11
-    kRegFingerThreshold6 = 0x12
-    kRegFingerThreshold7 = 0x13
-    kRegFingerThreshold8 = 0x14
-    kRegFingerThreshold9 = 0x15
-    kRegFingerThreshold10 = 0x16
-    kRegFingerThreshold11 = 0x17
-    kRegFingerThreshold12 = 0x18
-    kRegFingerThreshold13 = 0x19
-    kRegFingerThreshold14 = 0x1A
-    kRegFingerThreshold15 = 0x1B
-    kRegSensorDebounce = 0x1C
-    kRegButtonHys = 0x1D
-    kRegButtonLbr = 0x1F
-    kRegButtonNnt = 0x20
-    kRegButtonNt = 0x21
-    kRegProxEn = 0x26
-    kRegProxCfg = 0x27
-    kRegProxCfg2 = 0x28
-    kRegProxTouchTh0 = 0x2A
-    kRegProxTouchTh1 = 0x2C
-    kRegProxResolution0 = 0x2E
-    kRegProxResolution1 = 0x2F
-    kRegProxHys = 0x30
-    kRegProxLbr = 0x32
-    kRegProxNnt = 0x33
-    kRegProxNt = 0x34
-    kRegProxPositiveTh0 = 0x35
-    kRegProxPositiveTh1 = 0x36
-    kRegProxNegativeTh0 = 0x39
-    kRegProxNegativeTh1 = 0x3A
-    kRegLedOnTime = 0x3D
-    kRegBuzzerCfg = 0x3E
-    kRegBuzzerOnTime = 0x3F
-    kRegGpoCfg = 0x40
-    kRegPwmDutyCycleCfg0 = 0x41
-    kRegPwmDutyCycleCfg1 = 0x42
-    kRegPwmDutyCycleCfg2 = 0x43
-    kRegPwmDutyCycleCfg3 = 0x44
-    kRegPwmDutyCycleCfg4 = 0x45
-    kRegPwmDutyCycleCfg5 = 0x46
-    kRegPwmDutyCycleCfg6 = 0x47
-    kRegPwmDutyCycleCfg7 = 0x48
-    kRegSpoCfg = 0x4C
-    kRegDeviceCfg0 = 0x4D
-    kRegDeviceCfg1 = 0x4E
-    kRegDeviceCfg2 = 0x4F
-    kRegDeviceCfg3 = 0x50
-    kRegI2cAddr = 0x51
-    kRegRefreshCtrl = 0x52
-    kRegStateTimeout = 0x55
-    kRegSliderCfg = 0x5D
-    kRegSlider1Cfg = 0x61
-    kRegSlider1Resolution = 0x62
-    kRegSlider1Threshold = 0x63
-    kRegSlider2Cfg = 0x67
-    kRegSlider2Resolution = 0x68
-    kRegSlider2Threshold = 0x69
-    kRegSliderLbr = 0x71
-    kRegSliderNnt = 0x72
-    kRegSliderNt = 0x73
-    kRegScratchpad0 = 0x7A
-    kRegScratchpad1 = 0x7B
-    kRegConfigCrc = 0x7E
-    kRegGpoOutputState = 0x80
-    kRegSensorId = 0x82
-    kRegCtrlCmd = 0x86
-    kRegCtrlCmdStatus = 0x88
-    kRegCtrlCmdErr = 0x89
-    kRegSystemStatus = 0x8A
-    kRegPrevCtrlCmdCode = 0x8C
-    kRegFamilyId = 0x8F
-    kRegDeviceId = 0x90
-    kRegDeviceRev = 0x92
-    kRegCalcCrc = 0x94
-    kRegTotalWorkingSns = 0x97
-    kRegSnsCpHigh = 0x98
-    kRegSnsVddShort = 0x9A
-    kRegSnsGndShort = 0x9C
-    kRegSnsSnsShort = 0x9E
-    kRegCmodShieldTest = 0xA0
-    kRegButtonStat = 0xAA
-    kRegLatchedButtonStat = 0xAC
-    kRegProxStat = 0xAE
-    kRegLatchedProxStat = 0xAF
-    kRegSlider1Position = 0xB0
-    kRegLiftoffSlider1Position = 0xB1
-    kRegSlider2Position = 0xB2
-    kRegLiftoffSlider2Position = 0xB3
-    kRegSyncCounter0 = 0xB9
-    kRegDiffCnt0 = 0xBA
-    kRegDiffCnt1 = 0xBC
-    kRegDiffCnt2 = 0xBE
-    kRegDiffCnt3 = 0xC0
-    kRegDiffCnt4 = 0xC2
-    kRegDiffCnt5 = 0xC4
-    kRegDiffCnt6 = 0xC6
-    kRegDiffCnt7 = 0xC8
-    kRegDiffCnt8 = 0xCA
-    kRegDiffCnt9 = 0xCC
-    kRegDiffCnt10 = 0xCE
-    kRegDiffCnt11 = 0xD0
-    kRegDiffCnt12 = 0xD2
-    kRegDiffCnt13 = 0xD4
-    kRegDiffCnt14 = 0xD6
-    kRegDiffCnt15 = 0xD8
-    kRegGpoData = 0xDA
-    kRegSyncCounter1 = 0xDB
-    kRegDebugSensorId = 0xDC
-    kRegDebugCp = 0xDD
-    kRegDebugDiffCnt0 = 0xDE
-    kRegDebugBaseline0 = 0xE0
-    kRegDebugRawCnt0 = 0xE2
-    kRegDebugAvgRawCnt0 = 0xE4
-    kRegSyncCounter2 = 0xE7
+    REG_SENSOR_EN = 0x00
+    REG_FSS_EN = 0x02
+    REG_TOGGLE_EN = 0x04
+    REG_LED_ON_EN = 0x06
+    REG_SENSITIVITY0 = 0x08
+    REG_SENSITIVITY1 = 0x09
+    REG_SENSITIVITY2 = 0x0A
+    REG_SENSITIVITY3 = 0x0B
+    REG_BASE_THRESHOLD0 = 0x0C
+    REG_BASE_THRESHOLD1 = 0x0D
+    REG_FINGER_THRESHOLD2 = 0x0E
+    REG_FINGER_THRESHOLD3 = 0x0F
+    REG_FINGER_THRESHOLD4 = 0x10
+    REG_FINGER_THRESHOLD5 = 0x11
+    REG_FINGER_THRESHOLD6 = 0x12
+    REG_FINGER_THRESHOLD7 = 0x13
+    REG_FINGER_THRESHOLD8 = 0x14
+    REG_FINGER_THRESHOLD9 = 0x15
+    REG_FINGER_THRESHOLD10 = 0x16
+    REG_FINGER_THRESHOLD11 = 0x17
+    REG_FINGER_THRESHOLD12 = 0x18
+    REG_FINGER_THRESHOLD13 = 0x19
+    REG_FINGER_THRESHOLD14 = 0x1A
+    REG_FINGER_THRESHOLD15 = 0x1B
+    REG_SENSOR_DEBOUNCE = 0x1C
+    REG_BUTTON_HYS = 0x1D
+    REG_BUTTON_LBR = 0x1F
+    REG_BUTTON_NNT = 0x20
+    REG_BUTTON_NT = 0x21
+    REG_PROX_EN = 0x26
+    REG_PROX_CFG = 0x27
+    REG_PROX_CFG2 = 0x28
+    REG_PROX_TOUCH_TH0 = 0x2A
+    REG_PROX_TOUCH_TH1 = 0x2C
+    REG_PROX_RESOLUTION0 = 0x2E
+    REG_PROX_RESOLUTION1 = 0x2F
+    REG_PROX_HYS = 0x30
+    REG_PROX_LBR = 0x32
+    REG_PROX_NNT = 0x33
+    REG_PROX_NT = 0x34
+    REG_PROX_POSITIVE_TH0 = 0x35
+    REG_PROX_POSITIVE_TH1 = 0x36
+    REG_PROX_NEGATIVE_TH0 = 0x39
+    REG_PROX_NEGATIVE_TH1 = 0x3A
+    REG_LED_ON_TIME = 0x3D
+    REG_BUZZER_CFG = 0x3E
+    REG_BUZZER_ON_TIME = 0x3F
+    REG_GPO_CFG = 0x40
+    REG_PWM_DUTY_CYCLE_CFG0 = 0x41
+    REG_PWM_DUTY_CYCLE_CFG1 = 0x42
+    REG_PWM_DUTY_CYCLE_CFG2 = 0x43
+    REG_PWM_DUTY_CYCLE_CFG3 = 0x44
+    REG_PWM_DUTY_CYCLE_CFG4 = 0x45
+    REG_PWM_DUTY_CYCLE_CFG5 = 0x46
+    REG_PWM_DUTY_CYCLE_CFG6 = 0x47
+    REG_PWM_DUTY_CYCLE_CFG7 = 0x48
+    REG_SPO_CFG = 0x4C
+    REG_DEVICE_CFG0 = 0x4D
+    REG_DEVICE_CFG1 = 0x4E
+    REG_DEVICE_CFG2 = 0x4F
+    REG_DEVICE_CFG3 = 0x50
+    REG_I2C_ADDR = 0x51
+    REG_REFRESH_CTRL = 0x52
+    REG_STATE_TIMEOUT = 0x55
+    REG_SLIDER_CFG = 0x5D
+    REG_SLIDER1_CFG = 0x61
+    REG_SLIDER1_RESOLUTION = 0x62
+    REG_SLIDER1_THRESHOLD = 0x63
+    REG_SLIDER2_CFG = 0x67
+    REG_SLIDER2_RESOLUTION = 0x68
+    REG_SLIDER2_THRESHOLD = 0x69
+    REG_SLIDER_LBR = 0x71
+    REG_SLIDER_NNT = 0x72
+    REG_SLIDER_NT = 0x73
+    REG_SCRATCHPAD0 = 0x7A
+    REG_SCRATCHPAD1 = 0x7B
+    REG_CONFIG_CRC = 0x7E
+    REG_GPO_OUTPUT_STATE = 0x80
+    REG_SENSOR_ID = 0x82
+    REG_CTRL_CMD = 0x86
+    REG_CTRL_CMD_STATUS = 0x88
+    REG_CTRL_CMD_ERR = 0x89
+    REG_SYSTEM_STATUS = 0x8A
+    REG_PREV_CTRL_CMD_CODE = 0x8C
+    REG_FAMILY_ID = 0x8F
+    REG_DEVICE_ID = 0x90
+    REG_DEVICE_REV = 0x92
+    REG_CALC_CRC = 0x94
+    REG_TOTAL_WORKING_SNS = 0x97
+    REG_SNS_CP_HIGH = 0x98
+    REG_SNS_VDD_SHORT = 0x9A
+    REG_SNS_GND_SHORT = 0x9C
+    REG_SNS_SNS_SHORT = 0x9E
+    REG_CMOD_SHIELD_TEST = 0xA0
+    REG_BUTTON_STAT = 0xAA
+    REG_LATCHED_BUTTON_STAT = 0xAC
+    REG_PROX_STAT = 0xAE
+    REG_LATCHED_PROX_STAT = 0xAF
+    REG_SLIDER1_POSITION = 0xB0
+    REG_LIFTOFF_SLIDER1_POSITION = 0xB1
+    REG_SLIDER2_POSITION = 0xB2
+    REG_LIFTOFF_SLIDER2_POSITION = 0xB3
+    REG_SYNC_COUNTER0 = 0xB9
+    REG_DIFF_CNT0 = 0xBA
+    REG_DIFF_CNT1 = 0xBC
+    REG_DIFF_CNT2 = 0xBE
+    REG_DIFF_CNT3 = 0xC0
+    REG_DIFF_CNT4 = 0xC2
+    REG_DIFF_CNT5 = 0xC4
+    REG_DIFF_CNT6 = 0xC6
+    REG_DIFF_CNT7 = 0xC8
+    REG_DIFF_CNT8 = 0xCA
+    REG_DIFF_CNT9 = 0xCC
+    REG_DIFF_CNT10 = 0xCE
+    REG_DIFF_CNT11 = 0xD0
+    REG_DIFF_CNT12 = 0xD2
+    REG_DIFF_CNT13 = 0xD4
+    REG_DIFF_CNT14 = 0xD6
+    REG_DIFF_CNT15 = 0xD8
+    REG_GPO_DATA = 0xDA
+    REG_SYNC_COUNTER1 = 0xDB
+    REG_DEBUG_SENSOR_ID = 0xDC
+    REG_DEBUG_CP = 0xDD
+    REG_DEBUG_DIFF_CNT0 = 0xDE
+    REG_DEBUG_BASELINE0 = 0xE0
+    REG_DEBUG_RAW_CNT0 = 0xE2
+    REG_DEBUG_AVG_RAW_CNT0 = 0xE4
+    REG_SYNC_COUNTER2 = 0xE7
 
     # Note: Currently since the only supported SparkFun products use the CY8CMBR3102, only CS0 and GPO0 are used. 
     # If other sensors or GPOs are used in the future, additional shifts and masks can be added here.
     # Shifts and Masks
     # SENSOR_EN: Capacitive sensor enable/disable configuration.
-    kSensorEnShiftCs0 = 0
-    kSensorEnMaskCs0 = 0b01
-    kSensorEnShiftCs1 = 1
-    kSensorEnMaskCs1 = 0b10
+    SENSOR_EN_SHIFT_CS0 = 0
+    SENSOR_EN_MASK_CS0 = 0b01
+    SENSOR_EN_SHIFT_CS1 = 1
+    SENSOR_EN_MASK_CS1 = 0b10
 
     # TOGGLE_EN: GPO toggle enable/disable.
-    kToggleEnShiftGpo0 = 0
-    kToggleEnMaskGpo0 = 0b01
+    TOGGLE_EN_SHIFT_GPO0 = 0
+    TOGGLE_EN_MASK_GPO0 = 0b01
 
     # LED_ON_EN: GPO extended LED ON duration enable/disable.
-    kLedOnEnShiftGpo0 = 0
-    kLedOnEnMaskGpo0 = 0b01
+    LED_ON_EN_SHIFT_GPO0 = 0
+    LED_ON_EN_MASK_GPO0 = 0b01
 
     # SENSITIVITY0: Sensitivities (units: counts/pF) for button sensors 0 - 3
-    kSensitivity0ShiftCs0 = 0
-    kSensitivity0MaskCs0 = 0b11
+    SENSITIVITY0_SHIFT_CS0 = 0
+    SENSITIVITY0_MASK_CS0 = 0b11
 
     # GPO_CFG: GPO configuration
-    kGpoCfgShiftGpo0GpoCtl = 0
-    kGpoCfgMaskGpo0GpoCtl = 1 << kGpoCfgShiftGpo0GpoCtl
-    kGpoCfgShiftGpo0GpoPwm = 1
-    kGpoCfgMaskGpo0GpoPwm = 1 << kGpoCfgShiftGpo0GpoPwm
-    kGpoCfgShiftGpo0DriveMode = 2
-    kGpoCfgMaskGpo0DriveMode = 1 << kGpoCfgShiftGpo0DriveMode
-    kGpoCfgShiftGpo0ActiveState = 3
-    kGpoCfgMaskGpo0ActiveState = 1 << kGpoCfgShiftGpo0ActiveState
+    GPO_CFG_SHIFT_GPO0_GPO_CTL = 0
+    GPO_CFG_MASK_GPO0_GPO_CTL = 1 << GPO_CFG_SHIFT_GPO0_GPO_CTL
+    GPO_CFG_SHIFT_GPO0_GPO_PWM = 1
+    GPO_CFG_MASK_GPO0_GPO_PWM = 1 << GPO_CFG_SHIFT_GPO0_GPO_PWM
+    GPO_CFG_SHIFT_GPO0_DRIVE_MODE = 2
+    GPO_CFG_MASK_GPO0_DRIVE_MODE = 1 << GPO_CFG_SHIFT_GPO0_DRIVE_MODE
+    GPO_CFG_SHIFT_GPO0_ACTIVE_STATE = 3
+    GPO_CFG_MASK_GPO0_ACTIVE_STATE = 1 << GPO_CFG_SHIFT_GPO0_ACTIVE_STATE
 
     # SPO_CFG: Special purpose output configuration
-    kSpoCfgShiftSpo0 = 0
-    kSpoCfgMaskSpo0 = 0b00000111
-    kSpoCfgShiftSpo1 = 4
-    kSpoCfgMaskSpo1 = 0b01110000
+    SPO_CFG_SHIFT_SPO0 = 0
+    SPO_CFG_MASK_SPO0 = 0b00000111
+    SPO_CFG_SHIFT_SPO1 = 4
+    SPO_CFG_MASK_SPO1 = 0b01110000
 
     # GPO_OUTPUT_STATE: GPO output state control
-    kGpoOutputStateShiftGpo0 = 0
-    kGpoOutputStateMaskGpo0 = 0b01
+    GPO_OUTPUT_STATE_SHIFT_GPO0 = 0
+    GPO_OUTPUT_STATE_MASK_GPO0 = 0b01
 
     # GPO_DATA: Current GPO state values
-    kGpoDataShiftGpo0 = 0
-    kGpoDataMaskGpo0 = 0b01
+    GPO_DATA_SHIFT_GPO0 = 0
+    GPO_DATA_MASK_GPO0 = 0b01
 
     # Auto-Reset Enable
-    kAutoResetShiftButtonSldArst = 4
-    kAutoResetMaskButtonSldArst = 0b11 << kAutoResetShiftButtonSldArst
+    AUTO_RESET_SHIFT_BUTTON_SLD_ARST = 4
+    AUTO_RESET_MASK_BUTTON_SLD_ARST = 0b11 << AUTO_RESET_SHIFT_BUTTON_SLD_ARST
 
-    kAutoResetShiftProximityArst = 6
-    kAutoResetMaskProximityArst = 0b11 << kAutoResetShiftProximityArst
+    AUTO_RESET_SHIFT_PROXIMITY_ARST = 6
+    AUTO_RESET_MASK_PROXIMITY_ARST = 0b11 << AUTO_RESET_SHIFT_PROXIMITY_ARST
 
 
     # Value Variables 
     # IDs
-    kDefaultCY8CMBR3102FamilyID = 0x9A # When polling the FAMILY_ID register, this should be returned on boot.
-    kDefaultCY8CMBR3102DeviceID = 0xA01 # When polling the DEVICE_ID register, this should be returned on boot.
+    DEFAULT_CY8CMBR3102_FAMILY_ID = 0x9A # When polling the FAMILY_ID register, this should be returned on boot.
+    DEFAULT_CY8CMBR3102_DEVICE_ID = 0xA01 # When polling the DEVICE_ID register, this should be returned on boot.
 
     # Sensitivities
     # Sensitivity values (counts per pF)
-    kCsSensitivity500CountsPerPf = 0  # 50 counts/0.1pF
-    kCsSensitivity250CountsPerPf = 1  # 50 counts/0.2pF
-    kCsSensitivity167CountsPerPf = 2  # 50 counts/0.3pF
-    kCsSensitivity125CountsPerPf = 3  # 50 counts/0.4pF
+    CS_SENSITIVITY_500_COUNTS_PER_PF = 0  # 50 counts/0.1pF
+    CS_SENSITIVITY_250_COUNTS_PER_PF = 1  # 50 counts/0.2pF
+    CS_SENSITIVITY_167_COUNTS_PER_PF = 2  # 50 counts/0.3pF
+    CS_SENSITIVITY_125_COUNTS_PER_PF = 3  # 50 counts/0.4pF
 
     # Refresh Intervals
-    kRefreshInterval20ms = 1
-    kRefreshInterval40ms = 2
-    kRefreshInterval60ms = 3
-    kRefreshInterval80ms = 4
-    kRefreshInterval100ms = 5
-    kRefreshInterval120ms = 6
-    kRefreshInterval140ms = 7
-    kRefreshInterval160ms = 8
-    kRefreshInterval180ms = 9
-    kRefreshInterval200ms = 10
-    kRefreshInterval220ms = 11
-    kRefreshInterval240ms = 12
-    kRefreshInterval260ms = 13
-    kRefreshInterval280ms = 14
-    kRefreshInterval300ms = 15
-    kRefreshInterval320ms = 16
-    kRefreshInterval340ms = 17
-    kRefreshInterval360ms = 18
-    kRefreshInterval380ms = 19
-    kRefreshInterval400ms = 20
-    kRefreshInterval420ms = 21
-    kRefreshInterval440ms = 22
-    kRefreshInterval460ms = 23
-    kRefreshInterval480ms = 24
-    kRefreshInterval500ms = 25
+    REFRESH_INTERVAL_20MS = 1
+    REFRESH_INTERVAL_40MS = 2
+    REFRESH_INTERVAL_60MS = 3
+    REFRESH_INTERVAL_80MS = 4
+    REFRESH_INTERVAL_100MS = 5
+    REFRESH_INTERVAL_120MS = 6
+    REFRESH_INTERVAL_140MS = 7
+    REFRESH_INTERVAL_160MS = 8
+    REFRESH_INTERVAL_180MS = 9
+    REFRESH_INTERVAL_200MS = 10
+    REFRESH_INTERVAL_220MS = 11
+    REFRESH_INTERVAL_240MS = 12
+    REFRESH_INTERVAL_260MS = 13
+    REFRESH_INTERVAL_280MS = 14
+    REFRESH_INTERVAL_300MS = 15
+    REFRESH_INTERVAL_320MS = 16
+    REFRESH_INTERVAL_340MS = 17
+    REFRESH_INTERVAL_360MS = 18
+    REFRESH_INTERVAL_380MS = 19
+    REFRESH_INTERVAL_400MS = 20
+    REFRESH_INTERVAL_420MS = 21
+    REFRESH_INTERVAL_440MS = 22
+    REFRESH_INTERVAL_460MS = 23
+    REFRESH_INTERVAL_480MS = 24
+    REFRESH_INTERVAL_500MS = 25
 
     # Auto Reset Timeouts
-    kAutoResetTimeoutDisabled = 0
-    kAutoResetTimeout5Seconds = 1
-    kAutoResetTimeout20Seconds = 2
+    AUTO_RESET_TIMEOUT_DISABLED = 0
+    AUTO_RESET_TIMEOUT_5_SECONDS = 1
+    AUTO_RESET_TIMEOUT_20_SECONDS = 2
 
     # Commands
-    kCtrlCmdNoOp = 0
-    kCtrlCmdSaveConfig = 2
-    kCtrlCmdCalcCrc = 3
-    kCtrlCmdDeepSleep = 7
-    kCtrlCmdResetLatch = 8
-    kCtrlCmdAlpResetPs0 = 9
-    kCtrlCmdAlpResetPs1 = 10
-    kCtrlCmdSwReset = 255
+    CTRL_CMD_NO_OP = 0
+    CTRL_CMD_SAVE_CONFIG = 2
+    CTRL_CMD_CALC_CRC = 3
+    CTRL_CMD_DEEP_SLEEP = 7
+    CTRL_CMD_RESET_LATCH = 8
+    CTRL_CMD_ALP_RESET_PS0 = 9
+    CTRL_CMD_ALP_RESET_PS1 = 10
+    CTRL_CMD_SW_RESET = 255
     
-    def __init__(self, address=None, i2c_driver=None, enableDebug=False):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
-        self.enableDebug = enableDebug
-
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     def is_connected(self):
         """!
@@ -340,13 +335,11 @@ class QwiicCY8CMBR3(object):
         # Check ID registers to confirm connected
         family_id = self.get_family_id()
         device_id = self.get_device_id()
-        if (family_id != self.kDefaultCY8CMBR3102FamilyID or
-            device_id != self.kDefaultCY8CMBR3102DeviceID):
+        if (family_id != self.DEFAULT_CY8CMBR3102_FAMILY_ID or
+            device_id != self.DEFAULT_CY8CMBR3102_DEVICE_ID):
             return False
         
         return True
-
-    connected = property(is_connected)
 
     def begin(self):
         """!
@@ -364,16 +357,16 @@ class QwiicCY8CMBR3(object):
         if not self.enable(1, False):
             return False
         
-        if not self.set_sensitivity_cs0(self.kCsSensitivity500CountsPerPf):
+        if not self.set_sensitivity_cs0(self.CS_SENSITIVITY_500_COUNTS_PER_PF):
             return False
 
-        if not self.set_refresh_interval(self.kRefreshInterval100ms):
+        if not self.set_refresh_interval(self.REFRESH_INTERVAL_100MS):
             return False
         
         if not self.set_spo0_config(5):  # Set as GPO0
             return False
 
-        if not self.set_gpo_config(controlByHost=True, pwmOutput=False, strongDrive=True, activeHigh=False):
+        if not self.set_gpo_config(control_by_host=True, pwm_output=False, strong_drive=True, active_high=False):
             return False
         
         if not self.set_auto_reset_enable():
@@ -401,7 +394,7 @@ class QwiicCY8CMBR3(object):
         @return **int** The Family ID value
         """
         # Read the Family ID register
-        family_id = self._read_byte_with_retry(self.kRegFamilyId)
+        family_id = self._read_byte_with_retry(self.REG_FAMILY_ID)
         
         return family_id
     
@@ -412,7 +405,7 @@ class QwiicCY8CMBR3(object):
         @return **int** The Device ID value
         """
         # Read the Device ID register
-        device_id = self._read_word_with_retry(self.kRegDeviceId)
+        device_id = self._read_word_with_retry(self.REG_DEVICE_ID)
         
         return device_id
     
@@ -426,64 +419,62 @@ class QwiicCY8CMBR3(object):
 
         @return Returns `True` if successful, otherwise `False`
         """
-        sensorEnVal = self._read_word_with_retry(self.kRegSensorEn)
+        sensorEnVal = self._read_word_with_retry(self.REG_SENSOR_EN)
 
         if cs == 0:
             # Configure CS0 enable/disable
             if enable:
-                sensorEnVal |= self.kSensorEnMaskCs0
+                sensorEnVal |= self.SENSOR_EN_MASK_CS0
             else:
-                sensorEnVal &= ~self.kSensorEnMaskCs0
+                sensorEnVal &= ~self.SENSOR_EN_MASK_CS0
         
         elif cs == 1:
             # Configure CS1 enable/disable
             if enable:
-                sensorEnVal |= self.kSensorEnMaskCs1
+                sensorEnVal |= self.SENSOR_EN_MASK_CS1
             else:
-                sensorEnVal &= ~self.kSensorEnMaskCs1
+                sensorEnVal &= ~self.SENSOR_EN_MASK_CS1
         
         else:
-            self.debug_print("Invalid capacitive sensor number.")
             return False  # Invalid capacitive sensor number
 
         # Write the sensor enable value to the SENSOR_EN register
-        self._write_word_with_retry(self.kRegSensorEn, sensorEnVal)
+        self._write_word_with_retry(self.REG_SENSOR_EN, sensorEnVal)
 
         return True
 
-    def set_auto_reset_enable(self, enable=True, timeout=kAutoResetTimeout5Seconds):
+    def set_auto_reset_enable(self, enable=True, timeout=AUTO_RESET_TIMEOUT_5_SECONDS):
         """!
         Enables or disables the auto-reset feature for buttons and sliders
 
         @param enable: If `True`, enables auto-reset
             If `False`, disables auto-reset
         @param timeout: The auto-reset timeout to set
-            Use one of the kAutoResetTimeout* constants defined in this class
+            Use one of the AUTO_RESET_TIMEOUT_* constants defined in this class
 
         @return Returns `True` if successful, otherwise `False`
         """
         # Ensure valid inputs
-        if timeout < self.kAutoResetTimeoutDisabled or timeout > self.kAutoResetTimeout20Seconds:
-            self.debug_print("Invalid auto-reset timeout value.")
+        if timeout < self.AUTO_RESET_TIMEOUT_DISABLED or timeout > self.AUTO_RESET_TIMEOUT_20_SECONDS:
             return False  # Invalid auto-reset timeout value
         
-        deviceCfg2Val = self._read_byte_with_retry(self.kRegDeviceCfg2)
+        deviceCfg2Val = self._read_byte_with_retry(self.REG_DEVICE_CFG2)
 
         if enable:
-            deviceCfg2Val &= ~self.kAutoResetMaskProximityArst
-            deviceCfg2Val |= (timeout << self.kAutoResetShiftProximityArst) & self.kAutoResetMaskProximityArst
+            deviceCfg2Val &= ~self.AUTO_RESET_MASK_PROXIMITY_ARST
+            deviceCfg2Val |= (timeout << self.AUTO_RESET_SHIFT_PROXIMITY_ARST) & self.AUTO_RESET_MASK_PROXIMITY_ARST
 
-            deviceCfg2Val &= ~self.kAutoResetMaskButtonSldArst
-            deviceCfg2Val |= (timeout << self.kAutoResetShiftButtonSldArst) & self.kAutoResetMaskButtonSldArst
+            deviceCfg2Val &= ~self.AUTO_RESET_MASK_BUTTON_SLD_ARST
+            deviceCfg2Val |= (timeout << self.AUTO_RESET_SHIFT_BUTTON_SLD_ARST) & self.AUTO_RESET_MASK_BUTTON_SLD_ARST
         else:
-            deviceCfg2Val &= ~self.kAutoResetMaskProximityArst
-            deviceCfg2Val |= (self.kAutoResetTimeoutDisabled << self.kAutoResetShiftProximityArst) & self.kAutoResetMaskProximityArst
+            deviceCfg2Val &= ~self.AUTO_RESET_MASK_PROXIMITY_ARST
+            deviceCfg2Val |= (self.AUTO_RESET_TIMEOUT_DISABLED << self.AUTO_RESET_SHIFT_PROXIMITY_ARST) & self.AUTO_RESET_MASK_PROXIMITY_ARST
 
-            deviceCfg2Val &= ~self.kAutoResetMaskButtonSldArst
-            deviceCfg2Val |= (self.kAutoResetTimeoutDisabled << self.kAutoResetShiftButtonSldArst) & self.kAutoResetMaskButtonSldArst
+            deviceCfg2Val &= ~self.AUTO_RESET_MASK_BUTTON_SLD_ARST
+            deviceCfg2Val |= (self.AUTO_RESET_TIMEOUT_DISABLED << self.AUTO_RESET_SHIFT_BUTTON_SLD_ARST) & self.AUTO_RESET_MASK_BUTTON_SLD_ARST
 
         # Write the updated device configuration value back to the DEVICE_CFG2 register
-        self._write_byte_with_retry(self.kRegDeviceCfg2, deviceCfg2Val)
+        self._write_byte_with_retry(self.REG_DEVICE_CFG2, deviceCfg2Val)
 
         return True
 
@@ -491,20 +482,18 @@ class QwiicCY8CMBR3(object):
         """!
         Sets the SPO0 configuration
 
-        @param enable: If `True`, enables SPO0
-            If `False`, disables SPO0
-        @param mode: The SPO0 mode to set
-        @param threshold: The SPO0 threshold to set
+        @param config: The 3-bit SPO0 function value (bits 2:0 of the SPO_CFG
+            register; see the CY8CMBR3 register reference)
 
         @return Returns `True` if successful, otherwise `False`
         """
         # Ensure valid inputs
-        spoCfgVal = self._read_byte_with_retry(self.kRegSpoCfg)
-        spoCfgVal &= ~self.kSpoCfgMaskSpo0
-        spoCfgVal |= (config << self.kSpoCfgShiftSpo0) & self.kSpoCfgMaskSpo0
+        spoCfgVal = self._read_byte_with_retry(self.REG_SPO_CFG)
+        spoCfgVal &= ~self.SPO_CFG_MASK_SPO0
+        spoCfgVal |= (config << self.SPO_CFG_SHIFT_SPO0) & self.SPO_CFG_MASK_SPO0
 
         # Write the SPO0 configuration to the device
-        self._write_byte_with_retry(self.kRegSpoCfg, spoCfgVal)
+        self._write_byte_with_retry(self.REG_SPO_CFG, spoCfgVal)
 
         return True
 
@@ -513,25 +502,24 @@ class QwiicCY8CMBR3(object):
         Sets the sensitivity for the capacitive sensor 0 (CS0)
 
         @param sensitivity: The sensitivity value to set
-            Use one of the kCsSensitivity* constants defined in this class
+            Use one of the CS_SENSITIVITY_* constants defined in this class
 
         @return Returns `True` if successful, otherwise `False`
         """
-        if sensitivity < self.kCsSensitivity500CountsPerPf or sensitivity > self.kCsSensitivity125CountsPerPf:
-            self.debug_print("Invalid sensitivity value.")
+        if sensitivity < self.CS_SENSITIVITY_500_COUNTS_PER_PF or sensitivity > self.CS_SENSITIVITY_125_COUNTS_PER_PF:
             return False  # Invalid sensitivity value
         
         # Read the current SENSITIVITY register value
-        sensVal = self._read_byte_with_retry(self.kRegSensitivity0)
+        sensVal = self._read_byte_with_retry(self.REG_SENSITIVITY0)
 
         # Clear the bits associated with the capacitive sensor
-        sensVal &= ~self.kSensitivity0MaskCs0
+        sensVal &= ~self.SENSITIVITY0_MASK_CS0
 
         # Set the new sensitivity value
-        sensVal |= (sensitivity << self.kSensitivity0ShiftCs0) & self.kSensitivity0MaskCs0
+        sensVal |= (sensitivity << self.SENSITIVITY0_SHIFT_CS0) & self.SENSITIVITY0_MASK_CS0
 
         # Write the updated sensitivity value back to the register
-        self._write_byte_with_retry(self.kRegSensitivity0, sensVal)
+        self._write_byte_with_retry(self.REG_SENSITIVITY0, sensVal)
 
         return True
     
@@ -540,62 +528,61 @@ class QwiicCY8CMBR3(object):
         Sets the refresh interval for the capacitive sensor
 
         @param interval: The refresh interval value to set
-            Use one of the kRefreshInterval* constants defined in this class
+            Use one of the REFRESH_INTERVAL_* constants defined in this class
 
         @return Returns `True` if successful, otherwise `False`
         """
-        if interval < self.kRefreshInterval20ms or interval > self.kRefreshInterval500ms:
-            self.debug_print("Invalid refresh interval value.")
+        if interval < self.REFRESH_INTERVAL_20MS or interval > self.REFRESH_INTERVAL_500MS:
             return False  # Invalid refresh interval value
         
         # Write the refresh interval value to the REFRESH_CTRL register
-        self._write_byte_with_retry(self.kRegRefreshCtrl, interval)
+        self._write_byte_with_retry(self.REG_REFRESH_CTRL, interval)
 
         return True
     
-    def set_gpo_config(self, controlByHost, pwmOutput, strongDrive, activeHigh):
+    def set_gpo_config(self, control_by_host, pwm_output, strong_drive, active_high):
         """!
         Configures the GPO0 settings
 
-        @param controlByHost: If `True`, GPO0 is controlled by the host
+        @param control_by_host: If `True`, GPO0 is controlled by the host
             If `False`, GPO0 is controlled by the device
-        @param pwmOutput: If `True`, GPO0 outputs PWM signal
+        @param pwm_output: If `True`, GPO0 outputs PWM signal
             If `False`, GPO0 outputs digital signal
-        @param strongDrive: If `True`, GPO0 uses strong drive mode
+        @param strong_drive: If `True`, GPO0 uses strong drive mode
             If `False`, GPO0 uses weak drive mode
-        @param activeHigh: If `True`, GPO0 is active high
+        @param active_high: If `True`, GPO0 is active high
             If `False`, GPO0 is active low
 
         @return Returns `True` if successful, otherwise `False`
         """
-        gpoCfgVal = self._read_byte_with_retry(self.kRegGpoCfg)
+        gpoCfgVal = self._read_byte_with_retry(self.REG_GPO_CFG)
 
         # Configure control by host/device
-        if controlByHost:
-            gpoCfgVal |= self.kGpoCfgMaskGpo0GpoCtl
+        if control_by_host:
+            gpoCfgVal |= self.GPO_CFG_MASK_GPO0_GPO_CTL
         else:
-            gpoCfgVal &= ~self.kGpoCfgMaskGpo0GpoCtl
+            gpoCfgVal &= ~self.GPO_CFG_MASK_GPO0_GPO_CTL
         
         # Configure PWM/digital output
-        if pwmOutput:
-            gpoCfgVal |= self.kGpoCfgMaskGpo0GpoPwm
+        if pwm_output:
+            gpoCfgVal |= self.GPO_CFG_MASK_GPO0_GPO_PWM
         else:
-            gpoCfgVal &= ~self.kGpoCfgMaskGpo0GpoPwm
+            gpoCfgVal &= ~self.GPO_CFG_MASK_GPO0_GPO_PWM
 
         # Configure strong/weak drive mode
-        if strongDrive:
-            gpoCfgVal |= self.kGpoCfgMaskGpo0DriveMode
+        if strong_drive:
+            gpoCfgVal |= self.GPO_CFG_MASK_GPO0_DRIVE_MODE
         else:
-            gpoCfgVal &= ~self.kGpoCfgMaskGpo0DriveMode
+            gpoCfgVal &= ~self.GPO_CFG_MASK_GPO0_DRIVE_MODE
         
         # Configure active high/low
-        if activeHigh:
-            gpoCfgVal |= self.kGpoCfgMaskGpo0ActiveState
+        if active_high:
+            gpoCfgVal |= self.GPO_CFG_MASK_GPO0_ACTIVE_STATE
         else:
-            gpoCfgVal &= ~self.kGpoCfgMaskGpo0ActiveState
+            gpoCfgVal &= ~self.GPO_CFG_MASK_GPO0_ACTIVE_STATE
        
         # Write the GPO configuration value to the GPO_CFG register
-        self._write_byte_with_retry(self.kRegGpoCfg, gpoCfgVal)
+        self._write_byte_with_retry(self.REG_GPO_CFG, gpoCfgVal)
 
         return True
     
@@ -608,15 +595,15 @@ class QwiicCY8CMBR3(object):
 
         @return Returns `True` if successful, otherwise `False`
         """
-        gpoOutputVal = self._read_byte_with_retry(self.kRegGpoOutputState)
+        gpoOutputVal = self._read_byte_with_retry(self.REG_GPO_OUTPUT_STATE)
 
         if enable:
-            gpoOutputVal &= ~self.kGpoOutputStateMaskGpo0  # Active low
+            gpoOutputVal &= ~self.GPO_OUTPUT_STATE_MASK_GPO0  # Active low
         else:
-            gpoOutputVal |= self.kGpoOutputStateMaskGpo0
+            gpoOutputVal |= self.GPO_OUTPUT_STATE_MASK_GPO0
 
         # Write the GPO output state value to the GPO_OUTPUT_STATE register
-        self._write_byte_with_retry(self.kRegGpoOutputState, gpoOutputVal)
+        self._write_byte_with_retry(self.REG_GPO_OUTPUT_STATE, gpoOutputVal)
 
         return True
     
@@ -635,7 +622,7 @@ class QwiicCY8CMBR3(object):
         @return **int** The Debug Sensor ID value
         """
         # Read the Debug Sensor ID register
-        debugSensorId = self._read_byte_with_retry(self.kRegDebugSensorId)
+        debugSensorId = self._read_byte_with_retry(self.REG_DEBUG_SENSOR_ID)
         
         return debugSensorId
     
@@ -648,7 +635,7 @@ class QwiicCY8CMBR3(object):
         @return Returns `True` if successful, otherwise `False`
         """
         # Write the Sensor ID value to the SENSOR_ID register
-        self._write_byte_with_retry(self.kRegSensorId, sensor_id)
+        self._write_byte_with_retry(self.REG_SENSOR_ID, sensor_id)
 
         # Wait until the debug sensor ID matches the set sensor ID
         while (self.get_debug_sensor_id() != sensor_id):
@@ -672,7 +659,7 @@ class QwiicCY8CMBR3(object):
             return 0.0
 
         # Read the capacitance value from the DebugCp register
-        capacitancePf = self._read_byte_with_retry(self.kRegDebugCp)
+        capacitancePf = self._read_byte_with_retry(self.REG_DEBUG_CP)
 
         return capacitancePf
 
@@ -683,7 +670,7 @@ class QwiicCY8CMBR3(object):
         @return **int** The difference count value
         """
         # Read the difference count value from the DIFF_CNT0 register
-        diffCount = self._read_word_with_retry(self.kRegDiffCnt0)
+        diffCount = self._read_word_with_retry(self.REG_DIFF_CNT0)
 
         return diffCount
     
@@ -697,20 +684,19 @@ class QwiicCY8CMBR3(object):
         diffCount = self.get_diff_count()
 
         # Read the sensitivity setting for CS0
-        sensVal = self._read_byte_with_retry(self.kRegSensitivity0)
-        sensitivitySetting = (sensVal & self.kSensitivity0MaskCs0) >> self.kSensitivity0ShiftCs0
+        sensVal = self._read_byte_with_retry(self.REG_SENSITIVITY0)
+        sensitivitySetting = (sensVal & self.SENSITIVITY0_MASK_CS0) >> self.SENSITIVITY0_SHIFT_CS0
 
         # Map sensitivity setting to counts per pF
-        if sensitivitySetting == self.kCsSensitivity500CountsPerPf:
+        if sensitivitySetting == self.CS_SENSITIVITY_500_COUNTS_PER_PF:
             countsPerPf = 500
-        elif sensitivitySetting == self.kCsSensitivity250CountsPerPf:
+        elif sensitivitySetting == self.CS_SENSITIVITY_250_COUNTS_PER_PF:
             countsPerPf = 250
-        elif sensitivitySetting == self.kCsSensitivity167CountsPerPf:
+        elif sensitivitySetting == self.CS_SENSITIVITY_167_COUNTS_PER_PF:
             countsPerPf = 167
-        elif sensitivitySetting == self.kCsSensitivity125CountsPerPf:
+        elif sensitivitySetting == self.CS_SENSITIVITY_125_COUNTS_PER_PF:
             countsPerPf = 125
         else:
-            self.debug_print("Invalid sensitivity setting.")
             return 0.0  # Invalid sensitivity setting
 
         # Calculate capacitance in pF
@@ -728,38 +714,38 @@ class QwiicCY8CMBR3(object):
             return 0
 
         # Read the baseline count value from the DebugBaseline0 register
-        baselineCount = self._read_word_with_retry(self.kRegDebugBaseline0)
+        baselineCount = self._read_word_with_retry(self.REG_DEBUG_BASELINE0)
 
         return baselineCount
     
-    def check_saturation(self, rawCount):
+    def check_saturation(self, raw_count):
         """!
         Checks if the raw count value indicates saturation
 
-        @param rawCount: The raw count value to check
+        @param raw_count: The raw count value to check
 
         @return **bool** `True` if saturated, otherwise `False`
         """
         # Read the current sensitivity setting for CS0
-        sensVal = self._read_byte_with_retry(self.kRegSensitivity0)
-        sensitivitySetting = (sensVal & self.kSensitivity0MaskCs0) >> self.kSensitivity0ShiftCs0
+        sensVal = self._read_byte_with_retry(self.REG_SENSITIVITY0)
+        sensitivitySetting = (sensVal & self.SENSITIVITY0_MASK_CS0) >> self.SENSITIVITY0_SHIFT_CS0
 
-        if sensitivitySetting == self.kCsSensitivity500CountsPerPf:
+        if sensitivitySetting == self.CS_SENSITIVITY_500_COUNTS_PER_PF:
             saturationThreshold = 4094
-        elif sensitivitySetting == self.kCsSensitivity250CountsPerPf:
+        elif sensitivitySetting == self.CS_SENSITIVITY_250_COUNTS_PER_PF:
             saturationThreshold = 2046
-        elif sensitivitySetting == self.kCsSensitivity167CountsPerPf:
+        elif sensitivitySetting == self.CS_SENSITIVITY_167_COUNTS_PER_PF:
             saturationThreshold = 1022
-        elif sensitivitySetting == self.kCsSensitivity125CountsPerPf:
+        elif sensitivitySetting == self.CS_SENSITIVITY_125_COUNTS_PER_PF:
             saturationThreshold = 1022
     
-        return rawCount == saturationThreshold
+        return raw_count == saturationThreshold
     
-    def get_raw_count(self, autoCalibrate=False):
+    def get_raw_count(self, auto_calibrate=False):
         """!
         Reads and returns the raw count value from CS0
 
-        @param autoCalibrate: If `True`, performs auto-calibration if saturation is detected.
+        @param auto_calibrate: If `True`, performs auto-calibration if saturation is detected.
 
         Note:
         Do not touch the sensor while auto-calibration is occurring.
@@ -773,15 +759,14 @@ class QwiicCY8CMBR3(object):
             return 0
 
         # Read the raw count value from the DebugRawCnt0 register
-        rawCount = self._read_word_with_retry(self.kRegDebugRawCnt0)
+        raw_count = self._read_word_with_retry(self.REG_DEBUG_RAW_CNT0)
 
         # If autocalibration is enabled, we'll call reset() if the raw count is at maximum (saturated)
-        if autoCalibrate:
-            if self.check_saturation(rawCount):
-                self.debug_print("Raw count saturated, performing software reset for auto-calibration.")
+        if auto_calibrate:
+            if self.check_saturation(raw_count):
                 self.reset()
 
-        return rawCount
+        return raw_count
     
     def is_ctrl_command_complete(self):
         """!
@@ -789,26 +774,25 @@ class QwiicCY8CMBR3(object):
 
         @return **bool** `True` if the last command is complete, otherwise `False`
         """
-        ctrlCmd = self._read_byte_with_retry(self.kRegCtrlCmd)
+        ctrlCmd = self._read_byte_with_retry(self.REG_CTRL_CMD)
 
         # If CTRL_CMD is 0, then the last command is complete
-        return (ctrlCmd == self.kCtrlCmdNoOp)
+        return (ctrlCmd == self.CTRL_CMD_NO_OP)
     
-    def send_ctrl_command(self, command, waitForCompletion=True):
+    def send_ctrl_command(self, command, wait_for_completion=True):
         """!
         Sends a control command to the device
 
         @param command: The control command to send
-        @param waitForCompletion: If `True`, waits for the command to complete
+        @param wait_for_completion: If `True`, waits for the command to complete
 
         @return **bool** Returns `True` if successful, otherwise `False`
         """
         # Write the command to the CTRL_CMD register
-        if not self._write_byte_with_retry(self.kRegCtrlCmd, command):
-            self.debug_print(f"Failed to write control command to CTRL_CMD register: 0x{command:X}")
+        if not self._write_byte_with_retry(self.REG_CTRL_CMD, command):
             return False
 
-        if not waitForCompletion:
+        if not wait_for_completion:
             return True
 
         # Wait for the command to complete
@@ -816,15 +800,13 @@ class QwiicCY8CMBR3(object):
             pass  # Optionally, add a timeout here to avoid infinite loops
 
         # Read the CTRL_CMD_ERR register to check for errors
-        ctrlCmdErr = self._read_byte_with_retry(self.kRegCtrlCmdErr)
+        ctrlCmdErr = self._read_byte_with_retry(self.REG_CTRL_CMD_ERR)
         if ctrlCmdErr is None:
             return False
 
         if ctrlCmdErr != 0:  # Assuming 0 means no error
-            self.debug_print(f"Control Command Error: {ctrlCmdErr}")
             return False
 
-        self.debug_print(f"Control Command 0x{command:X} executed successfully!")
         return True  # Return true to indicate success
     
     def save_config(self):
@@ -834,20 +816,20 @@ class QwiicCY8CMBR3(object):
         @return **bool** Returns `True` if successful, otherwise `False`
         """
         # Calculate the CRC (using the CALC_CRC register) for the current configuration and load it in the CONFIG_CRC register
-        if not self.send_ctrl_command(self.kCtrlCmdCalcCrc):
+        if not self.send_ctrl_command(self.CTRL_CMD_CALC_CRC):
             return False
 
         # Read the calculated CRC from the CALC_CRC register
-        calcCrc = self._read_word_with_retry(self.kRegCalcCrc)
+        calcCrc = self._read_word_with_retry(self.REG_CALC_CRC)
         if calcCrc is None:
             return False
 
         # Write the calculated CRC to the CONFIG_CRC register
-        if not self._write_word_with_retry(self.kRegConfigCrc, calcCrc):
+        if not self._write_word_with_retry(self.REG_CONFIG_CRC, calcCrc):
             return False
 
         # Send the SAVE_CONFIG command to save the current configuration to non-volatile memory
-        if not self.send_ctrl_command(self.kCtrlCmdSaveConfig):
+        if not self.send_ctrl_command(self.CTRL_CMD_SAVE_CONFIG):
             return False
 
         return True  # Return true to indicate success
@@ -861,11 +843,10 @@ class QwiicCY8CMBR3(object):
         @return **bool** Returns `True` if successful, otherwise `False`
         """
         if new_address not in self.available_addresses:
-            self.debug_print("Invalid I2C address.")
             return False  # Invalid I2C address
 
         # Write the new I2C address to the I2C_ADDR register
-        if not self._write_byte_with_retry(self.kRegI2cAddr, new_address):
+        if not self._write_byte_with_retry(self.REG_I2C_ADDR, new_address):
             return False
 
         # Save the configuration to non-volatile memory
@@ -873,7 +854,7 @@ class QwiicCY8CMBR3(object):
             return False
         
         # Reset but do not wait for completion as the address will change directly after
-        if not self.reset(waitForCompletion=False):
+        if not self.reset(wait_for_completion=False):
             return False
 
         # Update the instance's address to the new address
@@ -881,25 +862,24 @@ class QwiicCY8CMBR3(object):
 
         # wait for the command to complete on the new address
         completionRetries = 10
-        from time import sleep
         while completionRetries > 0:
             if self.is_ctrl_command_complete():
                 break
             completionRetries -= 1
-            sleep(0.1)  # Small delay before retrying
+            self._i2c.delay_ms(100)  # Small delay before retrying
 
         return True  # Return true to indicate success
     
-    def reset(self, waitForCompletion=True):
+    def reset(self, wait_for_completion=True):
         """!
         Performs a software reset of the device
 
-        @param waitForCompletion: If `True`, waits for the reset to complete
+        @param wait_for_completion: If `True`, waits for the reset to complete
 
         @return **bool** Returns `True` if successful, otherwise `False`
         """
         # Send the SW_RESET command to perform a software reset
-        if not self.send_ctrl_command(self.kCtrlCmdSwReset, waitForCompletion):
+        if not self.send_ctrl_command(self.CTRL_CMD_SW_RESET, wait_for_completion):
             return False
 
         return True  # Return true to indicate success
@@ -917,8 +897,8 @@ class QwiicCY8CMBR3(object):
             try:
                 value = self._i2c.read_byte(self.address, register)
                 return value
-            except Exception as e:
-                self.debug_print(f"Read attempt {attempt + 1} failed: {e}")
+            except Exception:
+                pass  # Try again
 
     def _read_word_with_retry(self, register, retries=5):
         """!
@@ -933,8 +913,8 @@ class QwiicCY8CMBR3(object):
             try:
                 value = self._i2c.read_word(self.address, register)
                 return value
-            except Exception as e:
-                self.debug_print(f"Read word attempt {attempt + 1} failed: {e}")
+            except Exception:
+                pass  # Try again
         
     def _write_byte_with_retry(self, register, value, retries=5):
         """!
@@ -950,8 +930,8 @@ class QwiicCY8CMBR3(object):
             try:
                 self._i2c.write_byte(self.address, register, value)
                 return True
-            except Exception as e:
-                self.debug_print(f"Write attempt {attempt + 1} failed: {e}")
+            except Exception:
+                pass  # Try again
         return False
     
     def _write_word_with_retry(self, register, value, retries=5):
@@ -968,15 +948,6 @@ class QwiicCY8CMBR3(object):
             try:
                 self._i2c.write_word(self.address, register, value)
                 return True
-            except Exception as e:
-                self.debug_print(f"Write word attempt {attempt + 1} failed: {e}")
+            except Exception:
+                pass  # Try again
         return False
-
-    def debug_print(self, str):
-        """!
-        Prints debug information to the console if debugging is enabled
-
-        @param str: The string to print
-        """
-        if self.enableDebug:
-            print("QwiicCY8CMBR3: " + str)

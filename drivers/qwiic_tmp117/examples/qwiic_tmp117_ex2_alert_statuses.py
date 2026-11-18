@@ -39,9 +39,9 @@
 
 import qwiic_tmp117
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic TMP117 Example 2 - Alert Statuses\n")
 
 	# Create instance of device
@@ -75,8 +75,8 @@ def runExample():
 	print("\nHigh Limit:", myTMP117.get_high_limit(),"C")
 	print("Low Limit:", myTMP117.get_low_limit(),"C")
 
-	# Set to kAlertMode or kThermMode
-	myTMP117.set_alert_function_mode(myTMP117.kAlertMode)
+	# Set to ALERT_MODE or THERM_MODE
+	myTMP117.set_alert_function_mode(myTMP117.ALERT_MODE)
 
 	# Get "Alert Function Mode" Bit from configuration register
     # Note: Depending on the mode, this affects the way HIGH and
@@ -87,13 +87,13 @@ def runExample():
     #   7.6.1.2 Configuration Register (pg 26)
 
 	# Wait and then verify that the alert function mode is set
-	time.sleep(0.5)
+	qwiic_i2c.delay_ms(500)
 	print("\nAlert Function Mode:", myTMP117.get_alert_function_mode())
 	print("----------------------------------------")
 
 	while True:
 		if myTMP117.data_ready():
-			# Note: If you are in Alert Mode (T/nA = kAlertMode = 0), the high and low alert
+			# Note: If you are in Alert Mode (T/nA = ALERT_MODE = 0), the high and low alert
 			# flags will clear whenever you read the configuration register. You
 			# can add a delay to perform another temperature conversion to trigger the
 			# flags again. The delay depends on the conversion cycle time so make
@@ -106,11 +106,11 @@ def runExample():
 			# Adjust this value as necessary based on your conversion cycle time.
 			# Default conversion time for AVG = 1 and CONV = 4 about 1 second. Therefore,
 			# a value of between 1-3 seconds should be sufficient.
-			time.sleep(1.5)
+			qwiic_i2c.delay_ms(1500)
 
 			alertFlags = myTMP117.get_high_low_alert() # Returned value is a list containing the two flags
-			lowAlertFlag = alertFlags[myTMP117.kLowAlertIdx]
-			highAlertFlag = alertFlags[myTMP117.kHighAlertIdx]
+			lowAlertFlag = alertFlags[myTMP117.LOW_ALERT_IDX]
+			highAlertFlag = alertFlags[myTMP117.HIGH_ALERT_IDX]
 
 			print ("Low Alert Flag:", lowAlertFlag)
 			print ("High Alert Flag:", highAlertFlag)
@@ -119,18 +119,18 @@ def runExample():
 				print("High Alert")
 			elif lowAlertFlag:
 				# Alert when the temperature is over the LOW limit:
-				# - In Alert Mode (T/nA = kAlertMode = 0) this flag will clear
+				# - In Alert Mode (T/nA = ALERT_MODE = 0) this flag will clear
 				# when the configuration register is read.
-				# - In Therm mode (T/nA =  kThermMode = 1), this flag is always 0
+				# - In Therm mode (T/nA =  THERM_MODE = 1), this flag is always 0
 				print("Low Alert")
 			else:
 				print("No Alert")
 
-		time.sleep(0.5)
+		qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

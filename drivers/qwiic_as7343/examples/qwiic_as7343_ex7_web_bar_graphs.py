@@ -40,9 +40,9 @@
 
 import qwiic_as7343 
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic AS7343 Example 7 - Web Terminal Bar Graphs\n")
 
 	# Create instance of device
@@ -65,7 +65,7 @@ def runExample():
 	print("Device powered on")
 
 	# Set AutoSmux to output all 18 channels
-	if not myAS7343.set_auto_smux(myAS7343.kAutoSmux18Channels):
+	if not myAS7343.set_auto_smux(myAS7343.AUTO_SMUX_18_CHANNELS):
 		print("Failed to set AutoSmux", file=sys.stderr)
 		return
 	print("AutoSmux set to 18 channels")
@@ -80,7 +80,7 @@ def runExample():
 		myAS7343.set_led_drive(0) # 0 = 4mA
 		myAS7343.set_led_on()
 
-		time.sleep(0.100) # Wait 100 ms for LED to fully illuminate our target
+		qwiic_i2c.delay_ms(100) # Wait 100 ms for LED to fully illuminate our target
 		
 		# Read the spectral data
 		myAS7343.read_all_spectral_data()
@@ -88,25 +88,25 @@ def runExample():
 		myAS7343.set_led_off()
 
 		# Print our comma-separated spectral data in the format expected by the web terminal
-		print(f"{myAS7343.get_data(myAS7343.kChPurpleF1405nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChDarkBlueF2425nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChBlueFz450nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChLightBlueF3475nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChBlueF4515nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChGreenF5550nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChGreenFy555nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChOrangeFxl600nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChBrownF6640nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChRedF7690nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChDarkRedF8745nm)},"
-			  f"{myAS7343.get_data(myAS7343.kChVis1)},"
-			  f"{myAS7343.get_data(myAS7343.kChNir855nm)}\n", end='')
+		print(f"{myAS7343.get_data(myAS7343.CH_PURPLE_F1_405NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_DARK_BLUE_F2_425NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_BLUE_FZ_450NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_LIGHT_BLUE_F3_475NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_BLUE_F4_515NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_GREEN_F5_550NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_GREEN_FY_555NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_ORANGE_FXL_600NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_BROWN_F6_640NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_RED_F7_690NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_DARK_RED_F8_745NM)},"
+			  f"{myAS7343.get_data(myAS7343.CH_VIS1)},"
+			  f"{myAS7343.get_data(myAS7343.CH_NIR_855NM)}\n", end='')
 
-		time.sleep(0.500) # Wait 500 ms before next reading
+		qwiic_i2c.delay_ms(500) # Wait 500 ms before next reading
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

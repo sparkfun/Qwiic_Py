@@ -57,6 +57,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 #-----------------------------------------------------------------------------
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
 # This allows higher level logic to rapidly create a index of qwiic devices at
@@ -90,8 +92,7 @@ class QwiicKeypad(object):
 
     @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The QwiicKeypad device object.
     """
@@ -100,23 +101,18 @@ class QwiicKeypad(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ----------------------------------
     # is_connected()
@@ -125,13 +121,12 @@ class QwiicKeypad(object):
 
     def is_connected(self):
         """!
-        Determine if a Keypad device is conntected to the system..
+        Determine if a Keypad device is connected to the system.
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return self._i2c.isDeviceConnected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
-    connected = property(is_connected)
 
     # ----------------------------------
     # begin()
@@ -166,8 +161,8 @@ class QwiicKeypad(object):
 
         # bus can throw an issue
         try:
-            value = self._i2c.readByte(self.address, KEYPAD_BUTTON)
-        except IOError:
+            value = self._i2c.read_byte(self.address, KEYPAD_BUTTON)
+        except OSError:
             pass
 
         return value
@@ -182,9 +177,9 @@ class QwiicKeypad(object):
 
         @return **integer** The elapsed time since button was pressed
         """
-        MSB = self._i2c.readByte(self.address, KEYPAD_TIME_MSB)
-        LSB = self._i2c.readByte(self.address, KEYPAD_TIME_LSB)
-        return (MSB << 8) | LSB
+        msb = self._i2c.read_byte(self.address, KEYPAD_TIME_MSB)
+        lsb = self._i2c.read_byte(self.address, KEYPAD_TIME_LSB)
+        return (msb << 8) | lsb
 
     #----------------------------------------------------------------
     # get_version()
@@ -197,12 +192,11 @@ class QwiicKeypad(object):
 
         @return **string** The firmware version
         """
-        vMajor = self._i2c.readByte(self.address, KEYPAD_VERSION1)
-        vMinor = self._i2c.readByte(self.address, KEYPAD_VERSION2)
+        v_major = self._i2c.read_byte(self.address, KEYPAD_VERSION1)
+        v_minor = self._i2c.read_byte(self.address, KEYPAD_VERSION2)
 
-        return "v %d.%d" % (vMajor, vMinor)
+        return "v %d.%d" % (v_major, v_minor)
 
-    version = property(get_version)
     #----------------------------------------------------------------
     # update_fifo()
     #
@@ -217,4 +211,4 @@ class QwiicKeypad(object):
         @return No return value
         """
         # set bit0, commanding keypad to update fifo
-        self._i2c.writeByte(self.address, KEYPAD_UPDATE_FIFO, 0x01)
+        self._i2c.write_byte(self.address, KEYPAD_UPDATE_FIFO, 0x01)

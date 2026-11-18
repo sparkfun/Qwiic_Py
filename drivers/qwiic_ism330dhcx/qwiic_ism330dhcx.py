@@ -46,6 +46,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -57,12 +59,12 @@ _DEFAULT_NAME = "Qwiic ISM330DHCX"
 # address for the device.
 _AVAILABLE_I2C_ADDRESS = [0x6B, 0x6A]
 
-class IsmData:
+class ISMData:
     # Contains 3 axis data for storing either raw or calculated data from the ISM330DHCX
     def __init__(self):
-        self.xData = 0
-        self.yData = 0
-        self.zData = 0
+        self.x_data = 0
+        self.y_data = 0
+        self.z_data = 0
 
 # Define the class that encapsulates the device being created. All information
 # associated with this device is encapsulated by this class. The device class
@@ -73,562 +75,563 @@ class QwiicISM330DHCX(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Device identification
-    kDevId = 0x6B
-    kRegWhoAmI = 0x0F
+    DEV_ID = 0x6B
+    REG_WHO_AM_I = 0x0F
 
     # Ctrl1 XL register
-    kRegCtrl1XL = 0x10
+    REG_CTRL1_XL = 0x10
 
-    kCtrl1XlShiftOdr = 4
-    kCtrl1XlMaskOdr = 0b1111 << kCtrl1XlShiftOdr
-    kCtrl1XlShiftFs = 2
-    kCtrl1XlMaskFs = 0b11 << kCtrl1XlShiftFs
-    kCtrl1XlShiftLpf2XlEn = 1
-    kCtrl1XlMaskLpf2XlEn = 0b1 << kCtrl1XlShiftLpf2XlEn
+    CTRL1_XL_SHIFT_ODR = 4
+    CTRL1_XL_MASK_ODR = 0b1111 << CTRL1_XL_SHIFT_ODR
+    CTRL1_XL_SHIFT_FS = 2
+    CTRL1_XL_MASK_FS = 0b11 << CTRL1_XL_SHIFT_FS
+    CTRL1_XL_SHIFT_LPF2_XL_EN = 1
+    CTRL1_XL_MASK_LPF2_XL_EN = 0b1 << CTRL1_XL_SHIFT_LPF2_XL_EN
 
-    kXlFs2g = 0
-    kXlFs16g = 1
-    kXlFs4g = 2
-    kXlFs8g = 3
+    XL_FS_2G = 0
+    XL_FS_16G = 1
+    XL_FS_4G = 2
+    XL_FS_8G = 3
     
     # Ctrl2 G register
-    kRegCtrl2G = 0x11
-    kCtrl2GShiftOdr = 4
-    kCtrl2GMaskOdr = 0b1111 << kCtrl2GShiftOdr
-    kCtrl2GShiftFs = 0
-    kCtrl2GMaskFs = 0b1111 << kCtrl2GShiftFs
+    REG_CTRL2_G = 0x11
+    CTRL2_G_SHIFT_ODR = 4
+    CTRL2_G_MASK_ODR = 0b1111 << CTRL2_G_SHIFT_ODR
+    CTRL2_G_SHIFT_FS = 0
+    CTRL2_G_MASK_FS = 0b1111 << CTRL2_G_SHIFT_FS
 
-    kGyroFs125dps = 2
-    kGyroFs250dps = 0
-    kGyroFs500dps = 4
-    kGyroFs1000dps = 8
-    kGyroFs2000dps = 12
-    kGyroFs4000dps = 1
+    GYRO_FS_125DPS = 2
+    GYRO_FS_250DPS = 0
+    GYRO_FS_500DPS = 4
+    GYRO_FS_1000DPS = 8
+    GYRO_FS_2000DPS = 12
+    GYRO_FS_4000DPS = 1
 
     # Temperature register
-    kRegOutTempL = 0x20
+    REG_OUT_TEMP_L = 0x20
     
     # Accelerometer and Gyro output registers
-    kRegOutXLA = 0x28
-    kRegOutXLG = 0x22
+    REG_OUT_XLA = 0x28
+    REG_OUT_XLG = 0x22
 
     # Configuration regs
-    kRegFuncCfgAccess = 0x01
-    kFuncCfgAccessShiftRegAccess = 6
-    kFuncCfgAccessMaskRegAccess = 0b11 << kFuncCfgAccessShiftRegAccess
+    REG_FUNC_CFG_ACCESS = 0x01
+    FUNC_CFG_ACCESS_SHIFT_REG_ACCESS = 6
+    FUNC_CFG_ACCESS_MASK_REG_ACCESS = 0b11 << FUNC_CFG_ACCESS_SHIFT_REG_ACCESS
 
-    kRegCtrl9XL = 0x18
-    kCtrl9XlShiftDenX = 7
-    kCtrl9XlMaskDenX = 0b1 << kCtrl9XlShiftDenX
-    kCtrl9XlShiftDenY = 6
-    kCtrl9XlMaskDenY = 0b1 << kCtrl9XlShiftDenY
-    kCtrl9XlShiftDenZ = 5
-    kCtrl9XlMaskDenZ = 0b1 << kCtrl9XlShiftDenZ
-    kCtrl9XlShiftDenXlG = 3
-    kCtrl9XlMaskDenXlG = 0b11 << kCtrl9XlShiftDenXlG
-    kCtrl9XlShiftDenLh = 2
-    kCtrl9XlMaskDenLh = 0b1 << kCtrl9XlShiftDenLh
-    kCtrl9XlShiftDeviceConf = 1
-    kCtrl9XlMaskDeviceConf = 0b1 << kCtrl9XlShiftDeviceConf
+    REG_CTRL9_XL = 0x18
+    CTRL9_XL_SHIFT_DEN_X = 7
+    CTRL9_XL_MASK_DEN_X = 0b1 << CTRL9_XL_SHIFT_DEN_X
+    CTRL9_XL_SHIFT_DEN_Y = 6
+    CTRL9_XL_MASK_DEN_Y = 0b1 << CTRL9_XL_SHIFT_DEN_Y
+    CTRL9_XL_SHIFT_DEN_Z = 5
+    CTRL9_XL_MASK_DEN_Z = 0b1 << CTRL9_XL_SHIFT_DEN_Z
+    CTRL9_XL_SHIFT_DEN_XL_G = 3
+    CTRL9_XL_MASK_DEN_XL_G = 0b11 << CTRL9_XL_SHIFT_DEN_XL_G
+    CTRL9_XL_SHIFT_DEN_LH = 2
+    CTRL9_XL_MASK_DEN_LH = 0b1 << CTRL9_XL_SHIFT_DEN_LH
+    CTRL9_XL_SHIFT_DEVICE_CONF = 1
+    CTRL9_XL_MASK_DEVICE_CONF = 0b1 << CTRL9_XL_SHIFT_DEVICE_CONF
 
-    kRegCtrl3C = 0x12
-    kCtrl3CShiftBoot = 7
-    kCtrl3CMaskBoot = 0b1 << kCtrl3CShiftBoot
-    kCtrl3CShiftBdu = 6
-    kCtrl3CMaskBdu = 0b1 << kCtrl3CShiftBdu
-    kCtrl3CShiftHlActive = 5
-    kCtrl3CMaskHlActive = 0b1 << kCtrl3CShiftHlActive
-    kCtrl3CShiftPpOd = 4
-    kCtrl3CMaskPpOd = 0b1 << kCtrl3CShiftPpOd
-    kCtrl3CShiftSim = 3
-    kCtrl3CMaskSim = 0b1 << kCtrl3CShiftSim
-    kCtrl3CShiftIfInc = 2
-    kCtrl3CMaskIfInc = 0b1 << kCtrl3CShiftIfInc
-    kCtrl3CShiftSwReset = 0
-    kCtrl3CMaskSwReset = 0b1 << kCtrl3CShiftSwReset
+    REG_CTRL3_C = 0x12
+    CTRL3_C_SHIFT_BOOT = 7
+    CTRL3_C_MASK_BOOT = 0b1 << CTRL3_C_SHIFT_BOOT
+    CTRL3_C_SHIFT_BDU = 6
+    CTRL3_C_MASK_BDU = 0b1 << CTRL3_C_SHIFT_BDU
+    CTRL3_C_SHIFT_HL_ACTIVE = 5
+    CTRL3_C_MASK_HL_ACTIVE = 0b1 << CTRL3_C_SHIFT_HL_ACTIVE
+    CTRL3_C_SHIFT_PP_OD = 4
+    CTRL3_C_MASK_PP_OD = 0b1 << CTRL3_C_SHIFT_PP_OD
+    CTRL3_C_SHIFT_SIM = 3
+    CTRL3_C_MASK_SIM = 0b1 << CTRL3_C_SHIFT_SIM
+    CTRL3_C_SHIFT_IF_INC = 2
+    CTRL3_C_MASK_IF_INC = 0b1 << CTRL3_C_SHIFT_IF_INC
+    CTRL3_C_SHIFT_SW_RESET = 0
+    CTRL3_C_MASK_SW_RESET = 0b1 << CTRL3_C_SHIFT_SW_RESET
 
-    kRegCtrl4C = 0x13
-    kCtrl4CShiftSleepG = 6
-    kCtrl4CMaskSleepG = 0b1 << kCtrl4CShiftSleepG
-    kCtrl4CShiftInt2OnInt1 = 5
-    kCtrl4CMaskInt2OnInt1 = 0b1 << kCtrl4CShiftInt2OnInt1
-    kCtrl4CShiftDrdyMask = 3
-    kCtrl4CMaskDrdyMask = 0b1 << kCtrl4CShiftDrdyMask
-    kCtrl4CShiftI2cDisable = 2
-    kCtrl4CMaskI2cDisable = 0b1 << kCtrl4CShiftI2cDisable
-    kCtrl4CShiftLpf1SelG = 1
-    kCtrl4CMaskLpf1SelG = 0b1 << kCtrl4CShiftLpf1SelG
+    REG_CTRL4_C = 0x13
+    CTRL4_C_SHIFT_SLEEP_G = 6
+    CTRL4_C_MASK_SLEEP_G = 0b1 << CTRL4_C_SHIFT_SLEEP_G
+    CTRL4_C_SHIFT_INT2_ON_INT1 = 5
+    CTRL4_C_MASK_INT2_ON_INT1 = 0b1 << CTRL4_C_SHIFT_INT2_ON_INT1
+    CTRL4_C_SHIFT_DRDY_MASK = 3
+    CTRL4_C_MASK_DRDY_MASK = 0b1 << CTRL4_C_SHIFT_DRDY_MASK
+    CTRL4_C_SHIFT_I2C_DISABLE = 2
+    CTRL4_C_MASK_I2C_DISABLE = 0b1 << CTRL4_C_SHIFT_I2C_DISABLE
+    CTRL4_C_SHIFT_LPF1_SEL_G = 1
+    CTRL4_C_MASK_LPF1_SEL_G = 0b1 << CTRL4_C_SHIFT_LPF1_SEL_G
 
-    kRegCtrl6C = 0x15
-    kCtrl6CShiftDenMode = 5
-    kCtrl6CMaskDenMode = 0b111 << kCtrl6CShiftDenMode
-    kCtrl6CShiftXlHmMode = 4
-    kCtrl6CMaskXlHmMode = 0b1 << kCtrl6CShiftXlHmMode
-    kCtrl6CShiftUsrOffW = 3
-    kCtrl6CMaskUsrOffW = 0b1 << kCtrl6CShiftUsrOffW
-    kCtrl6CShiftFtype = 0
-    kCtrl6CMaskFtype = 0b111 << kCtrl6CShiftFtype
+    REG_CTRL6_C = 0x15
+    CTRL6_C_SHIFT_DEN_MODE = 5
+    CTRL6_C_MASK_DEN_MODE = 0b111 << CTRL6_C_SHIFT_DEN_MODE
+    CTRL6_C_SHIFT_XL_HM_MODE = 4
+    CTRL6_C_MASK_XL_HM_MODE = 0b1 << CTRL6_C_SHIFT_XL_HM_MODE
+    CTRL6_C_SHIFT_USR_OFF_W = 3
+    CTRL6_C_MASK_USR_OFF_W = 0b1 << CTRL6_C_SHIFT_USR_OFF_W
+    CTRL6_C_SHIFT_FTYPE = 0
+    CTRL6_C_MASK_FTYPE = 0b111 << CTRL6_C_SHIFT_FTYPE
 
-    kRegCtrl10C = 0x19
-    kCtrl10CShiftTimestampEn = 2
-    kCtrl10CMaskTimestampEn = 0b1 << kCtrl10CShiftTimestampEn
+    REG_CTRL10_C = 0x19
+    CTRL10_C_SHIFT_TIMESTAMP_EN = 2
+    CTRL10_C_MASK_TIMESTAMP_EN = 0b1 << CTRL10_C_SHIFT_TIMESTAMP_EN
 
-    kRegTimestamp0 = 0x40
-    kRegTimestamp1 = 0x41
-    kRegTimestamp2 = 0x42
-    kRegTimestamp3 = 0x43
+    REG_TIMESTAMP0 = 0x40
+    REG_TIMESTAMP1 = 0x41
+    REG_TIMESTAMP2 = 0x42
+    REG_TIMESTAMP3 = 0x43
 
     # Slope Filtering
-    kRegCtrl8XL = 0x17
-    kCtrl8XlShiftHpcfXl = 5
-    kCtrl8XlMaskHpcfXl = 0b111 << kCtrl8XlShiftHpcfXl
-    kCtrl8XlShiftHpRefModeXl = 4
-    kCtrl8XlMaskHpRefModeXl = 0b1 << kCtrl8XlShiftHpRefModeXl
-    kCtrl8XlShiftFastSettlModeXl = 3
-    kCtrl8XlMaskFastSettlModeXl = 0b1 << kCtrl8XlShiftFastSettlModeXl
-    kCtrl8XlShiftHpSlopeXlEn = 2
-    kCtrl8XlMaskHpSlopeXlEn = 0b1 << kCtrl8XlShiftHpSlopeXlEn
-    kCtrl8XlShiftLowPassOn6d = 0
-    kCtrl8XlMaskLowPassOn6d = 0b1 << kCtrl8XlShiftLowPassOn6d
+    REG_CTRL8_XL = 0x17
+    CTRL8_XL_SHIFT_HPCF_XL = 5
+    CTRL8_XL_MASK_HPCF_XL = 0b111 << CTRL8_XL_SHIFT_HPCF_XL
+    CTRL8_XL_SHIFT_HP_REF_MODE_XL = 4
+    CTRL8_XL_MASK_HP_REF_MODE_XL = 0b1 << CTRL8_XL_SHIFT_HP_REF_MODE_XL
+    CTRL8_XL_SHIFT_FAST_SETTL_MODE_XL = 3
+    CTRL8_XL_MASK_FAST_SETTL_MODE_XL = 0b1 << CTRL8_XL_SHIFT_FAST_SETTL_MODE_XL
+    CTRL8_XL_SHIFT_HP_SLOPE_XL_EN = 2
+    CTRL8_XL_MASK_HP_SLOPE_XL_EN = 0b1 << CTRL8_XL_SHIFT_HP_SLOPE_XL_EN
+    CTRL8_XL_SHIFT_LOW_PASS_ON_6D = 0
+    CTRL8_XL_MASK_LOW_PASS_ON_6D = 0b1 << CTRL8_XL_SHIFT_LOW_PASS_ON_6D
 
     # Possilbe Slope Filters
-    kHpPathDisableOnOut = 0x00
-    kSlopeOdrDiv4 = 0x10
-    kHpOdrDiv10 = 0x11
-    kHpOdrDiv20 = 0x12
-    kHpOdrDiv45 = 0x13
-    kHpOdrDiv100 = 0x14
-    kHpOdrDiv200 = 0x15
-    kHpOdrDiv400 = 0x16
-    kHpOdrDiv800 = 0x17
-    kHpRefMdOdrDiv10 = 0x31
-    kHpRefMdOdrDiv20 = 0x32
-    kHpRefMdOdrDiv45 = 0x33
-    kHpRefMdOdrDiv100 = 0x34
-    kHpRefMdOdrDiv200 = 0x35
-    kHpRefMdOdrDiv400 = 0x36
-    kHpRefMdOdrDiv800 = 0x37
-    kLpOdrDiv10 = 0x01
-    kLpOdrDiv20 = 0x02
-    kLpOdrDiv45 = 0x03
-    kLpOdrDiv100 = 0x04
-    kLpOdrDiv200 = 0x05
-    kLpOdrDiv400 = 0x06
-    kLpOdrDiv800 = 0x07
+    HP_PATH_DISABLE_ON_OUT = 0x00
+    SLOPE_ODR_DIV4 = 0x10
+    HP_ODR_DIV10 = 0x11
+    HP_ODR_DIV20 = 0x12
+    HP_ODR_DIV45 = 0x13
+    HP_ODR_DIV100 = 0x14
+    HP_ODR_DIV200 = 0x15
+    HP_ODR_DIV400 = 0x16
+    HP_ODR_DIV800 = 0x17
+    HP_REF_MD_ODR_DIV10 = 0x31
+    HP_REF_MD_ODR_DIV20 = 0x32
+    HP_REF_MD_ODR_DIV45 = 0x33
+    HP_REF_MD_ODR_DIV100 = 0x34
+    HP_REF_MD_ODR_DIV200 = 0x35
+    HP_REF_MD_ODR_DIV400 = 0x36
+    HP_REF_MD_ODR_DIV800 = 0x37
+    LP_ODR_DIV10 = 0x01
+    LP_ODR_DIV20 = 0x02
+    LP_ODR_DIV45 = 0x03
+    LP_ODR_DIV100 = 0x04
+    LP_ODR_DIV200 = 0x05
+    LP_ODR_DIV400 = 0x06
+    LP_ODR_DIV800 = 0x07
 
     # Possible bandwidths
-    kBwUltraLight = 0
-    kBwVeryLight = 1
-    kBwLight = 2
-    kBwMedium = 3
-    kBwStrong = 4
-    kBwVeryStrong = 5
-    kBwAggressive = 6
-    kBwXtreme = 7
+    BW_ULTRA_LIGHT = 0
+    BW_VERY_LIGHT = 1
+    BW_LIGHT = 2
+    BW_MEDIUM = 3
+    BW_STRONG = 4
+    BW_VERY_STRONG = 5
+    BW_AGGRESSIVE = 6
+    BW_XTREME = 7
 
     # Possible data rates (ODRs)
     # Accelerometer
-    kXlOdrOff    = 0
-    kXlOdr12Hz5  = 1
-    kXlOdr26Hz   = 2
-    kXlOdr52Hz   = 3
-    kXlOdr104Hz  = 4
-    kXlOdr208Hz  = 5
-    kXlOdr416Hz  = 6
-    kXlOdr833Hz  = 7
-    kXlOdr1666Hz = 8
-    kXlOdr3332Hz = 9
-    kXlOdr6667Hz = 10
-    kXlOdr1Hz6   = 11
+    XL_ODR_OFF    = 0
+    XL_ODR_12_5HZ  = 1
+    XL_ODR_26HZ   = 2
+    XL_ODR_52HZ   = 3
+    XL_ODR_104HZ  = 4
+    XL_ODR_208HZ  = 5
+    XL_ODR_416HZ  = 6
+    XL_ODR_833HZ  = 7
+    XL_ODR_1666HZ = 8
+    XL_ODR_3332HZ = 9
+    XL_ODR_6667HZ = 10
+    XL_ODR_1_6HZ   = 11
     
     # Gyroscope
-    kGyroOdrOff    = 0
-    kGyroOdr12Hz5  = 1
-    kGyroOdr26Hz   = 2
-    kGyroOdr52Hz   = 3
-    kGyroOdr104Hz  = 4
-    kGyroOdr208Hz  = 5
-    kGyroOdr416Hz  = 6
-    kGyroOdr833Hz  = 7
-    kGyroOdr1666Hz = 8
-    kGyroOdr3332Hz = 9
-    kGyroOdr6667Hz = 10
+    GYRO_ODR_OFF    = 0
+    GYRO_ODR_12_5HZ  = 1
+    GYRO_ODR_26HZ   = 2
+    GYRO_ODR_52HZ   = 3
+    GYRO_ODR_104HZ  = 4
+    GYRO_ODR_208HZ  = 5
+    GYRO_ODR_416HZ  = 6
+    GYRO_ODR_833HZ  = 7
+    GYRO_ODR_1666HZ = 8
+    GYRO_ODR_3332HZ = 9
+    GYRO_ODR_6667HZ = 10
 
     # MLC
-    kMlcOdr12Hz5 = 0
-    kMlcOdr26Hz  = 1
-    kMlcOdr52Hz  = 2
-    kMlcOdr104Hz = 3
+    MLC_ODR_12_5HZ = 0
+    MLC_ODR_26HZ  = 1
+    MLC_ODR_52HZ  = 2
+    MLC_ODR_104HZ = 3
 
     # Sensor Hub
-    kShOdr104Hz = 0
-    kShOdr52Hz  = 1
-    kShOdr26Hz  = 2
-    kShOdr13Hz  = 3
+    SH_ODR_104HZ = 0
+    SH_ODR_52HZ  = 1
+    SH_ODR_26HZ  = 2
+    SH_ODR_13HZ  = 3
 
     # Possible mem bank values
-    kUserBank = 0
-    kSensorHubBank = 1
-    kEmbeddedFuncBank = 2
+    USER_BANK = 0
+    SENSOR_HUB_BANK = 1
+    EMBEDDED_FUNC_BANK = 2
 
-    kRegEmbFuncOdrCfgB = 0x5F
-    kEmbFuncOdrShiftFsmOdr = 3
-    kEmbFuncOdrMaskFsmOdr = 0b11 << kEmbFuncOdrShiftFsmOdr
+    REG_EMB_FUNC_ODR_CFG_B = 0x5F
+    EMB_FUNC_ODR_SHIFT_FSM_ODR = 3
+    EMB_FUNC_ODR_MASK_FSM_ODR = 0b11 << EMB_FUNC_ODR_SHIFT_FSM_ODR
 
-    kOdrFsm12Hz5 = 0
-    kOdrFsm26Hz  = 1
-    kOdrFsm52Hz  = 2
-    kOdrFsm104Hz = 3
+    ODR_FSM_12_5HZ = 0
+    ODR_FSM_26HZ  = 1
+    ODR_FSM_52HZ  = 2
+    ODR_FSM_104HZ = 3
 
-    kRegEmbFuncEnB = 0x05
-    kEmbFuncEnBShiftMlcEn = 4
-    kEmbFuncEnBMaskMlcEn = 0b1 << kEmbFuncEnBShiftMlcEn
-    kEmbFuncEnBShiftFifoComprEn = 3
-    kEmbFuncEnBMaskFifoComprEn = 0b1 << kEmbFuncEnBShiftFifoComprEn
-    kEmbFuncEnBShiftFsmEn = 0
-    kEmbFuncEnBMaskFsmEn = 0b1 << kEmbFuncEnBShiftFsmEn
+    REG_EMB_FUNC_EN_B = 0x05
+    EMB_FUNC_EN_B_SHIFT_MLC_EN = 4
+    EMB_FUNC_EN_B_MASK_MLC_EN = 0b1 << EMB_FUNC_EN_B_SHIFT_MLC_EN
+    EMB_FUNC_EN_B_SHIFT_FIFO_COMPR_EN = 3
+    EMB_FUNC_EN_B_MASK_FIFO_COMPR_EN = 0b1 << EMB_FUNC_EN_B_SHIFT_FIFO_COMPR_EN
+    EMB_FUNC_EN_B_SHIFT_FSM_EN = 0
+    EMB_FUNC_EN_B_MASK_FSM_EN = 0b1 << EMB_FUNC_EN_B_SHIFT_FSM_EN
 
-    kRegEmbFuncOdrCfgC = 0x60
-    kEmbFuncOdrShiftMlcOdr = 2
-    kEmbFuncOdrMaskMlcOdr = 0b11 << kEmbFuncOdrShiftMlcOdr
+    REG_EMB_FUNC_ODR_CFG_C = 0x60
+    EMB_FUNC_ODR_SHIFT_MLC_ODR = 2
+    EMB_FUNC_ODR_MASK_MLC_ODR = 0b11 << EMB_FUNC_ODR_SHIFT_MLC_ODR
 
     # Fifo Registers
-    kRegFifoCtrl1 = 0x07
+    REG_FIFO_CTRL1 = 0x07
 
-    kRegFifoCtrl2 = 0x08
-    kFifoCtrl2ShiftStopOnWtm = 7
-    kFifoCtrl2MaskStopOnWtm = 0b1 << kFifoCtrl2ShiftStopOnWtm
-    kFifoCtrl2ShiftFifoComprRtEn = 6
-    kFifoCtrl2MaskFifoComprRtEn = 0b1 << kFifoCtrl2ShiftFifoComprRtEn
-    kFifoCtrl2ShiftOdrChgEn = 4
-    kFifoCtrl2MaskOdrChgEn = 0b1 << kFifoCtrl2ShiftOdrChgEn
-    kFifoCtrl2ShiftUncoptrRate = 1
-    kFifoCtrl2MaskUncoptrRate = 0b11 << kFifoCtrl2ShiftUncoptrRate
-    kFifoCtrl2ShiftWtm = 0
-    kFifoCtrl2MaskWtm = 0b1 << kFifoCtrl2ShiftWtm
+    REG_FIFO_CTRL2 = 0x08
+    FIFO_CTRL2_SHIFT_STOP_ON_WTM = 7
+    FIFO_CTRL2_MASK_STOP_ON_WTM = 0b1 << FIFO_CTRL2_SHIFT_STOP_ON_WTM
+    FIFO_CTRL2_SHIFT_FIFO_COMPR_RT_EN = 6
+    FIFO_CTRL2_MASK_FIFO_COMPR_RT_EN = 0b1 << FIFO_CTRL2_SHIFT_FIFO_COMPR_RT_EN
+    FIFO_CTRL2_SHIFT_ODR_CHG_EN = 4
+    FIFO_CTRL2_MASK_ODR_CHG_EN = 0b1 << FIFO_CTRL2_SHIFT_ODR_CHG_EN
+    FIFO_CTRL2_SHIFT_UNCOPTR_RATE = 1
+    FIFO_CTRL2_MASK_UNCOPTR_RATE = 0b11 << FIFO_CTRL2_SHIFT_UNCOPTR_RATE
+    FIFO_CTRL2_SHIFT_WTM = 0
+    FIFO_CTRL2_MASK_WTM = 0b1 << FIFO_CTRL2_SHIFT_WTM
 
-    kRegFifoCtrl3 = 0x09
-    kFifoCtrl3ShiftBdrGy = 4
-    kFifoCtrl3MaskBdrGy = 0b1111 << kFifoCtrl3ShiftBdrGy
-    kFifoCtrl3ShiftBdrXl = 0
-    kFifoCtrl3MaskBdrXl = 0b1111 << kFifoCtrl3ShiftBdrXl
+    REG_FIFO_CTRL3 = 0x09
+    FIFO_CTRL3_SHIFT_BDR_GY = 4
+    FIFO_CTRL3_MASK_BDR_GY = 0b1111 << FIFO_CTRL3_SHIFT_BDR_GY
+    FIFO_CTRL3_SHIFT_BDR_XL = 0
+    FIFO_CTRL3_MASK_BDR_XL = 0b1111 << FIFO_CTRL3_SHIFT_BDR_XL
 
-    kRegFifoCtrl4 = 0x0A
-    kFifoCtrl4ShiftOdrTsBatch = 6
-    kFifoCtrl4MaskOdrTsBatch = 0b11 << kFifoCtrl4ShiftOdrTsBatch
-    kFifoCtrl4ShiftOdrTBatch = 4
-    kFifoCtrl4MaskOdrTBatch = 0b11 << kFifoCtrl4ShiftOdrTBatch
-    kFifoCtrl4ShiftFifoMode = 0
-    kFifoCtrl4MaskFifoMode = 0b111 << kFifoCtrl4ShiftFifoMode
+    REG_FIFO_CTRL4 = 0x0A
+    FIFO_CTRL4_SHIFT_ODR_TS_BATCH = 6
+    FIFO_CTRL4_MASK_ODR_TS_BATCH = 0b11 << FIFO_CTRL4_SHIFT_ODR_TS_BATCH
+    FIFO_CTRL4_SHIFT_ODR_T_BATCH = 4
+    FIFO_CTRL4_MASK_ODR_T_BATCH = 0b11 << FIFO_CTRL4_SHIFT_ODR_T_BATCH
+    FIFO_CTRL4_SHIFT_FIFO_MODE = 0
+    FIFO_CTRL4_MASK_FIFO_MODE = 0b111 << FIFO_CTRL4_SHIFT_FIFO_MODE
 
 
     # Possible Fifo Modes
-    kBypassMode = 0
-    kFifoMode = 1
-    kStreamToFifoMode = 3
-    kBypassToStreamMode = 4
-    kStreamMode = 6
-    kBypassToFifoMode = 7
+    BYPASS_MODE = 0
+    FIFO_MODE = 1
+    STREAM_TO_FIFO_MODE = 3
+    BYPASS_TO_STREAM_MODE = 4
+    STREAM_MODE = 6
+    BYPASS_TO_FIFO_MODE = 7
 
     # Possible Accelerometer Batch Data Rates
-    kXlNotBatched = 0
-    kXlBatchedAt12Hz5 = 1
-    kXlBatchedAt26Hz = 2
-    kXlBatchedAt52Hz = 3
-    kXlBatchedAt104Hz = 4
-    kXlBatchedAt208Hz = 5
-    kXlBatchedAt417Hz = 6
-    kXlBatchedAt833Hz = 7
-    kXlBatchedAt1667Hz = 8
-    kXlBatchedAt3333Hz = 9
-    kXlBatchedAt6667Hz = 10
-    kXlBatchedAt6Hz5 = 11
+    XL_NOT_BATCHED = 0
+    XL_BATCHED_AT_12_5HZ = 1
+    XL_BATCHED_AT_26HZ = 2
+    XL_BATCHED_AT_52HZ = 3
+    XL_BATCHED_AT_104HZ = 4
+    XL_BATCHED_AT_208HZ = 5
+    XL_BATCHED_AT_417HZ = 6
+    XL_BATCHED_AT_833HZ = 7
+    XL_BATCHED_AT_1667HZ = 8
+    XL_BATCHED_AT_3333HZ = 9
+    XL_BATCHED_AT_6667HZ = 10
+    XL_BATCHED_AT_6_5HZ = 11
 
     # Possible Gyroscope Batch Data Rates
-    kGyroNotBatched = 0
-    kGyroBatchedAt12Hz5 = 1
-    kGyroBatchedAt26Hz = 2
-    kGyroBatchedAt52Hz = 3
-    kGyroBatchedAt104Hz = 4
-    kGyroBatchedAt208Hz = 5
-    kGyroBatchedAt417Hz = 6
-    kGyroBatchedAt833Hz = 7
-    kGyroBatchedAt1667Hz = 8
-    kGyroBatchedAt3333Hz = 9
-    kGyroBatchedAt6667Hz = 10
-    kGyroBatchedAt6Hz5 = 11
+    GYRO_NOT_BATCHED = 0
+    GYRO_BATCHED_AT_12_5HZ = 1
+    GYRO_BATCHED_AT_26HZ = 2
+    GYRO_BATCHED_AT_52HZ = 3
+    GYRO_BATCHED_AT_104HZ = 4
+    GYRO_BATCHED_AT_208HZ = 5
+    GYRO_BATCHED_AT_417HZ = 6
+    GYRO_BATCHED_AT_833HZ = 7
+    GYRO_BATCHED_AT_1667HZ = 8
+    GYRO_BATCHED_AT_3333HZ = 9
+    GYRO_BATCHED_AT_6667HZ = 10
+    GYRO_BATCHED_AT_6_5HZ = 11
 
     # Possible Decimation Rates
-    kNoDecimation = 0
-    kDec1 = 1
-    kDec8 = 2
-    kDec32 = 3
+    NO_DECIMATION = 0
+    DEC1 = 1
+    DEC8 = 2
+    DEC32 = 3
 
     # Possible Interrupt Events
-    kAllIntPulsed = 0
-    kBaseLatchedEmbPulsed = 1
-    kBasePulsedEmbLatched = 2
-    kAllIntLatched = 3
+    ALL_INT_PULSED = 0
+    BASE_LATCHED_EMB_PULSED = 1
+    BASE_PULSED_EMB_LATCHED = 2
+    ALL_INT_LATCHED = 3
 
     # Interrupt configuration
-    kRegTapCfg0 = 0x56
-    kTapCfg0ShiftIntClrOnRead = 6
-    kTapCfg0MaskIntClrOnRead = 0b1 << kTapCfg0ShiftIntClrOnRead
-    kTapCfg0ShiftSleepStatusOnInt = 5
-    kTapCfg0MaskSleepStatusOnInt = 0b1 << kTapCfg0ShiftSleepStatusOnInt
-    kTapCfg0ShiftSlopeFds = 4
-    kTapCfg0MaskSlopeFds = 0b1 << kTapCfg0ShiftSlopeFds
-    kTapCfg0ShiftTapXEn = 3
-    kTapCfg0MaskTapXEn = 0b1 << kTapCfg0ShiftTapXEn
-    kTapCfg0ShiftTapYEn = 2
-    kTapCfg0MaskTapYEn = 0b1 << kTapCfg0ShiftTapYEn
-    kTapCfg0ShiftTapZEn = 1
-    kTapCfg0MaskTapZEn = 0b1 << kTapCfg0ShiftTapZEn
-    kTapCfg0ShiftLir = 0
-    kTapCfg0MaskLir = 0b1 << kTapCfg0ShiftLir
+    REG_TAP_CFG0 = 0x56
+    TAP_CFG0_SHIFT_INT_CLR_ON_READ = 6
+    TAP_CFG0_MASK_INT_CLR_ON_READ = 0b1 << TAP_CFG0_SHIFT_INT_CLR_ON_READ
+    TAP_CFG0_SHIFT_SLEEP_STATUS_ON_INT = 5
+    TAP_CFG0_MASK_SLEEP_STATUS_ON_INT = 0b1 << TAP_CFG0_SHIFT_SLEEP_STATUS_ON_INT
+    TAP_CFG0_SHIFT_SLOPE_FDS = 4
+    TAP_CFG0_MASK_SLOPE_FDS = 0b1 << TAP_CFG0_SHIFT_SLOPE_FDS
+    TAP_CFG0_SHIFT_TAP_X_EN = 3
+    TAP_CFG0_MASK_TAP_X_EN = 0b1 << TAP_CFG0_SHIFT_TAP_X_EN
+    TAP_CFG0_SHIFT_TAP_Y_EN = 2
+    TAP_CFG0_MASK_TAP_Y_EN = 0b1 << TAP_CFG0_SHIFT_TAP_Y_EN
+    TAP_CFG0_SHIFT_TAP_Z_EN = 1
+    TAP_CFG0_MASK_TAP_Z_EN = 0b1 << TAP_CFG0_SHIFT_TAP_Z_EN
+    TAP_CFG0_SHIFT_LIR = 0
+    TAP_CFG0_MASK_LIR = 0b1 << TAP_CFG0_SHIFT_LIR
 
-    kRegTapCfg2 = 0x58
-    kTapCfg2ShiftInterruptsEnable = 7
-    kTapCfg2MaskInterruptsEnable = 0b1 << kTapCfg2ShiftInterruptsEnable
-    kTapCfg2ShiftInactEn = 5
-    kTapCfg2MaskInactEn = 0b11 << kTapCfg2ShiftInactEn
-    kTapCfg2ShiftTapThsY = 0
-    kTapCfg2MaskTapThsY = 0b11111 << kTapCfg2ShiftTapThsY
+    REG_TAP_CFG2 = 0x58
+    TAP_CFG2_SHIFT_INTERRUPTS_ENABLE = 7
+    TAP_CFG2_MASK_INTERRUPTS_ENABLE = 0b1 << TAP_CFG2_SHIFT_INTERRUPTS_ENABLE
+    TAP_CFG2_SHIFT_INACT_EN = 5
+    TAP_CFG2_MASK_INACT_EN = 0b11 << TAP_CFG2_SHIFT_INACT_EN
+    TAP_CFG2_SHIFT_TAP_THS_Y = 0
+    TAP_CFG2_MASK_TAP_THS_Y = 0b11111 << TAP_CFG2_SHIFT_TAP_THS_Y
 
-    kRegPageRw = 0x17
-    kPageRwShiftEmbFuncLir = 7
-    kPageRwMaskEmbFuncLir = 0b1 << kPageRwShiftEmbFuncLir
-    kPageRwShiftPageRw = 5
-    kPageRwMaskPageRw = 0b11 << kPageRwShiftPageRw
+    REG_PAGE_RW = 0x17
+    PAGE_RW_SHIFT_EMB_FUNC_LIR = 7
+    PAGE_RW_MASK_EMB_FUNC_LIR = 0b1 << PAGE_RW_SHIFT_EMB_FUNC_LIR
+    PAGE_RW_SHIFT_PAGE_RW = 5
+    PAGE_RW_MASK_PAGE_RW = 0b11 << PAGE_RW_SHIFT_PAGE_RW
 
-    kRegMlcInt1 = 0x0D
+    REG_MLC_INT1 = 0x0D
 
-    kRegEmbFuncInt1 = 0x0A
-    kEmbFuncInt1ShiftFsmLc = 7
-    kEmbFuncInt1MaskFsmLc = 0b1 << kEmbFuncInt1ShiftFsmLc
-    kEmbFuncInt1ShiftSigMot = 5
-    kEmbFuncInt1MaskSigMot = 0b1 << kEmbFuncInt1ShiftSigMot
-    kEmbFuncInt1ShiftTilt = 4
-    kEmbFuncInt1MaskTilt = 0b1 << kEmbFuncInt1ShiftTilt
-    kEmbFuncInt1ShiftStepDetector = 3
-    kEmbFuncInt1MaskStepDetector = 0b1 << kEmbFuncInt1ShiftStepDetector
+    REG_EMB_FUNC_INT1 = 0x0A
+    EMB_FUNC_INT1_SHIFT_FSM_LC = 7
+    EMB_FUNC_INT1_MASK_FSM_LC = 0b1 << EMB_FUNC_INT1_SHIFT_FSM_LC
+    EMB_FUNC_INT1_SHIFT_SIG_MOT = 5
+    EMB_FUNC_INT1_MASK_SIG_MOT = 0b1 << EMB_FUNC_INT1_SHIFT_SIG_MOT
+    EMB_FUNC_INT1_SHIFT_TILT = 4
+    EMB_FUNC_INT1_MASK_TILT = 0b1 << EMB_FUNC_INT1_SHIFT_TILT
+    EMB_FUNC_INT1_SHIFT_STEP_DETECTOR = 3
+    EMB_FUNC_INT1_MASK_STEP_DETECTOR = 0b1 << EMB_FUNC_INT1_SHIFT_STEP_DETECTOR
     
-    kRegFsmEnableA = 0x46
-    kRegFsmEnableB = 0x47
+    REG_FSM_ENABLE_A = 0x46
+    REG_FSM_ENABLE_B = 0x47
 
-    kRegFsmInt1A = 0x0B
-    kRegFsmInt1B = 0x0C
+    REG_FSM_INT1_A = 0x0B
+    REG_FSM_INT1_B = 0x0C
 
-    kRegInt1Ctrl = 0x0D
-    kInt1CtrlShiftDenDrdyFlag = 7
-    kInt1CtrlMaskDenDrdyFlag = 0b1 << kInt1CtrlShiftDenDrdyFlag
-    kInt1CtrlShiftInt1CntBdr = 6
-    kInt1CtrlMaskInt1CntBdr = 0b1 << kInt1CtrlShiftInt1CntBdr
-    kInt1CtrlShiftInt1FifoFull = 5
-    kInt1CtrlMaskInt1FifoFull = 0b1 << kInt1CtrlShiftInt1FifoFull
-    kInt1CtrlShiftInt1FifoOvr = 4
-    kInt1CtrlMaskInt1FifoOvr = 0b1 << kInt1CtrlShiftInt1FifoOvr
-    kInt1CtrlShiftInt1FifoTh = 3
-    kInt1CtrlMaskInt1FifoTh = 0b1 << kInt1CtrlShiftInt1FifoTh
-    kInt1CtrlShiftInt1Boot = 2
-    kInt1CtrlMaskInt1Boot = 0b1 << kInt1CtrlShiftInt1Boot
-    kInt1CtrlShiftInt1DrdyG = 1
-    kInt1CtrlMaskInt1DrdyG = 0b1 << kInt1CtrlShiftInt1DrdyG
-    kInt1CtrlShiftInt1DrdyXl = 0
-    kInt1CtrlMaskInt1DrdyXl = 0b1 << kInt1CtrlShiftInt1DrdyXl
+    REG_INT1_CTRL = 0x0D
+    INT1_CTRL_SHIFT_DEN_DRDY_FLAG = 7
+    INT1_CTRL_MASK_DEN_DRDY_FLAG = 0b1 << INT1_CTRL_SHIFT_DEN_DRDY_FLAG
+    INT1_CTRL_SHIFT_INT1_CNT_BDR = 6
+    INT1_CTRL_MASK_INT1_CNT_BDR = 0b1 << INT1_CTRL_SHIFT_INT1_CNT_BDR
+    INT1_CTRL_SHIFT_INT1_FIFO_FULL = 5
+    INT1_CTRL_MASK_INT1_FIFO_FULL = 0b1 << INT1_CTRL_SHIFT_INT1_FIFO_FULL
+    INT1_CTRL_SHIFT_INT1_FIFO_OVR = 4
+    INT1_CTRL_MASK_INT1_FIFO_OVR = 0b1 << INT1_CTRL_SHIFT_INT1_FIFO_OVR
+    INT1_CTRL_SHIFT_INT1_FIFO_TH = 3
+    INT1_CTRL_MASK_INT1_FIFO_TH = 0b1 << INT1_CTRL_SHIFT_INT1_FIFO_TH
+    INT1_CTRL_SHIFT_INT1_BOOT = 2
+    INT1_CTRL_MASK_INT1_BOOT = 0b1 << INT1_CTRL_SHIFT_INT1_BOOT
+    INT1_CTRL_SHIFT_INT1_DRDY_G = 1
+    INT1_CTRL_MASK_INT1_DRDY_G = 0b1 << INT1_CTRL_SHIFT_INT1_DRDY_G
+    INT1_CTRL_SHIFT_INT1_DRDY_XL = 0
+    INT1_CTRL_MASK_INT1_DRDY_XL = 0b1 << INT1_CTRL_SHIFT_INT1_DRDY_XL
 
-    kRegMd1Cfg = 0x5E
-    kMd1CfgShiftInt1SleepChange = 7
-    kMd1CfgMaskInt1SleepChange = 0b1 << kMd1CfgShiftInt1SleepChange
-    kMd1CfgShiftInt1SingleTap = 6
-    kMd1CfgMaskInt1SingleTap = 0b1 << kMd1CfgShiftInt1SingleTap
-    kMd1CfgShiftInt1Wu = 5
-    kMd1CfgMaskInt1Wu = 0b1 << kMd1CfgShiftInt1Wu
-    kMd1CfgShiftInt1Ff = 4
-    kMd1CfgMaskInt1Ff = 0b1 << kMd1CfgShiftInt1Ff
-    kMd1CfgShiftInt1DoubleTap = 3
-    kMd1CfgMaskInt1DoubleTap = 0b1 << kMd1CfgShiftInt1DoubleTap
-    kMd1CfgShiftInt16d = 2
-    kMd1CfgMaskInt16d = 0b1 << kMd1CfgShiftInt16d
-    kMd1CfgShiftInt1EmbFunc = 1
-    kMd1CfgMaskInt1EmbFunc = 0b1 << kMd1CfgShiftInt1EmbFunc
-    kMd1CfgShiftInt1Shub = 0
-    kMd1CfgMaskInt1Shub = 0b1 << kMd1CfgShiftInt1Shub
+    REG_MD1_CFG = 0x5E
+    MD1_CFG_SHIFT_INT1_SLEEP_CHANGE = 7
+    MD1_CFG_MASK_INT1_SLEEP_CHANGE = 0b1 << MD1_CFG_SHIFT_INT1_SLEEP_CHANGE
+    MD1_CFG_SHIFT_INT1_SINGLE_TAP = 6
+    MD1_CFG_MASK_INT1_SINGLE_TAP = 0b1 << MD1_CFG_SHIFT_INT1_SINGLE_TAP
+    MD1_CFG_SHIFT_INT1_WU = 5
+    MD1_CFG_MASK_INT1_WU = 0b1 << MD1_CFG_SHIFT_INT1_WU
+    MD1_CFG_SHIFT_INT1_FF = 4
+    MD1_CFG_MASK_INT1_FF = 0b1 << MD1_CFG_SHIFT_INT1_FF
+    MD1_CFG_SHIFT_INT1_DOUBLE_TAP = 3
+    MD1_CFG_MASK_INT1_DOUBLE_TAP = 0b1 << MD1_CFG_SHIFT_INT1_DOUBLE_TAP
+    MD1_CFG_SHIFT_INT1_6D = 2
+    MD1_CFG_MASK_INT1_6D = 0b1 << MD1_CFG_SHIFT_INT1_6D
+    MD1_CFG_SHIFT_INT1_EMB_FUNC = 1
+    MD1_CFG_MASK_INT1_EMB_FUNC = 0b1 << MD1_CFG_SHIFT_INT1_EMB_FUNC
+    MD1_CFG_SHIFT_INT1_SHUB = 0
+    MD1_CFG_MASK_INT1_SHUB = 0b1 << MD1_CFG_SHIFT_INT1_SHUB
 
-    kRegEmbFunInt2 = 0x0E
-    kEmbFuncInt2ShiftFsmLc = 7
-    kEmbFuncInt2MaskFsmLc = 0b1 << kEmbFuncInt2ShiftFsmLc
-    kEmbFuncInt2ShiftSigMot = 5
-    kEmbFuncInt2MaskSigMot = 0b1 << kEmbFuncInt2ShiftSigMot
-    kEmbFuncInt2ShiftTilt = 4
-    kEmbFuncInt2MaskTilt = 0b1 << kEmbFuncInt2ShiftTilt
-    kEmbFuncInt2ShiftStepDetector = 3
-    kEmbFuncInt2MaskStepDetector = 0b1 << kEmbFuncInt2ShiftStepDetector
+    REG_EMB_FUN_INT2 = 0x0E
+    EMB_FUNC_INT2_SHIFT_FSM_LC = 7
+    EMB_FUNC_INT2_MASK_FSM_LC = 0b1 << EMB_FUNC_INT2_SHIFT_FSM_LC
+    EMB_FUNC_INT2_SHIFT_SIG_MOT = 5
+    EMB_FUNC_INT2_MASK_SIG_MOT = 0b1 << EMB_FUNC_INT2_SHIFT_SIG_MOT
+    EMB_FUNC_INT2_SHIFT_TILT = 4
+    EMB_FUNC_INT2_MASK_TILT = 0b1 << EMB_FUNC_INT2_SHIFT_TILT
+    EMB_FUNC_INT2_SHIFT_STEP_DETECTOR = 3
+    EMB_FUNC_INT2_MASK_STEP_DETECTOR = 0b1 << EMB_FUNC_INT2_SHIFT_STEP_DETECTOR
 
-    kRegFsmInt2A = 0x0F
-    kRegFsmInt2B = 0x10
-    kRegMlcInt2 = 0x11
+    REG_FSM_INT2_A = 0x0F
+    REG_FSM_INT2_B = 0x10
+    REG_MLC_INT2 = 0x11
 
-    kRegInt2Ctrl = 0x0E
-    kInt2CtrlShiftInt2CntBdr = 6
-    kInt2CtrlMaskInt2CntBdr = 0b1 << kInt2CtrlShiftInt2CntBdr
-    kInt2CtrlShiftInt2FifoFull = 5
-    kInt2CtrlMaskInt2FifoFull = 0b1 << kInt2CtrlShiftInt2FifoFull
-    kInt2CtrlShiftInt2FifoOvr = 4
-    kInt2CtrlMaskInt2FifoOvr = 0b1 << kInt2CtrlShiftInt2FifoOvr
-    kInt2CtrlShiftInt2FifoTh = 3
-    kInt2CtrlMaskInt2FifoTh = 0b1 << kInt2CtrlShiftInt2FifoTh
-    kInt2CtrlShiftInt2DrdyTemp = 2
-    kInt2CtrlMaskInt2DrdyTemp = 0b1 << kInt2CtrlShiftInt2DrdyTemp
-    kInt2CtrlShiftInt2DrdyG = 1
-    kInt2CtrlMaskInt2DrdyG = 0b1 << kInt2CtrlShiftInt2DrdyG
-    kInt2CtrlShiftInt2DrdyXl = 0
-    kInt2CtrlMaskInt2DrdyXl = 0b1 << kInt2CtrlShiftInt2DrdyXl
+    REG_INT2_CTRL = 0x0E
+    INT2_CTRL_SHIFT_INT2_CNT_BDR = 6
+    INT2_CTRL_MASK_INT2_CNT_BDR = 0b1 << INT2_CTRL_SHIFT_INT2_CNT_BDR
+    INT2_CTRL_SHIFT_INT2_FIFO_FULL = 5
+    INT2_CTRL_MASK_INT2_FIFO_FULL = 0b1 << INT2_CTRL_SHIFT_INT2_FIFO_FULL
+    INT2_CTRL_SHIFT_INT2_FIFO_OVR = 4
+    INT2_CTRL_MASK_INT2_FIFO_OVR = 0b1 << INT2_CTRL_SHIFT_INT2_FIFO_OVR
+    INT2_CTRL_SHIFT_INT2_FIFO_TH = 3
+    INT2_CTRL_MASK_INT2_FIFO_TH = 0b1 << INT2_CTRL_SHIFT_INT2_FIFO_TH
+    INT2_CTRL_SHIFT_INT2_DRDY_TEMP = 2
+    INT2_CTRL_MASK_INT2_DRDY_TEMP = 0b1 << INT2_CTRL_SHIFT_INT2_DRDY_TEMP
+    INT2_CTRL_SHIFT_INT2_DRDY_G = 1
+    INT2_CTRL_MASK_INT2_DRDY_G = 0b1 << INT2_CTRL_SHIFT_INT2_DRDY_G
+    INT2_CTRL_SHIFT_INT2_DRDY_XL = 0
+    INT2_CTRL_MASK_INT2_DRDY_XL = 0b1 << INT2_CTRL_SHIFT_INT2_DRDY_XL
 
-    kRegMd2Cfg = 0x5F
-    kMd2CfgShiftInt2SleepChange = 7
-    kMd2CfgMaskInt2SleepChange = 0b1 << kMd2CfgShiftInt2SleepChange
-    kMd2CfgShiftInt2SingleTap = 6
-    kMd2CfgMaskInt2SingleTap = 0b1 << kMd2CfgShiftInt2SingleTap
-    kMd2CfgShiftInt2Wu = 5
-    kMd2CfgMaskInt2Wu = 0b1 << kMd2CfgShiftInt2Wu
-    kMd2CfgShiftInt2Ff = 4
-    kMd2CfgMaskInt2Ff = 0b1 << kMd2CfgShiftInt2Ff
-    kMd2CfgShiftInt2DoubleTap = 3
-    kMd2CfgMaskInt2DoubleTap = 0b1 << kMd2CfgShiftInt2DoubleTap
-    kMd2CfgShiftInt26d = 2
-    kMd2CfgMaskInt26d = 0b1 << kMd2CfgShiftInt26d
-    kMd2CfgShiftInt2EmbFunc = 1
-    kMd2CfgMaskInt2EmbFunc = 0b1 << kMd2CfgShiftInt2EmbFunc
-    kMd2CfgShiftInt2Timestamp = 0
-    kMd2CfgMaskInt2Timestamp = 0b1 << kMd2CfgShiftInt2Timestamp
+    REG_MD2_CFG = 0x5F
+    MD2_CFG_SHIFT_INT2_SLEEP_CHANGE = 7
+    MD2_CFG_MASK_INT2_SLEEP_CHANGE = 0b1 << MD2_CFG_SHIFT_INT2_SLEEP_CHANGE
+    MD2_CFG_SHIFT_INT2_SINGLE_TAP = 6
+    MD2_CFG_MASK_INT2_SINGLE_TAP = 0b1 << MD2_CFG_SHIFT_INT2_SINGLE_TAP
+    MD2_CFG_SHIFT_INT2_WU = 5
+    MD2_CFG_MASK_INT2_WU = 0b1 << MD2_CFG_SHIFT_INT2_WU
+    MD2_CFG_SHIFT_INT2_FF = 4
+    MD2_CFG_MASK_INT2_FF = 0b1 << MD2_CFG_SHIFT_INT2_FF
+    MD2_CFG_SHIFT_INT2_DOUBLE_TAP = 3
+    MD2_CFG_MASK_INT2_DOUBLE_TAP = 0b1 << MD2_CFG_SHIFT_INT2_DOUBLE_TAP
+    MD2_CFG_SHIFT_INT2_6D = 2
+    MD2_CFG_MASK_INT2_6D = 0b1 << MD2_CFG_SHIFT_INT2_6D
+    MD2_CFG_SHIFT_INT2_EMB_FUNC = 1
+    MD2_CFG_MASK_INT2_EMB_FUNC = 0b1 << MD2_CFG_SHIFT_INT2_EMB_FUNC
+    MD2_CFG_SHIFT_INT2_TIMESTAMP = 0
+    MD2_CFG_MASK_INT2_TIMESTAMP = 0b1 << MD2_CFG_SHIFT_INT2_TIMESTAMP
 
-    kRegSlv0Config = 0x17
-    kSlv0ConfigShiftShubOdr = 6
-    kSlv0ConfigMaskShubOdr = 0b11 << kSlv0ConfigShiftShubOdr
-    kSlv0ConfigShiftBatchExtSens0En = 3
-    kSlv0ConfigMaskBatchExtSens0En = 0b1 << kSlv0ConfigShiftBatchExtSens0En
-    kSlv0ConfigShiftSlave0Numop = 0
-    kSlv0ConfigMaskSlave0Numop = 0b111 << kSlv0ConfigShiftSlave0Numop
+    REG_SLV0_CONFIG = 0x17
+    SLV0_CONFIG_SHIFT_SHUB_ODR = 6
+    SLV0_CONFIG_MASK_SHUB_ODR = 0b11 << SLV0_CONFIG_SHIFT_SHUB_ODR
+    SLV0_CONFIG_SHIFT_BATCH_EXT_SENS0_EN = 3
+    SLV0_CONFIG_MASK_BATCH_EXT_SENS0_EN = 0b1 << SLV0_CONFIG_SHIFT_BATCH_EXT_SENS0_EN
+    SLV0_CONFIG_SHIFT_SLAVE0_NUMOP = 0
+    SLV0_CONFIG_MASK_SLAVE0_NUMOP = 0b111 << SLV0_CONFIG_SHIFT_SLAVE0_NUMOP
 
     # Data Ready Pulse modes
-    kDrdyLatched = 0
-    kDrdyPulsed = 1
+    DRDY_LATCHED = 0
+    DRDY_PULSED = 1
 
-    kRegCntrBdr1 = 0x0B
-    kCntrBdr1ShiftDatareadyPulsed = 7
-    kCntrBdr1MaskDatareadyPulsed = 0b1 << kCntrBdr1ShiftDatareadyPulsed
-    kCntrBdr1ShiftRstCounterBdr = 6
-    kCntrBdr1MaskRstCounterBdr = 0b1 << kCntrBdr1ShiftRstCounterBdr
-    kCntrBdr1ShiftTrigCounterBdr = 5
-    kCntrBdr1MaskTrigCounterBdr = 0b1 << kCntrBdr1ShiftTrigCounterBdr
-    kCntrBdr1ShiftCntBdrTh = 0
-    kCntrBdr1MaskCntBdrTh = 0b111 << kCntrBdr1ShiftCntBdrTh
+    REG_CNTR_BDR1 = 0x0B
+    CNTR_BDR1_SHIFT_DATAREADY_PULSED = 7
+    CNTR_BDR1_MASK_DATAREADY_PULSED = 0b1 << CNTR_BDR1_SHIFT_DATAREADY_PULSED
+    CNTR_BDR1_SHIFT_RST_COUNTER_BDR = 6
+    CNTR_BDR1_MASK_RST_COUNTER_BDR = 0b1 << CNTR_BDR1_SHIFT_RST_COUNTER_BDR
+    CNTR_BDR1_SHIFT_TRIG_COUNTER_BDR = 5
+    CNTR_BDR1_MASK_TRIG_COUNTER_BDR = 0b1 << CNTR_BDR1_SHIFT_TRIG_COUNTER_BDR
+    CNTR_BDR1_SHIFT_CNT_BDR_TH = 0
+    CNTR_BDR1_MASK_CNT_BDR_TH = 0b111 << CNTR_BDR1_SHIFT_CNT_BDR_TH
 
     # Sensor Hub registers
-    kRegDatawriteSlv0 = 0x21
-    kRegSlv0Subadd = 0x16
-    kRegSlv0Add = 0x15
-    kSlv0AddShiftSlave0 = 1
-    kSlv0AddMaskSlave0 = 0x7F << kSlv0AddShiftSlave0
-    kSlv0AddShiftRw0 = 0
-    kSlv0AddMaskRw0 = 0b1 << kSlv0AddShiftRw0
+    REG_DATAWRITE_SLV0 = 0x21
+    REG_SLV0_SUBADD = 0x16
+    REG_SLV0_ADD = 0x15
+    SLV0_ADD_SHIFT_SLAVE0 = 1
+    SLV0_ADD_MASK_SLAVE0 = 0x7F << SLV0_ADD_SHIFT_SLAVE0
+    SLV0_ADD_SHIFT_RW0 = 0
+    SLV0_ADD_MASK_RW0 = 0b1 << SLV0_ADD_SHIFT_RW0
     
-    kRegSlv1Subadd = 0x19
-    kRegSlv1Add = 0x18
-    kSlv1AddShiftSlave1 = 1
-    kSlv1AddMaskSlave1 = 0x7F << kSlv1AddShiftSlave1
-    kSlv1AddShiftR1 = 0
+    REG_SLV1_SUBADD = 0x19
+    REG_SLV1_ADD = 0x18
+    SLV1_ADD_SHIFT_SLAVE1 = 1
+    SLV1_ADD_MASK_SLAVE1 = 0x7F << SLV1_ADD_SHIFT_SLAVE1
+    SLV1_ADD_SHIFT_R1 = 0
 
-    kRegslv1Config = 0x1A
-    kSlv1ConfigShiftBatchExtSens1En = 3
-    kSlv1ConfigMaskBatchExtSens1En = 0b1 << kSlv1ConfigShiftBatchExtSens1En
-    kSlv1ConfigShiftSlave1Numop = 0
-    kSlv1ConfigMaskSlave1Numop = 0b111 << kSlv1ConfigShiftSlave1Numop
+    REG_SLV1_CONFIG = 0x1A
+    SLV1_CONFIG_SHIFT_BATCH_EXT_SENS1_EN = 3
+    SLV1_CONFIG_MASK_BATCH_EXT_SENS1_EN = 0b1 << SLV1_CONFIG_SHIFT_BATCH_EXT_SENS1_EN
+    SLV1_CONFIG_SHIFT_SLAVE1_NUMOP = 0
+    SLV1_CONFIG_MASK_SLAVE1_NUMOP = 0b111 << SLV1_CONFIG_SHIFT_SLAVE1_NUMOP
 
-    kRegSlv2Subadd = 0x1C
-    kRegSlv2Add = 0x1B
+    REG_SLV2_SUBADD = 0x1C
+    REG_SLV2_ADD = 0x1B
 
-    kRegSlv2Config = 0x1D
-    kSlv2ConfigShiftBatchExtSens2En = 3
-    kSlv2ConfigMaskBatchExtSens2En = 0b1 << kSlv2ConfigShiftBatchExtSens2En
-    kSlv2ConfigShiftSlave2Numop = 0
-    kSlv2ConfigMaskSlave2Numop = 0b111 << kSlv2ConfigShiftSlave2Numop
+    REG_SLV2_CONFIG = 0x1D
+    SLV2_CONFIG_SHIFT_BATCH_EXT_SENS2_EN = 3
+    SLV2_CONFIG_MASK_BATCH_EXT_SENS2_EN = 0b1 << SLV2_CONFIG_SHIFT_BATCH_EXT_SENS2_EN
+    SLV2_CONFIG_SHIFT_SLAVE2_NUMOP = 0
+    SLV2_CONFIG_MASK_SLAVE2_NUMOP = 0b111 << SLV2_CONFIG_SHIFT_SLAVE2_NUMOP
 
-    kRegSlv3Subadd = 0x1F
-    kRegSlv3Add = 0x1E
+    REG_SLV3_SUBADD = 0x1F
+    REG_SLV3_ADD = 0x1E
 
-    kRegSlv3Config = 0x20
-    kSlv3ConfigShiftBatchExtSens3En = 3
-    kSlv3ConfigMaskBatchExtSens3En = 0b1 << kSlv3ConfigShiftBatchExtSens3En
-    kSlv3ConfigShiftSlave3Numop = 0
-    kSlv3ConfigMaskSlave3Numop = 0b111 << kSlv3ConfigShiftSlave3Numop
+    REG_SLV3_CONFIG = 0x20
+    SLV3_CONFIG_SHIFT_BATCH_EXT_SENS3_EN = 3
+    SLV3_CONFIG_MASK_BATCH_EXT_SENS3_EN = 0b1 << SLV3_CONFIG_SHIFT_BATCH_EXT_SENS3_EN
+    SLV3_CONFIG_SHIFT_SLAVE3_NUMOP = 0
+    SLV3_CONFIG_MASK_SLAVE3_NUMOP = 0b111 << SLV3_CONFIG_SHIFT_SLAVE3_NUMOP
     
-    kRegMasterConfig = 0x14
-    kMasterConfigShiftRstMasterRegs = 7
-    kMasterConfigMaskRstMasterRegs = 0b1 << kMasterConfigShiftRstMasterRegs
-    kMasterConfigShiftWriteOnce = 6
-    kMasterConfigMaskWriteOnce = 0b1 << kMasterConfigShiftWriteOnce
-    kMasterConfigShiftStartConfig = 5
-    kMasterConfigMaskStartConfig = 0b1 << kMasterConfigShiftStartConfig
-    kMasterConfigShiftPassThroughMode = 4
-    kMasterConfigMaskPassThroughMode = 0b1 << kMasterConfigShiftPassThroughMode
-    kMasterConfigShiftShubPuEn = 3
-    kMasterConfigMaskShubPuEn = 0b1 << kMasterConfigShiftShubPuEn
-    kMasterConfigShiftMasterOn = 2
-    kMasterConfigMaskMasterOn = 0b1 << kMasterConfigShiftMasterOn
-    kMasterConfigShiftAuxSensOn = 0
-    kMasterConfigMaskAuxSensOn = 0b11 << kMasterConfigShiftAuxSensOn
+    REG_MASTER_CONFIG = 0x14
+    MASTER_CONFIG_SHIFT_RST_MASTER_REGS = 7
+    MASTER_CONFIG_MASK_RST_MASTER_REGS = 0b1 << MASTER_CONFIG_SHIFT_RST_MASTER_REGS
+    MASTER_CONFIG_SHIFT_WRITE_ONCE = 6
+    MASTER_CONFIG_MASK_WRITE_ONCE = 0b1 << MASTER_CONFIG_SHIFT_WRITE_ONCE
+    MASTER_CONFIG_SHIFT_START_CONFIG = 5
+    MASTER_CONFIG_MASK_START_CONFIG = 0b1 << MASTER_CONFIG_SHIFT_START_CONFIG
+    MASTER_CONFIG_SHIFT_PASS_THROUGH_MODE = 4
+    MASTER_CONFIG_MASK_PASS_THROUGH_MODE = 0b1 << MASTER_CONFIG_SHIFT_PASS_THROUGH_MODE
+    MASTER_CONFIG_SHIFT_SHUB_PU_EN = 3
+    MASTER_CONFIG_MASK_SHUB_PU_EN = 0b1 << MASTER_CONFIG_SHIFT_SHUB_PU_EN
+    MASTER_CONFIG_SHIFT_MASTER_ON = 2
+    MASTER_CONFIG_MASK_MASTER_ON = 0b1 << MASTER_CONFIG_SHIFT_MASTER_ON
+    MASTER_CONFIG_SHIFT_AUX_SENS_ON = 0
+    MASTER_CONFIG_MASK_AUX_SENS_ON = 0b11 << MASTER_CONFIG_SHIFT_AUX_SENS_ON
 
-    kRegSensorHub1 = 0x02
-    kRegStatusMaster = 0x22
+    REG_SENSOR_HUB1 = 0x02
+    REG_STATUS_MASTER = 0x22
 
-    kStatusMasterShiftWrOnceDone = 7
-    kStatusMasterMaskWrOnceDone = 0b1 << kStatusMasterShiftWrOnceDone
-    kStatusMasterShiftSlave3Nack = 6
-    kStatusMasterMaskSlave3Nack = 0b1 << kStatusMasterShiftSlave3Nack
-    kStatusMasterShiftSlave2Nack = 5
-    kStatusMasterMaskSlave2Nack = 0b1 << kStatusMasterShiftSlave2Nack
-    kStatusMasterShiftSlave1Nack = 4
-    kStatusMasterMaskSlave1Nack = 0b1 << kStatusMasterShiftSlave1Nack
-    kStatusMasterShiftSlave0Nack = 3
-    kStatusMasterMaskSlave0Nack = 0b1 << kStatusMasterShiftSlave0Nack
-    kStatusMasterShiftSensHubEndop = 0
-    kStatusMasterMaskSensHubEndop = 0b1 << kStatusMasterShiftSensHubEndop
+    STATUS_MASTER_SHIFT_WR_ONCE_DONE = 7
+    STATUS_MASTER_MASK_WR_ONCE_DONE = 0b1 << STATUS_MASTER_SHIFT_WR_ONCE_DONE
+    STATUS_MASTER_SHIFT_SLAVE3_NACK = 6
+    STATUS_MASTER_MASK_SLAVE3_NACK = 0b1 << STATUS_MASTER_SHIFT_SLAVE3_NACK
+    STATUS_MASTER_SHIFT_SLAVE2_NACK = 5
+    STATUS_MASTER_MASK_SLAVE2_NACK = 0b1 << STATUS_MASTER_SHIFT_SLAVE2_NACK
+    STATUS_MASTER_SHIFT_SLAVE1_NACK = 4
+    STATUS_MASTER_MASK_SLAVE1_NACK = 0b1 << STATUS_MASTER_SHIFT_SLAVE1_NACK
+    STATUS_MASTER_SHIFT_SLAVE0_NACK = 3
+    STATUS_MASTER_MASK_SLAVE0_NACK = 0b1 << STATUS_MASTER_SHIFT_SLAVE0_NACK
+    STATUS_MASTER_SHIFT_SENS_HUB_ENDOP = 0
+    STATUS_MASTER_MASK_SENS_HUB_ENDOP = 0b1 << STATUS_MASTER_SHIFT_SENS_HUB_ENDOP
 
-    kHubWriteModeCycle = 0 # Write each cycle
-    kHubWriteModeSingle = 1 # Write once
+    HUB_WRITE_MODE_CYCLE = 0 # Write each cycle
+    HUB_WRITE_MODE_SINGLE = 1 # Write once
 
-    kSelfTestDisable = 0
-    kSelfTestPositive = 1
-    kSelfTestNegative = 2
+    SELF_TEST_DISABLE = 0
+    SELF_TEST_POSITIVE = 1
+    SELF_TEST_NEGATIVE = 2
 
-    kRegCtrl5C = 0x14
-    kCtrl5CShiftRounding = 5
-    kCtrl5CMaskRounding = 0b11 << kCtrl5CShiftRounding
-    kCtrl5CShiftStG = 2
-    kCtrl5CMaskStG = 0b11 << kCtrl5CShiftStG
-    kCtrl5CShiftStXl = 0
-    kCtrl5CMaskStXl = 0b11 << kCtrl5CShiftStXl
+    REG_CTRL5_C = 0x14
+    CTRL5_C_SHIFT_ROUNDING = 5
+    CTRL5_C_MASK_ROUNDING = 0b11 << CTRL5_C_SHIFT_ROUNDING
+    CTRL5_C_SHIFT_ST_G = 2
+    CTRL5_C_MASK_ST_G = 0b11 << CTRL5_C_SHIFT_ST_G
+    CTRL5_C_SHIFT_ST_XL = 0
+    CTRL5_C_MASK_ST_XL = 0b11 << CTRL5_C_SHIFT_ST_XL
 
     # Status Register
-    kRegStatus = 0x1E
-    kStatusShiftTda = 2
-    kStatusMaskTda = 0b1 << kStatusShiftTda
-    kStatusShiftGda = 1
-    kStatusMaskGda = 0b1 << kStatusShiftGda
-    kStatusShiftXlda = 0
-    kStatusMaskXlda = 0b1 << kStatusShiftXlda
+    REG_STATUS = 0x1E
+    STATUS_SHIFT_TDA = 2
+    STATUS_MASK_TDA = 0b1 << STATUS_SHIFT_TDA
+    STATUS_SHIFT_GDA = 1
+    STATUS_MASK_GDA = 0b1 << STATUS_SHIFT_GDA
+    STATUS_SHIFT_XLDA = 0
+    STATUS_MASK_XLDA = 0b1 << STATUS_SHIFT_XLDA
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -636,17 +639,11 @@ class QwiicISM330DHCX(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-        self._fullScaleAccel = 0 # powered down by default
-        self._fullScaleGyro = 0  # powered down by default
+        self._full_scale_accel = 0 # powered down by default
+        self._full_scale_gyro = 0  # powered down by default
 
     def is_connected(self):
         """!
@@ -655,14 +652,12 @@ class QwiicISM330DHCX(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         
-        if self._i2c.isDeviceConnected(self.address) == False:
+        if not self._i2c.is_device_connected(self.address):
             return False
         
         # Confirm device ID is correct
-        if self.get_id() != self.kDevId:
+        if self.get_id() != self.DEV_ID:
             return False
-        
-    connected = property(is_connected)
 
     def begin(self):
         """!
@@ -679,49 +674,49 @@ class QwiicISM330DHCX(object):
 
         @return **int** The device ID
         """
-        return self._i2c.readByte(self.address, self.kRegWhoAmI)
+        return self._i2c.read_byte(self.address, self.REG_WHO_AM_I)
 
     def set_accel_full_scale(self, val):
         """!
         Set the scale of the accelerometer's readings 2g - 16g
 
-        @param int val: The scale to be applied to the accelerometer (0 - 3)
+        @param val: **int** The scale to be applied to the accelerometer (0 - 3)
 
         Possible values:
-            - kXlFs2g
-            - kXlFs16g
-            - kXlFs4g
-            - kXlFs8g
+            - XL_FS_2G
+            - XL_FS_16G
+            - XL_FS_4G
+            - XL_FS_8G
         """
-        if val < self.kXlFs2g or val > self.kXlFs8g:
+        if val < self.XL_FS_2G or val > self.XL_FS_8G:
             return
 
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl1XL)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL1_XL)
 
-        regVal &= ~self.kCtrl1XlMaskFs
-        regVal |= (val << self.kCtrl1XlShiftFs)
+        reg_val &= ~self.CTRL1_XL_MASK_FS
+        reg_val |= (val << self.CTRL1_XL_SHIFT_FS)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl1XL, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL1_XL, reg_val)
 
-        self._fullScaleAccel = val
+        self._full_scale_accel = val
     
     def set_gyro_full_scale(self, val):
         """!
         Set the scale of the gyroscope's readings 125, 250, 500, 1000, 2000, 4000 degrees per second
 
-        @param int val: The scale to be applied to the gyroscope (0, 1, 2, 4, 6, 12)
+        @param val: **int** The scale to be applied to the gyroscope (0, 1, 2, 4, 6, 12)
         """
-        if val < self.kGyroFs250dps or val > self.kGyroFs2000dps:
+        if val < self.GYRO_FS_250DPS or val > self.GYRO_FS_2000DPS:
             return
 
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl2G)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL2_G)
 
-        regVal &= ~self.kCtrl2GMaskFs
-        regVal |= (val << self.kCtrl2GShiftFs)
+        reg_val &= ~self.CTRL2_G_MASK_FS
+        reg_val |= (val << self.CTRL2_G_SHIFT_FS)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl2G, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL2_G, reg_val)
 
-        self._fullScaleGyro = val
+        self._full_scale_gyro = val
 
     def get_accel_full_scale(self):
         """!
@@ -730,14 +725,14 @@ class QwiicISM330DHCX(object):
         @return **int** The scale of the accelerometer's readings
 
         Possible return values:
-            - kXlFs2g
-            - kXlFs16g
-            - kXlFs4g
-            - kXlFs8g
+            - XL_FS_2G
+            - XL_FS_16G
+            - XL_FS_4G
+            - XL_FS_8G
         """
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl1XL)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL1_XL)
 
-        return (regVal & self.kCtrl1XlMaskFs) >> self.kCtrl1XlShiftFs
+        return (reg_val & self.CTRL1_XL_MASK_FS) >> self.CTRL1_XL_SHIFT_FS
 
 
     def get_gyro_full_scale(self):
@@ -747,24 +742,25 @@ class QwiicISM330DHCX(object):
         @return **int** The scale of the gyroscope's readings
 
         Possible return values:
-            - kGyroFs125dps
-            - kGyroFs250dps
-            - kGyroFs500dps
-            - kGyroFs1000dps
-            - kGyroFs2000dps
-            - kGyroFs4000dps
+            - GYRO_FS_125DPS
+            - GYRO_FS_250DPS
+            - GYRO_FS_500DPS
+            - GYRO_FS_1000DPS
+            - GYRO_FS_2000DPS
+            - GYRO_FS_4000DPS
         """
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl2G)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL2_G)
 
-        return (regVal & self.kCtrl2GMaskFs) >> self.kCtrl2GShiftFs
+        return (reg_val & self.CTRL2_G_MASK_FS) >> self.CTRL2_G_SHIFT_FS
 
     def get_temp(self):
         """!
-        Get the temperature
+        Get the raw temperature reading. Convert it to degrees Celsius with
+        convert_lsb_to_celsius()
 
-        @return **float** The temperature in degrees Celsius
+        @return **int** The raw temperature reading (signed 16-bit)
         """
-        temp = self._i2c.read_block(self.address, self.kRegOutTempL,2)
+        temp = self._i2c.read_block(self.address, self.REG_OUT_TEMP_L,2)
         val = (temp[1] << 8) | temp[0]
         # Convert to from unsigned to signed 16-bit
         if val > 32767:
@@ -776,21 +772,21 @@ class QwiicISM330DHCX(object):
         """!
         Get the raw data from the specified register
 
-        @param int reg: The register to read from
+        @param reg: **int** The register to read from
         """
         bytes = self._i2c.read_block(self.address, reg, 6)
 
-        dataOut = IsmData()
-        dataOut.xData = (bytes[1] << 8) | bytes[0]
-        dataOut.yData = (bytes[3] << 8) | bytes[2]
-        dataOut.zData = (bytes[5] << 8) | bytes[4]
+        data_out = ISMData()
+        data_out.x_data = (bytes[1] << 8) | bytes[0]
+        data_out.y_data = (bytes[3] << 8) | bytes[2]
+        data_out.z_data = (bytes[5] << 8) | bytes[4]
 
         # Convert to signed 16-bit
-        dataOut.xData, dataOut.yData, dataOut.zData = [
-            val if val < 32768 else val - 65536 for val in [dataOut.xData, dataOut.yData, dataOut.zData]
+        data_out.x_data, data_out.y_data, data_out.z_data = [
+            val if val < 32768 else val - 65536 for val in [data_out.x_data, data_out.y_data, data_out.z_data]
         ]
 
-        return dataOut
+        return data_out
 
     def get_raw_accel(self):
         """!
@@ -798,7 +794,7 @@ class QwiicISM330DHCX(object):
 
         @return **list** The raw accelerometer readings
         """
-        return self._get_raw_data(self.kRegOutXLA)
+        return self._get_raw_data(self.REG_OUT_XLA)
     
     def get_raw_gyro(self):
         """!
@@ -806,23 +802,23 @@ class QwiicISM330DHCX(object):
 
         @return **list** The raw gyroscope readings
         """
-        return self._get_raw_data(self.kRegOutXLG)
+        return self._get_raw_data(self.REG_OUT_XLG)
 
-    def _convert_data(self, data, key, convDict):
+    def _convert_data(self, data, key, conv_dict):
         """!
-        Use the key parameter to extract the conversion function from convDict and apply it to the data
+        Use the key parameter to extract the conversion function from conv_dict and apply it to the data
 
-        @param IsmData data: The data to be converted
-        @param int key: The key to be used to extract the conversion function from convDict
-        @param dict convDict: The dictionary containing the conversion functions
+        @param data: **ISMData** The data to be converted
+        @param key: **int** The key to be used to extract the conversion function from conv_dict
+        @param conv_dict: **dict** The dictionary containing the conversion functions
 
-        @return **IsmData** The converted data
+        @return **ISMData** The converted data
         """
-        if key in convDict:
-            conv = convDict[key]
-            data.xData = conv(data.xData)
-            data.yData = conv(data.yData)
-            data.zData = conv(data.zData)
+        if key in conv_dict:
+            conv = conv_dict[key]
+            data.x_data = conv(data.x_data)
+            data.y_data = conv(data.y_data)
+            data.z_data = conv(data.z_data)
         else:
             return None
 
@@ -832,37 +828,37 @@ class QwiicISM330DHCX(object):
         """!
         Retrieves raw register values and converts them according to the full scale settings
 
-        @return **IsmData** The accelerometer data in mg
+        @return **ISMData** The accelerometer data in mg
         """
         data = self.get_raw_accel()
 
-        fullScaleConversions = {
-            self.kXlFs2g: self.convert_2g_to_mg,
-            self.kXlFs4g: self.convert_4g_to_mg,
-            self.kXlFs8g: self.convert_8g_to_mg,
-            self.kXlFs16g: self.convert_16g_to_mg
+        full_scale_conversions = {
+            self.XL_FS_2G: self.convert_2g_to_mg,
+            self.XL_FS_4G: self.convert_4g_to_mg,
+            self.XL_FS_8G: self.convert_8g_to_mg,
+            self.XL_FS_16G: self.convert_16g_to_mg
         }
 
-        return self._convert_data(data, self._fullScaleAccel, fullScaleConversions)
+        return self._convert_data(data, self._full_scale_accel, full_scale_conversions)
 
     def get_gyro(self):
         """!
         Retrieves raw register values and converts them according to the full scale settings
 
-        @return **IsmData** The gyroscope data in mdps
+        @return **ISMData** The gyroscope data in mdps
         """
         data = self.get_raw_gyro()
 
-        fullScaleConversions = {
-            self.kGyroFs125dps: self.convert_125dps_to_mdps,
-            self.kGyroFs250dps: self.convert_250dps_to_mdps,
-            self.kGyroFs500dps: self.convert_500dps_to_mdps,
-            self.kGyroFs1000dps: self.convert_1000dps_to_mdps,
-            self.kGyroFs2000dps: self.convert_2000dps_to_mdps,
-            self.kGyroFs4000dps: self.convert_4000dps_to_mdps
+        full_scale_conversions = {
+            self.GYRO_FS_125DPS: self.convert_125dps_to_mdps,
+            self.GYRO_FS_250DPS: self.convert_250dps_to_mdps,
+            self.GYRO_FS_500DPS: self.convert_500dps_to_mdps,
+            self.GYRO_FS_1000DPS: self.convert_1000dps_to_mdps,
+            self.GYRO_FS_2000DPS: self.convert_2000dps_to_mdps,
+            self.GYRO_FS_4000DPS: self.convert_4000dps_to_mdps
         }
 
-        return self._convert_data(data, self._fullScaleGyro, fullScaleConversions)
+        return self._convert_data(data, self._full_scale_gyro, full_scale_conversions)
 
     # Conversion functions
     def convert_2g_to_mg(self, lsb):
@@ -905,27 +901,27 @@ class QwiicISM330DHCX(object):
         """!
         Enable the general device configuration
 
-        @param bool enable: Enable or disable the device configuration
+        @param enable: **bool** Enable or disable the device configuration
         """
         if enable != 0 and enable != 1:
             return
         
-        val = self._i2c.readByte(self.address, self.kRegCtrl9XL)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL9_XL)
         
-        val &= ~self.kCtrl9XlMaskDeviceConf
-        val |= (enable << self.kCtrl9XlShiftDeviceConf)
+        val &= ~self.CTRL9_XL_MASK_DEVICE_CONF
+        val |= (enable << self.CTRL9_XL_SHIFT_DEVICE_CONF)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl9XL, val)
+        self._i2c.write_byte(self.address, self.REG_CTRL9_XL, val)
 
     def device_reset(self):
         """!
         Reset the device to default settings
         """
-        val = self._i2c.readByte(self.address, self.kRegCtrl3C)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL3_C)
         
-        val |= self.kCtrl3CMaskSwReset
+        val |= self.CTRL3_C_MASK_SW_RESET
 
-        self._i2c.writeByte(self.address, self.kRegCtrl3C, val)
+        self._i2c.write_byte(self.address, self.REG_CTRL3_C, val)
 
     def get_device_reset(self):
         """!
@@ -933,112 +929,112 @@ class QwiicISM330DHCX(object):
 
         @return **bool** The device reset state
         """
-        val = self._i2c.readByte(self.address, self.kRegCtrl3C)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL3_C)
 
-        return (val & self.kCtrl3CMaskSwReset) == 0
+        return (val & self.CTRL3_C_MASK_SW_RESET) == 0
 
     def set_accel_slope_filter(self, val):
         """!
         Set's the accelerometer's slope filter
 
-        @param int val: The intensity of the filter (0x00 - 0x37)
+        @param val: **int** The intensity of the filter (0x00 - 0x37)
 
         See the constants in the class definition under "Possilbe Slope Filters" for a list of valid arguments
         """
-        if val < self.kHpPathDisableOnOut or val > self.kHpRefMdOdrDiv800:
+        if val < self.HP_PATH_DISABLE_ON_OUT or val > self.HP_REF_MD_ODR_DIV800:
             return
         
 
-        newSlopeEn = (val & 0x10) >> 4
-        newRefMode = (val & 0x20) >> 5
-        newCf = (val & 0x07)
+        new_slope_en = (val & 0x10) >> 4
+        new_ref_mode = (val & 0x20) >> 5
+        new_cf = (val & 0x07)
 
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl8XL)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL8_XL)
 
-        regVal &= ~self.kCtrl8XlMaskHpSlopeXlEn
-        regVal |= (newSlopeEn << self.kCtrl8XlShiftHpSlopeXlEn)
+        reg_val &= ~self.CTRL8_XL_MASK_HP_SLOPE_XL_EN
+        reg_val |= (new_slope_en << self.CTRL8_XL_SHIFT_HP_SLOPE_XL_EN)
 
-        regVal &= ~self.kCtrl8XlMaskHpRefModeXl
-        regVal |= (newRefMode << self.kCtrl8XlShiftHpRefModeXl)
+        reg_val &= ~self.CTRL8_XL_MASK_HP_REF_MODE_XL
+        reg_val |= (new_ref_mode << self.CTRL8_XL_SHIFT_HP_REF_MODE_XL)
 
-        regVal &= ~self.kCtrl8XlMaskHpcfXl
-        regVal |= (newCf << self.kCtrl8XlShiftHpcfXl)
+        reg_val &= ~self.CTRL8_XL_MASK_HPCF_XL
+        reg_val |= (new_cf << self.CTRL8_XL_SHIFT_HPCF_XL)
         
-        self._i2c.writeByte(self.address, self.kRegCtrl8XL, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL8_XL, reg_val)
     
     def set_accel_filter_lp2(self, enable = True):
         """!
         Enable the accelerometer's high resolution slope filter
 
-        @param bool enable: Enable or disable the filter
+        @param enable: **bool** Enable or disable the filter
         """
         if enable != True and enable != False:
             return
         
-        val = self._i2c.readByte(self.address, self.kRegCtrl1XL)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL1_XL)
         
-        val &= ~self.kCtrl1XlMaskLpf2XlEn
-        val |= (enable << self.kCtrl1XlShiftLpf2XlEn)
+        val &= ~self.CTRL1_XL_MASK_LPF2_XL_EN
+        val |= (enable << self.CTRL1_XL_SHIFT_LPF2_XL_EN)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl1XL, val)
+        self._i2c.write_byte(self.address, self.REG_CTRL1_XL, val)
 
     def set_gyro_filter_lp1(self, enable = True):
         """!
         Enables the gyroscope's slope filter
 
-        @param bool enable: Enable or disable the filter
+        @param enable: **bool** Enable or disable the filter
         """
         if enable != True and enable != False:
             return
         
-        val = self._i2c.readByte(self.address, self.kRegCtrl4C)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL4_C)
 
-        val &= ~self.kCtrl4CMaskLpf1SelG
-        val |= (enable << self.kCtrl4CShiftLpf1SelG)
+        val &= ~self.CTRL4_C_MASK_LPF1_SEL_G
+        val |= (enable << self.CTRL4_C_SHIFT_LPF1_SEL_G)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl4C, val)
+        self._i2c.write_byte(self.address, self.REG_CTRL4_C, val)
         
     def set_gyro_lp1_bandwidth(self, val):
         """!
         Sets the low pass filter's bandwidth for the gyroscope
 
-        @param int val: The bandwidth of the filter
+        @param val: **int** The bandwidth of the filter
 
         Possible values:
-            - kBwUltraLight
-            - kBwVeryLight
-            - kBwLight
-            - kBwMedium
-            - kBwStrong
-            - kBwVeryStrong
-            - kBwAggressive
-            - kBwXtreme
+            - BW_ULTRA_LIGHT
+            - BW_VERY_LIGHT
+            - BW_LIGHT
+            - BW_MEDIUM
+            - BW_STRONG
+            - BW_VERY_STRONG
+            - BW_AGGRESSIVE
+            - BW_XTREME
         """
-        if val < self.kBwUltraLight or val > self.kBwXtreme:
+        if val < self.BW_ULTRA_LIGHT or val > self.BW_XTREME:
             return
         
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl6C)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL6_C)
 
-        regVal &= ~self.kCtrl6CMaskFtype
-        regVal |= (val << self.kCtrl6CShiftFtype)
+        reg_val &= ~self.CTRL6_C_MASK_FTYPE
+        reg_val |= (val << self.CTRL6_C_SHIFT_FTYPE)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl6C, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL6_C, reg_val)
 
     def set_block_data_update(self, enable = True):
         """!
         Data is not updated until both MSB and LSB have been read from output registers
 
-        @param bool enable: Enable or disable the block data update
+        @param enable: **bool** Enable or disable the block data update
         """
         if enable != True and enable != False:
             return
         
-        val = self._i2c.readByte(self.address, self.kRegCtrl3C)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL3_C)
 
-        val &= ~self.kCtrl3CMaskBdu
-        val |= (enable << self.kCtrl3CShiftBdu)
+        val &= ~self.CTRL3_C_MASK_BDU
+        val |= (enable << self.CTRL3_C_SHIFT_BDU)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl3C, val)
+        self._i2c.write_byte(self.address, self.REG_CTRL3_C, val)
 
     def get_block_data_update(self):
         """!
@@ -1046,45 +1042,45 @@ class QwiicISM330DHCX(object):
 
         @return **int** The block data update state
         """
-        val = self._i2c.readByte(self.address, self.kRegCtrl3C)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL3_C)
 
-        return (val & self.kCtrl3CMaskBdu) >> self.kCtrl3CShiftBdu
+        return (val & self.CTRL3_C_MASK_BDU) >> self.CTRL3_C_SHIFT_BDU
     
     def _mem_bank_set(self, val):
         """!
         Enable access to the embedded functions/sensor hub configuration registers. Not to be used outside this module
 
-        @param int val: The value to set the memory bank to
+        @param val: **int** The value to set the memory bank to
 
         Possible values:
-            - kUserBank
-            - kSensorHubBank
-            - kEmbeddedFuncBank
+            - USER_BANK
+            - SENSOR_HUB_BANK
+            - EMBEDDED_FUNC_BANK
         """
-        if val < self.kUserBank or val > self.kEmbeddedFuncBank:
+        if val < self.USER_BANK or val > self.EMBEDDED_FUNC_BANK:
             return
 
-        regVal = self._i2c.readByte(self.address, self.kRegFuncCfgAccess)
+        reg_val = self._i2c.read_byte(self.address, self.REG_FUNC_CFG_ACCESS)
 
-        regVal &= ~self.kFuncCfgAccessMaskRegAccess
-        regVal |= (val << self.kFuncCfgAccessShiftRegAccess)
+        reg_val &= ~self.FUNC_CFG_ACCESS_MASK_REG_ACCESS
+        reg_val |= (val << self.FUNC_CFG_ACCESS_SHIFT_REG_ACCESS)
 
-        self._i2c.writeByte(self.address, self.kRegFuncCfgAccess, regVal)
+        self._i2c.write_byte(self.address, self.REG_FUNC_CFG_ACCESS, reg_val)
 
     def _fsm_enable_get(self):
         """!
         Embedded finite state machine functions mode. Not to be used outside this module
 
-        @return **tuple of int** Tuple containing fsmEnableA followed by fsmEnableB
+        @return **tuple of int** Tuple containing fsm_enable_a followed by fsm_enable_b
         """
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        fsmEnableA = self._i2c.readByte(self.address, self.kRegFsmEnableA)
-        fsmEnableB = self._i2c.readByte(self.address, self.kRegFsmEnableB)
+        fsm_enable_a = self._i2c.read_byte(self.address, self.REG_FSM_ENABLE_A)
+        fsm_enable_b = self._i2c.read_byte(self.address, self.REG_FSM_ENABLE_B)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-        return (fsmEnableA, fsmEnableB)
+        return (fsm_enable_a, fsm_enable_b)
     
     def _fsm_data_rate_get(self):
         """!
@@ -1093,18 +1089,18 @@ class QwiicISM330DHCX(object):
         @return **int** The data rate of the finite state machine
 
         Possible return values:
-            - kOdrFsm12Hz5
-            - kOdrFsm26Hz
-            - kOdrFsm52Hz
-            - kOdrFsm104Hz
+            - ODR_FSM_12_5HZ
+            - ODR_FSM_26HZ
+            - ODR_FSM_52HZ
+            - ODR_FSM_104HZ
         """
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        fsmOdrCfgB = self._i2c.readByte(self.address, self.kRegEmbFuncOdrCfgB)
+        fsm_odr_cfg_b = self._i2c.read_byte(self.address, self.REG_EMB_FUNC_ODR_CFG_B)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-        return (fsmOdrCfgB & self.kEmbFuncOdrMaskFsmOdr) >> self.kEmbFuncOdrShiftFsmOdr
+        return (fsm_odr_cfg_b & self.EMB_FUNC_ODR_MASK_FSM_ODR) >> self.EMB_FUNC_ODR_SHIFT_FSM_ODR
     
     def _mlc_get(self):
         """!
@@ -1112,13 +1108,13 @@ class QwiicISM330DHCX(object):
 
         @return **int** The Machine Learning Core enable state
         """
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        regVal = self._i2c.readByte(self.address, self.kRegEmbFuncEnB)
+        reg_val = self._i2c.read_byte(self.address, self.REG_EMB_FUNC_EN_B)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-        return (regVal & self.kEmbFuncEnBMaskMlcEn) >> self.kEmbFuncEnBShiftMlcEn
+        return (reg_val & self.EMB_FUNC_EN_B_MASK_MLC_EN) >> self.EMB_FUNC_EN_B_SHIFT_MLC_EN
     
     def _mlc_data_rate_get(self):
         """!
@@ -1128,399 +1124,399 @@ class QwiicISM330DHCX(object):
 
         For possible return values see the "MLC" section in "Possible data rates" in the class definition
         """
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        regVal = self._i2c.readByte(self.address, self.kRegEmbFuncOdrCfgC)
+        reg_val = self._i2c.read_byte(self.address, self.REG_EMB_FUNC_ODR_CFG_C)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-        return (regVal & self.kEmbFuncOdrMaskMlcOdr) >> self.kEmbFuncOdrShiftMlcOdr
+        return (reg_val & self.EMB_FUNC_ODR_MASK_MLC_ODR) >> self.EMB_FUNC_ODR_SHIFT_MLC_ODR
 
 
     def set_accel_data_rate(self, val): 
         """!
         Sets the data output rate of the accelerometer
 
-        @param int val: Data rate
+        @param val: **int** Data rate
 
         See the "Accelerometer section in Possible data rates" in the class definition for a list of valid arguments
         """
-        if val < self.kXlOdrOff or val > self.kXlOdr1Hz6:
+        if val < self.XL_ODR_OFF or val > self.XL_ODR_1_6HZ:
             return
         
-        enableA, enableB = self._fsm_enable_get()
+        enable_a, enable_b = self._fsm_enable_get()
 
-        odrXl = val
+        odr_xl = val
 
-        if (enableA & 0xFF) or (enableB & 0xFF):
+        if (enable_a & 0xFF) or (enable_b & 0xFF):
             # Coresponds to any of the FSMs being enabled
-            fsmOdr = self._fsm_data_rate_get()
-            if fsmOdr == self.kOdrFsm12Hz5:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr12Hz5
+            fsm_odr = self._fsm_data_rate_get()
+            if fsm_odr == self.ODR_FSM_12_5HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_12_5HZ
 
-            elif fsmOdr == self.kOdrFsm26Hz:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr26Hz
-                elif val == self.kXlOdr12Hz5:
-                    odrXl = self.kXlOdr26Hz
+            elif fsm_odr == self.ODR_FSM_26HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_26HZ
+                elif val == self.XL_ODR_12_5HZ:
+                    odr_xl = self.XL_ODR_26HZ
 
-            elif fsmOdr == self.kOdrFsm52Hz:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr52Hz
-                elif val == self.kXlOdr12Hz5:
-                    odrXl = self.kXlOdr52Hz
-                elif val == self.kXlOdr26Hz:
-                    odrXl = self.kXlOdr52Hz
+            elif fsm_odr == self.ODR_FSM_52HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_52HZ
+                elif val == self.XL_ODR_12_5HZ:
+                    odr_xl = self.XL_ODR_52HZ
+                elif val == self.XL_ODR_26HZ:
+                    odr_xl = self.XL_ODR_52HZ
 
-            elif fsmOdr == self.kOdrFsm104Hz:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr104Hz
-                elif val == self.kXlOdr12Hz5:
-                    odrXl = self.kXlOdr104Hz
-                elif val == self.kXlOdr26Hz:
-                    odrXl = self.kXlOdr104Hz
-                elif val == self.kXlOdr52Hz:
-                    odrXl = self.kXlOdr104Hz
+            elif fsm_odr == self.ODR_FSM_104HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_104HZ
+                elif val == self.XL_ODR_12_5HZ:
+                    odr_xl = self.XL_ODR_104HZ
+                elif val == self.XL_ODR_26HZ:
+                    odr_xl = self.XL_ODR_104HZ
+                elif val == self.XL_ODR_52HZ:
+                    odr_xl = self.XL_ODR_104HZ
 
         # Machine Learning Core data rate constraints:
-        mlcEnable = self._mlc_get()
+        mlc_enable = self._mlc_get()
 
-        if mlcEnable:
+        if mlc_enable:
             mlc_odr = self._mlc_data_rate_get()
 
-            if mlc_odr == self.kMlcOdr12Hz5:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr12Hz5
+            if mlc_odr == self.MLC_ODR_12_5HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_12_5HZ
                 else:
-                    odrXl = val
+                    odr_xl = val
 
-            elif mlc_odr == self.kMlcOdr26Hz:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr26Hz
-                elif val == self.kXlOdr12Hz5:
-                    odrXl = self.kXlOdr26Hz
+            elif mlc_odr == self.MLC_ODR_26HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_26HZ
+                elif val == self.XL_ODR_12_5HZ:
+                    odr_xl = self.XL_ODR_26HZ
                 else:
-                    odrXl = val
+                    odr_xl = val
 
-            elif mlc_odr == self.kMlcOdr52Hz:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr52Hz
-                elif val == self.kXlOdr12Hz5:
-                    odrXl = self.kXlOdr52Hz
-                elif val == self.kXlOdr26Hz:
-                    odrXl = self.kXlOdr52Hz
+            elif mlc_odr == self.MLC_ODR_52HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_52HZ
+                elif val == self.XL_ODR_12_5HZ:
+                    odr_xl = self.XL_ODR_52HZ
+                elif val == self.XL_ODR_26HZ:
+                    odr_xl = self.XL_ODR_52HZ
                 else:
-                    odrXl = val
+                    odr_xl = val
 
-            elif mlc_odr == self.kMlcOdr104Hz:
-                if val == self.kXlOdrOff:
-                    odrXl = self.kXlOdr104Hz
-                elif val == self.kXlOdr12Hz5:
-                    odrXl = self.kXlOdr104Hz
-                elif val == self.kXlOdr26Hz:
-                    odrXl = self.kXlOdr104Hz
-                elif val == self.kXlOdr52Hz:
-                    odrXl = self.kXlOdr104Hz
+            elif mlc_odr == self.MLC_ODR_104HZ:
+                if val == self.XL_ODR_OFF:
+                    odr_xl = self.XL_ODR_104HZ
+                elif val == self.XL_ODR_12_5HZ:
+                    odr_xl = self.XL_ODR_104HZ
+                elif val == self.XL_ODR_26HZ:
+                    odr_xl = self.XL_ODR_104HZ
+                elif val == self.XL_ODR_52HZ:
+                    odr_xl = self.XL_ODR_104HZ
                 else:
-                    odrXl = val
+                    odr_xl = val
 
             else:
-                odrXl = val
+                odr_xl = val
 
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl1XL)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL1_XL)
 
-        regVal &= ~self.kCtrl1XlMaskOdr
-        regVal |= (odrXl << self.kCtrl1XlShiftOdr)
+        reg_val &= ~self.CTRL1_XL_MASK_ODR
+        reg_val |= (odr_xl << self.CTRL1_XL_SHIFT_ODR)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl1XL, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL1_XL, reg_val)
 
     def set_gyro_data_rate(self, val):
         """!
         Sets the data output rate of the gyroscope
 
-        @param int val: Data rate
+        @param val: **int** Data rate
 
         See the "Gyroscope" section in Possible data rates" in the class definition for a list of valid arguments
         """
-        if val < self.kGyroOdrOff or val > self.kGyroOdr6667Hz:
+        if val < self.GYRO_ODR_OFF or val > self.GYRO_ODR_6667HZ:
             return
         
-        enableA, enableB = self._fsm_enable_get()
+        enable_a, enable_b = self._fsm_enable_get()
 
-        odrGy = val
+        odr_gy = val
 
-        if (enableA & 0xFF) or (enableB & 0xFF):
+        if (enable_a & 0xFF) or (enable_b & 0xFF):
             # Coresponds to any of the FSMs being enabled
-            fsmOdr = self._fsm_data_rate_get()
-            if fsmOdr == self.kOdrFsm12Hz5:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr12Hz5
+            fsm_odr = self._fsm_data_rate_get()
+            if fsm_odr == self.ODR_FSM_12_5HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_12_5HZ
 
-            elif fsmOdr == self.kOdrFsm26Hz:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr26Hz
-                elif val == self.kGyroOdr12Hz5:
-                    odrGy = self.kGyroOdr26Hz
+            elif fsm_odr == self.ODR_FSM_26HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_26HZ
+                elif val == self.GYRO_ODR_12_5HZ:
+                    odr_gy = self.GYRO_ODR_26HZ
 
-            elif fsmOdr == self.kOdrFsm52Hz:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr52Hz
-                elif val == self.kGyroOdr12Hz5:
-                    odrGy = self.kGyroOdr52Hz
-                elif val == self.kGyroOdr26Hz:
-                    odrGy = self.kGyroOdr52Hz
+            elif fsm_odr == self.ODR_FSM_52HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_52HZ
+                elif val == self.GYRO_ODR_12_5HZ:
+                    odr_gy = self.GYRO_ODR_52HZ
+                elif val == self.GYRO_ODR_26HZ:
+                    odr_gy = self.GYRO_ODR_52HZ
 
-            elif fsmOdr == self.kOdrFsm104Hz:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr104Hz
-                elif val == self.kGyroOdr12Hz5:
-                    odrGy = self.kGyroOdr104Hz
-                elif val == self.kGyroOdr26Hz:
-                    odrGy = self.kGyroOdr104Hz
-                elif val == self.kGyroOdr52Hz:
-                    odrGy = self.kGyroOdr104Hz
+            elif fsm_odr == self.ODR_FSM_104HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_104HZ
+                elif val == self.GYRO_ODR_12_5HZ:
+                    odr_gy = self.GYRO_ODR_104HZ
+                elif val == self.GYRO_ODR_26HZ:
+                    odr_gy = self.GYRO_ODR_104HZ
+                elif val == self.GYRO_ODR_52HZ:
+                    odr_gy = self.GYRO_ODR_104HZ
         
-        mlcEnable = self._mlc_get()
-        if mlcEnable:
+        mlc_enable = self._mlc_get()
+        if mlc_enable:
             mlc_odr = self._mlc_data_rate_get()
-            if mlc_odr == self.kMlcOdr12Hz5:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr12Hz5
+            if mlc_odr == self.MLC_ODR_12_5HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_12_5HZ
                 else:
-                    odrGy = val
+                    odr_gy = val
 
-            elif mlc_odr == self.kMlcOdr26Hz:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr26Hz
-                elif val == self.kGyroOdr12Hz5:
-                    odrGy = self.kGyroOdr26Hz
+            elif mlc_odr == self.MLC_ODR_26HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_26HZ
+                elif val == self.GYRO_ODR_12_5HZ:
+                    odr_gy = self.GYRO_ODR_26HZ
                 else:
-                    odrGy = val
+                    odr_gy = val
 
-            elif mlc_odr == self.kMlcOdr52Hz:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr52Hz
-                elif val == self.kGyroOdr12Hz5:
-                    odrGy = self.kGyroOdr52Hz
-                elif val == self.kGyroOdr26Hz:
-                    odrGy = self.kGyroOdr52Hz
+            elif mlc_odr == self.MLC_ODR_52HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_52HZ
+                elif val == self.GYRO_ODR_12_5HZ:
+                    odr_gy = self.GYRO_ODR_52HZ
+                elif val == self.GYRO_ODR_26HZ:
+                    odr_gy = self.GYRO_ODR_52HZ
                 else:
-                    odrGy = val
+                    odr_gy = val
 
-            elif mlc_odr == self.kMlcOdr104Hz:
-                if val == self.kGyroOdrOff:
-                    odrGy = self.kGyroOdr104Hz
-                elif val == self.kGyroOdr12Hz5:
-                    odrGy = self.kGyroOdr104Hz
-                elif val == self.kGyroOdr26Hz:
-                    odrGy = self.kGyroOdr104Hz
-                elif val == self.kGyroOdr52Hz:
-                    odrGy = self.kGyroOdr104Hz
+            elif mlc_odr == self.MLC_ODR_104HZ:
+                if val == self.GYRO_ODR_OFF:
+                    odr_gy = self.GYRO_ODR_104HZ
+                elif val == self.GYRO_ODR_12_5HZ:
+                    odr_gy = self.GYRO_ODR_104HZ
+                elif val == self.GYRO_ODR_26HZ:
+                    odr_gy = self.GYRO_ODR_104HZ
+                elif val == self.GYRO_ODR_52HZ:
+                    odr_gy = self.GYRO_ODR_104HZ
                 else:
-                    odrGy = val
+                    odr_gy = val
 
             else:
-                odrGy = val
+                odr_gy = val
         
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl2G)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL2_G)
 
-        regVal &= ~self.kCtrl2GMaskOdr
-        regVal |= (odrGy << self.kCtrl2GShiftOdr)
+        reg_val &= ~self.CTRL2_G_MASK_ODR
+        reg_val |= (odr_gy << self.CTRL2_G_SHIFT_ODR)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl2G, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL2_G, reg_val)
 
 
     def enable_timestamp(self, enable = True):
         """!
         Enables the timestamp counter.
 
-        @param bool enable: Enable or disable the timestamp counter
+        @param enable: **bool** Enable or disable the timestamp counter
         """
         if enable != True and enable != False:
             return
         
-        val = self._i2c.readByte(self.address, self.kRegCtrl10C)
+        val = self._i2c.read_byte(self.address, self.REG_CTRL10_C)
 
-        val &= ~self.kCtrl10CMaskTimestampEn
-        val |= (enable << self.kCtrl10CShiftTimestampEn)
+        val &= ~self.CTRL10_C_MASK_TIMESTAMP_EN
+        val |= (enable << self.CTRL10_C_SHIFT_TIMESTAMP_EN)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl10C, val)
+        self._i2c.write_byte(self.address, self.REG_CTRL10_C, val)
     
     def reset_timestamp(self):
         """!
         Resets the timestamp counter
         """
-        resetVal = 0xAA
-        self._i2c.writeByte(self.address, self.kRegTimestamp2, resetVal)
+        reset_val = 0xAA
+        self._i2c.write_byte(self.address, self.REG_TIMESTAMP2, reset_val)
 
     # Fifo Methods
     def set_fifo_watermark(self, val):
         """!
         Set the FIFO watermark level
 
-        @param int val: The watermark level. Must be between 0 and 511 (a 9-bit value)
+        @param val: **int** The watermark level. Must be between 0 and 511 (a 9-bit value)
         """
         if val < 0 or val > 511:
             return
         
-        ctrl2Val = (val >> 8) & 0x01 # WTM8
-        ctrl1Val = val & 0xFF # WTM[7:0]
+        ctrl2_val = (val >> 8) & 0x01 # WTM8
+        ctrl1_val = val & 0xFF # WTM[7:0]
 
-        regVal = self._i2c.readByte(self.address, self.kRegFifoCtrl2)
+        reg_val = self._i2c.read_byte(self.address, self.REG_FIFO_CTRL2)
 
-        regVal &= ~self.kFifoCtrl2MaskWtm
-        regVal |= (ctrl2Val << self.kFifoCtrl2ShiftWtm)
+        reg_val &= ~self.FIFO_CTRL2_MASK_WTM
+        reg_val |= (ctrl2_val << self.FIFO_CTRL2_SHIFT_WTM)
 
-        self._i2c.writeByte(self.address, self.kRegFifoCtrl2, regVal)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CTRL2, reg_val)
 
-        self._i2c.writeByte(self.address, self.kRegFifoCtrl1, ctrl1Val)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CTRL1, ctrl1_val)
 
     def set_fifo_mode(self, val):
         """!
         Sets the FIFO mode
 
-        @param int val: The FIFO mode
+        @param val: **int** The FIFO mode
 
         Possible values:
-            - kBypassMode
-            - kFifoMode
-            - kStreamToFifoMode
-            - kBypassToStreamMode
-            - kStreamMode
-            - kBypassToFifoMode
+            - BYPASS_MODE
+            - FIFO_MODE
+            - STREAM_TO_FIFO_MODE
+            - BYPASS_TO_STREAM_MODE
+            - STREAM_MODE
+            - BYPASS_TO_FIFO_MODE
         """
-        if val < self.kBypassMode or val > self.kBypassToFifoMode:
+        if val < self.BYPASS_MODE or val > self.BYPASS_TO_FIFO_MODE:
             return
         
-        regVal = self._i2c.readByte(self.address, self.kRegFifoCtrl4)
+        reg_val = self._i2c.read_byte(self.address, self.REG_FIFO_CTRL4)
 
-        regVal &= ~self.kFifoCtrl4MaskFifoMode
-        regVal |= (val << self.kFifoCtrl4ShiftFifoMode)
+        reg_val &= ~self.FIFO_CTRL4_MASK_FIFO_MODE
+        reg_val |= (val << self.FIFO_CTRL4_SHIFT_FIFO_MODE)
 
-        self._i2c.writeByte(self.address, self.kRegFifoCtrl4, regVal)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CTRL4, reg_val)
 
     def set_accel_fifo_batch_set(self, val):
         """!
         Sets the batch data rate for the accelerometer
 
-        @param int val: The batch data rate
+        @param val: **int** The batch data rate
 
         See the "Possible Accelerometer Batch Data Rates" in the class definition for a list of valid arguments
         """
-        if val < self.kXlNotBatched or val > self.kXlBatchedAt6Hz5:
+        if val < self.XL_NOT_BATCHED or val > self.XL_BATCHED_AT_6_5HZ:
             return
 
-        regVal = self._i2c.readByte(self.address, self.kRegFifoCtrl3)
+        reg_val = self._i2c.read_byte(self.address, self.REG_FIFO_CTRL3)
 
-        regVal &= ~self.kFifoCtrl3MaskBdrXl
-        regVal |= (val << self.kFifoCtrl3ShiftBdrXl)
+        reg_val &= ~self.FIFO_CTRL3_MASK_BDR_XL
+        reg_val |= (val << self.FIFO_CTRL3_SHIFT_BDR_XL)
         
-        self._i2c.writeByte(self.address, self.kRegFifoCtrl3, regVal)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CTRL3, reg_val)
 
 
     def set_gyro_fifo_batch_set(self, val):
         """!
         Sets the batch data rate for the gyroscope
 
-        @param int val: The batch data rate
+        @param val: **int** The batch data rate
 
         See the "Possible Gyroscope Batch Data Rates" in the class definition for a list of valid arguments
         """
-        if val < self.kGyroNotBatched or val > self.kGyroBatchedAt6Hz5:
+        if val < self.GYRO_NOT_BATCHED or val > self.GYRO_BATCHED_AT_6_5HZ:
             return
 
-        regVal = self._i2c.readByte(self.address, self.kRegFifoCtrl3)
+        reg_val = self._i2c.read_byte(self.address, self.REG_FIFO_CTRL3)
 
-        regVal &= ~self.kFifoCtrl3MaskBdrG
-        regVal |= (val << self.kFifoCtrl3ShiftBdrG)
+        reg_val &= ~self.FIFO_CTRL3_MASK_BDR_G
+        reg_val |= (val << self.FIFO_CTRL3_SHIFT_BDR_G)
         
-        self._i2c.writeByte(self.address, self.kRegFifoCtrl3, regVal)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CTRL3, reg_val)
     
     def set_fifo_timestamp_dec(self, val):
         """!
         Sets the FIFO time stamp decimation rate.
 
-        @param int val: The decimation rate
+        @param val: **int** The decimation rate
 
         Possible values:
-            - kNoDecimation
-            - kDec1
-            - kDec8
-            - kDec32
+            - NO_DECIMATION
+            - DEC1
+            - DEC8
+            - DEC32
         """
-        if val < self.kNoDecimation or val > self.kDec32:
+        if val < self.NO_DECIMATION or val > self.DEC32:
             return
         
-        regVal = self._i2c.readByte(self.address, self.kRegFifoCtrl4)
+        reg_val = self._i2c.read_byte(self.address, self.REG_FIFO_CTRL4)
 
-        regVal &= ~self.kFifoCtrl4MaskOdrTsBatch
-        regVal |= (val << self.kFifoCtrl4ShiftOdrTsBatch)
+        reg_val &= ~self.FIFO_CTRL4_MASK_ODR_TS_BATCH
+        reg_val |= (val << self.FIFO_CTRL4_SHIFT_ODR_TS_BATCH)
 
-        self._i2c.writeByte(self.address, self.kRegFifoCtrl4, regVal)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CTRL4, reg_val)
 
     # Interrupt and pin mode settings
-    def set_pin_mode(self, activeLow):
+    def set_pin_mode(self, active_low):
         """!
         Sets the active state of the interrupt pin - high or low.
 
-        @param bool activeLow: Set to `True` for active low, `False` for active high
+        @param active_low: **bool** Set to `True` for active low, `False` for active high
         """
-        if activeLow != True and activeLow != False:
+        if active_low != True and active_low != False:
             return
 
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl3C)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL3_C)
 
-        regVal &= ~self.kCtrl3CMaskHlActive
-        regVal |= (activeLow << self.kCtrl3CShiftHlActive)
+        reg_val &= ~self.CTRL3_C_MASK_HL_ACTIVE
+        reg_val |= (active_low << self.CTRL3_C_SHIFT_HL_ACTIVE)
 
-        if activeLow:
+        if active_low:
             # pinmode must be set to push-pull when active low is set.
             # See section 9.14 on pg 51 of datasheet for more information
-            regVal &= ~self.kCtrl3CMaskPpOd
+            reg_val &= ~self.CTRL3_C_MASK_PP_OD
 
-        self._i2c.writeByte(self.address, self.kRegCtrl3C, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL3_C, reg_val)
 
     def set_int_notification(self, val):
         """!
         Sets what triggers an interrupt
 
-        @param int val: The interrupt event type
+        @param val: **int** The interrupt event type
 
         Possible Values:
-            - kAllIntPulsed
-            - kBaseLatchedEmbPulsed
-            - kBasePulsedEmbLatched
-            - kAllIntLatched
+            - ALL_INT_PULSED
+            - BASE_LATCHED_EMB_PULSED
+            - BASE_PULSED_EMB_LATCHED
+            - ALL_INT_LATCHED
         """
-        if val < self.kAllIntPulsed or val > self.kAllIntLatched:
+        if val < self.ALL_INT_PULSED or val > self.ALL_INT_LATCHED:
             return
 
 
         lir = val & 0x01
-        intClrOnRead = val & 0x01
+        int_clr_on_read = val & 0x01
 
         # Set necessary values in the tap config register
-        regVal = self._i2c.readByte(self.address, self.kRegTapCfg0)
+        reg_val = self._i2c.read_byte(self.address, self.REG_TAP_CFG0)
 
-        regVal &= ~(self.kTapCfg0MaskLir | self.kTapCfg0MaskIntClrOnRead)
-        regVal |= (lir << self.kTapCfg0ShiftLir)
-        regVal |= (intClrOnRead << self.kTapCfg0ShiftIntClrOnRead)
+        reg_val &= ~(self.TAP_CFG0_MASK_LIR | self.TAP_CFG0_MASK_INT_CLR_ON_READ)
+        reg_val |= (lir << self.TAP_CFG0_SHIFT_LIR)
+        reg_val |= (int_clr_on_read << self.TAP_CFG0_SHIFT_INT_CLR_ON_READ)
         
-        self._i2c.writeByte(self.address, self.kRegTapCfg0, regVal)
+        self._i2c.write_byte(self.address, self.REG_TAP_CFG0, reg_val)
 
         # Set necessary values in the Page RW register
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        regVal = self._i2c.readByte(self.address, self.kRegPageRw)
+        reg_val = self._i2c.read_byte(self.address, self.REG_PAGE_RW)
 
-        embFuncLir = (val & 0x02) >> 1
-        regVal &= ~self.kPageRwMaskEmbFuncLir
-        regVal |= (embFuncLir << self.kPageRwShiftEmbFuncLir)
+        emb_func_lir = (val & 0x02) >> 1
+        reg_val &= ~self.PAGE_RW_MASK_EMB_FUNC_LIR
+        reg_val |= (emb_func_lir << self.PAGE_RW_SHIFT_EMB_FUNC_LIR)
 
-        self._i2c.writeByte(self.address, self.kRegPageRw, regVal)
+        self._i2c.write_byte(self.address, self.REG_PAGE_RW, reg_val)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
     class _PinIntRoute:
         """!
@@ -1543,17 +1539,17 @@ class QwiicISM330DHCX(object):
         """
         route = self._PinIntRoute()
 
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        route.mlc_int = self._i2c.readByte(self.address, self.kRegMlcInt1)
-        route.emb_func_int = self._i2c.readByte(self.address, self.kRegEmbFuncInt1)
-        route.fsm_int_a = self._i2c.readByte(self.address, self.kRegFsmInt1A)
-        route.fsm_int_b = self._i2c.readByte(self.address, self.kRegFsmInt1B)
+        route.mlc_int = self._i2c.read_byte(self.address, self.REG_MLC_INT1)
+        route.emb_func_int = self._i2c.read_byte(self.address, self.REG_EMB_FUNC_INT1)
+        route.fsm_int_a = self._i2c.read_byte(self.address, self.REG_FSM_INT1_A)
+        route.fsm_int_b = self._i2c.read_byte(self.address, self.REG_FSM_INT1_B)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
         
-        route.int_ctrl = self._i2c.readByte(self.address, self.kRegInt1Ctrl)
-        route.md_cfg = self._i2c.readByte(self.address, self.kRegMd1Cfg)
+        route.int_ctrl = self._i2c.read_byte(self.address, self.REG_INT1_CTRL)
+        route.md_cfg = self._i2c.read_byte(self.address, self.REG_MD1_CFG)
 
         return route
 
@@ -1566,17 +1562,17 @@ class QwiicISM330DHCX(object):
         """
         route = self._PinIntRoute()
 
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        route.mlc_int = self._i2c.readByte(self.address, self.kRegMlcInt2)
-        route.emb_func_int = self._i2c.readByte(self.address, self.kRegEmbFuncInt2)
-        route.fsm_int_a = self._i2c.readByte(self.address, self.kRegFsmInt2A)
-        route.fsm_int_b = self._i2c.readByte(self.address, self.kRegFsmInt2B)
+        route.mlc_int = self._i2c.read_byte(self.address, self.REG_MLC_INT2)
+        route.emb_func_int = self._i2c.read_byte(self.address, self.REG_EMB_FUNC_INT2)
+        route.fsm_int_a = self._i2c.read_byte(self.address, self.REG_FSM_INT2_A)
+        route.fsm_int_b = self._i2c.read_byte(self.address, self.REG_FSM_INT2_B)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
         
-        route.int_ctrl = self._i2c.readByte(self.address, self.kRegInt2Ctrl)
-        route.md_cfg = self._i2c.readByte(self.address, self.kRegMd2Cfg)
+        route.int_ctrl = self._i2c.read_byte(self.address, self.REG_INT2_CTRL)
+        route.md_cfg = self._i2c.read_byte(self.address, self.REG_MD2_CFG)
 
         return route
     
@@ -1585,123 +1581,123 @@ class QwiicISM330DHCX(object):
         Set the routing information to registers INT1_CTRL, MD1_CFG,
         EMB_FUNC_INT1, FSM_INT1_A, FSM_INT1_B
 
-        @param PinIntRoute val: The routing information
+        @param val: **PinIntRoute** The routing information
         """
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        self._i2c.writeByte(self.address, self.kRegMlcInt1, val.mlc_int)
-        self._i2c.writeByte(self.address, self.kRegEmbFuncInt1, val.emb_func_int)
-        self._i2c.writeByte(self.address, self.kRegFsmInt1A, val.fsm_int_a)
-        self._i2c.writeByte(self.address, self.kRegFsmInt1B, val.fsm_int_b)
+        self._i2c.write_byte(self.address, self.REG_MLC_INT1, val.mlc_int)
+        self._i2c.write_byte(self.address, self.REG_EMB_FUNC_INT1, val.emb_func_int)
+        self._i2c.write_byte(self.address, self.REG_FSM_INT1_A, val.fsm_int_a)
+        self._i2c.write_byte(self.address, self.REG_FSM_INT1_B, val.fsm_int_b)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-        embFunEn = (
-            (val.emb_func_int & self.kEmbFuncInt1MaskFsmLc) or
-            (val.emb_func_int & self.kEmbFuncInt1MaskSigMot) or
-            (val.emb_func_int & self.kEmbFuncInt1MaskTilt) or
-            (val.emb_func_int & self.kEmbFuncInt1MaskStepDetector)
+        emb_fun_en = (
+            (val.emb_func_int & self.EMB_FUNC_INT1_MASK_FSM_LC) or
+            (val.emb_func_int & self.EMB_FUNC_INT1_MASK_SIG_MOT) or
+            (val.emb_func_int & self.EMB_FUNC_INT1_MASK_TILT) or
+            (val.emb_func_int & self.EMB_FUNC_INT1_MASK_STEP_DETECTOR)
         )
 
-        if embFunEn or (val.fsm_int_a) or (val.fsm_int_b) or (val.mlc_int):
-            val.md_cfg |= self.kMd1CfgMaskInt1EmbFunc
+        if emb_fun_en or (val.fsm_int_a) or (val.fsm_int_b) or (val.mlc_int):
+            val.md_cfg |= self.MD1_CFG_MASK_INT1_EMB_FUNC
         else:
-            val.md_cfg &= ~self.kMd1CfgMaskInt1EmbFunc
+            val.md_cfg &= ~self.MD1_CFG_MASK_INT1_EMB_FUNC
         
-        self._i2c.writeByte(self.address, self.kRegInt1Ctrl, val.int_ctrl)
-        self._i2c.writeByte(self.address, self.kRegMd1Cfg, val.md_cfg)
+        self._i2c.write_byte(self.address, self.REG_INT1_CTRL, val.int_ctrl)
+        self._i2c.write_byte(self.address, self.REG_MD1_CFG, val.md_cfg)
 
-        tapCfg2 = self._i2c.readByte(self.address, self.kRegTapCfg2)
+        tap_cfg2 = self._i2c.read_byte(self.address, self.REG_TAP_CFG2)
 
-        intsEnable = (
-            (val.md_cfg & self.kMd1CfgMaskInt1Shub) or
-            (val.md_cfg & self.kMd1CfgMaskInt16d) or
-            (val.md_cfg & self.kMd1CfgMaskInt1DoubleTap) or
-            (val.md_cfg & self.kMd1CfgMaskInt1Ff) or
-            (val.md_cfg & self.kMd1CfgMaskInt1Wu) or
-            (val.md_cfg & self.kMd1CfgMaskInt1SingleTap) or
-            (val.md_cfg & self.kMd1CfgMaskInt1SleepChange)
+        ints_enable = (
+            (val.md_cfg & self.MD1_CFG_MASK_INT1_SHUB) or
+            (val.md_cfg & self.MD1_CFG_MASK_INT1_6D) or
+            (val.md_cfg & self.MD1_CFG_MASK_INT1_DOUBLE_TAP) or
+            (val.md_cfg & self.MD1_CFG_MASK_INT1_FF) or
+            (val.md_cfg & self.MD1_CFG_MASK_INT1_WU) or
+            (val.md_cfg & self.MD1_CFG_MASK_INT1_SINGLE_TAP) or
+            (val.md_cfg & self.MD1_CFG_MASK_INT1_SLEEP_CHANGE)
         )
 
-        if intsEnable or val.int_ctrl:
-            tapCfg2 |= self.kTapCfg2MaskInterruptsEnable
+        if ints_enable or val.int_ctrl:
+            tap_cfg2 |= self.TAP_CFG2_MASK_INTERRUPTS_ENABLE
         else:
-            tapCfg2 &= ~self.kTapCfg2MaskInterruptsEnable
+            tap_cfg2 &= ~self.TAP_CFG2_MASK_INTERRUPTS_ENABLE
 
-        self._i2c.writeByte(self.address, self.kRegTapCfg2, tapCfg2)
+        self._i2c.write_byte(self.address, self.REG_TAP_CFG2, tap_cfg2)
 
     def _pin_int2_route_set(self, val):
         """!
         Select the signal that needs to route on the int2 pad
 
-        @param PinIntRoute val: The routing information
+        @param val: **PinIntRoute** The routing information
         """
-        self._mem_bank_set(self.kEmbeddedFuncBank)
+        self._mem_bank_set(self.EMBEDDED_FUNC_BANK)
 
-        self._i2c.writeByte(self.address, self.kRegMlcInt2, val.mlc_int)
-        self._i2c.writeByte(self.address, self.kRegEmbFuncInt2, val.emb_func_int)
-        self._i2c.writeByte(self.address, self.kRegFsmInt2A, val.fsm_int_a)
-        self._i2c.writeByte(self.address, self.kRegFsmInt2B, val.fsm_int_b)
+        self._i2c.write_byte(self.address, self.REG_MLC_INT2, val.mlc_int)
+        self._i2c.write_byte(self.address, self.REG_EMB_FUNC_INT2, val.emb_func_int)
+        self._i2c.write_byte(self.address, self.REG_FSM_INT2_A, val.fsm_int_a)
+        self._i2c.write_byte(self.address, self.REG_FSM_INT2_B, val.fsm_int_b)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-        embFunEn = (
-            (val.emb_func_int & self.kEmbFuncInt2MaskFsmLc) or
-            (val.emb_func_int & self.kEmbFuncInt2MaskSigMot) or
-            (val.emb_func_int & self.kEmbFuncInt2MaskTilt) or
-            (val.emb_func_int & self.kEmbFuncInt2MaskStepDetector)
+        emb_fun_en = (
+            (val.emb_func_int & self.EMB_FUNC_INT2_MASK_FSM_LC) or
+            (val.emb_func_int & self.EMB_FUNC_INT2_MASK_SIG_MOT) or
+            (val.emb_func_int & self.EMB_FUNC_INT2_MASK_TILT) or
+            (val.emb_func_int & self.EMB_FUNC_INT2_MASK_STEP_DETECTOR)
         )
 
-        if embFunEn or (val.fsm_int_a) or (val.fsm_int_b) or (val.mlc_int):
-            val.md_cfg |= self.kMd2CfgMaskInt2EmbFunc
+        if emb_fun_en or (val.fsm_int_a) or (val.fsm_int_b) or (val.mlc_int):
+            val.md_cfg |= self.MD2_CFG_MASK_INT2_EMB_FUNC
         else:
-            val.md_cfg &= ~self.kMd2CfgMaskInt2EmbFunc
+            val.md_cfg &= ~self.MD2_CFG_MASK_INT2_EMB_FUNC
         
-        self._i2c.writeByte(self.address, self.kRegInt2Ctrl, val.int_ctrl)
-        self._i2c.writeByte(self.address, self.kRegMd2Cfg, val.md_cfg)
+        self._i2c.write_byte(self.address, self.REG_INT2_CTRL, val.int_ctrl)
+        self._i2c.write_byte(self.address, self.REG_MD2_CFG, val.md_cfg)
 
-        tapCfg2 = self._i2c.readByte(self.address, self.kRegTapCfg2)
+        tap_cfg2 = self._i2c.read_byte(self.address, self.REG_TAP_CFG2)
 
-        intCtrlEn = (
-            (val.int_ctrl & self.kInt2CtrlMaskInt2DrdyXl) or
-            (val.int_ctrl & self.kInt2CtrlMaskInt2DrdyG) or
-            (val.int_ctrl & self.kInt2CtrlMaskInt2DrdyTemp) or
-            (val.int_ctrl & self.kInt2CtrlMaskInt2FifoTh) or
-            (val.int_ctrl & self.kInt2CtrlMaskInt2FifoOvr) or
-            (val.int_ctrl & self.kInt2CtrlMaskInt2FifoFull) or
-            (val.int_ctrl & self.kInt2CtrlMaskInt2CntBdr)
+        int_ctrl_en = (
+            (val.int_ctrl & self.INT2_CTRL_MASK_INT2_DRDY_XL) or
+            (val.int_ctrl & self.INT2_CTRL_MASK_INT2_DRDY_G) or
+            (val.int_ctrl & self.INT2_CTRL_MASK_INT2_DRDY_TEMP) or
+            (val.int_ctrl & self.INT2_CTRL_MASK_INT2_FIFO_TH) or
+            (val.int_ctrl & self.INT2_CTRL_MASK_INT2_FIFO_OVR) or
+            (val.int_ctrl & self.INT2_CTRL_MASK_INT2_FIFO_FULL) or
+            (val.int_ctrl & self.INT2_CTRL_MASK_INT2_CNT_BDR)
         )
 
-        md2CfgEn = (
-            (val.md_cfg & self.kMd2CfgMaskInt26d) or
-            (val.md_cfg & self.kMd2CfgMaskInt2DoubleTap) or
-            (val.md_cfg & self.kMd2CfgMaskInt2Ff) or
-            (val.md_cfg & self.kMd2CfgMaskInt2Wu) or
-            (val.md_cfg & self.kMd2CfgMaskInt2SingleTap) or
-            (val.md_cfg & self.kMd2CfgMaskInt2SleepChange)
+        md2_cfg_en = (
+            (val.md_cfg & self.MD2_CFG_MASK_INT2_6D) or
+            (val.md_cfg & self.MD2_CFG_MASK_INT2_DOUBLE_TAP) or
+            (val.md_cfg & self.MD2_CFG_MASK_INT2_FF) or
+            (val.md_cfg & self.MD2_CFG_MASK_INT2_WU) or
+            (val.md_cfg & self.MD2_CFG_MASK_INT2_SINGLE_TAP) or
+            (val.md_cfg & self.MD2_CFG_MASK_INT2_SLEEP_CHANGE)
         )
 
-        if intCtrlEn or md2CfgEn:
-            tapCfg2 |= self.kTapCfg2MaskInterruptsEnable
+        if int_ctrl_en or md2_cfg_en:
+            tap_cfg2 |= self.TAP_CFG2_MASK_INTERRUPTS_ENABLE
         else:
-            tapCfg2 &= ~self.kTapCfg2MaskInterruptsEnable
+            tap_cfg2 &= ~self.TAP_CFG2_MASK_INTERRUPTS_ENABLE
         
-        self._i2c.writeByte(self.address, self.kRegTapCfg2, tapCfg2)
+        self._i2c.write_byte(self.address, self.REG_TAP_CFG2, tap_cfg2)
 
         
     def set_accel_status_to_int1(self, enable = True):
         """!
         Sends the accelerometer's data ready signal to interrupt one.
 
-        @param bool enable: Enable or disable the accelerometer status to the interrupt pin
+        @param enable: **bool** Enable or disable the accelerometer status to the interrupt pin
         """
         if enable != True and enable != False:
             return
 
         route = self._pin_int1_route_get()
 
-        route.int_ctrl &= ~self.kInt1CtrlMaskInt1DrdyXl
-        route.int_ctrl |= (enable << self.kInt1CtrlShiftInt1DrdyXl)
+        route.int_ctrl &= ~self.INT1_CTRL_MASK_INT1_DRDY_XL
+        route.int_ctrl |= (enable << self.INT1_CTRL_SHIFT_INT1_DRDY_XL)
 
         self._pin_int1_route_set(route)
     
@@ -1710,15 +1706,15 @@ class QwiicISM330DHCX(object):
         """!
         Sends the accelerometer's data ready signal to interrupt one.
 
-        @param bool enable: Enable or disable the accelerometer status to the interrupt pin
+        @param enable: **bool** Enable or disable the accelerometer status to the interrupt pin
         """
         if enable != True and enable != False:
             return
 
         route = self._pin_int1_route_get()
 
-        route.int_ctrl &= ~self.kInt1CtrlMaskInt1FifoTh
-        route.int_ctrl |= (enable << self.kInt1CtrlShiftInt1FifoTh)
+        route.int_ctrl &= ~self.INT1_CTRL_MASK_INT1_FIFO_TH
+        route.int_ctrl |= (enable << self.INT1_CTRL_SHIFT_INT1_FIFO_TH)
 
         self._pin_int1_route_set(route)
 
@@ -1726,15 +1722,15 @@ class QwiicISM330DHCX(object):
         """!
         Sends the accelerometer's data ready signal to interrupt one.
 
-        @param bool enable: Enable or disable the accelerometer status to the interrupt pin
+        @param enable: **bool** Enable or disable the accelerometer status to the interrupt pin
         """
         if enable != True and enable != False:
             return
 
         route = self._pin_int1_route_get()
 
-        route.int_ctrl &= ~self.kInt1CtrlMaskInt1CntBdr
-        route.int_ctrl |= (enable << self.kInt1CtrlShiftInt1CntBdr)
+        route.int_ctrl &= ~self.INT1_CTRL_MASK_INT1_CNT_BDR
+        route.int_ctrl |= (enable << self.INT1_CTRL_SHIFT_INT1_CNT_BDR)
 
         self._pin_int1_route_set(route)
 
@@ -1742,15 +1738,15 @@ class QwiicISM330DHCX(object):
         """!
         Sends the accelerometer's data ready signal to interrupt two.
 
-        @param bool enable: Enable or disable the accelerometer status to the interrupt pin
+        @param enable: **bool** Enable or disable the accelerometer status to the interrupt pin
         """
         if enable != True and enable != False:
             return
         
         route = self._pin_int2_route_get()
 
-        route.int_ctrl &= ~self.kInt2CtrlMaskInt2DrdyXl
-        route.int_ctrl |= (enable << self.kInt2CtrlShiftInt2DrdyXl)
+        route.int_ctrl &= ~self.INT2_CTRL_MASK_INT2_DRDY_XL
+        route.int_ctrl |= (enable << self.INT2_CTRL_SHIFT_INT2_DRDY_XL)
 
         self._pin_int2_route_set(route)
     
@@ -1758,15 +1754,15 @@ class QwiicISM330DHCX(object):
         """!
         Sends the gyroscope's data ready signal to interrupt one.
 
-        @param bool enable: Enable or disable the gyroscope status to the interrupt pin
+        @param enable: **bool** Enable or disable the gyroscope status to the interrupt pin
         """
         if enable != True and enable != False:
             return
         
         route = self._pin_int1_route_get()
 
-        route.int_ctrl &= ~self.kInt1CtrlMaskInt1DrdyG
-        route.int_ctrl |= (enable << self.kInt1CtrlShiftInt1DrdyG)
+        route.int_ctrl &= ~self.INT1_CTRL_MASK_INT1_DRDY_G
+        route.int_ctrl |= (enable << self.INT1_CTRL_SHIFT_INT1_DRDY_G)
 
         self._pin_int1_route_set(route)
 
@@ -1774,15 +1770,15 @@ class QwiicISM330DHCX(object):
         """!
         Sends the gyroscope's data ready signal to interrupt two.
 
-        @param bool enable: Enable or disable the gyroscope status to the interrupt pin
+        @param enable: **bool** Enable or disable the gyroscope status to the interrupt pin
         """
         if enable != True and enable != False:
             return
         
         route = self._pin_int2_route_get()
 
-        route.int_ctrl &= ~self.kInt2CtrlMaskInt2DrdyG
-        route.int_ctrl |= (enable << self.kInt2CtrlShiftInt2DrdyG)
+        route.int_ctrl &= ~self.INT2_CTRL_MASK_INT2_DRDY_G
+        route.int_ctrl |= (enable << self.INT2_CTRL_SHIFT_INT2_DRDY_G)
 
         self._pin_int2_route_set(route)
 
@@ -1791,183 +1787,183 @@ class QwiicISM330DHCX(object):
         Sets how the data ready signal is latched i.e. only return zero after interface reading
         OR is pulsed.
 
-        @param int val: The data ready mode.
+        @param val: **int** The data ready mode.
 
         Possible values:
-            - kDataReadyPulsed
-            - kDataReadyLatched
+            - DATA_READY_PULSED
+            - DATA_READY_LATCHED
         """
-        if val < self.kDataReadyPulsed or val > self.kDataReadyLatched:
+        if val < self.DATA_READY_PULSED or val > self.DATA_READY_LATCHED:
             return
 
-        regVal = self._i2c.readByte(self.address, self.kRegCntrBdr1)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CNTR_BDR1)
 
-        regVal &= ~self.kCntrBdr1ShiftDatareadyPulsed
-        regVal |= (val << self.kCntrBdr1ShiftDatareadyPulsed)
+        reg_val &= ~self.CNTR_BDR1_SHIFT_DATAREADY_PULSED
+        reg_val |= (val << self.CNTR_BDR1_SHIFT_DATAREADY_PULSED)
 
-        self._i2c.writeByte(self.address, self.kRegCntrBdr1, regVal)
+        self._i2c.write_byte(self.address, self.REG_CNTR_BDR1, reg_val)
     
     def set_hub_odr(self, rate):
         """!
         Sets the output data rate for the sensor hub.
 
-        @param int rate: The output data rate
+        @param rate: **int** The output data rate
 
         Possible values:
-            - kShOdr104Hz
-            - kShOdr52Hz
-            - kShOdr26Hz
-            - kShOdr13Hz
+            - SH_ODR_104HZ
+            - SH_ODR_52HZ
+            - SH_ODR_26HZ
+            - SH_ODR_13HZ
         """
-        if rate < self.kShOdr104Hz or rate > self.kShOdr13Hz:
+        if rate < self.SH_ODR_104HZ or rate > self.SH_ODR_13HZ:
             return
         
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        regVal = self._i2c.readByte(self.address, self.kRegSlv0Config)
+        reg_val = self._i2c.read_byte(self.address, self.REG_SLV0_CONFIG)
 
-        regVal &= ~self.kSlv0ConfigMaskShubOdr
-        regVal |= (rate << self.kSlv0ConfigShiftShubOdr)
+        reg_val &= ~self.SLV0_CONFIG_MASK_SHUB_ODR
+        reg_val |= (rate << self.SLV0_CONFIG_SHIFT_SHUB_ODR)
 
-        self._i2c.writeByte(self.address, self.kRegSlv0Config, regVal)
+        self._i2c.write_byte(self.address, self.REG_SLV0_CONFIG, reg_val)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
 
-    def set_hub_sensor_read(self, sensor, address, subAddress, lenData):
+    def set_hub_sensor_read(self, sensor, address, sub_address, len_data):
         """!
         Sets the general sensor hub settings, which sensor and their I2C address and register
         to read.
 
-        @param int sensor: The sensor to read from
-        @param int address: The I2C address of the sensor
-        @param int subAddress: The register address of the sensor
-        @param int lenData: The length of data to read from the sensor
+        @param sensor: **int** The sensor to read from
+        @param address: **int** The I2C address of the sensor
+        @param sub_address: **int** The register address of the sensor
+        @param len_data: **int** The length of data to read from the sensor
         """
         if sensor < 0 or sensor > 3:
             return
         
         if sensor == 0:
-            slvAddReg = self.kRegSlv0Add
-            slvSubaddReg = self.kRegSlv0Subadd
-            slvConfigReg = self.kRegSlv0Config
+            slv_add_reg = self.REG_SLV0_ADD
+            slv_subadd_reg = self.REG_SLV0_SUBADD
+            slv_config_reg = self.REG_SLV0_CONFIG
         elif sensor == 1:
-            slvAddReg = self.kRegSlv1Addr
-            slvSubaddReg = self.kRegSlv1Subadd
-            slvConfigReg = self.kRegSlv1Config
+            slv_add_reg = self.REG_SLV1_ADDR
+            slv_subadd_reg = self.REG_SLV1_SUBADD
+            slv_config_reg = self.REG_SLV1_CONFIG
         elif sensor == 2:
-            slvAddReg = self.kRegSlv2Addr
-            slvSubaddReg = self.kRegSlv2Subadd
-            slvConfigReg = self.kRegSlv2Config
+            slv_add_reg = self.REG_SLV2_ADDR
+            slv_subadd_reg = self.REG_SLV2_SUBADD
+            slv_config_reg = self.REG_SLV2_CONFIG
         elif sensor == 3:
-            slvAddReg = self.kRegSlv3Addr
-            slvSubaddReg = self.kRegSlv3Subadd
-            slvConfigReg = self.kRegSlv3Config
+            slv_add_reg = self.REG_SLV3_ADDR
+            slv_subadd_reg = self.REG_SLV3_SUBADD
+            slv_config_reg = self.REG_SLV3_CONFIG
         
         
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
         
         # TODO: okay to use slave0 vals for all of this masking since bit pos are the same for all 3 slaves. 
         #       the vendor API explicitly has a different function for each slave, so we might want to switch to that way,
         #       but it creates a lot of duplicated code
-        slvAddVal = (address >> 1) << self.kSlv0AddShiftSlave0
-        slvAddVal |= self.kSlv0AddMaskRw0 
+        slv_add_val = (address >> 1) << self.SLV0_ADD_SHIFT_SLAVE0
+        slv_add_val |= self.SLV0_ADD_MASK_RW0 
 
-        self._i2c.writeByte(self.address, slvAddReg, slvAddVal)
+        self._i2c.write_byte(self.address, slv_add_reg, slv_add_val)
 
-        self._i2c.writeByte(self.address, slvSubaddReg, subAddress)
+        self._i2c.write_byte(self.address, slv_subadd_reg, sub_address)
 
-        slvConfigRead = self._i2c.readByte(self.address, slvConfigReg)
+        slv_config_read = self._i2c.read_byte(self.address, slv_config_reg)
 
-        slvConfigRead &= ~self.kSlv0ConfigMaskSlave0Numop
-        slvConfigRead |= (lenData << self.kSlv0ConfigShiftSlave0Numop)
+        slv_config_read &= ~self.SLV0_CONFIG_MASK_SLAVE0_NUMOP
+        slv_config_read |= (len_data << self.SLV0_CONFIG_SHIFT_SLAVE0_NUMOP)
 
-        self._i2c.writeByte(self.address, slvConfigReg, slvConfigRead)
+        self._i2c.write_byte(self.address, slv_config_reg, slv_config_read)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-    def set_hub_sensor_write(self, address, subAddress, data):
+    def set_hub_sensor_write(self, address, sub_address, data):
         """!
         Gives settings to the 6DoF to write to an external sensor.
 
-        @param int address: The I2C address of the sensor
-        @param int subAddress: The register address of the sensor
-        @param int data: The single byte data to write to the sensor
+        @param address: **int** The I2C address of the sensor
+        @param sub_address: **int** The register address of the sensor
+        @param data: **int** The single byte data to write to the sensor
         """
         
         if data < 0 or data > 255:
             return
         
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        slv0AddVal = (address >> 1) << self.kSlv0AddShiftSlave0
-        slv0AddVal &= ~self.kSlv0AddMaskRw0
+        slv0_add_val = (address >> 1) << self.SLV0_ADD_SHIFT_SLAVE0
+        slv0_add_val &= ~self.SLV0_ADD_MASK_RW0
 
-        self._i2c.writeByte(self.address, self.kRegSlv0Add, slv0AddVal)
+        self._i2c.write_byte(self.address, self.REG_SLV0_ADD, slv0_add_val)
 
-        self._i2c.writeByte(self.address, self.kRegSlv0Subadd, subAddress)
+        self._i2c.write_byte(self.address, self.REG_SLV0_SUBADD, sub_address)
 
-        self._i2c.writeByte(self.address, self.kRegDatawriteSlv0, data)
+        self._i2c.write_byte(self.address, self.REG_DATAWRITE_SLV0, data)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
-    def set_number_hub_sensors(self, highestSlave):
+    def set_number_hub_sensors(self, highest_slave):
         """!
         Sets the number of sensors that the sensor hub will read from.
 
-        @param int highestSlave: The highest sensor number to read from (0-3)
+        @param highest_slave: **int** The highest sensor number to read from (0-3)
 
         For example, if highest slave is set to 2, the sensor hub will read from sensors 0, 1, and 2.
         """
-        if highestSlave < 0 or highestSlave > 3:
+        if highest_slave < 0 or highest_slave > 3:
             return
         
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        masterConfig = self._i2c.readByte(self.address, self.kRegMasterConfig)
+        master_config = self._i2c.read_byte(self.address, self.REG_MASTER_CONFIG)
 
-        masterConfig &= ~self.kMasterConfigMaskAuxSensOn
-        masterConfig |= (highestSlave << self.kMasterConfigShiftAuxSensOn)
+        master_config &= ~self.MASTER_CONFIG_MASK_AUX_SENS_ON
+        master_config |= (highest_slave << self.MASTER_CONFIG_SHIFT_AUX_SENS_ON)
 
-        self._i2c.writeByte(self.address, self.kRegMasterConfig, masterConfig)
+        self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
     def enable_sensor_i2c(self, enable = True):
         """!
         Enables the 6DoF as an I2C sensor controller
 
-        @param bool enable: Enable or disable the sensor I2C controller
+        @param enable: **bool** Enable or disable the sensor I2C controller
         """
 
         if enable != 1 and enable != 0:
             return
 
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        masterConfig = self._i2c.readByte(self.address, self.kRegMasterConfig)
+        master_config = self._i2c.read_byte(self.address, self.REG_MASTER_CONFIG)
 
-        masterConfig &= ~self.kMasterConfigMaskMasterOn
-        masterConfig |= (enable << self.kMasterConfigShiftMasterOn)
+        master_config &= ~self.MASTER_CONFIG_MASK_MASTER_ON
+        master_config |= (enable << self.MASTER_CONFIG_SHIFT_MASTER_ON)
 
-        self._i2c.writeByte(self.address, self.kRegMasterConfig, masterConfig)
+        self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
     def read_peripheral_sensor(self, len):
         """!
         Read external sensor data from the sensor hub
 
-        @param int len: The number of bytes to read from the sensor
+        @param len: **int** The number of bytes to read from the sensor
 
         @return **list** The data read from the sensor
         """
 
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        data = list(self._i2c.readBytes(self.address, self.kRegSensorHub1, len))
+        data = list(self._i2c.read_bytes(self.address, self.REG_SENSOR_HUB1, len))
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
         return data
 
@@ -1978,11 +1974,11 @@ class QwiicISM330DHCX(object):
         @return **int** The status of the sensor hub
         """
 
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        status = self._i2c.readByte(self.address, self.kRegStatusMaster)
+        status = self._i2c.read_byte(self.address, self.REG_STATUS_MASTER)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
         return status
 
@@ -1995,7 +1991,7 @@ class QwiicISM330DHCX(object):
         """
         status = self._sh_status_get()
 
-        if status & self.kStatusMasterMaskSensHubEndop:
+        if status & self.STATUS_MASTER_MASK_SENS_HUB_ENDOP:
             return True
         
         return False
@@ -2004,18 +2000,18 @@ class QwiicISM330DHCX(object):
         """!
         Get the NACK status of the external sensor
 
-        @param int sensor: The sensor to check
+        @param sensor: **int** The sensor to check
         """
         status = self._sh_status_get()
         
         if sensor == 0:
-            return status & self.kStatusMasterMaskSlave0Nack
+            return status & self.STATUS_MASTER_MASK_SLAVE0_NACK
         elif sensor == 1:
-            return status & self.kStatusMasterMaskSlave1Nack
+            return status & self.STATUS_MASTER_MASK_SLAVE1_NACK
         elif sensor == 2:
-            return status & self.kStatusMasterMaskSlave2Nack
+            return status & self.STATUS_MASTER_MASK_SLAVE2_NACK
         elif sensor == 3:
-            return status & self.kStatusMasterMaskSlave3Nack
+            return status & self.STATUS_MASTER_MASK_SLAVE3_NACK
         
         return False
 
@@ -2023,7 +2019,7 @@ class QwiicISM330DHCX(object):
         """!
         Read data from the MMC magnetometer
 
-        @param int len: The number of bytes to read from the magnetometer
+        @param len: **int** The number of bytes to read from the magnetometer
 
         @return **list** The data read from the magnetometer
         """
@@ -2034,136 +2030,136 @@ class QwiicISM330DHCX(object):
         Sets how often the 6DoF should write to the external sensor: once per cycle i.e. output
         data rate, or just once.
 
-        @param int config: The write mode
+        @param config: **int** The write mode
 
         Possible values:
-            - kHubWriteModeSingle
-            - kHubWriteModeCycle
+            - HUB_WRITE_MODE_SINGLE
+            - HUB_WRITE_MODE_CYCLE
         """
-        if config not in [self.kHubWriteModeSingle, self.kHubWriteModeCycle]:
+        if config not in [self.HUB_WRITE_MODE_SINGLE, self.HUB_WRITE_MODE_CYCLE]:
             return
         
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        masterConfig = self._i2c.readByte(self.address, self.kRegMasterConfig)
-        masterConfig &= ~self.kMasterConfigMaskWriteOnce
-        masterConfig |= (config << self.kMasterConfigShiftWriteOnce)
-        self._i2c.writeByte(self.address, self.kRegMasterConfig, masterConfig)
+        master_config = self._i2c.read_byte(self.address, self.REG_MASTER_CONFIG)
+        master_config &= ~self.MASTER_CONFIG_MASK_WRITE_ONCE
+        master_config |= (config << self.MASTER_CONFIG_SHIFT_WRITE_ONCE)
+        self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
     def set_hub_pass_through(self, enable = True):
         """!
         Allows the primary I2C data lines to communicate through the auxiliary I2C lines.
 
-        @param bool enable: Enable or disable the pass through
+        @param enable: **bool** Enable or disable the pass through
         """
 
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        masterConfig = self._i2c.readByte(self.address, self.kRegMasterConfig)
-        masterConfig &= ~self.kMasterConfigShiftPassThroughMode
-        masterConfig |= (enable << self.kMasterConfigShiftPassThroughMode)
-        self._i2c.writeByte(self.address, self.kRegMasterConfig, masterConfig)
+        master_config = self._i2c.read_byte(self.address, self.REG_MASTER_CONFIG)
+        master_config &= ~self.MASTER_CONFIG_SHIFT_PASS_THROUGH_MODE
+        master_config |= (enable << self.MASTER_CONFIG_SHIFT_PASS_THROUGH_MODE)
+        self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
     def set_hub_fifo_batching(self, enable = True):
         """!
         Sets sensor hub FIFO batching
 
-        @param bool enable: Enable or disable the FIFO batching
+        @param enable: **bool** Enable or disable the FIFO batching
         """
         if enable != 1 and enable != 0:
             return
 
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        slv0Config = self._i2c.readByte(self.address, self.kRegSlv0Config)
+        slv0_config = self._i2c.read_byte(self.address, self.REG_SLV0_CONFIG)
 
-        slv0Config &= ~self.kSlv0ConfigMaskBatchExtSens0En
-        slv0Config |= (enable << self.kSlv0ConfigShiftBatchExtSens0En)
+        slv0_config &= ~self.SLV0_CONFIG_MASK_BATCH_EXT_SENS0_EN
+        slv0_config |= (enable << self.SLV0_CONFIG_SHIFT_BATCH_EXT_SENS0_EN)
 
-        self._i2c.writeByte(self.address, self.kRegSlv0Config, slv0Config)
+        self._i2c.write_byte(self.address, self.REG_SLV0_CONFIG, slv0_config)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
 
     def set_hub_pull_ups(self, enable = True):
         """!
         Enables/Disables internal pullups on SDX/SCX lines
 
-        @param bool enable: Enable or disable the pullups
+        @param enable: **bool** Enable or disable the pullups
         """
         if enable != 1 and enable != 0:
             return
         
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        masterConfig = self._i2c.readByte(self.address, self.kRegMasterConfig)
-        masterConfig &= ~self.kMasterConfigMaskShubPuEn
-        masterConfig |= (enable << self.kMasterConfigShiftShubPuEn)
-        self._i2c.writeByte(self.address, self.kRegMasterConfig, masterConfig)
+        master_config = self._i2c.read_byte(self.address, self.REG_MASTER_CONFIG)
+        master_config &= ~self.MASTER_CONFIG_MASK_SHUB_PU_EN
+        master_config |= (enable << self.MASTER_CONFIG_SHIFT_SHUB_PU_EN)
+        self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
     def reset_sensor_hub(self):
         """!
         Resets all settings in the "Master Config" register
         """
-        self._mem_bank_set(self.kSensorHubBank)
+        self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        masterConfig = self._i2c.readByte(self.address, self.kRegMasterConfig)
-        masterConfig |= self.kMasterConfigMaskRstMasterRegs
-        self._i2c.writeByte(self.address, self.kRegMasterConfig, masterConfig)
-        masterConfig &= ~self.kMasterConfigMaskRstMasterRegs
-        self._i2c.writeByte(self.address, self.kRegMasterConfig, masterConfig)
+        master_config = self._i2c.read_byte(self.address, self.REG_MASTER_CONFIG)
+        master_config |= self.MASTER_CONFIG_MASK_RST_MASTER_REGS
+        self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
+        master_config &= ~self.MASTER_CONFIG_MASK_RST_MASTER_REGS
+        self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
 
-        self._mem_bank_set(self.kUserBank)
+        self._mem_bank_set(self.USER_BANK)
 
 
     # Self Test Functions
-    def setAccelSelfTest(self, val):
+    def set_accel_self_test(self, val):
         """!
         Linear acceleration sensor self-test enable.
 
-        @param int val: Change the values of st_xl in reg CTRL5_C
+        @param val: **int** Change the values of st_xl in reg CTRL5_C
 
         Possible values:
-            - kSelfTestDisable
-            - kSelfTestPositive
-            - kSelfTestNegative
+            - SELF_TEST_DISABLE
+            - SELF_TEST_POSITIVE
+            - SELF_TEST_NEGATIVE
         """
-        if val not in [self.kSelfTestDisable, self.kSelfTestPositive, self.kSelfTestNegative]:
+        if val not in [self.SELF_TEST_DISABLE, self.SELF_TEST_POSITIVE, self.SELF_TEST_NEGATIVE]:
             return
         
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl5C)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL5_C)
 
-        regVal &= ~self.kCtrl5CMaskStXl
-        regVal |= (val << self.kCtrl5CShiftStXl)
+        reg_val &= ~self.CTRL5_C_MASK_ST_XL
+        reg_val |= (val << self.CTRL5_C_SHIFT_ST_XL)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl5C, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL5_C, reg_val)
 
-    def setGyroSelfTest(self, val):
+    def set_gyro_self_test(self, val):
         """!
         Angular rate sensor self-test enable
 
-        @param int val: Change the values of st_g in reg CTRL5_C
+        @param val: **int** Change the values of st_g in reg CTRL5_C
 
         Possible values:
-            - kSelfTestDisable
-            - kSelfTestPositive
-            - kSelfTestNegative
+            - SELF_TEST_DISABLE
+            - SELF_TEST_POSITIVE
+            - SELF_TEST_NEGATIVE
         """
-        if val not in [self.kSelfTestDisable, self.kSelfTestPositive, self.kSelfTestNegative]:
+        if val not in [self.SELF_TEST_DISABLE, self.SELF_TEST_POSITIVE, self.SELF_TEST_NEGATIVE]:
             return
         
-        regVal = self._i2c.readByte(self.address, self.kRegCtrl5C)
+        reg_val = self._i2c.read_byte(self.address, self.REG_CTRL5_C)
 
-        regVal &= ~self.kCtrl5CMaskStG
-        regVal |= (val << self.kCtrl5CShiftStG)
+        reg_val &= ~self.CTRL5_C_MASK_ST_G
+        reg_val |= (val << self.CTRL5_C_SHIFT_ST_G)
 
-        self._i2c.writeByte(self.address, self.kRegCtrl5C, regVal)
+        self._i2c.write_byte(self.address, self.REG_CTRL5_C, reg_val)
 
     # Status Checking Functions
 
@@ -2173,9 +2169,9 @@ class QwiicISM330DHCX(object):
 
         @return **bool** If data is ready for both sensors
         """
-        status = self._i2c.readByte(self.address, self.kRegStatus)
+        status = self._i2c.read_byte(self.address, self.REG_STATUS)
 
-        if status & self.kStatusMaskXlda and status & self.kStatusMaskGda:
+        if status & self.STATUS_MASK_XLDA and status & self.STATUS_MASK_GDA:
             return True
         
         return False
@@ -2186,9 +2182,9 @@ class QwiicISM330DHCX(object):
 
         @return **bool** If data is ready for the accelerometer
         """
-        status = self._i2c.readByte(self.address, self.kRegStatus)
+        status = self._i2c.read_byte(self.address, self.REG_STATUS)
 
-        if status & self.kStatusMaskXlda:
+        if status & self.STATUS_MASK_XLDA:
             return True
         
         return False
@@ -2197,9 +2193,9 @@ class QwiicISM330DHCX(object):
         """!
         Checks if data is ready for the gyroscope
         """
-        status = self._i2c.readByte(self.address, self.kRegStatus)
+        status = self._i2c.read_byte(self.address, self.REG_STATUS)
 
-        if status & self.kStatusMaskGda:
+        if status & self.STATUS_MASK_GDA:
             return True
         
         return False
@@ -2208,9 +2204,9 @@ class QwiicISM330DHCX(object):
         """!
         Checks if data is ready for the temperature sensor
         """
-        status = self._i2c.readByte(self.address, self.kRegStatus)
+        status = self._i2c.read_byte(self.address, self.REG_STATUS)
 
-        if status & self.kStatusMaskTda:
+        if status & self.STATUS_MASK_TDA:
             return True
         
         return False

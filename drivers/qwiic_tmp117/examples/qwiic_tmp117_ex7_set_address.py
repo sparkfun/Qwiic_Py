@@ -40,9 +40,8 @@
 
 import qwiic_tmp117
 import sys
-import time
 
-def runExample():
+def run_example():
 	print("\nQwiic TMP117 Example 7 - Set Address\n")
 
 	# The default address of the device is 0x48, but it can be changed to any of the following:
@@ -76,7 +75,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

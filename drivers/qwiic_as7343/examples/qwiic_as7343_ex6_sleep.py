@@ -42,7 +42,7 @@
 
 import qwiic_as7343 
 import sys
-import time
+import qwiic_i2c
 
 def take_reading(device):
 	# Power on the device
@@ -50,7 +50,7 @@ def take_reading(device):
 	print("Device powered on")
 
 	# Set AutoSmux to output all 18 channels
-	if not device.set_auto_smux(device.kAutoSmux18Channels):
+	if not device.set_auto_smux(device.AUTO_SMUX_18_CHANNELS):
 		print("Failed to set AutoSmux", file=sys.stderr)
 		return
 	print("AutoSmux set to 18 channels")
@@ -64,7 +64,7 @@ def take_reading(device):
 	device.set_led_drive(0) # 0 = 4mA
 	device.set_led_on()
 
-	time.sleep(0.100) # Wait 100 ms for LED to fully illuminate our target
+	qwiic_i2c.delay_ms(100) # Wait 100 ms for LED to fully illuminate our target
 	
 	# Read the spectral data
 	device.read_all_spectral_data()
@@ -72,7 +72,7 @@ def take_reading(device):
 	device.set_led_off()
 
 	# Print our comma-separated spectral data
-	for i in range(0, device.kNumChannels):
+	for i in range(0, device.NUM_CHANNELS):
 		print(device.get_data(i), end=',')
 	print()
 
@@ -90,7 +90,7 @@ def sleep_device(device):
 		return
 	print("Device powered off")
 
-def runExample():
+def run_example():
 	print("\nQwiic AS7343 Example 6 - Sleep\n")
 
 	# Create instance of device
@@ -116,11 +116,11 @@ def runExample():
 		sleep_device(myAS7343)
 
 		# Wait 5 seconds before taking another reading
-		time.sleep(5.0)
+		qwiic_i2c.delay_ms(5000)
 		
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

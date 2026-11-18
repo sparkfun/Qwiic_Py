@@ -41,46 +41,46 @@
 
 import qwiic_otos
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
     print("\nQwiic OTOS Example 5 - Velocity and Acceleration\n")
 
     # Create instance of device
-    myOtos = qwiic_otos.QwiicOTOS()
+    my_otos = qwiic_otos.QwiicOTOS()
 
     # Check if it's connected
-    if myOtos.is_connected() == False:
+    if not my_otos.is_connected():
         print("The device isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
 
     # Initialize the device
-    myOtos.begin()
+    my_otos.begin()
 
     print("Ensure the OTOS is flat and stationary during calibration!")
     for i in range(5, 0, -1):
         print("Calibrating in %d seconds..." % i)
-        time.sleep(1)
+        qwiic_i2c.delay_ms(1000)
 
     print("Calibrating IMU...")
 
     # Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    myOtos.calibrateImu()
+    my_otos.calibrate_imu()
 
     # Reset the tracking algorithm - this resets the position to the origin,
     # but can also be used to recover from some rare tracking errors
-    myOtos.resetTracking()
+    my_otos.reset_tracking()
 
     # Main loop
     while True:
         # These values can be read individually like so:
-        pos = myOtos.getPosition()
-        vel = myOtos.getVelocity()
-        acc = myOtos.getAcceleration()
+        pos = my_otos.get_position()
+        vel = my_otos.get_velocity()
+        acc = my_otos.get_acceleration()
 
         # Or burst read them all at once with the following:
-        # (pos, vel, acc) = myOtos.getPosVelAcc()
+        # (pos, vel, acc) = my_otos.get_pos_vel_acc()
 
         # Print position
         print()
@@ -104,11 +104,11 @@ def runExample():
         print("Heading (Degrees/sec^2): {}".format(acc.h))
 
         # Wait a bit so we don't spam the serial port
-        time.sleep(0.5)
+        qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example")
         sys.exit(0)

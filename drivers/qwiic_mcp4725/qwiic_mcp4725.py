@@ -47,6 +47,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -66,20 +68,21 @@ class QwiicMCP4725(object):
     device_name         = _DEFAULT_NAME
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
-    kPowerDownModeNormal = 0  # PD1=0, PD0=0
-    kPowerDownMode1K = 1      # PD1=0, PD0=1
-    kPowerDownMode100K = 2    # PD1=1, PD0=0
-    kPowerDownMode500K = 3    # PD1=1, PD0=1
+    POWER_DOWN_MODE_NORMAL = 0  # PD1=0, PD0=0
+    POWER_DOWN_MODE_1K = 1      # PD1=0, PD0=1
+    POWER_DOWN_MODE_100K = 2    # PD1=1, PD0=0
+    POWER_DOWN_MODE_500K = 3    # PD1=1, PD0=1
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -87,14 +90,8 @@ class QwiicMCP4725(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     def is_connected(self):
         """!
@@ -105,9 +102,7 @@ class QwiicMCP4725(object):
         # Check if connected by seeing if an ACK is received
         # TODO: If the device has a product ID register, that should be
         # checked in addition to the ACK
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -122,27 +117,27 @@ class QwiicMCP4725(object):
         """!
         Writes a block of data to the device without specifying an address
 
-        @param list data: Bytes to write to the device
+        @param data: **list** Bytes to write to the device
         """
 
         # For devices that don't require an address to be sent before the data
-        self._i2c.writeBlock(self.address, data[0], data[1:])
+        self._i2c.write_block(self.address, data[0], data[1:])
 
 
-    def write_fast_mode(self, value, powerDownMode = kPowerDownModeNormal):
+    def write_fast_mode(self, value, power_down_mode=POWER_DOWN_MODE_NORMAL):
         """!
         Updates DAC register in fast mode
 
-        @param int value: 12-bit value to write to DAC register
-        @param int powerDownMode: Power down mode to write to DAC register
+        @param value: **int** 12-bit value to write to DAC register
+        @param power_down_mode: **int** Power down mode to write to DAC register
 
-        Allowable values for powerDownMode are:
-            - `kPowerDownModeNormal`
-            - `kPowerDownMode1K`
-            - `kPowerDownMode100K`
-            - `kPowerDownMode500K`
+        Allowable values for power_down_mode are:
+            - `POWER_DOWN_MODE_NORMAL`
+            - `POWER_DOWN_MODE_1K`
+            - `POWER_DOWN_MODE_100K`
+            - `POWER_DOWN_MODE_500K`
         """
-        if powerDownMode not in [self.kPowerDownModeNormal, self.kPowerDownMode1K, self.kPowerDownMode100K, self.kPowerDownMode500K]:
+        if power_down_mode not in [self.POWER_DOWN_MODE_NORMAL, self.POWER_DOWN_MODE_1K, self.POWER_DOWN_MODE_100K, self.POWER_DOWN_MODE_500K]:
             return
 
         if value > 4095:
@@ -154,26 +149,26 @@ class QwiicMCP4725(object):
         # byte 0: C2=0 | C0=0 | PD1 | PD0 | D11 | D10 | D9 | D8
         # byte 1: D7   | D6   | D5  | D4  | D3  | D2  | D1 | D0
 
-        bytesToWrite = [0] * 2
-        bytesToWrite[0] = (powerDownMode << 4) | ( (value & 0x0F00) >> 8 )
-        bytesToWrite[1] = value & 0xFF
-        self.write_block_no_address(bytesToWrite)
+        bytes_to_write = [0] * 2
+        bytes_to_write[0] = (power_down_mode << 4) | ( (value & 0x0F00) >> 8 )
+        bytes_to_write[1] = value & 0xFF
+        self.write_block_no_address(bytes_to_write)
 
-    def write_dac(self, value, powerDownMode = kPowerDownModeNormal):
+    def write_dac(self, value, power_down_mode=POWER_DOWN_MODE_NORMAL):
         """!
         Updates DAC register
 
-        @param int value: 12-bit value to write to DAC register
-        @param int powerDownMode: Power down mode to write to DAC register
+        @param value: **int** 12-bit value to write to DAC register
+        @param power_down_mode: **int** Power down mode to write to DAC register
 
-        Allowable values for powerDownMode are:
-            - `kPowerDownModeNormal`
-            - `kPowerDownMode1K`
-            - `kPowerDownMode100K`
-            - `kPowerDownMode500K`
+        Allowable values for power_down_mode are:
+            - `POWER_DOWN_MODE_NORMAL`
+            - `POWER_DOWN_MODE_1K`
+            - `POWER_DOWN_MODE_100K`
+            - `POWER_DOWN_MODE_500K`
         """
 
-        if powerDownMode not in [self.kPowerDownModeNormal, self.kPowerDownMode1K, self.kPowerDownMode100K, self.kPowerDownMode500K]:
+        if power_down_mode not in [self.POWER_DOWN_MODE_NORMAL, self.POWER_DOWN_MODE_1K, self.POWER_DOWN_MODE_100K, self.POWER_DOWN_MODE_500K]:
             return
 
         if value > 4095:
@@ -186,28 +181,28 @@ class QwiicMCP4725(object):
         # byte 1: D11  | D10   | D9   | D8 | D7 | D6  | D5  | D4
         # byte 2: D3   | D2    | D1   | D0 | X  | X   | X   | X
 
-        bytesToWrite = [0] * 3
-        bytesToWrite[0] = (0x40 | (powerDownMode << 1))
-        bytesToWrite[1] = ( (value & 0x0FF0) >> 4 )
-        bytesToWrite[2] = ( (value & 0x000F) << 4 )
-        self.write_block_no_address(bytesToWrite)
+        bytes_to_write = [0] * 3
+        bytes_to_write[0] = (0x40 | (power_down_mode << 1))
+        bytes_to_write[1] = ( (value & 0x0FF0) >> 4 )
+        bytes_to_write[2] = ( (value & 0x000F) << 4 )
+        self.write_block_no_address(bytes_to_write)
 
 
-    def write_dac_eeprom(self, value, powerDownMode = kPowerDownModeNormal):
+    def write_dac_eeprom(self, value, power_down_mode=POWER_DOWN_MODE_NORMAL):
         """!
         Updates DAC register and EEPROM register
 
-        @param int value: 12-bit value to write to DAC and EEPROM registers
-        @param int powerDownMode: Power down mode to write to DAC and EEPROM registers
+        @param value: **int** 12-bit value to write to DAC and EEPROM registers
+        @param power_down_mode: **int** Power down mode to write to DAC and EEPROM registers
 
-        Allowable values for powerDownMode are:
-            - `kPowerDownModeNormal`
-            - `kPowerDownMode1K`
-            - `kPowerDownMode100K`
-            - `kPowerDownMode500K`
+        Allowable values for power_down_mode are:
+            - `POWER_DOWN_MODE_NORMAL`
+            - `POWER_DOWN_MODE_1K`
+            - `POWER_DOWN_MODE_100K`
+            - `POWER_DOWN_MODE_500K`
         """
 
-        if powerDownMode not in [self.kPowerDownModeNormal, self.kPowerDownMode1K, self.kPowerDownMode100K, self.kPowerDownMode500K]:
+        if power_down_mode not in [self.POWER_DOWN_MODE_NORMAL, self.POWER_DOWN_MODE_1K, self.POWER_DOWN_MODE_100K, self.POWER_DOWN_MODE_500K]:
             return
 
         if value > 4095:
@@ -220,11 +215,11 @@ class QwiicMCP4725(object):
         # byte 1: D11  | D10   | D9   | D8 | D7 | D6  | D5  | D4
         # byte 2: D3   | D2    | D1   | D0 | X  | X   | X   | X
 
-        bytesToWrite = [0] * 3
-        bytesToWrite[0] = (0x60 | (powerDownMode << 1))
-        bytesToWrite[1] = ( (value & 0x0FF0) >> 4 )
-        bytesToWrite[2] = ( (value & 0x000F) << 4 )
-        self.write_block_no_address(bytesToWrite)
+        bytes_to_write = [0] * 3
+        bytes_to_write[0] = (0x60 | (power_down_mode << 1))
+        bytes_to_write[1] = ( (value & 0x0FF0) >> 4 )
+        bytes_to_write[2] = ( (value & 0x000F) << 4 )
+        self.write_block_no_address(bytes_to_write)
 
     def read_dac_eeprom(self):
         """!
@@ -247,7 +242,7 @@ class QwiicMCP4725(object):
         # byte 3 (EEPROM Reg): X   | PD1 | PD0 | X  | D11 | D10 | D9  | D8
         # byte 4 (EEPROM Reg): D7  | D6  | D5  | D4 | D3  | D2  | D1  | D0
 
-        read_bytes = self._i2c.readBlock(self.address, 0, 5)
+        read_bytes = self._i2c.read_block(self.address, 0, 5)
 
         data = {
             'rdy_flag': (read_bytes[0] & 0x80) >> 7,

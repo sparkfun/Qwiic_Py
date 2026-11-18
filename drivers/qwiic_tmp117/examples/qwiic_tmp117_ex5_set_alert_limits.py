@@ -39,15 +39,14 @@
 
 import qwiic_tmp117
 import sys
-import time
 
 def alert_mode_to_string(alert_mode):
-	if alert_mode == qwiic_tmp117.QwiicTMP117.kAlertMode:
+	if alert_mode == qwiic_tmp117.QwiicTMP117.ALERT_MODE:
 		return "Alert Mode"
-	elif alert_mode == qwiic_tmp117.QwiicTMP117.kThermMode:
+	elif alert_mode == qwiic_tmp117.QwiicTMP117.THERM_MODE:
 		return "Therm Mode"
 
-def runExample():
+def run_example():
 	print("\nQwiic TMP117 Example 5 - Set Alert Mode Temperature Limits\n")
 
 	# Create instance of device
@@ -105,7 +104,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

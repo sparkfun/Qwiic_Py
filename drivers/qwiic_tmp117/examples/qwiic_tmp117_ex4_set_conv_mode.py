@@ -36,19 +36,18 @@
 
 import qwiic_tmp117
 import sys
-import time
 
 def conv_mode_to_string(mode):
-	if mode == qwiic_tmp117.QwiicTMP117.kContinuousConversionMode:
+	if mode == qwiic_tmp117.QwiicTMP117.CONTINUOUS_CONVERSION_MODE:
 		return "Continuous Conversion Mode"
-	elif mode == qwiic_tmp117.QwiicTMP117.kShutdownMode:
+	elif mode == qwiic_tmp117.QwiicTMP117.SHUTDOWN_MODE:
 		return "Shutdown Mode"
-	elif mode == qwiic_tmp117.QwiicTMP117.kOneShotMode:
+	elif mode == qwiic_tmp117.QwiicTMP117.ONE_SHOT_MODE:
 		return "One-Shot Mode"
 	else:
 		return "Invalid Conversion Mode"
 
-def runExample():
+def run_example():
 	print("\nQwiic TMP117 Example 4 - Set Conversion Mode\n")
 
 	# Create instance of device
@@ -88,7 +87,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

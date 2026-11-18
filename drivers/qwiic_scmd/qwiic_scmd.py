@@ -54,6 +54,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
 #
@@ -73,7 +75,7 @@ class SCMDDiagnostics(object):
 
         Object used for diagnostic reporting.
 
-        :ivar numberOfSlaves:
+        :ivar number_of_slaves:
         :ivar U_I2C_RD_ERR:
         :ivar U_I2C_WR_ERR:
         :ivar U_BUF_DUMPED:
@@ -93,7 +95,7 @@ class SCMDDiagnostics(object):
         super(SCMDDiagnostics, self).__init__()
 
         # Attainable metrics from SCMD
-        self.numberOfSlaves = 0
+        self.number_of_slaves = 0
         self.U_I2C_RD_ERR = 0
         self.U_I2C_WR_ERR = 0
         self.U_BUF_DUMPED = 0
@@ -107,14 +109,13 @@ class SCMDDiagnostics(object):
         self.REG_OOR_CNT = 0
         self.REG_RO_WRITE_CNT = 0
 
-class QwiicScmd(object):
+class QwiicSCMD(object):
     """!
-        QwiicScmd
+        QwiicSCMD
 
         @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
         @return **Object** The Serial Control Motor Driver device object.
         """
@@ -255,43 +256,36 @@ class QwiicScmd(object):
     SCMD_REM_READ              = 0x7E
 
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address is not None else self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     #----------------------------------------------
     def is_connected(self):
         """!
-            Determine if a SCMD device is conntected to the system..
+            Determine if a SCMD device is connected to the system.
 
             @return **bool** True if the device is connected, otherwise False.
             """
-        return qwiic_i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return qwiic_i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
             Initialize the operation of the SCMD module
 
-            @return **bool** Returns true of the initializtion was successful, otherwise False.
+            @return **bool** Returns true if the device ID reads as ID_WORD (0xA9), otherwise False.
             """
         # dummy read
-        self._i2c.readByte(self.address, self.SCMD_ID)
+        self._i2c.read_byte(self.address, self.SCMD_ID)
 
-        return self._i2c.readByte(self.address, self.SCMD_ID)
+        return self._i2c.read_byte(self.address, self.SCMD_ID) == self.ID_WORD
 
 
     # check if enumeration is complete
@@ -301,9 +295,9 @@ class QwiicScmd(object):
 
             @return **boolean** Ready status
             """
-        statusByte = self._i2c.readByte(self.address, self.SCMD_STATUS_1)
+        status_byte = self._i2c.read_byte(self.address, self.SCMD_STATUS_1)
 
-        return statusByte & self.SCMD_ENUMERATION_BIT  and  statusByte != 0xFF  #wait for ready flag and not 0xFF
+        return status_byte & self.SCMD_ENUMERATION_BIT  and  status_byte != 0xFF  #wait for ready flag and not 0xFF
 
     def busy(self):
         """!
@@ -311,9 +305,9 @@ class QwiicScmd(object):
 
             @return **boolean** busy status
             """
-        statusByte = self._i2c.readByte(self.address, self.SCMD_STATUS_1)
+        status_byte = self._i2c.read_byte(self.address, self.SCMD_STATUS_1)
 
-        return statusByte & (self.SCMD_BUSY_BIT | self.SCMD_REM_READ_BIT | self.SCMD_REM_WRITE_BIT) != 0
+        return status_byte & (self.SCMD_BUSY_BIT | self.SCMD_REM_READ_BIT | self.SCMD_REM_WRITE_BIT) != 0
 
     # Enable and disable functions.  Call after begin to enable the h-bridges
     def enable(self):
@@ -324,7 +318,7 @@ class QwiicScmd(object):
 
         
             """
-        self._i2c.writeByte(self.address, self.SCMD_DRIVER_ENABLE, 0x01)
+        self._i2c.write_byte(self.address, self.SCMD_DRIVER_ENABLE, 0x01)
 
     def disable(self):
         """!
@@ -334,7 +328,7 @@ class QwiicScmd(object):
 
         
             """
-        self._i2c.writeByte(self.address, self.SCMD_DRIVER_ENABLE, 0x00)
+        self._i2c.write_byte(self.address, self.SCMD_DRIVER_ENABLE, 0x00)
 
     # this is a hack in the Arduino lib - the placeholder is for compatablity
     def reset(self):
@@ -353,14 +347,14 @@ class QwiicScmd(object):
     #
     #     Drive a motor at a level
     #
-    #   uint8_t motorNum -- Motor number from 0 to 33
+    #   uint8_t motor_num -- Motor number from 0 to 33
     #   uint8_t direction -- 0 or 1 for forward and backward
     #   int8_t level -- (-255) to 255 for drive strength
-    def set_drive(self, motorNum, direction, level):
+    def set_drive(self, motor_num, direction, level):
         """!
             Drive a motor at a level
 
-            @param motoNum: Motor number from 0 to 33
+            @param motor_num: Motor number from 0 to 33
             @param direction: 0 or 1 for forward and backward
             @param level: (-255) to 255 for drive strength
 
@@ -372,26 +366,26 @@ class QwiicScmd(object):
         # Convert value to a 7-bit int and match the indexing for uint8_t values as needed in Arduino library
         level = int(round((level + 1 - direction)/2))
 
-        driveValue = 0 # use to build value to actually write to register
+        drive_value = 0 # use to build value to actually write to register
 
         # Make sure the motor number is valid
-        if motorNum < 34:
-            driveValue = (level * direction) + (level * (direction - 1)) # set to 1/2 drive if direction = 1 or -1/2 drive if direction = 0 (level * direction)
-            driveValue += 128
-            self._i2c.writeByte(self.address, self.SCMD_MA_DRIVE + motorNum, driveValue)
+        if motor_num < 34:
+            drive_value = (level * direction) + (level * (direction - 1)) # set to 1/2 drive if direction = 1 or -1/2 drive if direction = 0 (level * direction)
+            drive_value += 128
+            self._i2c.write_byte(self.address, self.SCMD_MA_DRIVE + motor_num, drive_value)
 
 
     # inversion_mode( ... )
     #
     #     Configure a motor's direction inversion
     #
-    #   motorNum -- Motor number from 0 to 33
+    #   motor_num -- Motor number from 0 to 33
     #   polarity -- 0 or 1 for default or inverted
-    def inversion_mode(self, motorNum, polarity):
+    def inversion_mode(self, motor_num, polarity):
         """!
             Configure a motor's direction inversion
 
-            @param motoNum: Motor number from 0 to 33
+            @param motor_num: Motor number from 0 to 33
             @param polarity: 0 or 1 for default or inverted
 
             @return  No return value
@@ -399,58 +393,58 @@ class QwiicScmd(object):
         
             """
 
-        regTemp = 0
+        reg_temp = 0
         # Select target register
-        if motorNum < 2:
+        if motor_num < 2:
 
             # master
-            if motorNum == 0:
-                self._i2c.writeByte(self.address, self.SCMD_MOTOR_A_INVERT, polarity & 0x01)
-            if motorNum == 1:
-                self._i2c.writeByte(self.address, self.SCMD_MOTOR_B_INVERT, polarity & 0x01)
+            if motor_num == 0:
+                self._i2c.write_byte(self.address, self.SCMD_MOTOR_A_INVERT, polarity & 0x01)
+            if motor_num == 1:
+                self._i2c.write_byte(self.address, self.SCMD_MOTOR_B_INVERT, polarity & 0x01)
 
         else:
 
-            if motorNum < 10:
+            if motor_num < 10:
                 # register: SCMD_INV_2_9
-                regTemp = self.SCMD_INV_2_9
-                motorNum -= 2
+                reg_temp = self.SCMD_INV_2_9
+                motor_num -= 2
 
-            elif motorNum < 18:
+            elif motor_num < 18:
                 # register: SCMD_INV_10_17
-                regTemp = self.SCMD_INV_10_17
-                motorNum -= 10
+                reg_temp = self.SCMD_INV_10_17
+                motor_num -= 10
 
-            elif motorNum < 26:
+            elif motor_num < 26:
                 # register: SCMD_INV_18_25
-                regTemp = self.SCMD_INV_18_25
-                motorNum -= 18
+                reg_temp = self.SCMD_INV_18_25
+                motor_num -= 18
 
-            elif motorNum < 34:
+            elif motor_num < 34:
                 # register: SCMD_INV_26_33
-                regTemp = self.SCMD_INV_26_33
-                motorNum -= 26
+                reg_temp = self.SCMD_INV_26_33
+                motor_num -= 26
 
             else:
                 # out of range
                 return
 
-            # convert motorNum to one-hot mask
-            data = self._i2c.readByte(self.address, regTemp) & (~(1 << motorNum) & 0xFF)
-            self._i2c.writeByte(self.address, regTemp, data | ((polarity & 0x01) << motorNum))
+            # convert motor_num to one-hot mask
+            data = self._i2c.read_byte(self.address, reg_temp) & (~(1 << motor_num) & 0xFF)
+            self._i2c.write_byte(self.address, reg_temp, data | ((polarity & 0x01) << motor_num))
 
 
-    # bridgingMode( ... )
+    # bridging_mode( ... )
     #
     #     Configure a driver's bridging state
     #
-    #   driverNum -- Number of driver.  Master is 0, slave 1 is 1, etc.  0 to 16
+    #   driver_num -- Number of driver.  Master is 0, slave 1 is 1, etc.  0 to 16
     #   bridged -- 0 or 1 for forward and backward
-    def bridging_mode(self, driverNum, bridged):
+    def bridging_mode(self, driver_num, bridged):
         """!
             Configure a driver's bridging state
 
-            @param driverNum: Number of driver.  Master is 0, slave 1 is 1, etc.  0 to 16
+            @param driver_num: Number of driver.  Master is 0, slave 1 is 1, etc.  0 to 16
             @param bridged: 0 or 1 for forward and backward
 
             @return  No return value
@@ -458,30 +452,30 @@ class QwiicScmd(object):
         
             """
 
-        regTemp = 0
+        reg_temp = 0
         # Select target register
-        if driverNum < 1:
+        if driver_num < 1:
             # master
-            self._i2c.writeByte(self.address, self.SCMD_BRIDGE, bridged & 0x01)
+            self._i2c.write_byte(self.address, self.SCMD_BRIDGE, bridged & 0x01)
 
         else:
 
-            if driverNum < 9:
+            if driver_num < 9:
                 # register: SCMD_BRIDGE_SLV_L
-                regTemp = self.SCMD_BRIDGE_SLV_L
-                driverNum -= 1
+                reg_temp = self.SCMD_BRIDGE_SLV_L
+                driver_num -= 1
 
-            elif driverNum < 17:
+            elif driver_num < 17:
                 # register: SCMD_BRIDGE_SLV_H
-                regTemp = self.SCMD_BRIDGE_SLV_H
-                driverNum -= 9
+                reg_temp = self.SCMD_BRIDGE_SLV_H
+                driver_num -= 9
 
             else:
                 # out of range
                 return
-            # convert driverNum to one-hot mask
-            data = self._i2c.readByte(regTemp) & (~(1 << driverNum ) & 0xFF)
-            self._i2c.writeByte(self.address, regTemp, data | ((bridged & 0x01) << driverNum))
+            # convert driver_num to one-hot mask
+            data = self._i2c.read_byte(reg_temp) & (~(1 << driver_num ) & 0xFF)
+            self._i2c.write_byte(self.address, reg_temp, data | ((bridged & 0x01) << driver_num))
 
     # ****************************************************************************#
     #
@@ -489,7 +483,7 @@ class QwiicScmd(object):
     #
     # ****************************************************************************#
 
-    # getDiagnostics( ... )
+    # get_diagnostics( ... )
     #
     #    Get diagnostic information from the master
     #
@@ -502,29 +496,29 @@ class QwiicScmd(object):
             @return **Object - SCMDDiagnostics()** Object returned with properties that are the diagnostic info
             """
 
-        myDiag = SCMDDiagnostics()
+        my_diag = SCMDDiagnostics()
 
-        myDiag.U_I2C_RD_ERR = self._i2c.readByte(self.address, self.SCMD_U_I2C_RD_ERR)
-        myDiag.U_I2C_WR_ERR = self._i2c.readByte(self.address, self.SCMD_U_I2C_WR_ERR)
-        myDiag.U_BUF_DUMPED = self._i2c.readByte(self.address, self.SCMD_U_BUF_DUMPED)
-        myDiag.E_I2C_RD_ERR = self._i2c.readByte(self.address, self.SCMD_E_I2C_RD_ERR)
-        myDiag.E_I2C_WR_ERR = self._i2c.readByte(self.address, self.SCMD_E_I2C_WR_ERR)
-        myDiag.LOOP_TIME    = self._i2c.readByte(self.address, self.SCMD_LOOP_TIME)
-        myDiag.SLV_POLL_CNT = self._i2c.readByte(self.address, self.SCMD_SLV_POLL_CNT)
+        my_diag.U_I2C_RD_ERR = self._i2c.read_byte(self.address, self.SCMD_U_I2C_RD_ERR)
+        my_diag.U_I2C_WR_ERR = self._i2c.read_byte(self.address, self.SCMD_U_I2C_WR_ERR)
+        my_diag.U_BUF_DUMPED = self._i2c.read_byte(self.address, self.SCMD_U_BUF_DUMPED)
+        my_diag.E_I2C_RD_ERR = self._i2c.read_byte(self.address, self.SCMD_E_I2C_RD_ERR)
+        my_diag.E_I2C_WR_ERR = self._i2c.read_byte(self.address, self.SCMD_E_I2C_WR_ERR)
+        my_diag.LOOP_TIME    = self._i2c.read_byte(self.address, self.SCMD_LOOP_TIME)
+        my_diag.SLV_POLL_CNT = self._i2c.read_byte(self.address, self.SCMD_SLV_POLL_CNT)
 
         # Count slaves
-        topAddr = self._i2c.readByte(self.address,  self.SCMD_SLV_TOP_ADDR)
-        if topAddr >= self.START_SLAVE_ADDR and topAddr < (self.START_SLAVE_ADDR + 16):
+        top_addr = self._i2c.read_byte(self.address,  self.SCMD_SLV_TOP_ADDR)
+        if top_addr >= self.START_SLAVE_ADDR and top_addr < (self.START_SLAVE_ADDR + 16):
             # in valid range
-            myDiag.numberOfSlaves = topAddr - self.START_SLAVE_ADDR + 1
+            my_diag.number_of_slaves = top_addr - self.START_SLAVE_ADDR + 1
 
-        myDiag.MST_E_ERR        = self._i2c.readByte(self.address, self.SCMD_MST_E_ERR)
-        myDiag.MST_E_STATUS     = self._i2c.readByte(self.address, self.SCMD_MST_E_STATUS)
-        myDiag.FSAFE_FAULTS     = self._i2c.readByte(self.address, self.SCMD_FSAFE_FAULTS)
-        myDiag.REG_OOR_CNT      = self._i2c.readByte(self.address, self.SCMD_REG_OOR_CNT)
-        myDiag.REG_RO_WRITE_CNT = self._i2c.readByte(self.address, self.SCMD_REG_RO_WRITE_CNT)
+        my_diag.MST_E_ERR        = self._i2c.read_byte(self.address, self.SCMD_MST_E_ERR)
+        my_diag.MST_E_STATUS     = self._i2c.read_byte(self.address, self.SCMD_MST_E_STATUS)
+        my_diag.FSAFE_FAULTS     = self._i2c.read_byte(self.address, self.SCMD_FSAFE_FAULTS)
+        my_diag.REG_OOR_CNT      = self._i2c.read_byte(self.address, self.SCMD_REG_OOR_CNT)
+        my_diag.REG_RO_WRITE_CNT = self._i2c.read_byte(self.address, self.SCMD_REG_RO_WRITE_CNT)
 
-        return myDiag
+        return my_diag
 
     # get_remote_diagnostics( ... )
     #
@@ -541,23 +535,23 @@ class QwiicScmd(object):
             @return **Object - SCMDDiagnostics()** Object returned with properties that are the diagnostic info
             """
 
-        myDiag = SCMDDiagnostics()
+        my_diag = SCMDDiagnostics()
 
-        myDiag.numberOfSlaves   = 0
-        myDiag.U_I2C_RD_ERR     = 0
-        myDiag.U_I2C_WR_ERR     = 0
-        myDiag.U_BUF_DUMPED     = 0
-        myDiag.E_I2C_RD_ERR     = self.read_remote_register(address, self.SCMD_E_I2C_RD_ERR)
-        myDiag.E_I2C_WR_ERR     = self.read_remote_register(address, self.SCMD_E_I2C_WR_ERR)
-        myDiag.LOOP_TIME        = self.read_remote_register(address, self.SCMD_LOOP_TIME)
-        myDiag.SLV_POLL_CNT     = 0
-        myDiag.MST_E_ERR        = 0
-        myDiag.MST_E_STATUS     = 0
-        myDiag.FSAFE_FAULTS     = self.read_remote_register(address, self.SCMD_FSAFE_FAULTS)
-        myDiag.REG_OOR_CNT      = self.read_remote_register(address, self.SCMD_REG_OOR_CNT)
-        myDiag.REG_RO_WRITE_CNT = self.read_remote_register(address, self.SCMD_REG_RO_WRITE_CNT)
+        my_diag.number_of_slaves   = 0
+        my_diag.U_I2C_RD_ERR     = 0
+        my_diag.U_I2C_WR_ERR     = 0
+        my_diag.U_BUF_DUMPED     = 0
+        my_diag.E_I2C_RD_ERR     = self.read_remote_register(address, self.SCMD_E_I2C_RD_ERR)
+        my_diag.E_I2C_WR_ERR     = self.read_remote_register(address, self.SCMD_E_I2C_WR_ERR)
+        my_diag.LOOP_TIME        = self.read_remote_register(address, self.SCMD_LOOP_TIME)
+        my_diag.SLV_POLL_CNT     = 0
+        my_diag.MST_E_ERR        = 0
+        my_diag.MST_E_STATUS     = 0
+        my_diag.FSAFE_FAULTS     = self.read_remote_register(address, self.SCMD_FSAFE_FAULTS)
+        my_diag.REG_OOR_CNT      = self.read_remote_register(address, self.SCMD_REG_OOR_CNT)
+        my_diag.REG_RO_WRITE_CNT = self.read_remote_register(address, self.SCMD_REG_RO_WRITE_CNT)
 
-        return myDiag
+        return my_diag
 
     # reset_diagnostic_counts( ... )
     #
@@ -572,17 +566,17 @@ class QwiicScmd(object):
         
             """
 
-        self._i2c.writeByte(self.address, self.SCMD_U_I2C_RD_ERR, 0)
-        self._i2c.writeByte(self.address, self.SCMD_U_I2C_WR_ERR, 0)
-        self._i2c.writeByte(self.address, self.SCMD_U_BUF_DUMPED, 0)
-        self._i2c.writeByte(self.address, self.SCMD_E_I2C_RD_ERR, 0)
-        self._i2c.writeByte(self.address, self.SCMD_E_I2C_WR_ERR, 0)
+        self._i2c.write_byte(self.address, self.SCMD_U_I2C_RD_ERR, 0)
+        self._i2c.write_byte(self.address, self.SCMD_U_I2C_WR_ERR, 0)
+        self._i2c.write_byte(self.address, self.SCMD_U_BUF_DUMPED, 0)
+        self._i2c.write_byte(self.address, self.SCMD_E_I2C_RD_ERR, 0)
+        self._i2c.write_byte(self.address, self.SCMD_E_I2C_WR_ERR, 0)
         # Clear uport time
-        self._i2c.writeByte(self.address, self.SCMD_LOOP_TIME, 0)
-        self._i2c.writeByte(self.address, self.SCMD_MST_E_ERR, 0)
-        self._i2c.writeByte(self.address, self.SCMD_FSAFE_FAULTS, 0)
-        self._i2c.writeByte(self.address, self.SCMD_REG_OOR_CNT, 0)
-        self._i2c.writeByte(self.address, self.SCMD_REG_RO_WRITE_CNT, 0)
+        self._i2c.write_byte(self.address, self.SCMD_LOOP_TIME, 0)
+        self._i2c.write_byte(self.address, self.SCMD_MST_E_ERR, 0)
+        self._i2c.write_byte(self.address, self.SCMD_FSAFE_FAULTS, 0)
+        self._i2c.write_byte(self.address, self.SCMD_REG_OOR_CNT, 0)
+        self._i2c.write_byte(self.address, self.SCMD_REG_RO_WRITE_CNT, 0)
 
     # reset_remote_diagnostic_counts( ... )
     #
@@ -631,14 +625,14 @@ class QwiicScmd(object):
             @return **integer** Register Value
             """
 
-        self._i2c.writeByte(self.address, self.SCMD_REM_ADDR, address)
-        self._i2c.writeByte(self.address, self.SCMD_REM_OFFSET, offset)
-        self._i2c.writeByte(self.address, self.SCMD_REM_READ, 1)
+        self._i2c.write_byte(self.address, self.SCMD_REM_ADDR, address)
+        self._i2c.write_byte(self.address, self.SCMD_REM_OFFSET, offset)
+        self._i2c.write_byte(self.address, self.SCMD_REM_READ, 1)
 
         while self.busy():
             pass
 
-        return self._i2c.readByte(self.address, self.SCMD_REM_DATA_RD)
+        return self._i2c.read_byte(self.address, self.SCMD_REM_DATA_RD)
 
 
     # write_remote_register( ... )
@@ -647,15 +641,15 @@ class QwiicScmd(object):
     #
     #   address -- Address of slave to read.  Can be 0x50 to 0x5F for slave 1 to 16.
     #   offset -- Address of data to write.  Can be 0x00 to 0x7F
-    #   dataToWrite -- Data to write.
+    #   data_to_write -- Data to write.
 
-    def write_remote_register(self, address, offset, dataToWrite):
+    def write_remote_register(self, address, offset, data_to_write):
         """!
             Write data from a slave
 
             @param address: Address of slave to read.  Can be 0x50 to 0x5F for slave 1 to 16.
             @param offset: Address of data to read.  Can be 0x00 to 0x7F
-            @param dataToWrite: The data to write
+            @param data_to_write: The data to write
 
             @return  No return value
 
@@ -665,10 +659,10 @@ class QwiicScmd(object):
         while self.busy():
             pass
 
-        self._i2c.writeByte(self.address, self.SCMD_REM_ADDR, address)
-        self._i2c.writeByte(self.address, self.SCMD_REM_OFFSET, offset)
-        self._i2c.writeByte(self.address, self.SCMD_REM_DATA_WR, dataToWrite)
-        self._i2c.writeByte(self.address, self.SCMD_REM_WRITE, 1)
+        self._i2c.write_byte(self.address, self.SCMD_REM_ADDR, address)
+        self._i2c.write_byte(self.address, self.SCMD_REM_OFFSET, offset)
+        self._i2c.write_byte(self.address, self.SCMD_REM_DATA_WR, data_to_write)
+        self._i2c.write_byte(self.address, self.SCMD_REM_WRITE, 1)
 
         while self.busy():
             pass

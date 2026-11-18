@@ -36,45 +36,45 @@
 import qwiic_cap1203
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic CAP1203 Example 6 - Disable Interrupt\n")
 
 	# Create instance of device
-	myDevice = qwiic_cap1203.QwiicCAP1203()
+	my_device = qwiic_cap1203.QwiicCAP1203()
 
 	# Check if it's connected
-	if myDevice.is_connected() == False:
+	if my_device.is_connected() == False:
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myDevice.begin()
+	my_device.begin()
 
 	# Interrupt is ENABLED as default.
 	# When the interrupt pin is DISABLED, the alert LED
 	# does not turn on. When the interrupt pin is ENABLED,
 	# the alert LED turns on when a touch is detected.
-	myDevice.set_interrupt_disabled()  # Disable Interrupt
-	# myDevice.set_interrupt_enabled()   # Enable Interrupt
+	my_device.set_interrupt_disabled()  # Disable Interrupt
+	# my_device.set_interrupt_enabled()   # Enable Interrupt
 
 	# Check the current status of the interrupt pin.
 	# Returns True if interrupt pin is enabled and
 	# False if disabled.
-	if myDevice.is_interrupt_enabled():
+	if my_device.is_interrupt_enabled():
 		print("Interrupt: ENABLED")
 	else:
 		print("Interrupt: DISABLED")
 
 	while True:
-		if myDevice.is_touched():
+		if my_device.is_touched():
 			print("Touch")
-			while myDevice.is_touched():
+			while my_device.is_touched():
 				pass
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

@@ -36,7 +36,7 @@
 
 import qwiic_cy8cmbr3
 import sys
-import time
+import qwiic_i2c
 
 # NOTE: Before running this example, ensure you have cut the pull-up traces on all but one of the sensors
 
@@ -44,7 +44,7 @@ import time
 # address example script (qwiic_cy8cmbr3_ex4_i2c_addr.py)
 addresses = [0x30, 0x31] # Add more addresses as needed
 
-def runExample():
+def run_example():
 	print("\nQwiic Template Example 5 - Multiple Sensors\n")
 
 	sensors = []
@@ -76,11 +76,11 @@ def runExample():
 			print("Sensor 0x" + hex(sensor.address) + " Soil Capacitance: " + str(capacitance) + " pF")
 		print("")  # Blank line between readings
 		# Sleep for a second to avoid spamming the output
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

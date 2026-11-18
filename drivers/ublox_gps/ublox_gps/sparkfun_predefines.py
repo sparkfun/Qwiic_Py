@@ -3,7 +3,7 @@
 from . import core
 
 __all__ = ['ACK_CLS', 'CFG_CLS', 'ESF_CLS', 'INF_CLS', 'MGA_CLS', 'MON_CLS',
-           'NAV_CLS', 'TIM_CLS', ]
+           'NAV_CLS', 'RXM_CLS', 'TIM_CLS', ]
 
 ACK_CLS = core.Cls(0x05, 'ACK', [
     core.Message(0x01, 'ACK', [
@@ -1117,6 +1117,51 @@ TIM_CLS = core.Cls(0x0D, 'TIM', [
         core.Field('wno', 'U2'),
         core.BitField('flags', 'X1', [
             core.Flag('src', 0, 3)
+        ]),
+    ]),
+])
+
+# UBX-RXM-RAWX (0x02 0x15): raw pseudorange, carrier phase and doppler.
+# From sparkfun/qwiic_ublox_gps_py PR #14, laid out as in the u-blox F9
+# interface description (M8 has reserved bytes where F9 has version and sigId).
+RXM_CLS = core.Cls(0x02, 'RXM', [
+    core.Message(0x15, 'RAWX', [
+        core.Field('rcvTow', 'R8'),
+        core.Field('week', 'U2'),
+        core.Field('leapS', 'I1'),
+        core.Field('numMeas', 'U1'),
+        core.BitField('recStat', 'X1', [
+            core.Flag('leapSec', 0, 1),
+            core.Flag('clkReset', 1, 2),
+        ]),
+        core.Field('version', 'U1'),
+        core.PadByte(repeat=1),
+        core.RepeatedBlock('RB', [
+            core.Field('prMeas', 'R8'),
+            core.Field('cpMeas', 'R8'),
+            core.Field('doMeas', 'R4'),
+            core.Field('gnssId', 'U1'),
+            core.Field('svId', 'U1'),
+            core.Field('sigId', 'U1'),
+            core.Field('freqId', 'U1'),
+            core.Field('locktime', 'U2'),
+            core.Field('cno', 'U1'),
+            core.BitField('prStdev', 'X1', [
+                core.Flag('prStd', 0, 4),
+            ]),
+            core.BitField('cpStdev', 'X1', [
+                core.Flag('cpStd', 0, 4),
+            ]),
+            core.BitField('doStdev', 'X1', [
+                core.Flag('doStd', 0, 4),
+            ]),
+            core.BitField('trkStat', 'X1', [
+                core.Flag('prValid', 0, 1),
+                core.Flag('cpValid', 1, 2),
+                core.Flag('halfCyc', 2, 3),
+                core.Flag('subHalfCyc', 3, 4),
+            ]),
+            core.PadByte(),
         ]),
     ]),
 ])

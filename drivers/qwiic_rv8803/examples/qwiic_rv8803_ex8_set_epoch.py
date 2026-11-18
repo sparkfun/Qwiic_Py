@@ -35,9 +35,9 @@
 
 import qwiic_rv8803
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic RV8803 Example 8 - Set Epoch\n")
 
 	# Create instance of device
@@ -52,7 +52,7 @@ def runExample():
 	# Initialize the device
 	myRTC.begin()
 
-	myRTC.set_time_zone_quarter_hours(0) # Make sure t1he time zone is zero, otherwise getEpoch will be offset
+	myRTC.set_time_zone_quarter_hours(0) # Make sure t1he time zone is zero, otherwise get_epoch() will be offset
 	myRTC.set_epoch(1732736438) # set with Unix Epoch for GMT: Wednesday, November 27, 2024 7:40:38 PM
 
 	while True:
@@ -64,11 +64,11 @@ def runExample():
 		# get time in ISO 8601 format
 		print("Current ISO-8601 Time: ", myRTC.string_time_8601())
 
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

@@ -39,17 +39,17 @@
 
 import qwiic_led_stick
 import math
-import time
+import qwiic_i2c
 import sys
 
-def walking_rainbow(LED_stick, rainbow_length, LED_length, delay):
-    red_array = [None] * LED_length
-    blue_array = [None] * LED_length
-    green_array = [None] * LED_length
+def walking_rainbow(led_stick, rainbow_length, led_length, delay_ms):
+    red_array = [None] * led_length
+    blue_array = [None] * led_length
+    green_array = [None] * led_length
 
     for j in range(0, rainbow_length):
 
-        for i in range(0, LED_length):
+        for i in range(0, led_length):
             # There are n colors generated for the rainbow
             # The value of n determins which color is generated at each pixel
             n = i + 1 - j
@@ -89,8 +89,8 @@ def walking_rainbow(LED_stick, rainbow_length, LED_length, delay):
                 blue_array[i] = int(math.floor(1530 - (6 *255 / rainbow_length * n)))
 
         # Set all the LEDs to the color values accordig to the arrays
-        LED_stick.set_all_LED_unique_color(red_array, green_array, blue_array, LED_length)
-        time.sleep(delay)
+        led_stick.set_all_led_unique_color(red_array, green_array, blue_array, led_length)
+        qwiic_i2c.delay_ms(delay_ms)
 
 def run_example():
 
@@ -104,7 +104,7 @@ def run_example():
     print("\nLED Stick ready!")
 
     while True:
-        walking_rainbow(my_stick, 20, 10, 0.3)
+        walking_rainbow(my_stick, 20, 10, 300)
 
 if __name__ == '__main__':
     try:

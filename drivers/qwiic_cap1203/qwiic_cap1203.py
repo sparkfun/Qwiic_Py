@@ -50,7 +50,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -147,15 +148,16 @@ class QwiicCAP1203(object):
     SENSITIVITY_2X = 0x06
     SENSITIVITY_1X = 0x07  # Least sensitive
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -163,14 +165,8 @@ class QwiicCAP1203(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # TODO: Initialize any variables used by this driver
 
@@ -181,14 +177,12 @@ class QwiicCAP1203(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        if(not self._i2c.isDeviceConnected(self.address)):
+        if(not self._i2c.is_device_connected(self.address)):
             return False
         
         # Something ACK'd, check if the product ID is correct
-        prodid = self._i2c.readByte(self.address, self.PROD_ID)
+        prodid = self._i2c.read_byte(self.address, self.PROD_ID)
         return prodid == self.PROD_ID_VALUE
-
-    connected = property(is_connected)
 
     def begin(self):
         """!
@@ -212,7 +206,7 @@ class QwiicCAP1203(object):
 
         @return **int** Main Control Register value
         """
-        self._i2c.readByte(self.address, self.MAIN_CONTROL)
+        self._i2c.read_byte(self.address, self.MAIN_CONTROL)
 
     def check_status(self):
         """!
@@ -221,7 +215,7 @@ class QwiicCAP1203(object):
 
         @return **int** General Status Register value
         """
-        self._i2c.readByte(self.address, self.GENERAL_STATUS)
+        self._i2c.read_byte(self.address, self.GENERAL_STATUS)
 
     def clear_interrupt(self):
         """!
@@ -229,9 +223,9 @@ class QwiicCAP1203(object):
         This bit must be cleared in order to detec a new capacitive
         touch input. See datasheet on Main Control Register (pg. 22).
         """
-        reg = self._i2c.readByte(self.address, self.MAIN_CONTROL)
+        reg = self._i2c.read_byte(self.address, self.MAIN_CONTROL)
         reg &= 0xFE
-        self._i2c.writeByte(self.address, self.MAIN_CONTROL, reg)
+        self._i2c.write_byte(self.address, self.MAIN_CONTROL, reg)
 
     def set_interrupt_disabled(self):
         """!
@@ -239,18 +233,18 @@ class QwiicCAP1203(object):
         when a sensor is touched. Set on default in begin function See data 
         sheet on Interrupt Enable Register (pg. 33).
         """
-        reg = self._i2c.readByte(self.address, self.INTERRUPT_ENABLE)
+        reg = self._i2c.read_byte(self.address, self.INTERRUPT_ENABLE)
         reg &= 0xF8
-        self._i2c.writeByte(self.address, self.INTERRUPT_ENABLE, reg)
+        self._i2c.write_byte(self.address, self.INTERRUPT_ENABLE, reg)
 
     def set_interrupt_enabled(self):
         """!
         This turns on all the interrupts, so the alert LED turns on when any 
         sensor is touched. See data sheet on Interrupt Enable Register (pg. 33).
         """
-        reg = self._i2c.readByte(self.address, self.INTERRUPT_ENABLE)
+        reg = self._i2c.read_byte(self.address, self.INTERRUPT_ENABLE)
         reg |= 0x07
-        self._i2c.writeByte(self.address, self.INTERRUPT_ENABLE, reg)
+        self._i2c.write_byte(self.address, self.INTERRUPT_ENABLE, reg)
 
     def is_interrupt_enabled(self):
         """!
@@ -261,7 +255,7 @@ class QwiicCAP1203(object):
 
         @return **bool** `True` if enabled, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.INTERRUPT_ENABLE)
+        reg = self._i2c.read_byte(self.address, self.INTERRUPT_ENABLE)
         if (reg & 0x07) == 0x07:
             return True
         return False
@@ -272,16 +266,16 @@ class QwiicCAP1203(object):
         want to change sensitivity settings if creating your own capacitive 
         touch pads. See datasheet on Sensitivity Control Register (pg. 25).
 
-        @param int sensitivity: Sensitivity multiplier
+        @param sensitivity: **int** Sensitivity multiplier
         """
-        reg = self._i2c.readByte(self.address, self.SENSITIVITY_CONTROL)
+        reg = self._i2c.read_byte(self.address, self.SENSITIVITY_CONTROL)
         reg &= 0x8F
         if sensitivity >= self.SENSITIVITY_128X and sensitivity <= self.SENSITIVITY_1X:
             reg |= sensitivity << 4
         else:
             # Default case: calibrated for CAP1203 touch sensor
             reg |= self.SENSITIVITY_2X << 4
-        self._i2c.writeByte(self.address, self.SENSITIVITY_CONTROL, reg)
+        self._i2c.write_byte(self.address, self.SENSITIVITY_CONTROL, reg)
 
     def get_sensitivity(self):
         """!
@@ -290,7 +284,7 @@ class QwiicCAP1203(object):
 
         @return **int** Sensitivity multiplier
         """
-        reg = self._i2c.readByte(self.address, self.SENSITIVITY_CONTROL)
+        reg = self._i2c.read_byte(self.address, self.SENSITIVITY_CONTROL)
         sensitivity = (reg >> 4) & 0x07
         if sensitivity == self.SENSITIVITY_128X:
             return 128
@@ -320,7 +314,7 @@ class QwiicCAP1203(object):
 
         @return **bool** `True` if left sensor is touched, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.SENSOR_INPUT_STATUS)
+        reg = self._i2c.read_byte(self.address, self.SENSOR_INPUT_STATUS)
 
         # Touch detected
         if ((reg >> 0) & 0x01) == self.ON:
@@ -336,7 +330,7 @@ class QwiicCAP1203(object):
 
         @return **bool** `True` if middle sensor is touched, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.SENSOR_INPUT_STATUS)
+        reg = self._i2c.read_byte(self.address, self.SENSOR_INPUT_STATUS)
 
         # Touch detected
         if ((reg >> 1) & 0x01) == self.ON:
@@ -352,7 +346,7 @@ class QwiicCAP1203(object):
 
         @return **bool** `True` if right sensor is touched, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.SENSOR_INPUT_STATUS)
+        reg = self._i2c.read_byte(self.address, self.SENSOR_INPUT_STATUS)
 
         # Touch detected
         if ((reg >> 2) & 0x01) == self.ON:
@@ -368,7 +362,7 @@ class QwiicCAP1203(object):
 
         @return **bool** `True` if any sensor is touched, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.GENERAL_STATUS)
+        reg = self._i2c.read_byte(self.address, self.GENERAL_STATUS)
 
         # Touch detected
         if ((reg >> 0) & 0x01) == self.ON:
@@ -380,15 +374,15 @@ class QwiicCAP1203(object):
         """!
         Checks if a right swipe occured on the board. This method
         takes up all functionality due to implementation of 
-        while loop with millis().
+        while loop with a 100 ms timeout.
 
         @return **bool** `True` if right swipe occured, otherwise `False`
         """
         swipe = False  # Tracks if conditions are being met
-        start_time = self.millis()
+        start_time = self._i2c.ticks_ms()
 
         # LEFT TOUCH CONDITION
-        while (self.millis() - start_time) < 100:
+        while self._i2c.ticks_diff(self._i2c.ticks_ms(), start_time) < 100:
             if self.is_left_touched():
                 swipe = True
                 while self.is_left_touched():
@@ -399,11 +393,11 @@ class QwiicCAP1203(object):
         if not swipe:
             return False
 
-        start_time = self.millis()  # Reset start time
+        start_time = self._i2c.ticks_ms()  # Reset start time
         swipe = False  # Reset check statement
 
         # MIDDLE TOUCH CONDITION
-        while (self.millis() - start_time) < 100:
+        while self._i2c.ticks_diff(self._i2c.ticks_ms(), start_time) < 100:
             if self.is_middle_touched():
                 swipe = True
                 while self.is_middle_touched():
@@ -414,11 +408,11 @@ class QwiicCAP1203(object):
         if not swipe:
             return False
 
-        start_time = self.millis()  # Reset start time
+        start_time = self._i2c.ticks_ms()  # Reset start time
         swipe = False  # Reset check statement
 
         # RIGHT TOUCH CONDITION
-        while (self.millis() - start_time) < 100:
+        while self._i2c.ticks_diff(self._i2c.ticks_ms(), start_time) < 100:
             if self.is_right_touched():
                 return True
 
@@ -428,15 +422,15 @@ class QwiicCAP1203(object):
         """!
         Checks if a left swipe occured on the board. This method
         takes up all functionality due to implementation of 
-        while loop with millis().
+        while loop with a 100 ms timeout.
 
         @return **bool** `True` if left swipe occured, otherwise `False`
         """
         swipe = False  # Tracks if conditions are being met
-        start_time = self.millis()
+        start_time = self._i2c.ticks_ms()
 
         # RIGHT TOUCH CONDITION
-        while (self.millis() - start_time) < 100:
+        while self._i2c.ticks_diff(self._i2c.ticks_ms(), start_time) < 100:
             if self.is_right_touched():
                 swipe = True
                 while self.is_right_touched():
@@ -447,11 +441,11 @@ class QwiicCAP1203(object):
         if not swipe:
             return False
 
-        start_time = self.millis()  # Reset start time
+        start_time = self._i2c.ticks_ms()  # Reset start time
         swipe = False  # Reset check statement
 
         # MIDDLE TOUCH CONDITION
-        while (self.millis() - start_time) < 100:
+        while self._i2c.ticks_diff(self._i2c.ticks_ms(), start_time) < 100:
             if self.is_middle_touched():
                 swipe = True
                 while self.is_middle_touched():
@@ -462,11 +456,11 @@ class QwiicCAP1203(object):
         if not swipe:
             return False
 
-        start_time = self.millis()  # Reset start time
+        start_time = self._i2c.ticks_ms()  # Reset start time
         swipe = False  # Reset check statement
 
         # LEFT TOUCH CONDITION
-        while (self.millis() - start_time) < 100:
+        while self._i2c.ticks_diff(self._i2c.ticks_ms(), start_time) < 100:
             if self.is_left_touched():
                 return True
 
@@ -477,11 +471,11 @@ class QwiicCAP1203(object):
         Sets a specific pad to act as a power button. Function takes in which 
         pad to set as power button. See datasheet on Power Button (pg. 16).
 
-        @param int pad: Pad to be set as power button
+        @param pad: **int** Pad to be set as power button
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.POWER_BUTTON)
+        reg = self._i2c.read_byte(self.address, self.POWER_BUTTON)
         reg &= 0xF8
 
         # Set pad to act as power button (pg. 43)
@@ -494,7 +488,7 @@ class QwiicCAP1203(object):
         else:
             # User input invalid pad number
             return False
-        self._i2c.writeByte(self.address, self.POWER_BUTTON, reg)
+        self._i2c.write_byte(self.address, self.POWER_BUTTON, reg)
         return True
 
     def get_power_button_pad(self):
@@ -511,7 +505,7 @@ class QwiicCAP1203(object):
 
         @return **int** Pad number set as power button
         """
-        reg = self._i2c.readByte(self.address, self.POWER_BUTTON)
+        reg = self._i2c.read_byte(self.address, self.POWER_BUTTON)
 
         return (reg & 0x07) + 1
 
@@ -524,18 +518,18 @@ class QwiicCAP1203(object):
         
         Possible inputs (represent time in ms): 280, 560, 1120, 2240
 
-        @param int input_time: Power button input time
+        @param input_time: **int** Power button input time
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.POWER_BUTTON_CONFIG)
+        reg = self._i2c.read_byte(self.address, self.POWER_BUTTON_CONFIG)
         reg &= 0xFC
         if input_time >= self.PWR_TIME_280_MS and input_time <= self.PWR_TIME_2240_MS:
             reg |= input_time & 0x03
         else:
             # User input invalid time
             return False
-        self._i2c.writeByte(self.address, self.POWER_BUTTON_CONFIG, reg)
+        self._i2c.write_byte(self.address, self.POWER_BUTTON_CONFIG, reg)
         return True
 
     def get_power_button_time(self):
@@ -552,7 +546,7 @@ class QwiicCAP1203(object):
         
         @return **int** Time in milliseconds
         """
-        reg = self._i2c.readByte(self.address, self.POWER_BUTTON_CONFIG)
+        reg = self._i2c.read_byte(self.address, self.POWER_BUTTON_CONFIG)
         if (reg & 0x03) == self.PWR_TIME_280_MS:
             return 280
         elif (reg & 0x03) == self.PWR_TIME_560_MS:
@@ -569,18 +563,18 @@ class QwiicCAP1203(object):
         Enables power button in active state. See data sheet on Power Button
         Configuration Register (pg. 43-44)
         """
-        reg = self._i2c.readByte(self.address, self.POWER_BUTTON_CONFIG)
+        reg = self._i2c.read_byte(self.address, self.POWER_BUTTON_CONFIG)
         reg |= 0x04
-        self._i2c.writeByte(self.address, self.POWER_BUTTON_CONFIG, reg)
+        self._i2c.write_byte(self.address, self.POWER_BUTTON_CONFIG, reg)
 
     def set_power_button_disabled(self):
         """!
         Disables power button in active state. See data sheet on Power Button
         Configuration Register (pg. 43-44)
         """
-        reg = self._i2c.readByte(self.address, self.POWER_BUTTON_CONFIG)
+        reg = self._i2c.read_byte(self.address, self.POWER_BUTTON_CONFIG)
         reg &= 0xFB
-        self._i2c.writeByte(self.address, self.POWER_BUTTON_CONFIG, reg)
+        self._i2c.write_byte(self.address, self.POWER_BUTTON_CONFIG, reg)
 
     def is_power_button_enabled(self):
         """!
@@ -590,7 +584,7 @@ class QwiicCAP1203(object):
 
         @return **bool** `True` if enabled, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.POWER_BUTTON_CONFIG)
+        reg = self._i2c.read_byte(self.address, self.POWER_BUTTON_CONFIG)
         if reg & 0x04 == 0x04:
             # Power button enabled
             return True
@@ -606,21 +600,8 @@ class QwiicCAP1203(object):
 
         @return **bool** `True` if power button is touched, otherwise `False`
         """
-        reg = self._i2c.readByte(self.address, self.GENERAL_STATUS)
+        reg = self._i2c.read_byte(self.address, self.GENERAL_STATUS)
         if reg & 0x10 == 0x10:
             self.clear_interrupt()
             return True
         return False
-    
-    def millis(self):
-        """!
-        Get the current time in milliseconds
-
-        @return **int** Current time in milliseconds
-        """
-        if hasattr(time, "ticks_ms"):
-	        # MicroPython: time.time() gives an integer, instead use ticks_ms()
-            return time.ticks_ms()
-        else:
-	        # Other platforms: time.time() gives a float
-            return int(round(time.time() * 1000))

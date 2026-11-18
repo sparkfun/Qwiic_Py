@@ -57,10 +57,11 @@ package.
 
 
 # Load Necessary Modules:
-import time				# Time access and conversion package
-import math				# Basic math package
+import qwiic_i2c		# I2C bus driver package
 import qwiic_pca9685	# PCA9685 LED driver package
 						# (used on Pi Servo pHAT)
+
+__version__ = "3.0.0"
 
 # Device Name:
 _DEFAULT_NAME = "Pi Servo HAT"
@@ -81,28 +82,27 @@ _AVAILABLE_I2C_ADDRESS = [0x40]
 
 # Full List:
 #_AVAILABLE_I2C_ADDRESS = list(range(0x40,0x7F+1))					# Full Address List
-#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(acAddr)		# Exclude All Call
-#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(subAddr_1)	# Exclude Sub Addr 1
-#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(subAddr_2)	# Exclude Sub Addr 2
-#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(subAddr_3)	# Exclude Sub Addr 3
+#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(AC_ADDR)		# Exclude All Call
+#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(SUB_ADDR_1)	# Exclude Sub Addr 1
+#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(SUB_ADDR_2)	# Exclude Sub Addr 2
+#_AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(SUB_ADDR_3)	# Exclude Sub Addr 3
 
 # Default Servo Frequency:
 _DEFAULT_SERVO_FREQUENCY = 50	# Hz
 
-class PiServoHat(object):
+class PiServoHAT(object):
 	"""!
-	SparkFun PiServoHat
-	Initialise the qwiic_pca9685 python module at ``address`` with ``i2c_driver``.
+	SparkFun PiServoHAT
+	Initialise the qwiic_pca9685 python module at ``address`` with ``i2c_bus``.
 
 	@param address: The I2C address to use for the device.
 						If not provided, the default address is
 						used.
-	@param i2c_driver: An existing i2c driver object. If not
-						provided a driver object is created.
+	@param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
 	@return **Bool** Constructor Initialization
 						True-	Successful
-						False-	Issue loading I2C driver
+						False-	Issue loading I2C bus
 	"""
 
 	# Constructor
@@ -116,18 +116,18 @@ class PiServoHat(object):
 	available_addresses = _AVAILABLE_I2C_ADDRESS
 	
 	# Special Use Addresses:
-	gcAddr = 0x00 		# General Call address for software reset
-	acAddr = 0x70		# All Call address- used for modifications to
+	GC_ADDR = 0x00 		# General Call address for software reset
+	AC_ADDR = 0x70		# All Call address- used for modifications to
 						# multiple PCA9685 chips reguardless of thier
 						# I2C address set by hardware pins (A0 to A5).
-	subAddr_1 = 0x71	# 1110 001X or 0xE2 (7-bit)
-	subAddr_2 = 0x72	# 1110 010X or 0xE4 (7-bit)
-	subAddr_3 = 0x74	# 1110 100X or 0xE8 (7-bit)
+	SUB_ADDR_1 = 0x71	# 1110 001X or 0xE2 (7-bit)
+	SUB_ADDR_2 = 0x72	# 1110 010X or 0xE4 (7-bit)
+	SUB_ADDR_3 = 0x74	# 1110 100X or 0xE8 (7-bit)
 
-	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(acAddr)	# Exclude All Call
-	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(subAddr_1)	# Exclude Sub Addr 1
-	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(subAddr_2)	# Exclude Sub Addr 2
-	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(subAddr_3)	# Exclude Sub Addr 3
+	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(AC_ADDR)	# Exclude All Call
+	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(SUB_ADDR_1)	# Exclude Sub Addr 1
+	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(SUB_ADDR_2)	# Exclude Sub Addr 2
+	# _AVAILABLE_I2C_ADDRESS = _AVAILABLE_I2C_ADDRESS.remove(SUB_ADDR_3)	# Exclude Sub Addr 3
 	
 	#----------------------------------------------
 	# Default Servo frequency:
@@ -135,21 +135,18 @@ class PiServoHat(object):
 	
 	#----------------------------------------------
 	# Constructor
-	def __init__(self, address=None, debug = None, min_pt=1, max_pt=2):
+	def __init__(self, address=None, i2c_bus=None, min_pt=1, max_pt=2):
 		"""!
 		This method initializes the class object. If no 'address' or
-		'i2c_driver' are inputed or 'None' is specified, the method will
+		'i2c_bus' are inputed or 'None' is specified, the method will
 		use the defaults.
 
 		@param address: The I2C address to use for the device.
 							If not provided, the method will default to
 							the first address in the
 							'available_addresses' list.
-								Default = 0x40
-		@param debug: Designated whether or not to print debug
-							statements.
-							0-	Don't print debug statements
-							1-	Print debug statements
+							Default = 0x40
+		@param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 		@param min_pt: The minimum pulse time of the servos in 
 							milliseconds.  If not provided, default to 
 							1 ms
@@ -157,19 +154,18 @@ class PiServoHat(object):
 							milliseconds.  If not provided, default to 
 							2 ms
 		"""
+		# The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+		address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 		
 		# Did the user specify an I2C address?
 		# Defaults to 0x40 if unspecified.
-		self.address = address if address != None else self.available_addresses[0]
+		self.address = address if address is not None else self.available_addresses[0]
 
-		# Do you want debug statements?
-		if debug == None:
-			self.debug = 0	# Debug Statements Disabled
-		else:
-			self.debug = debug	# Debug Statements Enabled (1)
-		
+		# Use the given I2C bus, or the platform's default bus
+		self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
+
 		# Initialization
-		self.PCA9685 = qwiic_pca9685.QwiicPCA9685(self.address, debug)
+		self.pca9685 = qwiic_pca9685.QwiicPCA9685(self.address, self._i2c)
 		
 		#----------------------------------------------
 		# Grab Available Channels:
@@ -185,10 +181,6 @@ class PiServoHat(object):
 		# 	piservohat.set_pwm_frequency(_DEFAULT_SERVO_FREQUENCY)
 		
 		#----------------------------------------------
-		# Sets PWM frequency to Default = 50 Hz
-		self.set_pwm_frequency(_DEFAULT_SERVO_FREQUENCY)
-
-		#----------------------------------------------
 		# Sets the minimum pulse widths for the servos
 		self.minimum_pulse_width = float(min_pt)
 
@@ -202,9 +194,25 @@ class PiServoHat(object):
 			self.minimum_pulse_width = max_pt
 			self.maximum_pulse_width = min_pt
 
+	#----------------------------------------------
+	# Begin operation
+	def begin(self):
+		"""!
+		Sets the PWM frequency to the default 50 Hz and starts the
+		PCA9685. (In 2.x the constructor did this.)
+
+		@return **Bool** True if the device is connected and
+					configured, otherwise False.
+		"""
+		if not self.is_connected():
+			return False
+
 		#----------------------------------------------
-		# Begin operation
-		self.PCA9685.begin()
+		# Sets PWM frequency to Default = 50 Hz
+		if not self.set_pwm_frequency(_DEFAULT_SERVO_FREQUENCY):
+			return False
+
+		return self.pca9685.begin()
 
 	#----------------------------------------------
 	# Check if Connected
@@ -216,7 +224,7 @@ class PiServoHat(object):
 					True-	Connected
 					False-	Not Connected
 		"""
-		return self.PCA9685.is_connected()
+		return self.pca9685.is_connected()
 
 	#----------------------------------------------
 	# Restart PCA9685
@@ -227,10 +235,10 @@ class PiServoHat(object):
 		the default 50 Hz setting.
 		"""
 		# Soft Reset Chip
-		self.PCA9685.soft_reset()
+		self.pca9685.soft_reset()
 
 		# Clear MODE1 Register
-		self.PCA9685.restart()
+		self.pca9685.restart()
 
 		#----------------------------------------------
 		# Sets PWM frequency to Default = 50 Hz
@@ -249,7 +257,7 @@ class PiServoHat(object):
 		"""
 
 		# Get pre-scale value (determines PWM frequency)
-		prescale = self.PCA9685.get_pre_scale()
+		prescale = self.pca9685.get_pre_scale()
 
 		# Calculate frequency based off internal clock frequency (default)
 		self.frequency = int((25*10**6)/((prescale + 1)*4096))
@@ -281,14 +289,10 @@ class PiServoHat(object):
 		may be halfed.)
 		"""
 		
-		# Debug message
-		if self.debug == 1:
-			print("PWM Frequency: %s" % frequency)
-		
-		if frequency == None:
+		if frequency is None:
 			frequency = 50	# Default (50 Hz)
 				
-		if self.PCA9685.set_pre_scale(frequency) == True:
+		if self.pca9685.set_pre_scale(frequency) == True:
 			self.frequency = frequency
 			return True
 		else:
@@ -329,7 +333,7 @@ class PiServoHat(object):
 				self.minimum_pulse_width = max_pulse_time
 
 			return True
-		except:
+		except (TypeError, ValueError):
 			return False
 	#----------------------------------------------
 	# Moves Servo on Specified Channel to Position (in Degrees)
@@ -353,19 +357,9 @@ class PiServoHat(object):
 		"""
 		
 		# # Check Auto-Increment Bit
-		# if self.PCA9685.get_auto_increment_bit != 1:
+		# if self.pca9685.get_auto_increment_bit != 1:
 		# 	# Enable Word Reads/Writes
-		# 	self.PCA9685.set_auto_increment_bit(1)
-
-		# Debug message
-		if self.debug == 1:
-			try:
-				self.available_pwm_channels.index(channel)
-			except:
-				print("available Channels list:")
-				print(self.available_pwm_channels)
-				print("Selected Channel: %s" % channel)
-
+		# 	self.pca9685.set_auto_increment_bit(1)
 
 		period = 1 / self.frequency			# seconds
 		resolution = period / 4096			# seconds
@@ -375,14 +369,10 @@ class PiServoHat(object):
 		
 		# Calculate Positioning- Linear Interpolation:
 
-		# Debug message
-		if self.debug == 1:
-			print("Servo Range: %s" % swing)
-		
-		if swing == None:
+		if swing is None:
 			swing = 90	# Default
 		elif swing != 90 and swing != 180:
-			raise Exception("Error: 'swing' input value. Must be 90 or 180.")
+			raise ValueError("swing must be 90 or 180")
 		
 		# Servo Timing
 		ratio = float(position) / swing # the ratio of the movement to the max angle
@@ -391,23 +381,14 @@ class PiServoHat(object):
 		# converts movement back into a position time
 		position_time = ((ratio * time_dif) + self.minimum_pulse_width) / 1000 # convert back into seconds (float)
 
-		if self.debug == 1:
-			print(f"Ratio: {str(ratio)}, time_dif: {str(time_dif)}, pt: {str(position_time)}")
-
 		
 		# Round Values from Float to Integers
 		on_value = round(delay)									# integer
 		off_value = round(position_time / resolution + delay)	# integer
 
-		# Debug message
-		if self.debug == 1:
-			print("On value: %s" % on_value)
-			print("Off value: %s" % off_value)
-			print("Total (max. 4096): %s" % (on_value + off_value))
-		
 		# Move servo to position immediately
-		self.PCA9685.set_channel_word(channel, 1, on_value)	# Timing for "On" edge of PWM
-		self.PCA9685.set_channel_word(channel, 0, off_value)	# Timing for "Off" edge of PWM
+		self.pca9685.set_channel_word(channel, 1, on_value)	# Timing for "On" edge of PWM
+		self.pca9685.set_channel_word(channel, 0, off_value)	# Timing for "Off" edge of PWM
 		
 
 	def set_duty_cycle(self, channel, duty_cycle):
@@ -422,18 +403,9 @@ class PiServoHat(object):
 		"""
 		
 		# # Check Auto-Increment Bit
-		# if self.PCA9685.get_auto_increment_bit != 1:
+		# if self.pca9685.get_auto_increment_bit != 1:
 		# 	# Enable Word Reads/Writes
-		# 	self.PCA9685.set_auto_increment_bit(1)
-
-		# Debug message
-		if self.debug == 1:
-			try:
-				self.available_pwm_channels.index(channel)
-			except:
-				print("available Channels list:")
-				print(self.available_pwm_channels)
-				print("Selected Channel: %s" % channel)
+		# 	self.pca9685.set_auto_increment_bit(1)
 
 		# Initial Condition
 		delay = 0
@@ -442,15 +414,9 @@ class PiServoHat(object):
 		on_value = round(delay)						# integer
 		off_value = round(duty_cycle/100*4096) - 1	# integer
 
-		# Debug message
-		if self.debug == 1:
-			print("On value: %s" % on_value)
-			print("Off value: %s" % off_value)
-			print("Total (max. 4096): %s" % (on_value + off_value))
-		
 		# Change Duty-Cycle
-		self.PCA9685.set_channel_word(channel, 1, on_value)	# Timing for "On" edge of PWM
-		self.PCA9685.set_channel_word(channel, 0, off_value)	# Timing for "Off" edge of PWM
+		self.pca9685.set_channel_word(channel, 1, on_value)	# Timing for "On" edge of PWM
+		self.pca9685.set_channel_word(channel, 0, off_value)	# Timing for "Off" edge of PWM
 
 	#----------------------------------------------
 	# Retrieves Servo Position on Specified Channel (in Degrees)
@@ -468,35 +434,15 @@ class PiServoHat(object):
 		"""
 		
 		# # Check Auto-Increment Bit
-		# if self.PCA9685.get_auto_increment_bit != 1:
+		# if self.pca9685.get_auto_increment_bit != 1:
 		# 	# Enable Word Reads/Writes
-		# 	self.PCA9685.set_auto_increment_bit(1)
+		# 	self.pca9685.set_auto_increment_bit(1)
 
-		# Debug message
-		if self.debug == 1:
-			try:
-				self.available_pwm_channels.index(channel)
-			except:
-				print("available Channels list:")
-				print(self.available_pwm_channels)
-				print("Selected Channel: %s" % channel)
-
-		initial_on = self.PCA9685.get_channel_word(channel, 1)	# Timing for "On" edge of PWM
-		initial_off = self.PCA9685.get_channel_word(channel, 0)	# Timing for "Off" edge of PWM
-
-		# Debug message
-		if self.debug == 1:
-			print("On value: %s" % initial_on)
-			print("Off value: %s" % initial_off)
-			print("Total (max. 4096): %s" % (initial_on + initial_off))
-			print("Difference: %s" % (initial_on - initial_off))
+		initial_on = self.pca9685.get_channel_word(channel, 1)	# Timing for "On" edge of PWM
+		initial_off = self.pca9685.get_channel_word(channel, 0)	# Timing for "Off" edge of PWM
 
 		period = 1 / self.frequency			# seconds
 		resolution = period / 4096			# seconds
-
-		# Debug message
-		if self.debug == 1:
-			print("Servo Range: %s" % swing)
 
 		# 180 Degree Servo Timing:
 		# 	0 	Degrees	=	1.0	ms
@@ -507,10 +453,10 @@ class PiServoHat(object):
 		# 	45	Degrees	=	1.5	ms
 		#	90	Degrees	=	2.0	ms
 		
-		if swing == None:
+		if swing is None:
 			swing = 90	# Default
 		elif swing != 90 and swing != 180:
-			raise Exception("Error: 'swing' input value. Must be 90 or 180.")
+			raise ValueError("swing must be 90 or 180")
 			
 		
 		# Servo Timing
@@ -518,10 +464,6 @@ class PiServoHat(object):
 		difference = (initial_off - initial_on) * resolution	# steps/second
 		position = ((difference * 1000) - 1) / m				# degrees
 
-		# Debug message
-		if self.debug == 1:
-			print("On value: %s" % initial_on)
-		
 		return position
 			
 	#----------------------------------------------
@@ -530,7 +472,7 @@ class PiServoHat(object):
 		"""!
 		Set the SLEEP bit to 1, which will unpower the servos. This preserves the life of the servos.
 		"""
-		self.PCA9685.set_sleep_bit(1)
+		self.pca9685.set_sleep_bit(1)
 
 	#----------------------------------------------
 	# Wake PCA9685
@@ -538,5 +480,5 @@ class PiServoHat(object):
 		"""!
 		Set the SLEEP bit to 0, which will power the servos.
 		"""
-		self.PCA9685.set_sleep_bit(0)
-		time.sleep(0.001)  # wait for oscillator to stabilize
+		self.pca9685.set_sleep_bit(0)
+		self._i2c.delay_ms(1)  # wait for oscillator to stabilize

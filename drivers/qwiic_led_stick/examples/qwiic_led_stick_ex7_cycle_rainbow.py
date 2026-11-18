@@ -38,39 +38,39 @@
 # Example 7
 
 import qwiic_led_stick
-import time
+import qwiic_i2c
 import sys
 
-def cycle_rainbow(LED_stick, delay):
+def cycle_rainbow(led_stick, delay_ms):
     # Red to yellow
     for g in range(0, 255):
-        LED_stick.set_all_LED_color(255, g, 0)
-        time.sleep(delay)
+        led_stick.set_all_led_color(255, g, 0)
+        qwiic_i2c.delay_ms(delay_ms)
     
     # Yellow to green
     for r in range(255, 0, -1):
-        LED_stick.set_all_LED_color(r, 255, 0)
-        time.sleep(delay)
+        led_stick.set_all_led_color(r, 255, 0)
+        qwiic_i2c.delay_ms(delay_ms)
     
     # Green to cyan
     for b in range(0, 255):
-        LED_stick.set_all_LED_color(0, 255, b)
-        time.sleep(delay)
+        led_stick.set_all_led_color(0, 255, b)
+        qwiic_i2c.delay_ms(delay_ms)
     
     # Cyan to blue
     for g in range(255, 0, -1):
-        LED_stick.set_all_LED_color(0, g, 255)
-        time.sleep(delay)
+        led_stick.set_all_led_color(0, g, 255)
+        qwiic_i2c.delay_ms(delay_ms)
     
     # Blue to magenta
     for r in range(0, 255):
-        LED_stick.set_all_LED_color(r, 0, 255)
-        time.sleep(delay)
+        led_stick.set_all_led_color(r, 0, 255)
+        qwiic_i2c.delay_ms(delay_ms)
     
     # Magenta to red
     for b in range(255, 0, -1):
-        LED_stick.set_all_LED_color(255, 0, b)
-        time.sleep(delay)
+        led_stick.set_all_led_color(255, 0, b)
+        qwiic_i2c.delay_ms(delay_ms)
         
 def run_example():
 
@@ -84,7 +84,7 @@ def run_example():
     print("\nLED Stick ready!")
 
     while True:
-        cycle_rainbow(my_stick, 0.01)
+        cycle_rainbow(my_stick, 10)
 
 if __name__ == '__main__':
     try:

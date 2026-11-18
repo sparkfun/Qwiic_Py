@@ -36,8 +36,6 @@
 
 import qwiic_mcp4725
 import sys
-import time
-
 # This is a lookup table of 512 values that represent a sine wave.
 # To generate a waveform with a dac we can use a lookeup table.
 # For this example, sinewave Tables were generated using this calculator:
@@ -108,30 +106,30 @@ sintab = [  2048, 2073, 2098, 2123, 2148, 2174, 2199, 2224,
   1648, 1673, 1698, 1723, 1747, 1772, 1797, 1822,
   1847, 1872, 1897, 1922, 1948, 1973, 1998, 2023]
 
-def runExample():
+def run_example():
 	print("\nQwiic Template Example 2 - Waveform\n")
 
 	# Create instance of device
-	myDac = qwiic_mcp4725.QwiicMCP4725()
+	my_dac = qwiic_mcp4725.QwiicMCP4725()
 
 	# Check if it's connected
-	if myDac.is_connected() == False:
+	if not my_dac.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myDac.begin()
+	my_dac.begin()
 
 	lookup_index = 0
 	
 	while True:
-		myDac.write_dac(sintab[lookup_index])
+		my_dac.write_dac(sintab[lookup_index])
 		lookup_index = (lookup_index + 1) % 512
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

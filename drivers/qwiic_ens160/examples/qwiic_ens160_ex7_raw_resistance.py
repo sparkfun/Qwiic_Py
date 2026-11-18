@@ -36,9 +36,9 @@
 
 import qwiic_ens160
 import sys
-from time import sleep
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	# TODO Replace template and title
 	print("\nQwiic ENS160 Example 7 - Raw Resistance\n")
 
@@ -46,7 +46,7 @@ def runExample():
 	myEns = qwiic_ens160.QwiicENS160()
 
 	# Check if it's connected
-	if myEns.is_connected() == False:
+	if not myEns.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
@@ -54,13 +54,13 @@ def runExample():
 	# Initialize the device
 	myEns.begin()
 
-	myEns.set_operating_mode(myEns.kOpModeReset)
+	myEns.set_operating_mode(myEns.OP_MODE_RESET)
 
-	sleep(0.1)
+	qwiic_i2c.delay_ms(100)
 
 	# Set to standard operation
-	# Others include kOpModeDeepSleep and kOpModeIdle
-	myEns.set_operating_mode(myEns.kOpModeStandard)
+	# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
+	myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
 	
 	# There are four values here: 
 	# 0 - Operating ok: Standard Operation
@@ -69,19 +69,19 @@ def runExample():
 	# 	  and only once in sensor's lifetime.
 	# 3 - No Valid Output
 
-	ensStatus = myEns.get_flags()
-	print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", ensStatus)
+	ens_status = myEns.get_flags()
+	print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", ens_status)
 	
 	while True:
 		if myEns.check_data_status():
 			res_value = myEns.get_raw_resistance()
 			print("Resistance Value: ", res_value)
 		
-		sleep(0.2)
+		qwiic_i2c.delay_ms(200)
 	
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

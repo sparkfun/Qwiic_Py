@@ -36,7 +36,7 @@
 import qwiic_as726x
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic AS726x Example 2 - Settings\n")
 
 	# Create instance of device
@@ -49,31 +49,31 @@ def runExample():
 		return
 
 	# Set a desired custom Gain or Measurement Mode here, to be passed to the begin() function
-	gain = myAS726x.kGain1x
+	gain = myAS726x.GAIN_1X
 	# Other possible gain settings:
-	# kGain1x = 0b00 #1x
-    # kGain37x = 0b01 #3.7x 
-    # kGain16x = 0b10 #16x
-    # kGain64x = 0b11 #64x (default)
+	# GAIN_1X = 0b00 #1x
+    # GAIN_37X = 0b01 #3.7x 
+    # GAIN_16X = 0b10 #16x
+    # GAIN_64X = 0b11 #64x (default)
 
-	measurementMode = myAS726x.kMeasurementMode4Chan
+	measurement_mode = myAS726x.MEASUREMENT_MODE_4CHAN
 	# Other possible measurement modes:
-    # kMeasurementMode4Chan 	# 4-channel reading 
+    # MEASUREMENT_MODE_4CHAN 	# 4-channel reading 
 								# on the as7262: V, B, G, Y (O and R will be 0)
 	# 							# on the as7263: S, T, U, V (R and W will be 0)
-    # kMeasurementMode4Chan2	# 4-channel reading, of 2nd set of channels
+    # MEASUREMENT_MODE_4CHAN2	# 4-channel reading, of 2nd set of channels
 								# on the as7262: G, Y, O, R (V and B will be 0)
 								# on the as7263: R, T, U, W (S and V will be 0)
-    # kMeasurementMode6ChanContinuous # 6-channel continuous reading
-    # kMeasurementMode6ChanOneShot (default) # 6-channel one-shot reading
+    # MEASUREMENT_MODE_6CHAN_CONTINUOUS # 6-channel continuous reading
+    # MEASUREMENT_MODE_6CHAN_ONE_SHOT (default) # 6-channel one-shot reading
 
 	# Initialize the device with non-default settings
-	myAS726x.begin(gain, measurementMode)
+	myAS726x.begin(gain, measurement_mode)
 
 	while True:
 		myAS726x.take_measurements()
 		# Check which device is connected
-		if myAS726x.get_version() == myAS726x.kSensorTypeAs7262:
+		if myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7262:
 			# Visible readings
 			print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
 				myAS726x.get_calibrated_violet(),
@@ -84,7 +84,7 @@ def runExample():
 				myAS726x.get_calibrated_red()
 			), end="")
 		
-		elif myAS726x.get_version() == myAS726x.kSensorTypeAs7263:
+		elif myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7263:
 			# Near IR readings
 			print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
 				myAS726x.get_calibrated_r(),
@@ -99,7 +99,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

@@ -38,7 +38,6 @@
 # Example 3
 
 import qwiic_led_stick
-import time
 import sys
 
 def run_example():
@@ -58,7 +57,7 @@ def run_example():
     green_list = [59, 216, 170, 21, 114, 63, 226, 92, 155, 175]
     blue_list = [214, 147, 25, 124, 153, 163, 188, 33, 175, 221]
 
-    my_stick.set_all_LED_unique_color(red_list, green_list, blue_list, 10)
+    my_stick.set_all_led_unique_color(red_list, green_list, blue_list, 10)
 
 if __name__ == '__main__':
     try:

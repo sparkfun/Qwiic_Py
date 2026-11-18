@@ -49,9 +49,9 @@ New to qwiic? Take a look at the entire [SparkFun Qwiic Ecoststem](https://www.s
 """
 # ---------------------------------------------------------------------------------
 
-import math
-import time
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 _DEFAULT_NAME = "Qwiic LED Stick"
 
@@ -67,8 +67,7 @@ class QwiicLEDStick(object):
 
     @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided a 
-                        a driver is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The GPIO device object.
     """
@@ -88,19 +87,15 @@ class QwiicLEDStick(object):
     COMMAND_WRITE_ALL_LED_BRIGHTNESS = 0x77
     COMMAND_WRITE_ALL_LED_OFF = 0x78
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address != None else self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver == None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c == None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
     
     # ------------------------------------------------------------------------------
     # is_connected()
@@ -108,11 +103,11 @@ class QwiicLEDStick(object):
     # Is an actual board connected to our system?
     def is_connected(self):
         """!
-        Determine if a Qwiic SGP40 device is connected to the system.
+        Determine if a Qwiic LED Stick is connected to the system.
 
         @return **bool** True if the device is connected, false otherwise.
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
+        return qwiic_i2c.is_device_connected(self.address)
 
     # ------------------------------------------------------------------------------
     # begin()
@@ -129,10 +124,10 @@ class QwiicLEDStick(object):
         return self.is_connected()
     
     # ------------------------------------------------------------------------------
-    # set_single_LED_color(number, red, green, blue)
+    # set_single_led_color(number, red, green, blue)
     #
     # Change the color of a specific LED.
-    def set_single_LED_color(self, number, red, green, blue):
+    def set_single_led_color(self, number, red, green, blue):
         """!
         Change the color of a specific LED.
 
@@ -159,13 +154,13 @@ class QwiicLEDStick(object):
         
 
         data = [int(number), int(red), int(green), int(blue)]
-        return self._i2c.writeBlock(self.address, self.COMMAND_WRITE_SINGLE_LED_COLOR, data)
+        return self._i2c.write_block(self.address, self.COMMAND_WRITE_SINGLE_LED_COLOR, data)
 
     # ------------------------------------------------------------------------------
-    # set_all_LED_color(red, green, blue)
+    # set_all_led_color(red, green, blue)
     #
     # Set the color of all LEDs in the string
-    def set_all_LED_color(self, red, green, blue):
+    def set_all_led_color(self, red, green, blue):
         """!
         Set the color of all LEDs in the string. Each will be shining the same color.
             The color value must be between 0-255.
@@ -192,13 +187,13 @@ class QwiicLEDStick(object):
         
 
         data_list = [int(red), int(green), int(blue)]
-        return self._i2c.writeBlock(self.address, self.COMMAND_WRITE_ALL_LED_COLOR, data_list)
+        return self._i2c.write_block(self.address, self.COMMAND_WRITE_ALL_LED_COLOR, data_list)
     
     # ------------------------------------------------------------------------------
-    # set_all_LED_unique_color(red_list, blue_list, green_list, length)
+    # set_all_led_unique_color(red_list, blue_list, green_list, length)
     #
     # Change the color of all LEDs at once to individual values
-    def set_all_LED_unique_color(self, red_list, green_list, blue_list, length):
+    def set_all_led_unique_color(self, red_list, green_list, blue_list, length):
         """!
         Change the color of all LEDs at once to individual values.
 
@@ -238,27 +233,27 @@ class QwiicLEDStick(object):
             transmission_len = len(red_2dim_list[i])    # Calculate the number of red values to send
             offset = i * n                              # Calculate LED offset
             data_list = [transmission_len, offset] + red_2dim_list[i]
-            self._i2c.writeBlock(self.address, self.COMMAND_WRITE_RED_ARRAY, data_list)
+            self._i2c.write_block(self.address, self.COMMAND_WRITE_RED_ARRAY, data_list)
         
         # Send out green values
         for i in range(0, len(green_2dim_list)):
             transmission_len = len(green_2dim_list[i])
             offset = i * n
             data_list = [transmission_len, offset] + green_2dim_list[i]
-            self._i2c.writeBlock(self.address, self.COMMAND_WRITE_GREEN_ARRAY, data_list)
+            self._i2c.write_block(self.address, self.COMMAND_WRITE_GREEN_ARRAY, data_list)
 
         # Send out blue values
         for i in range(0, len(blue_2dim_list)):
             transmission_len = len(blue_2dim_list[i])
             offset = i * n
             data_list = [transmission_len, offset] + blue_2dim_list[i]
-            self._i2c.writeBlock(self.address, self.COMMAND_WRITE_BLUE_ARRAY, data_list)
+            self._i2c.write_block(self.address, self.COMMAND_WRITE_BLUE_ARRAY, data_list)
     
     # -----------------------------------------------------------------------------
-    # set_single_LED_brightness(number, brightness)
+    # set_single_led_brightness(number, brightness)
     #
     # Change the brightness of a specific LED while keeping their current color
-    def set_single_LED_brightness(self, number, brightness):
+    def set_single_led_brightness(self, number, brightness):
         """!
         Change the brightness of a specific LED while keeping their current color.
             To turn LEDs off but remember their previous color, set brightness to 0.
@@ -275,13 +270,13 @@ class QwiicLEDStick(object):
             brightness = 0
         
         data = [int(number), int(brightness)]
-        return self._i2c.writeBlock(self.address, self.COMMAND_WRITE_SINGLE_LED_BRIGHTNESS, data)
+        return self._i2c.write_block(self.address, self.COMMAND_WRITE_SINGLE_LED_BRIGHTNESS, data)
     
     # ----------------------------------------------------------------------------
-    # set_all_LED_brightness(brightness)
+    # set_all_led_brightness(brightness)
     #
     # Change the brightness of all LEDs while keeping their current color
-    def set_all_LED_brightness(self, brightness):
+    def set_all_led_brightness(self, brightness):
         """!
         Change the brightness of all LEDs while keeping their current color.
             To turn all LEDs off but remember their previous color, set brightness to 0
@@ -296,19 +291,19 @@ class QwiicLEDStick(object):
         if brightness < 0:
             brightness = 0
         
-        return self._i2c.writeByte(self.address, self.COMMAND_WRITE_ALL_LED_BRIGHTNESS, int(brightness))
+        return self._i2c.write_byte(self.address, self.COMMAND_WRITE_ALL_LED_BRIGHTNESS, int(brightness))
     
     # ---------------------------------------------------------------------------
     # led_off()
     #
     # Turn all LEDs off by setting color to 0
-    def LED_off(self):
+    def led_off(self):
         """!
         Turn all LEDs off by setting color to 0
 
         @return **bool** true if the command was sent successfully, false otherwise.
         """
-        return self._i2c.writeByte(self.address, self.COMMAND_WRITE_ALL_LED_OFF, 0)
+        return self._i2c.write_byte(self.address, self.COMMAND_WRITE_ALL_LED_OFF, 0)
     
     # ---------------------------------------------------------------------------
     # change_address(new_address)
@@ -326,7 +321,7 @@ class QwiicLEDStick(object):
         if new_address < 0x08 or new_address > 0x77:
             return False
         
-        self._i2c.writeByte(self.address, self.COMMAND_CHANGE_ADDRESS, new_address)
+        self._i2c.write_byte(self.address, self.COMMAND_CHANGE_ADDRESS, new_address)
         
         # Update address variable
         self.address = new_address
@@ -344,5 +339,5 @@ class QwiicLEDStick(object):
         @return **bool** true if the command was sent successfully, false otherwise.
         """
         # TODO: need to figure out the max length of the LED string
-        return self._i2c.writeByte(self.address, self.COMMAND_CHANGE_LED_LENGTH, new_length)
+        return self._i2c.write_byte(self.address, self.COMMAND_CHANGE_LED_LENGTH, new_length)
         

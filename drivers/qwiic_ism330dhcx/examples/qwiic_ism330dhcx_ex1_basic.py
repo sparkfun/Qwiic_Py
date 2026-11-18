@@ -35,65 +35,65 @@
 
 import qwiic_ism330dhcx
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic ISM330DHCX Example 1 - Basic Readings\n")
 
 	# Create instance of device
-	myIsm = qwiic_ism330dhcx.QwiicISM330DHCX()
+	my_ism = qwiic_ism330dhcx.QwiicISM330DHCX()
 
 	# Check if it's connected
-	if myIsm.is_connected() == False:
+	if my_ism.is_connected() == False:
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
-	myIsm.begin()
+	my_ism.begin()
 	# Reset the device to default settings. This if helpful is you're doing multiple
 	# uploads testing different settings. 
-	myIsm.device_reset()
+	my_ism.device_reset()
 
 	# Wait for it to finish resetting
-	while myIsm.get_device_reset() == False:
-		time.sleep(1)
+	while not my_ism.get_device_reset():
+		qwiic_i2c.delay_ms(1000)
 
 	print("Reset.")
 	print("Applying settings.")
-	time.sleep(0.100)
+	qwiic_i2c.delay_ms(100)
 
-	myIsm.set_device_config()
-	myIsm.set_block_data_update()
+	my_ism.set_device_config()
+	my_ism.set_block_data_update()
 
 	# Set the output data rate and precision of the accelerometer
-	myIsm.set_accel_data_rate(myIsm.kXlOdr104Hz)
-	myIsm.set_accel_full_scale(myIsm.kXlFs4g)
+	my_ism.set_accel_data_rate(my_ism.XL_ODR_104HZ)
+	my_ism.set_accel_full_scale(my_ism.XL_FS_4G)
 
 	# Set the output data rate and precision of the gyroscope
-	myIsm.set_gyro_data_rate(myIsm.kGyroOdr104Hz)
-	myIsm.set_gyro_full_scale(myIsm.kGyroFs500dps)
+	my_ism.set_gyro_data_rate(my_ism.GYRO_ODR_104HZ)
+	my_ism.set_gyro_full_scale(my_ism.GYRO_FS_500DPS)
 
 	# Turn on the accelerometer's filter and apply settings
-	myIsm.set_accel_filter_lp2()
-	myIsm.set_accel_slope_filter(myIsm.kLpOdrDiv100)
+	my_ism.set_accel_filter_lp2()
+	my_ism.set_accel_slope_filter(my_ism.LP_ODR_DIV100)
 
 	# Turn on the gyroscope's filter and apply settings
-	myIsm.set_gyro_filter_lp1()
-	myIsm.set_gyro_lp1_bandwidth(myIsm.kBwMedium)
+	my_ism.set_gyro_filter_lp1()
+	my_ism.set_gyro_lp1_bandwidth(my_ism.BW_MEDIUM)
 
 	while True:
-		if myIsm.check_status():
+		if my_ism.check_status():
 			# Get the accelerometer data
-			accelData = myIsm.get_accel()
-			print("Accel X: %f, Y: %f, Z: %f " % (accelData.xData, accelData.yData, accelData.zData), end='')
-			gyroData = myIsm.get_gyro()
-			print("Gyro X: %f, Y: %f, Z: %f" % (gyroData.xData, gyroData.yData, gyroData.zData))
+			accel_data = my_ism.get_accel()
+			print("Accel X: %f, Y: %f, Z: %f " % (accel_data.x_data, accel_data.y_data, accel_data.z_data), end='')
+			gyro_data = my_ism.get_gyro()
+			print("Gyro X: %f, Y: %f, Z: %f" % (gyro_data.x_data, gyro_data.y_data, gyro_data.z_data))
 		
-		time.sleep(0.100) # Delay so that we don't spam user console or I2C bus
+		qwiic_i2c.delay_ms(100) # Delay so that we don't spam user console or I2C bus
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

@@ -36,25 +36,25 @@
 import qwiic_cap1203
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic CAP1203 Example 4 - Power Button\n")
 
 	# Create instance of device
-	myDevice = qwiic_cap1203.QwiicCAP1203()
+	my_device = qwiic_cap1203.QwiicCAP1203()
 
 	# Check if it's connected
-	if myDevice.is_connected() == False:
+	if my_device.is_connected() == False:
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myDevice.begin()
+	my_device.begin()
 
 	# Set which pad acts as the power button: PAD_LEFT, PAD_MIDDLE, PAD_RIGHT
-	# myDevice.set_power_button_pad(myDevice.PAD_LEFT)
-	myDevice.set_power_button_pad(myDevice.PAD_MIDDLE)
-	# myDevice.set_power_button_pad(myDevice.PAD_RIGHT)
+	# my_device.set_power_button_pad(my_device.PAD_LEFT)
+	my_device.set_power_button_pad(my_device.PAD_MIDDLE)
+	# my_device.set_power_button_pad(my_device.PAD_RIGHT)
 
     # Get the current pad which acts as the power button.
     # The function returns the pad as an interger which
@@ -64,7 +64,7 @@ def runExample():
     # 1     Left
     # 2     Middle
     # 3     Right
-	pad = myDevice.get_power_button_pad()
+	pad = my_device.get_power_button_pad()
 	if pad == 1:
 		print("Power Button Pad: Left")
 	elif pad == 2:
@@ -75,41 +75,41 @@ def runExample():
 	# Set the length of time (in ms) which the designated
 	# power button must indicate a touch before being
 	# recognized as a power button touch.
-	# sensor.set_power_button_time(myDevice.PWR_TIME_280_MS)    # 280 ms
-	# sensor.set_power_button_time(myDevice.PWR_TIME_560_MS)    # 560 ms
-	# sensor.set_power_button_time(myDevice.PWR_TIME_1120_MS)   # 1120 ms
-	myDevice.set_power_button_time(myDevice.PWR_TIME_2240_MS)  # 2240 ms
+	# my_device.set_power_button_time(my_device.PWR_TIME_280_MS)    # 280 ms
+	# my_device.set_power_button_time(my_device.PWR_TIME_560_MS)    # 560 ms
+	# my_device.set_power_button_time(my_device.PWR_TIME_1120_MS)   # 1120 ms
+	my_device.set_power_button_time(my_device.PWR_TIME_2240_MS)  # 2240 ms
 
 	# Get the length of time the designated power button
 	# must indicate a touch before being recognized as a
 	# power button touch.
-	print("Power Button Time: " + str(myDevice.get_power_button_time()) + " ms")
+	print("Power Button Time: " + str(my_device.get_power_button_time()) + " ms")
 
 	# Enable or disable the power button functionality.
 	# When the power button is ENABLED, the specified pad
-	# (from setPowerButtonPad() function) acts as a power
+	# (from set_power_button_pad()) acts as a power
 	# button. When the power button is DISABLED, all pads
 	# act as regular capacitive touch sensors.
-	myDevice.set_power_button_enabled()  # Enable power button
-	# myDevice.set_power_button_disabled()  # Disable power button
+	my_device.set_power_button_enabled()  # Enable power button
+	# my_device.set_power_button_disabled()  # Disable power button
 
 	# Returns the state of the power button. Returns true
 	# if ENABLED, otherwise returns false.
-	if myDevice.is_power_button_enabled() == True:
+	if my_device.is_power_button_enabled() == True:
 		print("Power Button: ENABLED")
 	else:
 		print("Power Button: DISABLED")
 
 	while True:
-		if myDevice.is_power_button_touched():
+		if my_device.is_power_button_touched():
 			print("Power Button")
-			while myDevice.is_power_button_touched():
+			while my_device.is_power_button_touched():
 				# Wait until user removes finger
 				pass
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

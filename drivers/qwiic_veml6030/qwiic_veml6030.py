@@ -50,7 +50,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -135,15 +136,16 @@ class QwiicVEML6030(object):
     VEML6030_INTEG_TIME_50 = 50
     VEML6030_INTEG_TIME_25 = 25
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -151,14 +153,8 @@ class QwiicVEML6030(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     def is_connected(self):
         """!
@@ -167,9 +163,7 @@ class QwiicVEML6030(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -238,7 +232,7 @@ class QwiicVEML6030(object):
         """!
         Sets the integration time
 
-        @param int time: Integration time in ms, possible values:
+        @param time: **int** Integration time in ms, possible values:
             25, 50, 100, 200, 400, and 800
         """
         # Determine integration time bits
@@ -291,7 +285,7 @@ class QwiicVEML6030(object):
         """!
         Sets the persistence protect number
 
-        @param int prot_val: Protect number
+        @param prot_val: **int** Protect number
         """
         # Determine protect number bits
         if prot_val == 1:
@@ -367,7 +361,7 @@ class QwiicVEML6030(object):
         """
         self._write_register(self.VEML6030_SETTING_REG, self.VEML6030_SD_MASK, self.VEML6030_POWER, self.VEML6030_NO_SHIFT)
         # Wait 4ms for power on to complete
-        time.sleep(0.004)
+        self._i2c.delay_ms(4)
 
     def enable_pow_save(self):
         """!
@@ -395,7 +389,7 @@ class QwiicVEML6030(object):
         """!
         Sets the power saving mode. See datasheet for the effects of each value
 
-        @param int mode_val: Power saving mode number, can be 1-4
+        @param mode_val: **int** Power saving mode number, can be 1-4
         """
         # Determine power saving mode bits
         if mode_val == 1:
@@ -461,7 +455,7 @@ class QwiicVEML6030(object):
         """!
         Sets the low threshold for interrupts
 
-        @param float lux_val: Low threshold in lux
+        @param lux_val: **float** Low threshold in lux
         """
         # Threshold cannot exceed 120k lux
         if lux_val < 0 or lux_val > 120000:
@@ -486,7 +480,7 @@ class QwiicVEML6030(object):
         """!
         Sets the high threshold for interrupts
 
-        @param float lux_val: High threshold in lux
+        @param lux_val: **float** High threshold in lux
         """
         # Threshold cannot exceed 120k lux
         if lux_val < 0 or lux_val > 120000:
@@ -545,7 +539,7 @@ class QwiicVEML6030(object):
         """!
         Compensates lux values over 1000
 
-        @param float lux_val: Lux value
+        @param lux_val: **float** Lux value
 
         @return **float** Compensated lux value
         """
@@ -562,7 +556,7 @@ class QwiicVEML6030(object):
         """!
         Calculates lux value from raw bits
 
-        @param int light_bits: Raw bits
+        @param light_bits: **int** Raw bits
 
         @return **float** Lux value (or VEML6030_UNKOWN_ERROR on error)
         """
@@ -606,7 +600,7 @@ class QwiicVEML6030(object):
         """!
         Calculates raw bits from lux value
 
-        @param float lux_val: Lux value
+        @param lux_val: **float** Lux value
 
         @return **int** Raw bits (or VEML6030_UNKOWN_ERROR on error)
         """
@@ -650,10 +644,10 @@ class QwiicVEML6030(object):
         """!
         Writes specific bits to a register
 
-        @param int w_reg: Register address
-        @param int mask: Bit mask
-        @param int bits: Bits to write
-        @param int start_position: Offset position
+        @param w_reg: **int** Register address
+        @param mask: **int** Bit mask
+        @param bits: **int** Bits to write
+        @param start_position: **int** Offset position
         """
         # Read current register value
         i2c_write = self._read_register(w_reg)
@@ -663,14 +657,14 @@ class QwiicVEML6030(object):
         i2c_write |= bits << start_position
 
         # Write new value back to register
-        self._i2c.writeWord(self.address, w_reg, i2c_write)
+        self._i2c.write_word(self.address, w_reg, i2c_write)
 
     def _read_register(self, reg):
         """!
         Reads a register
 
-        @param int reg: Register address
+        @param reg: **int** Register address
 
         @return **int** Register value
         """
-        return self._i2c.readWord(self.address, reg)
+        return self._i2c.read_word(self.address, reg)

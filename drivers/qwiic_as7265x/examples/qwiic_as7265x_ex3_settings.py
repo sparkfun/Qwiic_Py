@@ -36,7 +36,7 @@
 import qwiic_as7265x
 import sys
 
-def runExample():
+def run_example():
     print("\nQwiic Spectral Triad Example 3 - Settings\n")
 
     print("Point the Triad away and press a key to begin with illumination...")
@@ -57,39 +57,39 @@ def runExample():
         return
     
     # There are four gain settings. There are four gain settings. It is possible to saturate the reading so don't simply jump to 64x.
-    # kGain1x  # 1x
-    # kGain37x # 3.7x
-    # kGain16x # 16x
-    # kGain64x # 64x (default)
-    myAS7265x.set_gain(myAS7265x.kGain16x)
+    # GAIN_1X  # 1x
+    # GAIN_37X # 3.7x
+    # GAIN_16X # 16x
+    # GAIN_64X # 64x (default)
+    myAS7265x.set_gain(myAS7265x.GAIN_16X)
 
     # There are four measurement modes, 
-    # kMeasurementMode4Chan     # 4-channel reading 
+    # MEASUREMENT_MODE_4CHAN     # 4-channel reading 
                                 # on the as7262: V, B, G, Y (O and R will be 0)
                                 # on the as7263: S, T, U, V (R and W will be 0)
-    # kMeasurementMode4Chan2    # 4-channel reading, of 2nd set of channels
+    # MEASUREMENT_MODE_4CHAN2    # 4-channel reading, of 2nd set of channels
                                 # on the as7262: G, Y, O, R (V and B will be 0)
                                 # on the as7263: R, T, U, W (S and V will be 0)
-    # kMeasurementMode6ChanContinuous # 6-channel continuous reading
-    # kMeasurementMode6ChanOneShot (default) # 6-channel one-shot reading
-    myAS7265x.set_measurement_mode(myAS7265x.kMeasurementMode6ChanOneShot)
+    # MEASUREMENT_MODE_6CHAN_CONTINUOUS # 6-channel continuous reading
+    # MEASUREMENT_MODE_6CHAN_ONE_SHOT (default) # 6-channel one-shot reading
+    myAS7265x.set_measurement_mode(myAS7265x.MEASUREMENT_MODE_6CHAN_ONE_SHOT)
 
     # Integration cycles is from 0 (2.78ms) to 255 (711ms)
     # myAS7265x.set_integration_cycles(49) # default is 50*2.8ms = 140ms per reading
     myAS7265x.set_integration_cycles(1) # 2*2.8ms = 5.6ms per reading
 
     # Drive current can be set for each LED, but each LED has a different max current
-    # kLedCurrentLimit12_5mA # 12.5mA (default)
-    # kLedCurrentLimit25mA  # 25mA (NOT ALLOWED FOR UV)
-    # kLedCurrentLimit50mA  # 50mA (NOT ALLOWED FOR UV)
-    # kLedCurrentLimit100mA # 100mA (NOT ALLOWED FOR UV OR IR)
-    myAS7265x.set_bulb_current(myAS7265x.kLedCurrentLimit12_5mA, myAS7265x.kLedWhite) 
+    # LED_CURRENT_LIMIT_12_5MA # 12.5mA (default)
+    # LED_CURRENT_LIMIT_25MA  # 25mA (NOT ALLOWED FOR UV)
+    # LED_CURRENT_LIMIT_50MA  # 50mA (NOT ALLOWED FOR UV)
+    # LED_CURRENT_LIMIT_100MA # 100mA (NOT ALLOWED FOR UV OR IR)
+    myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_WHITE) 
 
     # UV LED has max forward current of 30mA so DO NOT set the drive current higher
-    myAS7265x.set_bulb_current(myAS7265x.kLedCurrentLimit12_5mA, myAS7265x.kLedUv)
+    myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_UV)
     
     # IR LED has max forward current of 65mA so DO NOT set the drive current higher
-    myAS7265x.set_bulb_current(myAS7265x.kLedCurrentLimit12_5mA, myAS7265x.kLedIr)
+    myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_IR)
 
     # The status indicator Blue LED can be enabled/disabled and have its current set
     # can also call enable_indicator() # Default
@@ -127,7 +127,7 @@ def runExample():
 
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example")
         sys.exit(0)

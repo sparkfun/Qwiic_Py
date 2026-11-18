@@ -48,8 +48,9 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
 import struct
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -71,132 +72,133 @@ class QwiicAS726x(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Device Regs
-    kStatusReg = 0x00
-    kWriteReg = 0x01
-    kReadReg = 0x02
+    STATUS_REG = 0x00
+    WRITE_REG = 0x01
+    READ_REG = 0x02
 
-    kTxValid = 0x02
-    kRxValid = 0x01
+    TX_VALID = 0x02
+    RX_VALID = 0x01
 
     # Register Addresses
-    kDeviceType = 0x00
-    kHwVersion = 0x01
-    kConfig = 0x04
-    kIntegrationTime = 0x05
-    kDeviceTemp = 0x06
-    kLedConfig = 0x07
+    DEVICE_TYPE = 0x00
+    HW_VERSION = 0x01
+    CONFIG = 0x04
+    INTEGRATION_TIME = 0x05
+    DEVICE_TEMP = 0x06
+    LED_CONFIG = 0x07
 
     # The same register locations are shared between the AS7262 and AS7263, they're just called something different
     # AS7262 Registers
-    kAs7262V = 0x08
-    kAs7262B = 0x0A
-    kAs7262G = 0x0C
-    kAs7262Y = 0x0E
-    kAs7262O = 0x10
-    kAs7262R = 0x12
-    kAs7262VCal = 0x14
-    kAs7262BCal = 0x18
-    kAs7262GCal = 0x1C
-    kAs7262YCal = 0x20
-    kAs7262OCal = 0x24
-    kAs7262RCal = 0x28
+    AS7262V = 0x08
+    AS7262B = 0x0A
+    AS7262G = 0x0C
+    AS7262Y = 0x0E
+    AS7262O = 0x10
+    AS7262R = 0x12
+    AS7262V_CAL = 0x14
+    AS7262B_CAL = 0x18
+    AS7262G_CAL = 0x1C
+    AS7262Y_CAL = 0x20
+    AS7262O_CAL = 0x24
+    AS7262R_CAL = 0x28
 
     # AS7263 Registers
-    kAs7263R = 0x08
-    kAs7263S = 0x0A
-    kAs7263T = 0x0C
-    kAs7263U = 0x0E
-    kAs7263V = 0x10
-    kAs7263W = 0x12
-    kAs7263RCal = 0x14
-    kAs7263SCal = 0x18
-    kAs7263TCal = 0x1C
-    kAs7263UCal = 0x20
-    kAs7263VCal = 0x24
-    kAs7263WCal = 0x28
+    AS7263R = 0x08
+    AS7263S = 0x0A
+    AS7263T = 0x0C
+    AS7263U = 0x0E
+    AS7263V = 0x10
+    AS7263W = 0x12
+    AS7263R_CAL = 0x14
+    AS7263S_CAL = 0x18
+    AS7263T_CAL = 0x1C
+    AS7263U_CAL = 0x20
+    AS7263V_CAL = 0x24
+    AS7263W_CAL = 0x28
 
     # AS7261 Registers
-    kAs7261X = 0x08  # 16b
-    kAs7261Y = 0x0A  # 16b
-    kAs7261Z = 0x0C  # 16b
-    kAs7261Nir = 0x0E  # 16b
-    kAs7261Dark = 0x10  # 16b
-    kAs7261Clear = 0x12  # 16b
-    kAs7261XCal = 0x14
-    kAs7261YCal = 0x18
-    kAs7261ZCal = 0x1C
-    kAs7261X1931Cal = 0x20
-    kAs7261Y1931Cal = 0x24
-    kAs7261UpriCal = 0x28
-    kAs7261VpriCal = 0x2C
-    kAs7261UCal = 0x30
-    kAs7261VCal = 0x34
-    kAs7261DuvCal = 0x38
-    kAs7261LuxCal = 0x3C  # 16b
-    kAs7261CctCal = 0x3E  # 16b
+    AS7261X = 0x08  # 16b
+    AS7261Y = 0x0A  # 16b
+    AS7261Z = 0x0C  # 16b
+    AS7261_NIR = 0x0E  # 16b
+    AS7261_DARK = 0x10  # 16b
+    AS7261_CLEAR = 0x12  # 16b
+    AS7261X_CAL = 0x14
+    AS7261Y_CAL = 0x18
+    AS7261Z_CAL = 0x1C
+    AS7261X1931_CAL = 0x20
+    AS7261Y1931_CAL = 0x24
+    AS7261_UPRI_CAL = 0x28
+    AS7261_VPRI_CAL = 0x2C
+    AS7261U_CAL = 0x30
+    AS7261V_CAL = 0x34
+    AS7261_DUV_CAL = 0x38
+    AS7261_LUX_CAL = 0x3C  # 16b
+    AS7261_CCT_CAL = 0x3E  # 16b
 
-    kSensorTypeAs7261 = 0x3D
-    kSensorTypeAs7262 = 0x3E
-    kSensorTypeAs7263 = 0x3F
+    SENSOR_TYPE_AS7261 = 0x3D
+    SENSOR_TYPE_AS7262 = 0x3E
+    SENSOR_TYPE_AS7263 = 0x3F
 
-    kPollingDelay = 5  # Amount of ms to wait between checking for virtual register changes
-    kMaxRetries = 3
-    kTimeout = 3000
+    POLLING_DELAY = 5  # Amount of ms to wait between checking for virtual register changes
+    MAX_RETRIES = 3
+    TIMEOUT = 3000
     
     # Necessary Config Register bits
-    kConfigSRSTShift = 7
-    kConfigSRSTMask = 0b1 << kConfigSRSTShift
-    kConfigIntShift = 6
-    kConfigIntMask = 0b1 << kConfigIntShift
-    kConfigGainShift = 4
-    kConfigGainMask = 0b11 << kConfigGainShift
-    kConfigModeShift = 2
-    kConfigModeMask = 0b11 << kConfigModeShift
-    kConfigDataReadyShift = 1
-    kConfigDataReadyMask = 0b1 << kConfigDataReadyShift
-    kConfigFRSTShift = 0
-    kConfigFRSTMask = 0b1 << kConfigFRSTShift
+    CONFIG_SRST_SHIFT = 7
+    CONFIG_SRST_MASK = 0b1 << CONFIG_SRST_SHIFT
+    CONFIG_INT_SHIFT = 6
+    CONFIG_INT_MASK = 0b1 << CONFIG_INT_SHIFT
+    CONFIG_GAIN_SHIFT = 4
+    CONFIG_GAIN_MASK = 0b11 << CONFIG_GAIN_SHIFT
+    CONFIG_MODE_SHIFT = 2
+    CONFIG_MODE_MASK = 0b11 << CONFIG_MODE_SHIFT
+    CONFIG_DATA_READY_SHIFT = 1
+    CONFIG_DATA_READY_MASK = 0b1 << CONFIG_DATA_READY_SHIFT
+    CONFIG_FRST_SHIFT = 0
+    CONFIG_FRST_MASK = 0b1 << CONFIG_FRST_SHIFT
 
     # Necessary LED Config Register Bits
-    kLedConfigLedDrvShift = 4
-    kLedConfigLedDrvMask = 0b11 << kLedConfigLedDrvShift
-    kLedConfigLedEnableShift = 3
-    kLedConfigLedEnableMask = 0b1 << kLedConfigLedEnableShift
-    kLedConfigIndCurrentShift = 1
-    kLedConfigIndCurrentMask = 0b11 << kLedConfigIndCurrentShift
-    kLedConfigIndEnableShift = 0
-    kLedConfigIndEnableMask = 0b1 << kLedConfigIndEnableShift
+    LED_CONFIG_LED_DRV_SHIFT = 4
+    LED_CONFIG_LED_DRV_MASK = 0b11 << LED_CONFIG_LED_DRV_SHIFT
+    LED_CONFIG_LED_ENABLE_SHIFT = 3
+    LED_CONFIG_LED_ENABLE_MASK = 0b1 << LED_CONFIG_LED_ENABLE_SHIFT
+    LED_CONFIG_IND_CURRENT_SHIFT = 1
+    LED_CONFIG_IND_CURRENT_MASK = 0b11 << LED_CONFIG_IND_CURRENT_SHIFT
+    LED_CONFIG_IND_ENABLE_SHIFT = 0
+    LED_CONFIG_IND_ENABLE_MASK = 0b1 << LED_CONFIG_IND_ENABLE_SHIFT
 
     # Values to write to current limit, gain, and mode 
-    kLedCurrentLimit12_5mA = 0b00
-    kLedCurrentLimit25mA = 0b01
-    kLedCurrentLimit50mA = 0b10
-    kLedCurrentLimit100mA = 0b11
+    LED_CURRENT_LIMIT_12_5MA = 0b00
+    LED_CURRENT_LIMIT_25MA = 0b01
+    LED_CURRENT_LIMIT_50MA = 0b10
+    LED_CURRENT_LIMIT_100MA = 0b11
 
-    kIndicatorCurrentLimit1mA = 0b00
-    kIndicatorCurrentLimit2mA = 0b01
-    kIndicatorCurrentLimit4mA = 0b10
-    kIndicatorCurrentLimit8mA = 0b11
+    INDICATOR_CURRENT_LIMIT_1MA = 0b00
+    INDICATOR_CURRENT_LIMIT_2MA = 0b01
+    INDICATOR_CURRENT_LIMIT_4MA = 0b10
+    INDICATOR_CURRENT_LIMIT_8MA = 0b11
 
-    kGain1x = 0b00
-    kGain37x = 0b01 #3.7x 
-    kGain16x = 0b10 #16x
-    kGain64x = 0b11 #64x
+    GAIN_1X = 0b00
+    GAIN_37X = 0b01 #3.7x 
+    GAIN_16X = 0b10 #16x
+    GAIN_64X = 0b11 #64x
 
-    kMeasurementMode4Chan = 0b00
-    kMeasurementMode4Chan2 = 0b01
-    kMeasurementMode6ChanContinuous = 0b10
-    kMeasurementMode6ChanOneShot = 0b11
+    MEASUREMENT_MODE_4CHAN = 0b00
+    MEASUREMENT_MODE_4CHAN2 = 0b01
+    MEASUREMENT_MODE_6CHAN_CONTINUOUS = 0b10
+    MEASUREMENT_MODE_6CHAN_ONE_SHOT = 0b11
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -204,16 +206,10 @@ class QwiicAS726x(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-        self._sensorVersion = 0
+        self._sensor_version = 0
 
     def is_connected(self):
         """!
@@ -222,11 +218,9 @@ class QwiicAS726x(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        return self._i2c.isDeviceConnected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
-    connected = property(is_connected)
-
-    def begin(self, gain = kGain64x, measurementMode = kMeasurementMode6ChanOneShot):
+    def begin(self, gain = GAIN_64X, measurement_mode = MEASUREMENT_MODE_6CHAN_ONE_SHOT):
         """!
         Initializes this device with default parameters
 
@@ -236,17 +230,17 @@ class QwiicAS726x(object):
         if not self.is_connected():
             return False
 
-        self._sensorVersion = self.virtual_read_register(self.kHwVersion)
+        self._sensor_version = self.virtual_read_register(self.HW_VERSION)
 
-        if self._sensorVersion not in [self.kSensorTypeAs7261, self.kSensorTypeAs7262, self.kSensorTypeAs7263]:
+        if self._sensor_version not in [self.SENSOR_TYPE_AS7261, self.SENSOR_TYPE_AS7262, self.SENSOR_TYPE_AS7263]:
             return False
         
         # Set Bulb to 12.5mA (minimum)
-        self.set_bulb_current(self.kLedCurrentLimit12_5mA)
+        self.set_bulb_current(self.LED_CURRENT_LIMIT_12_5MA)
         self.disable_bulb() # To avoid overheating
 
         # Set Indicator to 8mA (maximum)
-        self.set_indicator_current(self.kIndicatorCurrentLimit8mA)
+        self.set_indicator_current(self.INDICATOR_CURRENT_LIMIT_8MA)
         self.disable_indicator() # To save power
 
         self.set_integration_time(50) # 50 * 2.8ms = 140ms. 0 to 255 is valid.
@@ -256,7 +250,7 @@ class QwiicAS726x(object):
 
         # Set gain and measurement mode (default to 64x and 6 channel one-shot)
         self.set_gain(gain)
-        self.set_measurement_mode(measurementMode)
+        self.set_measurement_mode(measurement_mode)
 
         return True
 
@@ -271,16 +265,16 @@ class QwiicAS726x(object):
         self.clear_data_available()
 
         # Set the measurement mode to one-shot for all 6 channels
-        self.set_measurement_mode(self.kMeasurementMode6ChanOneShot)
+        self.set_measurement_mode(self.MEASUREMENT_MODE_6CHAN_ONE_SHOT)
 
         time_waited = 0
         while self.data_available() == False:
-            time.sleep(self. kPollingDelay / 1000)
-            time_waited += self.kPollingDelay
-            if time_waited > self.kTimeout:
+            self._i2c.delay_ms(self.POLLING_DELAY)
+            time_waited += self.POLLING_DELAY
+            if time_waited > self.TIMEOUT:
                 return False
 
-        # Readings can now be accessed via getViolet(), getBlue(), etc
+        # Readings can now be accessed via get_violet(), get_blue(), etc
         return True
 
     def get_version(self):
@@ -289,7 +283,7 @@ class QwiicAS726x(object):
 
         @return **int** The version of the sensor
         """
-        return self._sensorVersion
+        return self._sensor_version
 
     def take_measurements_with_bulb(self):
         """!
@@ -301,21 +295,17 @@ class QwiicAS726x(object):
         self.take_measurements()
         self.disable_bulb()
 
-    def get_temperature(self, device):
+    def get_temperature(self):
         """!
-        Returns the temperature of a given device in Celsius
-
-        @param int device: The device to get the temperature from
+        Returns the temperature of the device in Celsius
         """
-        return self.virtual_read_register(self.kDeviceTemp)
+        return self.virtual_read_register(self.DEVICE_TEMP)
 
     def get_temperature_f(self):
         """!
-        Returns the temperature of a given device in Fahrenheit
-
-        @param int device: The device to get the temperature from
+        Returns the temperature of the device in Fahrenheit
         """
-        return (self.virtual_read_register(self.kDeviceTemp) * 1.8) + 32
+        return (self.virtual_read_register(self.DEVICE_TEMP) * 1.8) + 32
 
     def set_measurement_mode(self, mode):
         """!
@@ -326,22 +316,22 @@ class QwiicAS726x(object):
         Mode 2: All 6 channels continuously
         Mode 3: One-shot reading of all channels
 
-        @param int mode: The mode to set
+        @param mode: **int** The mode to set
 
         Allowable mode values are:
-            - kMeasurementMode4Chan
-            - kMeasurementMode4Chan2
-            - kMeasurementMode6ChanContinuous
-            - kMeasurementMode6ChanOneShot
+            - MEASUREMENT_MODE_4CHAN
+            - MEASUREMENT_MODE_4CHAN2
+            - MEASUREMENT_MODE_6CHAN_CONTINUOUS
+            - MEASUREMENT_MODE_6CHAN_ONE_SHOT
         """
-        if mode > self.kMeasurementMode6ChanOneShot:
-            mode = self.kMeasurementMode6ChanOneShot
+        if mode > self.MEASUREMENT_MODE_6CHAN_ONE_SHOT:
+            mode = self.MEASUREMENT_MODE_6CHAN_ONE_SHOT
 
-        value = self.virtual_read_register(self.kConfig)
-        value &= ~self.kConfigModeMask
-        value |= mode << self.kConfigModeShift
+        value = self.virtual_read_register(self.CONFIG)
+        value &= ~self.CONFIG_MODE_MASK
+        value |= mode << self.CONFIG_MODE_SHIFT
 
-        self.virtual_write_register(self.kConfig, value)
+        self.virtual_write_register(self.CONFIG, value)
 
     def get_measurement_mode(self):
         """!
@@ -350,13 +340,13 @@ class QwiicAS726x(object):
         @return **int** The measurement mode
 
         Allowable mode values are:
-            - kMeasurementMode4Chan
-            - kMeasurementMode4Chan2
-            - kMeasurementMode6ChanContinuous
-            - kMeasurementMode6ChanOneShot
+            - MEASUREMENT_MODE_4CHAN
+            - MEASUREMENT_MODE_4CHAN2
+            - MEASUREMENT_MODE_6CHAN_CONTINUOUS
+            - MEASUREMENT_MODE_6CHAN_ONE_SHOT
         """
-        value = self.virtual_read_register(self.kConfig)
-        return (value & self.kConfigModeMask) >> self.kConfigModeShift
+        value = self.virtual_read_register(self.CONFIG)
+        return (value & self.CONFIG_MODE_MASK) >> self.CONFIG_MODE_SHIFT
 
     def data_available(self):
         """!
@@ -364,93 +354,93 @@ class QwiicAS726x(object):
 
         @return **bool** `True` if the data ready flag is set, otherwise `False`
         """
-        value = self.virtual_read_register(self.kConfig)
-        return (value & self.kConfigDataReadyMask) != 0
+        value = self.virtual_read_register(self.CONFIG)
+        return (value & self.CONFIG_DATA_READY_MASK) != 0
 
     def enable_indicator(self):
         """!
         Enable the onboard indicator LED
         """
 
-        value = self.virtual_read_register(self.kLedConfig)
-        value |= self.kLedConfigIndEnableMask
+        value = self.virtual_read_register(self.LED_CONFIG)
+        value |= self.LED_CONFIG_IND_ENABLE_MASK
 
-        self.virtual_write_register(self.kLedConfig, value)
+        self.virtual_write_register(self.LED_CONFIG, value)
 
     def disable_indicator(self):
         """!
         Disable the onboard indicator LED
         """
 
-        value = self.virtual_read_register(self.kLedConfig)
-        value &= ~self.kLedConfigIndEnableMask
+        value = self.virtual_read_register(self.LED_CONFIG)
+        value &= ~self.LED_CONFIG_IND_ENABLE_MASK
 
-        self.virtual_write_register(self.kLedConfig, value)
+        self.virtual_write_register(self.LED_CONFIG, value)
 
     def set_indicator_current(self, current):
         """!
         Set the current limit of onboard LED. Default is max 8mA = 0b11.
 
-        @param int current: The current limit to set the indicator LED to
+        @param current: **int** The current limit to set the indicator LED to
 
         Allowable current values are:
-            - kIndicatorCurrentLimit1mA
-            - kIndicatorCurrentLimit2mA
-            - kIndicatorCurrentLimit4mA
-            - kIndicatorCurrentLimit8mA
+            - INDICATOR_CURRENT_LIMIT_1MA
+            - INDICATOR_CURRENT_LIMIT_2MA
+            - INDICATOR_CURRENT_LIMIT_4MA
+            - INDICATOR_CURRENT_LIMIT_8MA
         """
-        if current > self.kIndicatorCurrentLimit8mA:
-            current = self.kIndicatorCurrentLimit8mA
+        if current > self.INDICATOR_CURRENT_LIMIT_8MA:
+            current = self.INDICATOR_CURRENT_LIMIT_8MA
 
-        value = self.virtual_read_register(self.kLedConfig)
-        value &= ~self.kLedConfigIndCurrentMask
+        value = self.virtual_read_register(self.LED_CONFIG)
+        value &= ~self.LED_CONFIG_IND_CURRENT_MASK
 
-        value |= current << self.kLedConfigIndCurrentShift
+        value |= current << self.LED_CONFIG_IND_CURRENT_SHIFT
 
-        self.virtual_write_register(self.kLedConfig, value)
+        self.virtual_write_register(self.LED_CONFIG, value)
 
     def enable_bulb(self):
         """!
         Enable the LED or bulb on a given device
         """
 
-        value = self.virtual_read_register(self.kLedConfig)
-        value |= self.kLedConfigLedEnableMask
+        value = self.virtual_read_register(self.LED_CONFIG)
+        value |= self.LED_CONFIG_LED_ENABLE_MASK
 
-        self.virtual_write_register(self.kLedConfig, value)
+        self.virtual_write_register(self.LED_CONFIG, value)
 
     def disable_bulb(self):
         """!
         Disable the LED or bulb on a given device
         """
 
-        value = self.virtual_read_register(self.kLedConfig)
-        value &= ~self.kLedConfigLedEnableMask
+        value = self.virtual_read_register(self.LED_CONFIG)
+        value &= ~self.LED_CONFIG_LED_ENABLE_MASK
 
-        self.virtual_write_register(self.kLedConfig, value)
+        self.virtual_write_register(self.LED_CONFIG, value)
 
 
     def set_bulb_current(self, current):
         """!
         Set the current for the specified LED
 
-        @param int current: The current to set the LED to
+        @param current: **int** The current to set the LED to
 
         Allowable current values are:
-            - kLedCurrentLimit12_5mA
-            - kLedCurrentLimit25mA
-            - kLedCurrentLimit50mA
-            - kLedCurrentLimit100mA
+            - LED_CURRENT_LIMIT_12_5MA
+            - LED_CURRENT_LIMIT_25MA
+            - LED_CURRENT_LIMIT_50MA
+            - LED_CURRENT_LIMIT_100MA
         """
 
-        if current > self.kLedCurrentLimit100mA:
-            current = self.kLedCurrentLimit100mA
+        if current > self.LED_CURRENT_LIMIT_100MA:
+            current = self.LED_CURRENT_LIMIT_100MA
         
-        value = self.virtual_read_register(self.kLedConfig)
-        value &= ~self.kLedConfigLedDrvMask
-        value |= current << self.kLedConfigLedDrvShift
+        value = self.virtual_read_register(self.LED_CONFIG)
+        value &= ~self.LED_CONFIG_LED_DRV_MASK
+        value |= current << self.LED_CONFIG_LED_DRV_SHIFT
 
-        self.virtual_write_register(self.kLedConfig, value)
+        self.virtual_write_register(self.LED_CONFIG, value)
 
     def set_gain(self, gain):
         """!
@@ -460,16 +450,16 @@ class QwiicAS726x(object):
         Gain 2: 16x
         Gain 3: 64x
 
-        @param int gain: The gain value to set
+        @param gain: **int** The gain value to set
         """
-        if gain > self.kGain64x:
-            gain = self.kGain64x
+        if gain > self.GAIN_64X:
+            gain = self.GAIN_64X
 
-        value = self.virtual_read_register(self.kConfig)
-        value &= ~self.kConfigGainMask
-        value |= gain << self.kConfigGainShift
+        value = self.virtual_read_register(self.CONFIG)
+        value &= ~self.CONFIG_GAIN_MASK
+        value |= gain << self.CONFIG_GAIN_SHIFT
 
-        self.virtual_write_register(self.kConfig, value)
+        self.virtual_write_register(self.CONFIG, value)
 
     def get_gain(self):
         """!
@@ -477,26 +467,26 @@ class QwiicAS726x(object):
 
         @return **int** The gain value
         """
-        value = self.virtual_read_register(self.kConfig)
-        return (value & self.kConfigGainMask) >> self.kConfigGainShift
+        value = self.virtual_read_register(self.CONFIG)
+        return (value & self.CONFIG_GAIN_MASK) >> self.CONFIG_GAIN_SHIFT
 
     def soft_reset(self):
         """!
         Does a soft reset. Give sensor at least 1000ms to reset
         """
-        value = self.virtual_read_register(self.kConfig)
-        value |= (1 << self.kConfigSRSTShift)
-        self.virtual_write_register(self.kConfig, value) 
+        value = self.virtual_read_register(self.CONFIG)
+        value |= (1 << self.CONFIG_SRST_SHIFT)
+        self.virtual_write_register(self.CONFIG, value) 
 
-    def set_integration_time(self, integrationValue):
+    def set_integration_time(self, integration_value):
         """!
         Sets the integration cycle amount. 
         Give this function a byte from 0 to 255.
         Time will be 2.8ms * [integration cycles + 1]
 
-        @param int integrationValue: The number of integration cycles to set
+        @param integration_value: **int** The number of integration cycles to set
         """
-        self.virtual_write_register(self.kIntegrationTime, integrationValue)
+        self.virtual_write_register(self.INTEGRATION_TIME, integration_value)
 
     def get_integration_time(self):
         """!
@@ -504,287 +494,287 @@ class QwiicAS726x(object):
 
         @return **int** The integration time
         """
-        return self.virtual_read_register(self.kIntegrationTime)
+        return self.virtual_read_register(self.INTEGRATION_TIME)
 
     def enable_interrupt(self):
         """!
         Enable the interrupt pin
         """
-        value = self.virtual_read_register(self.kConfig)
-        value |= self.kConfigIntMask
+        value = self.virtual_read_register(self.CONFIG)
+        value |= self.CONFIG_INT_MASK
 
-        self.virtual_write_register(self.kConfig, value)
+        self.virtual_write_register(self.CONFIG, value)
 
     def disable_interrupt(self):
         """!
         Disable the interrupt pin
         """
-        value = self.virtual_read_register(self.kConfig)
-        value &= ~self.kConfigIntMask
+        value = self.virtual_read_register(self.CONFIG)
+        value &= ~self.CONFIG_INT_MASK
 
-        self.virtual_write_register(self.kConfig, value)
+        self.virtual_write_register(self.CONFIG, value)
 
     # Get the various color readings
     def get_violet(self):
-        return self.get_channel(self.kAs7262V)
+        return self.get_channel(self.AS7262V)
 
     def get_blue(self):
-        return self.get_channel(self.kAs7262B)
+        return self.get_channel(self.AS7262B)
 
     def get_green(self):
-        return self.get_channel(self.kAs7262G)
+        return self.get_channel(self.AS7262G)
 
     def get_yellow(self):
-        return self.get_channel(self.kAs7262Y)
+        return self.get_channel(self.AS7262Y)
 
     def get_orange(self):
-        return self.get_channel(self.kAs7262O)
+        return self.get_channel(self.AS7262O)
 
     def get_red(self):
-        return self.get_channel(self.kAs7262R)
+        return self.get_channel(self.AS7262R)
 
     # Get the various NIR readings
     def get_r(self):
-        return self.get_channel(self.kAs7263R)
+        return self.get_channel(self.AS7263R)
 
     def get_s(self):
-        return self.get_channel(self.kAs7263S)
+        return self.get_channel(self.AS7263S)
 
     def get_t(self):
-        return self.get_channel(self.kAs7263T)
+        return self.get_channel(self.AS7263T)
 
     def get_u(self):
-        return self.get_channel(self.kAs7263U)
+        return self.get_channel(self.AS7263U)
 
     def get_v(self):
-        return self.get_channel(self.kAs7263V)
+        return self.get_channel(self.AS7263V)
 
     def get_w(self):
-        return self.get_channel(self.kAs7263W)
+        return self.get_channel(self.AS7263W)
 
     # Get the various CIE readings
     def get_x(self):
-        return self.get_channel(self.kAs7261X)
+        return self.get_channel(self.AS7261X)
 
     def get_y(self):
-        return self.get_channel(self.kAs7261Y)
+        return self.get_channel(self.AS7261Y)
 
     def get_z(self):
-        return self.get_channel(self.kAs7261Z)
+        return self.get_channel(self.AS7261Z)
 
     def get_nir(self):
-        return self.get_channel(self.kAs7261Nir)
+        return self.get_channel(self.AS7261_NIR)
 
     def get_dark(self):
-        return self.get_channel(self.kAs7261Dark)
+        return self.get_channel(self.AS7261_DARK)
 
     def get_clear(self):
-        return self.get_channel(self.kAs7261Clear)
+        return self.get_channel(self.AS7261_CLEAR)
 
     # Returns the various calibration data
 
     # AS7262
     def get_calibrated_violet(self):
-        return self.get_calibrated_value(self.kAs7262VCal)
+        return self.get_calibrated_value(self.AS7262V_CAL)
 
     def get_calibrated_blue(self):
-        return self.get_calibrated_value(self.kAs7262BCal)
+        return self.get_calibrated_value(self.AS7262B_CAL)
 
     def get_calibrated_green(self):
-        return self.get_calibrated_value(self.kAs7262GCal)
+        return self.get_calibrated_value(self.AS7262G_CAL)
 
     def get_calibrated_yellow(self):
-        return self.get_calibrated_value(self.kAs7262YCal)
+        return self.get_calibrated_value(self.AS7262Y_CAL)
 
     def get_calibrated_orange(self):
-        return self.get_calibrated_value(self.kAs7262OCal)
+        return self.get_calibrated_value(self.AS7262O_CAL)
 
     def get_calibrated_red(self):
-        return self.get_calibrated_value(self.kAs7262RCal)
+        return self.get_calibrated_value(self.AS7262R_CAL)
 
     # AS7263
     def get_calibrated_r(self):
-        return self.get_calibrated_value(self.kAs7263RCal)
+        return self.get_calibrated_value(self.AS7263R_CAL)
 
     def get_calibrated_s(self):
-        return self.get_calibrated_value(self.kAs7263SCal)
+        return self.get_calibrated_value(self.AS7263S_CAL)
 
     def get_calibrated_t(self):
-        return self.get_calibrated_value(self.kAs7263TCal)
+        return self.get_calibrated_value(self.AS7263T_CAL)
 
     def get_calibrated_u(self):
-        return self.get_calibrated_value(self.kAs7263UCal)
+        return self.get_calibrated_value(self.AS7263U_CAL)
 
     def get_calibrated_v(self):
-        return self.get_calibrated_value(self.kAs7263VCal)
+        return self.get_calibrated_value(self.AS7263V_CAL)
 
     def get_calibrated_w(self):
-        return self.get_calibrated_value(self.kAs7263WCal)
+        return self.get_calibrated_value(self.AS7263W_CAL)
 
     # AS7261
     def get_calibrated_x(self):
-        return self.get_calibrated_value(self.kAs7261XCal)
+        return self.get_calibrated_value(self.AS7261X_CAL)
 
     def get_calibrated_y(self):
-        return self.get_calibrated_value(self.kAs7261YCal)
+        return self.get_calibrated_value(self.AS7261Y_CAL)
 
     def get_calibrated_z(self):
-        return self.get_calibrated_value(self.kAs7261ZCal)
+        return self.get_calibrated_value(self.AS7261Z_CAL)
 
     def get_calibrated_x1931(self):
-        return self.get_calibrated_value(self.kAs7261X1931Cal)
+        return self.get_calibrated_value(self.AS7261X1931_CAL)
 
     def get_calibrated_y1931(self):
-        return self.get_calibrated_value(self.kAs7261Y1931Cal)
+        return self.get_calibrated_value(self.AS7261Y1931_CAL)
 
     def get_calibrated_upri1976(self):
-        return self.get_calibrated_value(self.kAs7261UpriCal)
+        return self.get_calibrated_value(self.AS7261_UPRI_CAL)
 
     def get_calibrated_vpri1976(self):
-        return self.get_calibrated_value(self.kAs7261VpriCal)
+        return self.get_calibrated_value(self.AS7261_VPRI_CAL)
 
     def get_calibrated_u1976(self):
-        return self.get_calibrated_value(self.kAs7261UCal)
+        return self.get_calibrated_value(self.AS7261U_CAL)
 
     def get_calibrated_v1976(self):
-        return self.get_calibrated_value(self.kAs7261VCal)
+        return self.get_calibrated_value(self.AS7261V_CAL)
 
     def get_calibrated_duv1976(self):
-        return self.get_calibrated_value(self.kAs7261DuvCal)
+        return self.get_calibrated_value(self.AS7261_DUV_CAL)
 
     def get_calibrated_lux(self):
-        return self.get_channel(self.kAs7261LuxCal)
+        return self.get_channel(self.AS7261_LUX_CAL)
 
     def get_calibrated_cct(self):
-        return self.get_channel(self.kAs7261CctCal)
+        return self.get_channel(self.AS7261_CCT_CAL)
     
     # Helper functions
-    def get_channel(self, channelReg):
+    def get_channel(self, channel_reg):
         """!
         Get the value of a channel
 
-        @param int channel_register: The register to read the channel from
+        @param channel_reg: **int** The register to read the channel from
         """
-        color_data = self.virtual_read_register(channelReg) << 8  # High byte
-        color_data |= self.virtual_read_register(channelReg + 1)  # Low byte
+        color_data = self.virtual_read_register(channel_reg) << 8  # High byte
+        color_data |= self.virtual_read_register(channel_reg + 1)  # Low byte
         return color_data
 
-    def get_calibrated_value(self, calAddress):
+    def get_calibrated_value(self, cal_address):
         """!
         Given an address, read four bytes and return the floating point calibrated value
 
-        @param int calAddress: The address to read the calibrated value from
+        @param cal_address: **int** The address to read the calibrated value from
 
         @return **float** The calibrated value
         """
-        b0 = self.virtual_read_register(calAddress + 0)
-        b1 = self.virtual_read_register(calAddress + 1)
-        b2 = self.virtual_read_register(calAddress + 2)
-        b3 = self.virtual_read_register(calAddress + 3)
+        b0 = self.virtual_read_register(cal_address + 0)
+        b1 = self.virtual_read_register(cal_address + 1)
+        b2 = self.virtual_read_register(cal_address + 2)
+        b3 = self.virtual_read_register(cal_address + 3)
 
         # Channel calibrated values are stored big-endian
-        calBytes = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3
+        cal_bytes = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3
 
-        return self.convert_bytes_to_float(calBytes)
+        return self.convert_bytes_to_float(cal_bytes)
     
-    def convert_bytes_to_float(self, myLong):
+    def convert_bytes_to_float(self, my_long):
         """!
         Convert a 4-byte value containing the bytes of a float respresentation of a number 
         to a float value
 
-        @param int myLong: The 4-byte value to convert
+        @param my_long: **int** The 4-byte value to convert
 
         @return **float** The float value
         """
-        packed_val = struct.pack('I', myLong)
+        packed_val = struct.pack('I', my_long)
         return struct.unpack('f', packed_val)[0]
 
     def clear_data_available(self):
         """!
         Clear the data ready flag in the config register
         """
-        value = self.virtual_read_register(self.kConfig)
-        value &= ~self.kConfigDataReadyMask
-        self._i2c.write_byte(self.address, self.kConfig, value)
+        value = self.virtual_read_register(self.CONFIG)
+        value &= ~self.CONFIG_DATA_READY_MASK
+        self._i2c.write_byte(self.address, self.CONFIG, value)
 
-    def virtual_read_register(self, virtualAddr):
+    def virtual_read_register(self, virtual_addr):
         """!
         Read a virtual register from the AS726x
 
-        @param int virtualAddr: The virtual register address to read
+        @param virtual_addr: **int** The virtual register address to read
 
         @return **int** The value read from the register or -1 if an error occurred
         """
-        status = self._i2c.read_byte(self.address, self.kStatusReg)
+        status = self._i2c.read_byte(self.address, self.STATUS_REG)
 
         # Do a prelim check of the read register
-        if status & self.kRxValid != 0:
-               self._i2c.read_byte(self.address, self.kReadReg) # read, but do nothing with it
+        if status & self.RX_VALID != 0:
+               self._i2c.read_byte(self.address, self.READ_REG) # read, but do nothing with it
         
         # Wait for WRITE flag to clear
         retries = 0
         while True:
-            status = self._i2c.read_byte(self.address, self.kStatusReg)
-            if status & self.kTxValid == 0:
+            status = self._i2c.read_byte(self.address, self.STATUS_REG)
+            if status & self.TX_VALID == 0:
                 break
-            time.sleep(self.kPollingDelay / 1000)
+            self._i2c.delay_ms(self.POLLING_DELAY)
             retries += 1
-            if retries > self.kMaxRetries:
+            if retries > self.MAX_RETRIES:
                 return -1
         
         # Send the virtual register address
-        self._i2c.write_byte(self.address, self.kWriteReg, virtualAddr)
+        self._i2c.write_byte(self.address, self.WRITE_REG, virtual_addr)
 
         # Wait for READ flag to be set
         retries = 0
         while True:
-            status = self._i2c.read_byte(self.address, self.kStatusReg)
-            if status & self.kRxValid != 0:
+            status = self._i2c.read_byte(self.address, self.STATUS_REG)
+            if status & self.RX_VALID != 0:
                 break
-            time.sleep(self.kPollingDelay / 1000)
+            self._i2c.delay_ms(self.POLLING_DELAY)
             retries += 1
-            if retries > self.kMaxRetries:
+            if retries > self.MAX_RETRIES:
                 return -1
 
-        return self._i2c.read_byte(self.address, self.kReadReg)
+        return self._i2c.read_byte(self.address, self.READ_REG)
 
 
-    def virtual_write_register(self, virtualAddr, dataToWrite):
+    def virtual_write_register(self, virtual_addr, data_to_write):
         """!
         Write a virtual register to the AS726x
 
-        @param int virtualAddr: The virtual register address to write
-        @param int dataToWrite: The value to write to the register
+        @param virtual_addr: **int** The virtual register address to write
+        @param data_to_write: **int** The value to write to the register
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Wait for WRITE register to be empty
         retries = 0
         while True:
-            status = self._i2c.read_byte(self.address, self.kStatusReg)
-            if status & self.kTxValid == 0:
+            status = self._i2c.read_byte(self.address, self.STATUS_REG)
+            if status & self.TX_VALID == 0:
                 break
-            time.sleep(self.kPollingDelay / 1000)
+            self._i2c.delay_ms(self.POLLING_DELAY)
             retries += 1
-            if retries > self.kMaxRetries:
+            if retries > self.MAX_RETRIES:
                 return False
         
         # Send the virtual register address (bit 7 should be 1 to indicate we're writing)
-        self._i2c.write_byte(self.address, self.kWriteReg, virtualAddr | 0x80)
+        self._i2c.write_byte(self.address, self.WRITE_REG, virtual_addr | 0x80)
 
         # Wait for WRITE register to be empty
         retries = 0
         while True:
-            status = self._i2c.read_byte(self.address, self.kStatusReg)
-            if status & self.kTxValid == 0:
+            status = self._i2c.read_byte(self.address, self.STATUS_REG)
+            if status & self.TX_VALID == 0:
                 break
-            time.sleep(self.kPollingDelay / 1000)
+            self._i2c.delay_ms(self.POLLING_DELAY)
             retries += 1
-            if retries > self.kMaxRetries:
+            if retries > self.MAX_RETRIES:
                 return False
         
         # Send the data to write
-        self._i2c.write_byte(self.address, self.kWriteReg, dataToWrite)
+        self._i2c.write_byte(self.address, self.WRITE_REG, data_to_write)
         
         return True
     

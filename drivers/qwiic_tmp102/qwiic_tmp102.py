@@ -11,6 +11,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 """
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 #======================================================================
 # Basic setup of I2C commands and available I2C Addresses
 #
@@ -37,14 +39,13 @@ _AVAILABLE_I2C_ADDRESS = [0x48, 0x49, 0x4A, 0x4B]
 # Some devices have multiple available addresses - this is a list of these addresses.
 # NOTE: The first address in this list is considered the default I2C address for the
 # device.
-class QwiicTmp102Sensor(object):
+class QwiicTMP102(object):
     """!
-    QwiicTmp102Sensor
+    QwiicTMP102
 
     @param address: The I2C address to use for the device.
                     If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                    a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The TMP102 Sensor device object.
     """
@@ -52,20 +53,15 @@ class QwiicTmp102Sensor(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = self.available_addresses[0] if address is None else address
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
 
     # ----------------------------------
@@ -75,13 +71,11 @@ class QwiicTmp102Sensor(object):
 
     def is_connected(self):
         """!
-        Determine if a Soil MoistureSensor device is conntected to the system..
+        Determine if a TMP102 device is connected to the system.
 
         @return **bool** True if the device is connected, otherwise False.
         """        
-        return qwiic_i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return qwiic_i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -89,13 +83,13 @@ class QwiicTmp102Sensor(object):
     # Initialize the system/validate the board.
     def begin(self):
         """!
-        Initialize the operation of the Soil Moisture Sensor module
+        Initialize the operation of the TMP102 module
 
         @return **bool** Returns true of the initialization was successful, otherwise False.
         """
         # Set variables
-        self.tempC = 0
-        self.tempF = 0
+        self.temp_c = 0
+        self.temp_f = 0
         
         # Basically return True if we are connected...
         return self.is_connected()
@@ -125,20 +119,20 @@ class QwiicTmp102Sensor(object):
                 return None
                 
         if(data[1]&0x01):	# 13 bit mode
-                baseRead = ((data[0]) << 5) | (data[1] >> 3)
-                if(baseRead > 0xFFF):
-                        baseRead |= 0xE000
+                base_read = ((data[0]) << 5) | (data[1] >> 3)
+                if(base_read > 0xFFF):
+                        base_read |= 0xE000
         else:
                 #Combine bytes to create a signed int 
-                baseRead = ((data[0]) << 4) | (data[1] >> 4)
+                base_read = ((data[0]) << 4) | (data[1] >> 4)
 
         	#Temperature data can be + or -, if it should be negative,
                 #convert 12 bit to 16 bit and use the 2s compliment.
-                if(baseRead > 0x7FF):
-                        baseRead |= 0xF000
+                if(base_read > 0x7FF):
+                        base_read |= 0xF000
 
-        self.tempC = baseRead * 0.0625
-        return self.tempC
+        self.temp_c = base_read * 0.0625
+        return self.temp_c
         
     def read_temp_f(self):
         """!
@@ -147,8 +141,8 @@ class QwiicTmp102Sensor(object):
         @return **float** The temperature in Fahrenheit.
         """
 
-        self.tempF = self.read_temp_c() * 9.0 / 5.0 + 32.0
-        return self.tempF
+        self.temp_f = self.read_temp_c() * 9.0 / 5.0 + 32.0
+        return self.temp_f
         
     def set_conversion_rate(self, rate):
         """!
@@ -161,14 +155,14 @@ class QwiicTmp102Sensor(object):
         3 - 8 Hz
         """
         
-        configByte = self.read_block_pointer_reg(CONFIG_REGISTER)
+        config_byte = self.read_block_pointer_reg(CONFIG_REGISTER)
         rate = rate&0x03
                 
         # Load new conversion rate
-        configByte[1] &= 0x3F           # Clear CR0/1 (bit 6 and 7 of second byte)
-        configByte[1] |= rate<<6        # Shift in new conversion rate
+        config_byte[1] &= 0x3F           # Clear CR0/1 (bit 6 and 7 of second byte)
+        config_byte[1] |= rate<<6        # Shift in new conversion rate
       
-        self._i2c.writeBlock(self.address, CONFIG_REGISTER, configByte)
+        self._i2c.write_block(self.address, CONFIG_REGISTER, config_byte)
         
     def set_extended_mode(self, mode):
         """!
@@ -176,29 +170,29 @@ class QwiicTmp102Sensor(object):
         0 - disabled (-55C to +128C)
         1 - enabled  (-55C to +150C)
         """
-        configByte = self.read_block_pointer_reg(CONFIG_REGISTER)
+        config_byte = self.read_block_pointer_reg(CONFIG_REGISTER)
         
         # Load new value for extention mode
-        configByte[1] &= 0xEF		# Clear EM (bit 4 of second byte)
-        configByte[1] |= mode<<4	# Shift in new exentended mode bit
+        config_byte[1] &= 0xEF		# Clear EM (bit 4 of second byte)
+        config_byte[1] |= mode<<4	# Shift in new exentended mode bit
         
-        self._i2c.writeBlock(self.address, CONFIG_REGISTER, configByte)
+        self._i2c.write_block(self.address, CONFIG_REGISTER, config_byte)
     
     def sleep(self):
         """!
         Switch sensor to low power mode
         """
-        sleepValue = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
-        sleepValue |= 0x01	# Set SD (bit 0 of first byte)
-        self._i2c.writeByte(self.address, CONFIG_REGISTER, sleepValue)
+        sleep_value = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
+        sleep_value |= 0x01	# Set SD (bit 0 of first byte)
+        self._i2c.write_byte(self.address, CONFIG_REGISTER, sleep_value)
 
     def wakeup(self):
         """!
         Wakeup and start running in normal power mode
         """
-        wakeValue = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
-        wakeValue &= 0xFE	# Clear SD (bit 0 of first byte)
-        self._i2c.writeByte(self.address, CONFIG_REGISTER, wakeValue)
+        wake_value = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
+        wake_value &= 0xFE	# Clear SD (bit 0 of first byte)
+        self._i2c.write_byte(self.address, CONFIG_REGISTER, wake_value)
 
     def set_alert_polarity(self, polarity):
         """!
@@ -206,13 +200,13 @@ class QwiicTmp102Sensor(object):
         0 - Active LOW
         1 - Active HIGH
         """
-        configByte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
+        config_byte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
         
         # Load new value for polarity
-        configByte &= 0xFB           # Clear POL (bit 2 of registerByte)
-        configByte |= polarity<<2    # Shift in new POL bit
+        config_byte &= 0xFB           # Clear POL (bit 2 of register_byte)
+        config_byte |= polarity<<2    # Shift in new POL bit
 
-        self._i2c.writeByte(self.address, CONFIG_REGISTER, configByte)
+        self._i2c.write_byte(self.address, CONFIG_REGISTER, config_byte)
 
     def alert(self):
         """!
@@ -224,89 +218,92 @@ class QwiicTmp102Sensor(object):
         alert &= 0x20   #Clear everything but the alert bit (bit 5)
         return alert>>5
         
-    def one_shot(self, setOneShot = 0):
+    def one_shot(self, set_one_shot = 0):
         """!
         Sets the SingleShot Register. Returns 1 after the conversion is complete
 
-        @param int setOneShot: 0 - Continuous conversion (default)
+        @param set_one_shot: **int** 1 - Start a one-shot conversion
+                                 0 - Return the one-shot (conversion ready) bit (default)
 
         @return **int** The state of the one shot register.
         """
-        registerByte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
-        if(setOneShot == 1):
-                registerByte |= (1<<7)
-                self._i2c.writeByte(self.address, CONFIG_REGISTER, registerByte)
+        register_byte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
+        if(set_one_shot == 1):
+                register_byte |= (1<<7)
+                self._i2c.write_byte(self.address, CONFIG_REGISTER, register_byte)
                 return 0
         else:
-                registerByte &= (1<<7)
-                return (registerByte>>7)
+                register_byte &= (1<<7)
+                return (register_byte>>7)
 
 
     def set_low_temp_c(self, temperature):
         """!
         Sets T_LOW (degrees C) alert threshold
 
-        @param float temperature: The temperature in Celsius to set the alert threshold to.
+        @param temperature: **float** The temperature in Celsius to set the alert threshold to.
         """
         if(temperature > 150.0):
                 temperature = 150.0
         if(temperature < -55.0):
                 temperature = -55.0
                 
-        registerByte = self.read_block_pointer_reg(CONFIG_REGISTER)
+        register_byte = self.read_block_pointer_reg(CONFIG_REGISTER)
         
         #Check if temperature should be 12 or 13 bits
         # 0 - temp data will be 12 bits
         # 1 - temp data will be 13 bits
-        extendedMode = (registerByte[1]&0x10) >> 4	
+        extended_mode = (register_byte[1]&0x10) >> 4	
                                                                 
         #Convert analog temperature to digital value
         temperature = temperature/0.0625
         
         # Align data for the temperature registers (see pg. 19 of datasheet)
-        if(extendedMode):	#13-bit mode
-                registerByte[0] = int(temperature)>>5
-                registerByte[1] = (int(temperature) & 0x1F)<<3 # lower 5 bits 
+        if(extended_mode):	#13-bit mode
+                register_byte[0] = int(temperature)>>5
+                register_byte[1] = (int(temperature) & 0x1F)<<3 # lower 5 bits 
         else:
-                registerByte[0] = int(temperature)>>4
-                registerByte[1] = (int(temperature) & 0xF)<<4 # lower 4 bits
+                register_byte[0] = int(temperature)>>4
+                register_byte[1] = (int(temperature) & 0xF)<<4 # lower 4 bits
               
-        self._i2c.writeBlock(self.address, T_LOW_REGISTER, registerByte)
+        self._i2c.write_block(self.address, T_LOW_REGISTER, register_byte)
 
     def set_high_temp_c(self, temperature):
         """!
-        Sets T_LOW (degrees C) alert threshold
+        Sets T_HIGH (degrees C) alert threshold
+
+        @param temperature: **float** The temperature in Celsius to set the alert threshold to.
         """
 
         if(temperature > 150.0):
                 temperature = 150.0
         if(temperature < -55.0):
                 temperature = -55.0
-        registerByte = self.read_block_pointer_reg(CONFIG_REGISTER)
+        register_byte = self.read_block_pointer_reg(CONFIG_REGISTER)
         
         #Check if temperature should be 12 or 13 bits
         # 0 - temp data will be 12 bits
         # 1 - temp data will be 13 bits
-        extendedMode = (registerByte[1]&0x10) >> 4	
+        extended_mode = (register_byte[1]&0x10) >> 4	
                                                                 
         #Convert analog temperature to digital value
         temperature = temperature/0.0625
         
         # Align data for the temperature registers (see pg. 19 of datasheet)
-        if(extendedMode):	#13-bit mode
-                registerByte[0] = int(temperature)>>5 
-                registerByte[1] = (int(temperature) & 0x1F)<<3 # lower 5 bits 
+        if(extended_mode):	#13-bit mode
+                register_byte[0] = int(temperature)>>5 
+                register_byte[1] = (int(temperature) & 0x1F)<<3 # lower 5 bits 
         else:
-                registerByte[0] = int(temperature)>>4
-                registerByte[1] = (int(temperature) & 0xF)<<4 # lower 4 bits
+                register_byte[0] = int(temperature)>>4
+                register_byte[1] = (int(temperature) & 0xF)<<4 # lower 4 bits
                 
-        self._i2c.writeBlock(self.address, T_HIGH_REGISTER, registerByte)
+        self._i2c.write_block(self.address, T_HIGH_REGISTER, register_byte)
 
     def set_low_temp_f(self, temperature):
         """!
         Sets T_LOW (degrees F) alert threshold
 
-        @param float temperature: The temperature in Fahrenheit to set the alert threshold to.
+        @param temperature: **float** The temperature in Fahrenheit to set the alert threshold to.
         """
         new_temp = (temperature - 32)*5/9    # Convert temperature to C
         self.set_low_temp_c(new_temp)           # Set T_LOW
@@ -326,27 +323,27 @@ class QwiicTmp102Sensor(object):
 
         @return **float** The low temp in Celsius.
         """
-        configByte = self.read_block_pointer_reg(CONFIG_REGISTER)
+        config_byte = self.read_block_pointer_reg(CONFIG_REGISTER)
 
         # 0 - temp data will be 12 bits
         # 1 - temp data will be 13 bits
-        extendedMode = (configByte[1]&0x10)>>4	
+        extended_mode = (config_byte[1]&0x10)>>4	
 
-        lowTempByte = self.read_block_pointer_reg(T_LOW_REGISTER)
+        low_temp_byte = self.read_block_pointer_reg(T_LOW_REGISTER)
 
-        if(lowTempByte[0] == 0xFF and lowTempByte[1] == 0xFF):
+        if(low_temp_byte[0] == 0xFF and low_temp_byte[1] == 0xFF):
                 return None
 
-        if (extendedMode):
-                digitalTemp = ((lowTempByte[0]) << 5) | (lowTempByte[1] >> 3)
-                if(digitalTemp > 0xFFF):
-                        digitalTemp |= 0xE000
+        if (extended_mode):
+                digital_temp = ((low_temp_byte[0]) << 5) | (low_temp_byte[1] >> 3)
+                if(digital_temp > 0xFFF):
+                        digital_temp |= 0xE000
         else:
-                digitalTemp = ((lowTempByte[0]) << 4) | (lowTempByte[1] >> 4)
-                if(digitalTemp > 0x7FF):
-                        digitalTemp |= 0xF000
+                digital_temp = ((low_temp_byte[0]) << 4) | (low_temp_byte[1] >> 4)
+                if(digital_temp > 0x7FF):
+                        digital_temp |= 0xF000
                         
-        return digitalTemp*0.0625    
+        return digital_temp*0.0625    
         
                     
     def read_high_temp_c(self):
@@ -355,27 +352,27 @@ class QwiicTmp102Sensor(object):
 
         @return **float** The high temp in Celsius.
         """
-        configByte = self.read_block_pointer_reg(CONFIG_REGISTER)
+        config_byte = self.read_block_pointer_reg(CONFIG_REGISTER)
 
         # 0 - temp data will be 12 bits
         # 1 - temp data will be 13 bits
-        extendedMode = (configByte[1]&0x10)>>4	
+        extended_mode = (config_byte[1]&0x10)>>4	
 
-        highTempByte = self.read_block_pointer_reg(T_HIGH_REGISTER)
+        high_temp_byte = self.read_block_pointer_reg(T_HIGH_REGISTER)
 
-        if(highTempByte[0] == 0xFF and highTempByte[1] == 0xFF):
+        if(high_temp_byte[0] == 0xFF and high_temp_byte[1] == 0xFF):
                 return None
 
-        if (extendedMode):
-                digitalTemp = ((highTempByte[0]) << 5) | (highTempByte[1] >> 3)
-                if(digitalTemp > 0xFFF):
-                        digitalTemp |= 0xE000
+        if (extended_mode):
+                digital_temp = ((high_temp_byte[0]) << 5) | (high_temp_byte[1] >> 3)
+                if(digital_temp > 0xFFF):
+                        digital_temp |= 0xE000
         else:
-                digitalTemp = ((highTempByte[0]) << 4) | (highTempByte[1] >> 4)
-                if(digitalTemp > 0x7FF):
-                        digitalTemp |= 0xF000
+                digital_temp = ((high_temp_byte[0]) << 4) | (high_temp_byte[1] >> 4)
+                if(digital_temp > 0x7FF):
+                        digital_temp |= 0xF000
                         
-        return digitalTemp*0.0625
+        return digital_temp*0.0625
 
 
     def read_low_temp_f(self):
@@ -396,54 +393,54 @@ class QwiicTmp102Sensor(object):
         return self.read_high_temp_c()*9.0/5.0 + 32.0
 
 
-    def set_fault(self, faultSetting):
+    def set_fault(self, fault_setting):
         """!
         Set the number of consecutive faults
 
-        @param int faultSetting: The number of consecutive faults to trigger an alert.
+        @param fault_setting: **int** The number of consecutive faults to trigger an alert.
         0 - 1 fault
         1 - 2 faults
         2 - 4 faults
         3 - 6 faults
         """
-        faultSetting = faultSetting&3   #Make sure rate is not set higher than 3.
+        fault_setting = fault_setting&3   #Make sure rate is not set higher than 3.
 
-        configByte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
+        config_byte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
                 
         #Load new conversion rate
-        configByte &= 0xE7                   # Clear F0/1 (bit 3 and 4 of first byte)
-        configByte |= faultSetting<<3        # Shift new fault setting
+        config_byte &= 0xE7                   # Clear F0/1 (bit 3 and 4 of first byte)
+        config_byte |= fault_setting<<3        # Shift new fault setting
         
-        self._i2c.writeByte(self.address, CONFIG_REGISTER, configByte)
+        self._i2c.write_byte(self.address, CONFIG_REGISTER, config_byte)
         
     def set_alert_mode(self, mode):
         """!
         Set Alert type
 
-        @param int mode: The mode to set the alert to.
+        @param mode: **int** The mode to set the alert to.
         0 - Comparator Mode: Active from temp > T_HIGH until temp < T_LOW
         1 - Thermostat Mode: Active when temp > T_HIGH until any read operation occurs
         """
-        configByte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
+        config_byte = self.read_block_pointer_reg(CONFIG_REGISTER)[0]
         
         #Load new conversion rate
-        configByte &= 0xFD            # Clear old TM bit (bit 1 of first byte)
-        configByte |= mode<<1	        # Shift in new TM bit
+        config_byte &= 0xFD            # Clear old TM bit (bit 1 of first byte)
+        config_byte |= mode<<1	        # Shift in new TM bit
 
-        self._i2c.writeByte(self.address, CONFIG_REGISTER, configByte)
+        self._i2c.write_byte(self.address, CONFIG_REGISTER, config_byte)
 
-    def read_block_pointer_reg(self, reg, numBytes = 2):
+    def read_block_pointer_reg(self, reg, num_bytes = 2):
         """!
         To read from the device, we first write the register we want to read then explicitly send a stop bit.
         Then, restart the connection to read the data from the device.
 
         See datasheet page. 13
 
-        @param int reg: The register to read from.
-        @param int numBytes: The number of bytes to read.
+        @param reg: **int** The register to read from.
+        @param num_bytes: **int** The number of bytes to read.
 
         @return **list** A list of bytes from the device.
         """
-        self._i2c.writeCommand(self.address, reg)
+        self._i2c.write_byte(self.address, None, reg)
 
-        return list(self._i2c.readBlock(self.address, reg, numBytes))
+        return list(self._i2c.read_block(self.address, reg, num_bytes))

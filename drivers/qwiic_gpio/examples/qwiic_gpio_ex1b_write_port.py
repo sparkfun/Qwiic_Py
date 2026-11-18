@@ -38,41 +38,41 @@
 #==================================================================================
 
 import qwiic_gpio
-import time
+import qwiic_i2c
 import sys
 
 # This function is used to toggle the GPIO pin settings in a list of GPIO_HI or GPIO_LO
-def flipGPIO( gpioConfig ):
-    for i in range(len(gpioConfig)):
-        if gpioConfig[i] == qwiic_gpio.QwiicGPIO.GPIO_HI:
-            gpioConfig[i] = qwiic_gpio.QwiicGPIO.GPIO_LO
+def flip_gpio( gpio_config ):
+    for i in range(len(gpio_config)):
+        if gpio_config[i] == qwiic_gpio.QwiicGPIO.GPIO_HI:
+            gpio_config[i] = qwiic_gpio.QwiicGPIO.GPIO_LO
         else:
-            gpioConfig[i] = qwiic_gpio.QwiicGPIO.GPIO_HI
+            gpio_config[i] = qwiic_gpio.QwiicGPIO.GPIO_HI
 
-def runExample():
+def run_example():
 
     print("\nSparkFun Qwiic GPIO Example 1\n")
-    myGPIO = qwiic_gpio.QwiicGPIO()
+    my_gpio = qwiic_gpio.QwiicGPIO()
 
-    if myGPIO.isConnected() == False:
+    if not my_gpio.is_connected():
         print("The Qwiic GPIO isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
 
-    myGPIO.begin()
-    myGPIO.pinModePort( [ myGPIO.GPIO_OUT] * myGPIO.NUM_GPIO ) # Set all 8 pins to output
+    my_gpio.begin()
+    my_gpio.pin_mode_port( [ my_gpio.GPIO_OUT] * my_gpio.NUM_GPIO ) # Set all 8 pins to output
 
-    gpioConfig = [ myGPIO.GPIO_HI, myGPIO.GPIO_LO, myGPIO.GPIO_HI, myGPIO.GPIO_LO, myGPIO.GPIO_HI, myGPIO.GPIO_LO, myGPIO.GPIO_HI, myGPIO.GPIO_LO ]
+    gpio_config = [ my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO ]
 
     while True:
         print("Writing new GPIO port outputs!")
-        myGPIO.digitalWritePort( gpioConfig )
-        flipGPIO( gpioConfig )
-        time.sleep(1)
+        my_gpio.digital_write_port( gpio_config )
+        flip_gpio( gpio_config )
+        qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example 1")
         sys.exit(0)

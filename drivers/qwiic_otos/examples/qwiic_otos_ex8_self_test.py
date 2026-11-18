@@ -40,37 +40,36 @@
 
 import qwiic_otos
 import sys
-import time
 
-def runExample():
+def run_example():
     print("\nQwiic OTOS Example 8 - Self Test\n")
 
     # Create instance of device
-    myOtos = qwiic_otos.QwiicOTOS()
+    my_otos = qwiic_otos.QwiicOTOS()
 
     # Check if it's connected
-    if myOtos.is_connected() == False:
+    if not my_otos.is_connected():
         print("The device isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
 
     # Initialize the device
-    myOtos.begin()
+    my_otos.begin()
 
     print("The OTOS must be stationary during the self test!")
 
     # Perform the self test
-    result = myOtos.selfTest()
+    result = my_otos.self_test()
     
     # Check if the self test passed
-    if(result == True):
+    if result:
         print("Self test passed!")
     else:
         print("Self test failed!")
 
 if __name__ == '__main__':
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example")
         sys.exit(0)

@@ -35,21 +35,21 @@
 
 import qwiic_bmp581
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
-	print("\nQwiic Template Example 8 - Low Power\n")
+def run_example():
+	print("\nQwiic BMP581 Example 8 - Low Power\n")
 
 	# Create instance of device
 	myBMP581 = qwiic_bmp581.QwiicBMP581()
 
 	# Check if it's connected
-	if myBMP581.is_connected() == False:
+	if not myBMP581.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	if myBMP581.begin() == False:
+	if not myBMP581.begin():
 		print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
 		return
 	
@@ -60,21 +60,21 @@ def runExample():
     # support 2 sleep modes, namely standby (1 uA) and deep standby (0.55 uA).
     # Note - setting deep standby will affect the sensor configuration, see the
     # datasheet for more information
-	myBMP581.set_power_mode(myBMP581.kPowerModeDeepStandby)
+	myBMP581.set_power_mode(myBMP581.POWER_MODE_DEEP_STANDBY)
 
 	while True:
 		# Wait until next measurement. For low power applications, this could be
 		# replaced by setting the microcontroller into a sleep state
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 		# Transition from sleep mode into forced mode. This will trigger a single
 		# measurement, after which the sensor automatically returns to sleep mode
 		# Note - the sensor can only enter forced mode from sleep mode. Transitions
 		# between forced and normal modes are ignored
-		myBMP581.set_power_mode(myBMP581.kPowerModeForced)
+		myBMP581.set_power_mode(myBMP581.POWER_MODE_FORCED)
 
 		# Wait for the measurement to complete
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 		# Get the measurements
 		data = myBMP581.get_sensor_data()
@@ -84,7 +84,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

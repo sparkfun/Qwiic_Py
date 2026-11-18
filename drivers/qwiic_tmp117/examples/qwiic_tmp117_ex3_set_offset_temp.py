@@ -36,9 +36,9 @@
 
 import qwiic_tmp117
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic TMP117 Example 3 - Set Offset Temperature Value\n")
 
 	# Create instance of device
@@ -66,12 +66,12 @@ def runExample():
 			else:
 				myTMP117.set_temperature_offset(tempOffset)
 				print("New Offset Temperature (in C):", myTMP117.get_temperature_offset())
-				time.sleep(1) # Wait for the offset to be set
+				qwiic_i2c.delay_ms(1000) # Wait for the offset to be set
 				print("Temperature with Offset (C):", myTMP117.read_temp_c())
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

@@ -46,6 +46,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -66,12 +68,12 @@ class QwiicAS7343(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # --------- Constant Variables ---------
-    kNumChannels = 18
-    kDefaultAS7343DeviceID = 0x81; 
+    NUM_CHANNELS = 18
+    DEFAULT_AS7343_DEVICE_ID = 0x81; 
     
     # ----------- Register Bank Settings -----------
-    kRegBank0 = 0x00  # Register bank 0 (default)
-    kRegBank1 = 0x01  # Register bank 1
+    REG_BANK0 = 0x00  # Register bank 0 (default)
+    REG_BANK1 = 0x01  # Register bank 1
 
     # ----------- Sensor Channels -----------
     # Use these to access each channel individually from the _data array in the class.
@@ -80,475 +82,476 @@ class QwiicAS7343(object):
     # Cycle 1: FZ, FY, FXL, NIR, 2xVIS, FD
     # Cycle 2: F2, F3, F4, F6, 2xVIS, FD
     # Cycle 3: F1, F7, F8, F5, 2xVIS, FD
-    kChBlueFz450nm = 0x00  # Blue peak wavelength 450 nanometers (cycle 1)
-    kChGreenFy555nm = 0x01  # Green (wide bandwidth) peak wavelength 555 nanometers (cycle 1)
-    kChOrangeFxl600nm = 0x02  # Orange peak wavelength 600 nanometers (cycle 1)
-    kChNir855nm = 0x03  # NIR peak wavelength 855 nanometers (cycle 1)
-    kChVis1 = 0x04  # VIS (cycle 1)
-    kChFd1 = 0x05  # Flicker Detection (cycle 1)
-    kChDarkBlueF2425nm = 0x06  # Dark Blue peak wavelength 425 nanometers (cycle 2)
-    kChLightBlueF3475nm = 0x07  # Light Blue peak wavelength 475 nanometers (cycle 2)
-    kChBlueF4515nm = 0x08  # Blue peak wavelength 515 nanometers (cycle 2)
-    kChBrownF6640nm = 0x09  # Brown peak wavelength 640 nanometers (cycle 2)
-    kChVis2 = 0x0A  # VIS (cycle 2)
-    kChFd2 = 0x0B  # Flicker Detection (cycle 2)
-    kChPurpleF1405nm = 0x0C  # Purple peak wavelength 405 nanometers (cycle 3)
-    kChRedF7690nm = 0x0D  # Red peak wavelength 690 nanometers (cycle 3)
-    kChDarkRedF8745nm = 0x0E  # Dark Red peak wavelength 745 nanometers (cycle 3)
-    kChGreenF5550nm = 0x0F  # Green (Narrow bandwidth) peak wavelength 550 nanometers (cycle 3)
-    kChVis3 = 0x10  # VIS (cycle 3)
-    kChFd3 = 0x11  # Flicker Detection (cycle 3)
+    CH_BLUE_FZ_450NM = 0x00  # Blue peak wavelength 450 nanometers (cycle 1)
+    CH_GREEN_FY_555NM = 0x01  # Green (wide bandwidth) peak wavelength 555 nanometers (cycle 1)
+    CH_ORANGE_FXL_600NM = 0x02  # Orange peak wavelength 600 nanometers (cycle 1)
+    CH_NIR_855NM = 0x03  # NIR peak wavelength 855 nanometers (cycle 1)
+    CH_VIS1 = 0x04  # VIS (cycle 1)
+    CH_FD1 = 0x05  # Flicker Detection (cycle 1)
+    CH_DARK_BLUE_F2_425NM = 0x06  # Dark Blue peak wavelength 425 nanometers (cycle 2)
+    CH_LIGHT_BLUE_F3_475NM = 0x07  # Light Blue peak wavelength 475 nanometers (cycle 2)
+    CH_BLUE_F4_515NM = 0x08  # Blue peak wavelength 515 nanometers (cycle 2)
+    CH_BROWN_F6_640NM = 0x09  # Brown peak wavelength 640 nanometers (cycle 2)
+    CH_VIS2 = 0x0A  # VIS (cycle 2)
+    CH_FD2 = 0x0B  # Flicker Detection (cycle 2)
+    CH_PURPLE_F1_405NM = 0x0C  # Purple peak wavelength 405 nanometers (cycle 3)
+    CH_RED_F7_690NM = 0x0D  # Red peak wavelength 690 nanometers (cycle 3)
+    CH_DARK_RED_F8_745NM = 0x0E  # Dark Red peak wavelength 745 nanometers (cycle 3)
+    CH_GREEN_F5_550NM = 0x0F  # Green (Narrow bandwidth) peak wavelength 550 nanometers (cycle 3)
+    CH_VIS3 = 0x10  # VIS (cycle 3)
+    CH_FD3 = 0x11  # Flicker Detection (cycle 3)
 
     # ----------- Sensor Gain Settings -----------
-    kAgain0_5 = 0x00  # 0.5x gain
-    kAgain1 = 0x01
-    kAgain2 = 0x02
-    kAgain4 = 0x03
-    kAgain8 = 0x04
-    kAgain16 = 0x05
-    kAgain32 = 0x06
-    kAgain64 = 0x07
-    kAgain128 = 0x08
-    kAgain256 = 0x09
-    kAgain512 = 0x0A
-    kAgain1024 = 0x0B
-    kAgain2048 = 0x0C
+    AGAIN_0_5 = 0x00  # 0.5x gain
+    AGAIN_1 = 0x01
+    AGAIN_2 = 0x02
+    AGAIN_4 = 0x03
+    AGAIN_8 = 0x04
+    AGAIN_16 = 0x05
+    AGAIN_32 = 0x06
+    AGAIN_64 = 0x07
+    AGAIN_128 = 0x08
+    AGAIN_256 = 0x09
+    AGAIN_512 = 0x0A
+    AGAIN_1024 = 0x0B
+    AGAIN_2048 = 0x0C
 
     # ----------- Flicker Detection Gain Settings -----------
-    kFdGain0_5 = 0x00  # 0.5x gain
-    kFdGain1 = 0x01
-    kFdGain2 = 0x02
-    kFdGain4 = 0x03
-    kFdGain8 = 0x04
-    kFdGain16 = 0x05
-    kFdGain32 = 0x06
-    kFdGain64 = 0x07
-    kFdGain128 = 0x08
-    kFdGain256 = 0x09
-    kFdGain512 = 0x0A
-    kFdGain1024 = 0x0B
-    kFdGain2048 = 0x0C
+    FD_GAIN_0_5 = 0x00  # 0.5x gain
+    FD_GAIN_1 = 0x01
+    FD_GAIN_2 = 0x02
+    FD_GAIN_4 = 0x03
+    FD_GAIN_8 = 0x04
+    FD_GAIN_16 = 0x05
+    FD_GAIN_32 = 0x06
+    FD_GAIN_64 = 0x07
+    FD_GAIN_128 = 0x08
+    FD_GAIN_256 = 0x09
+    FD_GAIN_512 = 0x0A
+    FD_GAIN_1024 = 0x0B
+    FD_GAIN_2048 = 0x0C
 
     # ----------- FIFO Threshold Settings -----------
-    kFifoThresholdLvl1 = 0x00
-    kFifoThresholdLvl4 = 0x01
-    kFifoThresholdLvl8 = 0x02
-    kFifoThresholdLvl16 = 0x03
+    FIFO_THRESHOLD_LVL_1 = 0x00
+    FIFO_THRESHOLD_LVL_4 = 0x01
+    FIFO_THRESHOLD_LVL_8 = 0x02
+    FIFO_THRESHOLD_LVL_16 = 0x03
 
     # ----------- Spectral Threshold Channel -----------
-    kSpectralThresholdChannel0 = 0x00
-    kSpectralThresholdChannel1 = 0x01
-    kSpectralThresholdChannel2 = 0x02
-    kSpectralThresholdChannel3 = 0x03
-    kSpectralThresholdChannel4 = 0x04
-    kSpectralThresholdChannel5 = 0x05
+    SPECTRAL_THRESHOLD_CHANNEL_0 = 0x00
+    SPECTRAL_THRESHOLD_CHANNEL_1 = 0x01
+    SPECTRAL_THRESHOLD_CHANNEL_2 = 0x02
+    SPECTRAL_THRESHOLD_CHANNEL_3 = 0x03
+    SPECTRAL_THRESHOLD_CHANNEL_4 = 0x04
+    SPECTRAL_THRESHOLD_CHANNEL_5 = 0x05
 
     # ----------- Automatic Channel Read-out -----------
-    kAutoSmux6Channels = 0x00  # 6 channel readout
-    kAutoSmux12Channels = 0x02  # 12 channel readout
-    kAutoSmux18Channels = 0x03  # 18 channel readout
+    AUTO_SMUX_6_CHANNELS = 0x00  # 6 channel readout
+    AUTO_SMUX_12_CHANNELS = 0x02  # 12 channel readout
+    AUTO_SMUX_18_CHANNELS = 0x03  # 18 channel readout
 
     # ----------- GPIO Mode Settings -----------
-    kGpioModeInput = 0x00  # GPIO set to input mode
-    kGpioModeOutput = 0x01  # GPIO set to output mode
+    GPIO_MODE_INPUT = 0x00  # GPIO set to input mode
+    GPIO_MODE_OUTPUT = 0x01  # GPIO set to output mode
 
     # ----------- GPIO Output Settings -----------
-    kGpioOutputLow = 0x00  # GPIO set to low
-    kGpioOutputHigh = 0x01  # GPIO set to high
+    GPIO_OUTPUT_LOW = 0x00  # GPIO set to low
+    GPIO_OUTPUT_HIGH = 0x01  # GPIO set to high
 
     # Register Definitions:
     # ----------- AUX ID Register ----------- 
-    kRegAuxID = 0x58
+    REG_AUX_ID = 0x58
 
-    kShiftAuxID = 0
+    SHIFT_AUX_ID = 0
 
-    kMaskAuxID = 0b1111 << kShiftAuxID
+    MASK_AUX_ID = 0b1111 << SHIFT_AUX_ID
 
     # ----------- REV ID Register ----------- 
-    kRegRevID = 0x59
+    REG_REV_ID = 0x59
 
-    kShiftRevID = 0
+    SHIFT_REV_ID = 0
     
-    kMaskRevID = 0b111 << kShiftRevID
+    MASK_REV_ID = 0b111 << SHIFT_REV_ID
 
     # ----------- ID Register ----------- 
-    kRegID = 0x5A
+    REG_ID = 0x5A
     # Register is a single 8bit value
 
     # ----------- CFG12 Register -----------
-    kRegCfg12 = 0x66
+    REG_CFG12 = 0x66
 
-    kShiftCfg12Reserved = 0
-    kShiftCfg12SpThCh = 5
+    SHIFT_CFG12_RESERVED = 0
+    SHIFT_CFG12_SP_TH_CH = 5
 
-    kMaskCfg12Reserved = 0b11111 << kShiftCfg12Reserved
-    kMaskCfg12SpThCh = 0b111 << kShiftCfg12SpThCh
+    MASK_CFG12_RESERVED = 0b11111 << SHIFT_CFG12_RESERVED
+    MASK_CFG12_SP_TH_CH = 0b111 << SHIFT_CFG12_SP_TH_CH
 
     # ----------- Enable Register ----------- 
-    kRegEnable = 0x80
+    REG_ENABLE = 0x80
 
-    kShiftEnablePon = 0
-    kShiftEnableSpEn = 1
-    kShiftEnableWen = 3
-    kShiftEnableSmuxEn = 4
-    kShiftEnableFden = 6
-    kShiftEnableEnable = 8
+    SHIFT_ENABLE_PON = 0
+    SHIFT_ENABLE_SP_EN = 1
+    SHIFT_ENABLE_WEN = 3
+    SHIFT_ENABLE_SMUX_EN = 4
+    SHIFT_ENABLE_FDEN = 6
+    SHIFT_ENABLE_ENABLE = 8
 
-    kMaskEnablePon = 0b1 << kShiftEnablePon
-    kMaskEnableSpEn = 0b1 << kShiftEnableSpEn
-    kMaskEnableWen = 0b1 << kShiftEnableWen
-    kMaskEnableSmuxEn = 0b1 << kShiftEnableSmuxEn
-    kMaskEnableFden = 0b1 << kShiftEnableFden
-    kMaskEnableEnable = 0b1 << kShiftEnableEnable
+    MASK_ENABLE_PON = 0b1 << SHIFT_ENABLE_PON
+    MASK_ENABLE_SP_EN = 0b1 << SHIFT_ENABLE_SP_EN
+    MASK_ENABLE_WEN = 0b1 << SHIFT_ENABLE_WEN
+    MASK_ENABLE_SMUX_EN = 0b1 << SHIFT_ENABLE_SMUX_EN
+    MASK_ENABLE_FDEN = 0b1 << SHIFT_ENABLE_FDEN
+    MASK_ENABLE_ENABLE = 0b1 << SHIFT_ENABLE_ENABLE
 
     # ----------- ATime Register -----------
-    kRegATime = 0x81 # Register Address, register is a single uint8_t.
+    REG_A_TIME = 0x81 # Register Address, register is a single uint8_t.
 
     # ----------- WTime Register -----------
-    kRegWTime = 0x83 # Register Address, register is a single uint8_t.
+    REG_W_TIME = 0x83 # Register Address, register is a single uint8_t.
 
 
     # ----------- SP TH L Register -----------
-    kRegSpThL = 0x84
+    REG_SP_TH_L = 0x84
 
-    kShiftSpThLSpThLsb = 0
-    kShiftSpThLSpThMsb = 8
+    SHIFT_SP_TH_L_SP_TH_LSB = 0
+    SHIFT_SP_TH_L_SP_TH_MSB = 8
 
-    kMaskSpThLSpThLsb = 0xFF << kShiftSpThLSpThLsb
-    kMaskSpThLSpThMsb = 0xFF << kShiftSpThLSpThMsb
+    MASK_SP_TH_L_SP_TH_LSB = 0xFF << SHIFT_SP_TH_L_SP_TH_LSB
+    MASK_SP_TH_L_SP_TH_MSB = 0xFF << SHIFT_SP_TH_L_SP_TH_MSB
 
     # ----------- SP TH H Register -----------
-    kRegSpThH = 0x86
+    REG_SP_TH_H = 0x86
 
-    kShiftSpThHSpThLsb = 0
-    kShiftSpThHSpThMsb = 8
+    SHIFT_SP_TH_H_SP_TH_LSB = 0
+    SHIFT_SP_TH_H_SP_TH_MSB = 8
 
-    kMaskSpThHSpThLsb = 0xFF << kShiftSpThHSpThLsb
-    kMaskSpThHSpThMsb = 0xFF << kShiftSpThHSpThMsb
+    MASK_SP_TH_H_SP_TH_LSB = 0xFF << SHIFT_SP_TH_H_SP_TH_LSB
+    MASK_SP_TH_H_SP_TH_MSB = 0xFF << SHIFT_SP_TH_H_SP_TH_MSB
 
     # ----------- Status Register -----------
-    kRegStatus = 0x93
+    REG_STATUS = 0x93
 
-    kShiftStatusSint = 0
-    kShiftStatusFint = 2
-    kShiftStatusAint = 3
-    kShiftStatusAsat = 7
+    SHIFT_STATUS_SINT = 0
+    SHIFT_STATUS_FINT = 2
+    SHIFT_STATUS_AINT = 3
+    SHIFT_STATUS_ASAT = 7
 
-    kMaskStatusSint = 0b1 << kShiftStatusSint
-    kMaskStatusFint = 0b1 << kShiftStatusFint
-    kMaskStatusAint = 0b1 << kShiftStatusAint
-    kMaskStatusAsat = 0b1 << kShiftStatusAsat
+    MASK_STATUS_SINT = 0b1 << SHIFT_STATUS_SINT
+    MASK_STATUS_FINT = 0b1 << SHIFT_STATUS_FINT
+    MASK_STATUS_AINT = 0b1 << SHIFT_STATUS_AINT
+    MASK_STATUS_ASAT = 0b1 << SHIFT_STATUS_ASAT
 
     # ----------- A Status Register -----------
-    kRegAStatus = 0x94
+    REG_A_STATUS = 0x94
 
-    kShiftAStatusAgainStatus = 0
-    kShiftAStatusAsatStatus = 7
+    SHIFT_A_STATUS_AGAIN_STATUS = 0
+    SHIFT_A_STATUS_ASAT_STATUS = 7
 
-    kMaskAStatusAgainStatus = 0b1111 << kShiftAStatusAgainStatus
-    kMaskAStatusAsatStatus = 0b1 << kShiftAStatusAsatStatus
+    MASK_A_STATUS_AGAIN_STATUS = 0b1111 << SHIFT_A_STATUS_AGAIN_STATUS
+    MASK_A_STATUS_ASAT_STATUS = 0b1 << SHIFT_A_STATUS_ASAT_STATUS
 
     # ----------- Data Registers -----------
-    kRegData0 = 0x95
-    kRegData1 = 0x97
-    kRegData2 = 0x99
-    kRegData3 = 0x9B
-    kRegData4 = 0x9D
-    kRegData5 = 0x9F
-    kRegData6 = 0xA1
-    kRegData7 = 0xA3
-    kRegData8 = 0xA5
-    kRegData9 = 0xA7
-    kRegData10 = 0xA9
-    kRegData11 = 0xAB
-    kRegData12 = 0xAD
-    kRegData13 = 0xAF
-    kRegData14 = 0xB1
-    kRegData15 = 0xB3
-    kRegData16 = 0xB5
-    kRegData17 = 0xB7
+    REG_DATA0 = 0x95
+    REG_DATA1 = 0x97
+    REG_DATA2 = 0x99
+    REG_DATA3 = 0x9B
+    REG_DATA4 = 0x9D
+    REG_DATA5 = 0x9F
+    REG_DATA6 = 0xA1
+    REG_DATA7 = 0xA3
+    REG_DATA8 = 0xA5
+    REG_DATA9 = 0xA7
+    REG_DATA10 = 0xA9
+    REG_DATA11 = 0xAB
+    REG_DATA12 = 0xAD
+    REG_DATA13 = 0xAF
+    REG_DATA14 = 0xB1
+    REG_DATA15 = 0xB3
+    REG_DATA16 = 0xB5
+    REG_DATA17 = 0xB7
 
-    kShiftDataLsb = 0
-    kShiftDataMsb = 8
+    SHIFT_DATA_LSB = 0
+    SHIFT_DATA_MSB = 8
 
-    kMaskDataLsb = 0xFF << kShiftDataLsb
-    kMaskDataMsb = 0xFF << kShiftDataMsb
+    MASK_DATA_LSB = 0xFF << SHIFT_DATA_LSB
+    MASK_DATA_MSB = 0xFF << SHIFT_DATA_MSB
 
     # ----------- Status 2 Register -----------
-    kRegStatus2 = 0x90
+    REG_STATUS2 = 0x90
 
-    kShiftStatus2FdsatDig = 0
-    kShiftStatus2FdsatAna = 1
-    kShiftStatus2AsatAna = 3
-    kShiftStatus2AsatDig = 4
-    kShiftStatus2Avalid = 6
+    SHIFT_STATUS2_FDSAT_DIG = 0
+    SHIFT_STATUS2_FDSAT_ANA = 1
+    SHIFT_STATUS2_ASAT_ANA = 3
+    SHIFT_STATUS2_ASAT_DIG = 4
+    SHIFT_STATUS2_AVALID = 6
 
-    kMaskStatus2FdsatDig = 0b1 << kShiftStatus2FdsatDig
-    kMaskStatus2FdsatAna = 0b1 << kShiftStatus2FdsatAna
-    kMaskStatus2AsatAna = 0b1 << kShiftStatus2AsatAna
-    kMaskStatus2AsatDig = 0b1 << kShiftStatus2AsatDig
-    kMaskStatus2Avalid = 0b1 << kShiftStatus2Avalid
+    MASK_STATUS2_FDSAT_DIG = 0b1 << SHIFT_STATUS2_FDSAT_DIG
+    MASK_STATUS2_FDSAT_ANA = 0b1 << SHIFT_STATUS2_FDSAT_ANA
+    MASK_STATUS2_ASAT_ANA = 0b1 << SHIFT_STATUS2_ASAT_ANA
+    MASK_STATUS2_ASAT_DIG = 0b1 << SHIFT_STATUS2_ASAT_DIG
+    MASK_STATUS2_AVALID = 0b1 << SHIFT_STATUS2_AVALID
 
     # ----------- Status 3 Register -----------
-    kRegStatus3 = 0x91
+    REG_STATUS3 = 0x91
 
-    kShiftStatus3IntSpL = 4
-    kShiftStatus3IntSpH = 5
+    SHIFT_STATUS3_INT_SP_L = 4
+    SHIFT_STATUS3_INT_SP_H = 5
 
-    kMaskStatus3IntSpL = 0b1 << kShiftStatus3IntSpL
-    kMaskStatus3IntSpH = 0b1 << kShiftStatus3IntSpH
+    MASK_STATUS3_INT_SP_L = 0b1 << SHIFT_STATUS3_INT_SP_L
+    MASK_STATUS3_INT_SP_H = 0b1 << SHIFT_STATUS3_INT_SP_H
 
     # ----------- Status 4 Register -----------
-    kRegStatus4 = 0xBC
+    REG_STATUS4 = 0xBC
 
-    kShiftStatus4IntBusy = 0
-    kShiftStatus4SaiAct = 1
-    kShiftStatus4SpTrig = 2
-    kShiftStatus4FdTrig = 4
-    kShiftStatus4OvTemp = 5
-    kShiftStatus4FifoOv = 7
+    SHIFT_STATUS4_INT_BUSY = 0
+    SHIFT_STATUS4_SAI_ACT = 1
+    SHIFT_STATUS4_SP_TRIG = 2
+    SHIFT_STATUS4_FD_TRIG = 4
+    SHIFT_STATUS4_OV_TEMP = 5
+    SHIFT_STATUS4_FIFO_OV = 7
 
-    kMaskStatus4IntBusy = 0b1 << kShiftStatus4IntBusy
-    kMaskStatus4SaiAct = 0b1 << kShiftStatus4SaiAct
-    kMaskStatus4SpTrig = 0b1 << kShiftStatus4SpTrig
-    kMaskStatus4FdTrig = 0b1 << kShiftStatus4FdTrig
-    kMaskStatus4OvTemp = 0b1 << kShiftStatus4OvTemp
-    kMaskStatus4FifoOv = 0b1 << kShiftStatus4FifoOv
+    MASK_STATUS4_INT_BUSY = 0b1 << SHIFT_STATUS4_INT_BUSY
+    MASK_STATUS4_SAI_ACT = 0b1 << SHIFT_STATUS4_SAI_ACT
+    MASK_STATUS4_SP_TRIG = 0b1 << SHIFT_STATUS4_SP_TRIG
+    MASK_STATUS4_FD_TRIG = 0b1 << SHIFT_STATUS4_FD_TRIG
+    MASK_STATUS4_OV_TEMP = 0b1 << SHIFT_STATUS4_OV_TEMP
+    MASK_STATUS4_FIFO_OV = 0b1 << SHIFT_STATUS4_FIFO_OV
 
     # ----------- Status 5 Register -----------
-    kRegStatus5 = 0x93
+    REG_STATUS5 = 0x93
 
-    kShiftStatus5SintSmux = 2
-    kShiftStatus5SintFd = 3
-    kShiftStatus5Reserved = 4
-    kShiftStatus5ReservedOne = 6
+    SHIFT_STATUS5_SINT_SMUX = 2
+    SHIFT_STATUS5_SINT_FD = 3
+    SHIFT_STATUS5_RESERVED = 4
+    SHIFT_STATUS5_RESERVED_ONE = 6
 
-    kMaskStatus5SintSmux = 0b1 << kShiftStatus5SintSmux
-    kMaskStatus5SintFd = 0b1 << kShiftStatus5SintFd
-    kMaskStatus5Reserved = 0b11 << kShiftStatus5Reserved
-    kMaskStatus5ReservedOne = 0b111 << kShiftStatus5ReservedOne
+    MASK_STATUS5_SINT_SMUX = 0b1 << SHIFT_STATUS5_SINT_SMUX
+    MASK_STATUS5_SINT_FD = 0b1 << SHIFT_STATUS5_SINT_FD
+    MASK_STATUS5_RESERVED = 0b11 << SHIFT_STATUS5_RESERVED
+    MASK_STATUS5_RESERVED_ONE = 0b111 << SHIFT_STATUS5_RESERVED_ONE
 
     # ----------- FD Status Register -----------
-    kRegFdStatus = 0xE3
+    REG_FD_STATUS = 0xE3
 
-    kShiftFdStatusFd100HzDet = 0
-    kShiftFdStatusFd120HzDet = 1
-    kShiftFdStatusFd100HzValid = 2
-    kShiftFdStatusFd120HzValid = 3
-    kShiftFdStatusFdSaturation = 4
-    kShiftFdStatusFdMeasValid = 5
+    SHIFT_FD_STATUS_FD_100HZ_DET = 0
+    SHIFT_FD_STATUS_FD_120HZ_DET = 1
+    SHIFT_FD_STATUS_FD_100HZ_VALID = 2
+    SHIFT_FD_STATUS_FD_120HZ_VALID = 3
+    SHIFT_FD_STATUS_FD_SATURATION = 4
+    SHIFT_FD_STATUS_FD_MEAS_VALID = 5
 
-    kMaskFdStatusFd100HzDet = 0b1 << kShiftFdStatusFd100HzDet
-    kMaskFdStatusFd120HzDet = 0b1 << kShiftFdStatusFd120HzDet
-    kMaskFdStatusFd100HzValid = 0b1 << kShiftFdStatusFd100HzValid
-    kMaskFdStatusFd120HzValid = 0b1 << kShiftFdStatusFd120HzValid
-    kMaskFdStatusFdSaturation = 0b1 << kShiftFdStatusFdSaturation
-    kMaskFdStatusFdMeasValid = 0b1 << kShiftFdStatusFdMeasValid
+    MASK_FD_STATUS_FD_100HZ_DET = 0b1 << SHIFT_FD_STATUS_FD_100HZ_DET
+    MASK_FD_STATUS_FD_120HZ_DET = 0b1 << SHIFT_FD_STATUS_FD_120HZ_DET
+    MASK_FD_STATUS_FD_100HZ_VALID = 0b1 << SHIFT_FD_STATUS_FD_100HZ_VALID
+    MASK_FD_STATUS_FD_120HZ_VALID = 0b1 << SHIFT_FD_STATUS_FD_120HZ_VALID
+    MASK_FD_STATUS_FD_SATURATION = 0b1 << SHIFT_FD_STATUS_FD_SATURATION
+    MASK_FD_STATUS_FD_MEAS_VALID = 0b1 << SHIFT_FD_STATUS_FD_MEAS_VALID
 
     # ----------- Cfg0 Register -----------
-    kRegCfg0 = 0xBF
+    REG_CFG0 = 0xBF
 
-    kShiftCfg0Wlong = 2
-    kShiftCfg0RegBank = 4
-    kShiftCfg0LowPower = 5
+    SHIFT_CFG0_WLONG = 2
+    SHIFT_CFG0_REG_BANK = 4
+    SHIFT_CFG0_LOW_POWER = 5
 
-    kMaskCfg0Wlong = 0b1 << kShiftCfg0Wlong
-    kMaskCfg0RegBank = 0b1 << kShiftCfg0RegBank
-    kMaskCfg0LowPower = 0b1 << kShiftCfg0LowPower
+    MASK_CFG0_WLONG = 0b1 << SHIFT_CFG0_WLONG
+    MASK_CFG0_REG_BANK = 0b1 << SHIFT_CFG0_REG_BANK
+    MASK_CFG0_LOW_POWER = 0b1 << SHIFT_CFG0_LOW_POWER
 
     # ----------- Cfg1 Register -----------
-    kRegCfg1 = 0xC6
+    REG_CFG1 = 0xC6
 
-    kShiftCfg1Again = 0
+    SHIFT_CFG1_AGAIN = 0
 
-    kMaskCfg1Again = 0b11111 << kShiftCfg1Again
+    MASK_CFG1_AGAIN = 0b11111 << SHIFT_CFG1_AGAIN
 
     # ----------- Cfg3 Register -----------
-    kRegCfg3 = 0xC7
+    REG_CFG3 = 0xC7
 
-    kShiftCfg3Sai = 4
+    SHIFT_CFG3_SAI = 4
 
-    kMaskCfg3Sai = 0b1 << kShiftCfg3Sai
+    MASK_CFG3_SAI = 0b1 << SHIFT_CFG3_SAI
 
     # ----------- Cfg6 Register -----------
-    kRegCfg6 = 0xF5
+    REG_CFG6 = 0xF5
 
-    kShiftCfg6SmuxCmd = 3
+    SHIFT_CFG6_SMUX_CMD = 3
 
-    kMaskCfg6SmuxCmd = 0b11 << kShiftCfg6SmuxCmd
+    MASK_CFG6_SMUX_CMD = 0b11 << SHIFT_CFG6_SMUX_CMD
 
     # ----------- Cfg8 Register -----------
-    kRegCfg8 = 0xC9
+    REG_CFG8 = 0xC9
 
-    kShiftCfg8FifoTh = 6
+    SHIFT_CFG8_FIFO_TH = 6
 
-    kMaskCfg8FifoTh = 0b11 << kShiftCfg8FifoTh
+    MASK_CFG8_FIFO_TH = 0b11 << SHIFT_CFG8_FIFO_TH
 
     # ----------- Cfg9 Register -----------
-    kRegCfg9 = 0xCA
+    REG_CFG9 = 0xCA
 
-    kShiftCfg9SiencSmux = 5
-    kShiftCfg9SiencFd = 7
+    SHIFT_CFG9_SIENC_SMUX = 5
+    SHIFT_CFG9_SIENC_FD = 7
 
-    kMaskCfg9SiencSmux = 0b1 << kShiftCfg9SiencSmux
-    kMaskCfg9SiencFd = 0b1 << kShiftCfg9SiencFd
+    MASK_CFG9_SIENC_SMUX = 0b1 << SHIFT_CFG9_SIENC_SMUX
+    MASK_CFG9_SIENC_FD = 0b1 << SHIFT_CFG9_SIENC_FD
 
     # ----------- Cfg10 Register -----------
-    kRegCfg10 = 0x65
+    REG_CFG10 = 0x65
 
-    kShiftCfg10FdPers = 0
+    SHIFT_CFG10_FD_PERS = 0
 
-    kMaskCfg10FdPers = 0b111 << kShiftCfg10FdPers
+    MASK_CFG10_FD_PERS = 0b111 << SHIFT_CFG10_FD_PERS
 
     # ----------- Pers Register -----------
-    kRegPers = 0xCF
+    REG_PERS = 0xCF
 
-    kShiftPersApers = 0
+    SHIFT_PERS_APERS = 0
 
-    kMaskPersApers = 0b1111 << kShiftPersApers
+    MASK_PERS_APERS = 0b1111 << SHIFT_PERS_APERS
 
     # ----------- Gpio Register -----------
-    kRegGpio = 0x6B
+    REG_GPIO = 0x6B
 
-    kShiftGpioIn = 0
-    kShiftGpioOut = 1
-    kShiftGpioInEn = 2
-    kShiftGpioInv = 3
+    SHIFT_GPIO_IN = 0
+    SHIFT_GPIO_OUT = 1
+    SHIFT_GPIO_IN_EN = 2
+    SHIFT_GPIO_INV = 3
 
-    kMaskGpioIn = 0b1 << kShiftGpioIn
-    kMaskGpioOut = 0b1 << kShiftGpioOut
-    kMaskGpioInEn = 0b1 << kShiftGpioInEn
-    kMaskGpioInv = 0b1 << kShiftGpioInv
+    MASK_GPIO_IN = 0b1 << SHIFT_GPIO_IN
+    MASK_GPIO_OUT = 0b1 << SHIFT_GPIO_OUT
+    MASK_GPIO_IN_EN = 0b1 << SHIFT_GPIO_IN_EN
+    MASK_GPIO_INV = 0b1 << SHIFT_GPIO_INV
 
     # ----------- AStep Register -----------
-    kRegAStep = 0xD4
+    REG_A_STEP = 0xD4
 
-    kShiftAStepL = 0
-    kShiftAStepH = 8
+    SHIFT_A_STEP_L = 0
+    SHIFT_A_STEP_H = 8
 
-    kMaskAStepL = 0xFF << kShiftAStepL
-    kMaskAStepH = 0xFF << kShiftAStepH
+    MASK_A_STEP_L = 0xFF << SHIFT_A_STEP_L
+    MASK_A_STEP_H = 0xFF << SHIFT_A_STEP_H
 
     # ----------- Cfg20 Register -----------
-    kRegCfg20 = 0xD6
+    REG_CFG20 = 0xD6
 
-    kShiftCfg20AutoSmux = 5
-    kShiftCfg20FdFifo8b = 7
+    SHIFT_CFG20_AUTO_SMUX = 5
+    SHIFT_CFG20_FD_FIFO8B = 7
 
-    kMaskCfg20AutoSmux = 0b11 << kShiftCfg20AutoSmux
-    kMaskCfg20FdFifo8b = 0b1 << kShiftCfg20FdFifo8b
+    MASK_CFG20_AUTO_SMUX = 0b11 << SHIFT_CFG20_AUTO_SMUX
+    MASK_CFG20_FD_FIFO8B = 0b1 << SHIFT_CFG20_FD_FIFO8B
 
     # ----------- Led Register -----------
-    kRegLed = 0xCD
+    REG_LED = 0xCD
 
-    kShiftLedDrive = 0
-    kShiftLedAct = 7
+    SHIFT_LED_DRIVE = 0
+    SHIFT_LED_ACT = 7
 
-    kMaskLedDrive = 0b1111111 << kShiftLedDrive
-    kMaskLedAct = 0b1 << kShiftLedAct
+    MASK_LED_DRIVE = 0b1111111 << SHIFT_LED_DRIVE
+    MASK_LED_ACT = 0b1 << SHIFT_LED_ACT
 
     # ----------- Agc Gain Max Register -----------
-    kRegAgcGainMax = 0xD7
+    REG_AGC_GAIN_MAX = 0xD7
 
-    kShiftAgcGainMax = 4
+    SHIFT_AGC_GAIN_MAX = 4
 
-    kMaskAgcGainMax = 0b1111 << kShiftAgcGainMax
+    MASK_AGC_GAIN_MAX = 0b1111 << SHIFT_AGC_GAIN_MAX
 
     # ----------- Az Config Register -----------
-    kRegAzConfig = 0xDE
+    REG_AZ_CONFIG = 0xDE
 
     # Register is a single 8-bit value
 
     # ----------- Fd Time1 Register -----------
-    kRegFdTime1 = 0xE0
+    REG_FD_TIME1 = 0xE0
 
     # Register is a single 8-bit value
 
     # ----------- Fd Time2 Register -----------
-    kRegFdTime2 = 0xE2
+    REG_FD_TIME2 = 0xE2
 
-    kShiftFdTime2FdTimeH = 0
-    kShiftFdTime2FdGain = 3
+    SHIFT_FD_TIME2_FD_TIME_H = 0
+    SHIFT_FD_TIME2_FD_GAIN = 3
 
-    kMaskFdTime2FdTimeH = 0b111 << kShiftFdTime2FdTimeH
-    kMaskFdTime2FdGain = 0b11111 << kShiftFdTime2FdGain
+    MASK_FD_TIME2_FD_TIME_H = 0b111 << SHIFT_FD_TIME2_FD_TIME_H
+    MASK_FD_TIME2_FD_GAIN = 0b11111 << SHIFT_FD_TIME2_FD_GAIN
 
     # ----------- Fd Time Cfg0 Register -----------
-    kRegFdTimeCfg0 = 0xDF
+    REG_FD_TIME_CFG0 = 0xDF
 
-    kShiftFdTimeCfg0FifoWriteFd = 7
+    SHIFT_FD_TIME_CFG0_FIFO_WRITE_FD = 7
 
-    kMaskFdTimeCfg0FifoWriteFd = 0b1 << kShiftFdTimeCfg0FifoWriteFd
+    MASK_FD_TIME_CFG0_FIFO_WRITE_FD = 0b1 << SHIFT_FD_TIME_CFG0_FIFO_WRITE_FD
 
     # ----------- Int Enab Register -----------
-    kRegIntEnab = 0xF9
+    REG_INT_ENAB = 0xF9
 
-    kShiftIntEnabSein = 0
-    kShiftIntEnabFien = 2
-    kShiftIntEnabSpIen = 3
-    kShiftIntEnabAsien = 7
+    SHIFT_INT_ENAB_SEIN = 0
+    SHIFT_INT_ENAB_FIEN = 2
+    SHIFT_INT_ENAB_SP_IEN = 3
+    SHIFT_INT_ENAB_ASIEN = 7
 
-    kMaskIntEnabSein = 0b1 << kShiftIntEnabSein
-    kMaskIntEnabFien = 0b1 << kShiftIntEnabFien
-    kMaskIntEnabSpIen = 0b1 << kShiftIntEnabSpIen
-    kMaskIntEnabAsien = 0b1 << kShiftIntEnabAsien
+    MASK_INT_ENAB_SEIN = 0b1 << SHIFT_INT_ENAB_SEIN
+    MASK_INT_ENAB_FIEN = 0b1 << SHIFT_INT_ENAB_FIEN
+    MASK_INT_ENAB_SP_IEN = 0b1 << SHIFT_INT_ENAB_SP_IEN
+    MASK_INT_ENAB_ASIEN = 0b1 << SHIFT_INT_ENAB_ASIEN
 
     # ----------- Control Register -----------
-    kRegControl = 0xFA
+    REG_CONTROL = 0xFA
 
-    kShiftControlClearSaiAct = 0
-    kShiftControlFifoClr = 1
-    kShiftControlSpManAz = 2
-    kShiftControlSwReset = 3
+    SHIFT_CONTROL_CLEAR_SAI_ACT = 0
+    SHIFT_CONTROL_FIFO_CLR = 1
+    SHIFT_CONTROL_SP_MAN_AZ = 2
+    SHIFT_CONTROL_SW_RESET = 3
 
-    kMaskControlClearSaiAct = 0b1 << kShiftControlClearSaiAct
-    kMaskControlFifoClr = 0b1 << kShiftControlFifoClr
-    kMaskControlSpManAz = 0b1 << kShiftControlSpManAz
-    kMaskControlSwReset = 0b1 << kShiftControlSwReset
+    MASK_CONTROL_CLEAR_SAI_ACT = 0b1 << SHIFT_CONTROL_CLEAR_SAI_ACT
+    MASK_CONTROL_FIFO_CLR = 0b1 << SHIFT_CONTROL_FIFO_CLR
+    MASK_CONTROL_SP_MAN_AZ = 0b1 << SHIFT_CONTROL_SP_MAN_AZ
+    MASK_CONTROL_SW_RESET = 0b1 << SHIFT_CONTROL_SW_RESET
 
     # ----------- Fifo Map Register -----------
-    kRegFifoMap = 0xFC
+    REG_FIFO_MAP = 0xFC
 
-    kShiftFifoMapFifoWriteAStatus = 0
-    kShiftFifoMapFifoWriteCh0Data = 1
-    kShiftFifoMapFifoWriteCh1Data = 2
-    kShiftFifoMapFifoWriteCh2Data = 3
-    kShiftFifoMapFifoWriteCh3Data = 4
-    kShiftFifoMapFifoWriteCh4Data = 5
-    kShiftFifoMapFifoWriteCh5Data = 6
+    SHIFT_FIFO_MAP_FIFO_WRITE_A_STATUS = 0
+    SHIFT_FIFO_MAP_FIFO_WRITE_CH0_DATA = 1
+    SHIFT_FIFO_MAP_FIFO_WRITE_CH1_DATA = 2
+    SHIFT_FIFO_MAP_FIFO_WRITE_CH2_DATA = 3
+    SHIFT_FIFO_MAP_FIFO_WRITE_CH3_DATA = 4
+    SHIFT_FIFO_MAP_FIFO_WRITE_CH4_DATA = 5
+    SHIFT_FIFO_MAP_FIFO_WRITE_CH5_DATA = 6
 
-    kMaskFifoMapFifoWriteAStatus = 0b1 << kShiftFifoMapFifoWriteAStatus
-    kMaskFifoMapFifoWriteCh0Data = 0b1 << kShiftFifoMapFifoWriteCh0Data
-    kMaskFifoMapFifoWriteCh1Data = 0b1 << kShiftFifoMapFifoWriteCh1Data
-    kMaskFifoMapFifoWriteCh2Data = 0b1 << kShiftFifoMapFifoWriteCh2Data
-    kMaskFifoMapFifoWriteCh3Data = 0b1 << kShiftFifoMapFifoWriteCh3Data
-    kMaskFifoMapFifoWriteCh4Data = 0b1 << kShiftFifoMapFifoWriteCh4Data
-    kMaskFifoMapFifoWriteCh5Data = 0b1 << kShiftFifoMapFifoWriteCh5Data
+    MASK_FIFO_MAP_FIFO_WRITE_A_STATUS = 0b1 << SHIFT_FIFO_MAP_FIFO_WRITE_A_STATUS
+    MASK_FIFO_MAP_FIFO_WRITE_CH0_DATA = 0b1 << SHIFT_FIFO_MAP_FIFO_WRITE_CH0_DATA
+    MASK_FIFO_MAP_FIFO_WRITE_CH1_DATA = 0b1 << SHIFT_FIFO_MAP_FIFO_WRITE_CH1_DATA
+    MASK_FIFO_MAP_FIFO_WRITE_CH2_DATA = 0b1 << SHIFT_FIFO_MAP_FIFO_WRITE_CH2_DATA
+    MASK_FIFO_MAP_FIFO_WRITE_CH3_DATA = 0b1 << SHIFT_FIFO_MAP_FIFO_WRITE_CH3_DATA
+    MASK_FIFO_MAP_FIFO_WRITE_CH4_DATA = 0b1 << SHIFT_FIFO_MAP_FIFO_WRITE_CH4_DATA
+    MASK_FIFO_MAP_FIFO_WRITE_CH5_DATA = 0b1 << SHIFT_FIFO_MAP_FIFO_WRITE_CH5_DATA
 
     # ----------- Fifo Lvl Register -----------
-    kRegFifoLvl = 0xFD
+    REG_FIFO_LVL = 0xFD
 
     # Register is a single 8-bit value
 
     # ----------- FData Register -----------
-    kRegFData = 0xFE
+    REG_F_DATA = 0xFE
 
-    kShiftFDataL = 0
-    kShiftFDataH = 8
+    SHIFT_F_DATA_L = 0
+    SHIFT_F_DATA_H = 8
 
-    kMaskFDataL = 0xFF << kShiftFDataL
-    kMaskFDataH = 0xFF << kShiftFDataH
+    MASK_F_DATA_L = 0xFF << SHIFT_F_DATA_L
+    MASK_F_DATA_H = 0xFF << SHIFT_F_DATA_H
 
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -556,16 +559,10 @@ class QwiicAS7343(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-        self._data = [None] * self.kNumChannels
+        self._data = [None] * self.NUM_CHANNELS
 
     def is_connected(self):
         """!
@@ -574,18 +571,14 @@ class QwiicAS7343(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        if not self._i2c.isDeviceConnected(self.address):
-            print("Device not connected")
+        if not self._i2c.is_device_connected(self.address):
             return False
 
         # Check that Part Number Identifier is correct (read only and should always be 0x81)
-        if self.get_device_id() != self.kDefaultAS7343DeviceID:
-            print("Device ID mismatch")
+        if self.get_device_id() != self.DEFAULT_AS7343_DEVICE_ID:
             return False
         
         return True
-
-    connected = property(is_connected)
 
     def begin(self):
         """!
@@ -600,32 +593,32 @@ class QwiicAS7343(object):
         """!
         Sets the register bank for the device
 
-        @param int bank: The register bank to set
+        @param bank: **int** The register bank to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the bank is valid
-        if bank not in [self.kRegBank0, self.kRegBank1]:
+        if bank not in [self.REG_BANK0, self.REG_BANK1]:
             return False
 
         # Read the current cfg0 register
-        cfg0 = self._i2c.read_byte(self.address, self.kRegCfg0)
+        cfg0 = self._i2c.read_byte(self.address, self.REG_CFG0)
 
         # Clear the register bank bits
-        cfg0 &= ~self.kMaskCfg0RegBank
+        cfg0 &= ~self.MASK_CFG0_REG_BANK
 
         # Set the new register bank
-        cfg0 |= (bank << self.kShiftCfg0RegBank) & self.kMaskCfg0RegBank
+        cfg0 |= (bank << self.SHIFT_CFG0_REG_BANK) & self.MASK_CFG0_REG_BANK
 
         # Write the new cfg0 register value
-        self._i2c.write_byte(self.address, self.kRegCfg0, cfg0)
+        self._i2c.write_byte(self.address, self.REG_CFG0, cfg0)
         return True
 
     def read_register(self, register):
         """!
         Reads a single byte from the specified register
 
-        @param int register: The register to read from
+        @param register: **int** The register to read from
 
         @return **int** The value read from the register
         """
@@ -634,9 +627,9 @@ class QwiicAS7343(object):
         # if the desired register is equal to or greater than 0x80, set bank 0.
         # Otherwise, set bank 1.
         if register >= 0x80:
-            self.set_register_bank(self.kRegBank0)
+            self.set_register_bank(self.REG_BANK0)
         else:
-            self.set_register_bank(self.kRegBank1)
+            self.set_register_bank(self.REG_BANK1)
 
         # Read the register value
         return self._i2c.read_byte(self.address, register)
@@ -648,27 +641,27 @@ class QwiicAS7343(object):
         @return **int** The device ID
         """
         # Read the device ID register
-        return self.read_register(self.kRegID)
+        return self.read_register(self.REG_ID)
     
     def power_on(self, enable=True):
         """!
         Powers on the AS7343
 
-        @param bool enable: `True` to power on, `False` to power off
+        @param enable: **bool** `True` to power on, `False` to power off
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Read the current enable register
-        enable_reg = self.read_register(self.kRegEnable)
+        enable_reg = self.read_register(self.REG_ENABLE)
 
         # Set the power on bit
         if enable:
-            enable_reg |= self.kMaskEnablePon
+            enable_reg |= self.MASK_ENABLE_PON
         else:
-            enable_reg &= ~self.kMaskEnablePon
+            enable_reg &= ~self.MASK_ENABLE_PON
 
         # Write the new enable register value
-        self._i2c.write_byte(self.address, self.kRegEnable, enable_reg)
+        self._i2c.write_byte(self.address, self.REG_ENABLE, enable_reg)
         return True
     
     def power_off(self):
@@ -683,21 +676,21 @@ class QwiicAS7343(object):
         """!
         Enables or disables spectral measurement
 
-        @param bool enable: `True` to enable, `False` to disable
+        @param enable: **bool** `True` to enable, `False` to disable
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Read the current enable register
-        enable_reg = self.read_register(self.kRegEnable)
+        enable_reg = self.read_register(self.REG_ENABLE)
 
         # Set the spectral measurement enable bit
         if enable:
-            enable_reg |= self.kMaskEnableSpEn
+            enable_reg |= self.MASK_ENABLE_SP_EN
         else:
-            enable_reg &= ~self.kMaskEnableSpEn
+            enable_reg &= ~self.MASK_ENABLE_SP_EN
 
         # Write the new enable register value
-        self._i2c.write_byte(self.address, self.kRegEnable, enable_reg)
+        self._i2c.write_byte(self.address, self.REG_ENABLE, enable_reg)
         return True
     
     def spectral_measurement_disable(self):
@@ -716,23 +709,23 @@ class QwiicAS7343(object):
         """
         
         # Set the register bank to bank 0 to access the data registers
-        self.set_register_bank(self.kRegBank0)
+        self.set_register_bank(self.REG_BANK0)
 
         # Read the spectral data registers
-        for i in range(self.kNumChannels):
-            self._data[i] = (self._i2c.read_word(self.address, self.kRegData0 + (i * 2)))
+        for i in range(self.NUM_CHANNELS):
+            self._data[i] = (self._i2c.read_word(self.address, self.REG_DATA0 + (i * 2)))
 
     
     def get_data(self, channel):
         """!
         Gets the data for a specific channel
 
-        @param int channel: The channel to get data from
+        @param channel: **int** The channel to get data from
 
         @return **int** The data for the specified channel or `None` if invalid
         """
         # Check if the channel is valid
-        if channel < 0 or channel >= self.kNumChannels:
+        if channel < 0 or channel >= self.NUM_CHANNELS:
             return None
 
         # Return the data for the specified channel
@@ -742,46 +735,46 @@ class QwiicAS7343(object):
         """!
         Sets the automatic SMUX mode
 
-        @param int auto_smux: The automatic SMUX mode to set
+        @param auto_smux: **int** The automatic SMUX mode to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the auto SMUX mode is valid
-        if auto_smux not in [self.kAutoSmux6Channels, self.kAutoSmux12Channels, self.kAutoSmux18Channels]:
+        if auto_smux not in [self.AUTO_SMUX_6_CHANNELS, self.AUTO_SMUX_12_CHANNELS, self.AUTO_SMUX_18_CHANNELS]:
             return False
 
         # Read the current cfg20 register
-        cfg20 = self.read_register(self.kRegCfg20)
+        cfg20 = self.read_register(self.REG_CFG20)
 
         # Clear the automatic SMUX bits
-        cfg20 &= ~self.kMaskCfg20AutoSmux
+        cfg20 &= ~self.MASK_CFG20_AUTO_SMUX
 
         # Set the new automatic SMUX mode
-        cfg20 |= (auto_smux << self.kShiftCfg20AutoSmux) & self.kMaskCfg20AutoSmux
+        cfg20 |= (auto_smux << self.SHIFT_CFG20_AUTO_SMUX) & self.MASK_CFG20_AUTO_SMUX
 
         # Write the new cfg20 register value
-        self._i2c.write_byte(self.address, self.kRegCfg20, cfg20)
+        self._i2c.write_byte(self.address, self.REG_CFG20, cfg20)
         return True
     
     def set_led_on(self, led_on = True):
         """!
         Sets the LED state
 
-        @param bool led_on: `True` to turn on the LED, `False` to turn it off
+        @param led_on: **bool** `True` to turn on the LED, `False` to turn it off
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Read the current LED register
-        led_reg = self.read_register(self.kRegLed)
+        led_reg = self.read_register(self.REG_LED)
 
         # Set the LED state
         if led_on:
-            led_reg |= self.kMaskLedAct
+            led_reg |= self.MASK_LED_ACT
         else:
-            led_reg &= ~self.kMaskLedAct
+            led_reg &= ~self.MASK_LED_ACT
 
         # Write the new LED register value
-        self._i2c.write_byte(self.address, self.kRegLed, led_reg)
+        self._i2c.write_byte(self.address, self.REG_LED, led_reg)
         return True
     
     def set_led_off(self):
@@ -796,7 +789,7 @@ class QwiicAS7343(object):
         """!
         Sets the LED drive current
 
-        @param int drive: The LED drive current to set
+        @param drive: **int** The LED drive current to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
@@ -805,14 +798,14 @@ class QwiicAS7343(object):
             return False
 
         # Read the current LED register
-        led_reg = self.read_register(self.kRegLed)
+        led_reg = self.read_register(self.REG_LED)
 
         # Set the LED drive current
-        led_reg &= ~self.kMaskLedDrive
-        led_reg |= (drive << self.kShiftLedDrive) & self.kMaskLedDrive
+        led_reg &= ~self.MASK_LED_DRIVE
+        led_reg |= (drive << self.SHIFT_LED_DRIVE) & self.MASK_LED_DRIVE
 
         # Write the new LED register value
-        self._i2c.write_byte(self.address, self.kRegLed, led_reg)
+        self._i2c.write_byte(self.address, self.REG_LED, led_reg)
         return True
     
     def get_red(self):
@@ -821,7 +814,7 @@ class QwiicAS7343(object):
 
         @return **int** The red channel data
         """
-        return self.get_data(self.kChRedF7690nm)
+        return self.get_data(self.CH_RED_F7_690NM)
     
     def get_green(self):
         """!
@@ -829,7 +822,7 @@ class QwiicAS7343(object):
 
         @return **int** The green channel data
         """
-        return self.get_data(self.kChGreenF5550nm)
+        return self.get_data(self.CH_GREEN_F5_550NM)
     
     def get_blue(self):
         """!
@@ -837,7 +830,7 @@ class QwiicAS7343(object):
 
         @return **int** The blue channel data
         """
-        return self.get_data(self.kChBlueFz450nm)
+        return self.get_data(self.CH_BLUE_FZ_450NM)
     
     def get_nir(self):
         """!
@@ -845,60 +838,60 @@ class QwiicAS7343(object):
 
         @return **int** The NIR channel data
         """
-        return self.get_data(self.kChNir855nm)
+        return self.get_data(self.CH_NIR_855NM)
     
     # TODO: Check endianness for these write_words
-    def set_spectral_int_threshold_high(self, spThH):
+    def set_spectral_int_threshold_high(self, sp_th_h):
         """!
         Sets the spectral intensity threshold high value
 
-        @param 16-bit positive int spThH: The spectral intensity threshold high value
+        @param sp_th_h: The spectral intensity threshold high value (16-bit, 0 to 65535)
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the spectral intensity threshold high value is valid
-        if spThH < 0 or spThH > 0xFFFF:
+        if sp_th_h < 0 or sp_th_h > 0xFFFF:
             return False
     
         # Right the full 16-bit value to the register
-        self._i2c.write_word(self.address, self.kRegSpThH, spThH)
+        self._i2c.write_word(self.address, self.REG_SP_TH_H, sp_th_h)
         return True
     
-    def set_spectral_int_threshold_low(self, spThL):
+    def set_spectral_int_threshold_low(self, sp_th_l):
         """!
         Sets the spectral intensity threshold low value
 
-        @param 16-bit positive int spThL: The spectral intensity threshold low value
+        @param sp_th_l: The spectral intensity threshold low value (16-bit, 0 to 65535)
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the spectral intensity threshold low value is valid
-        if spThL < 0 or spThL > 0xFFFF:
+        if sp_th_l < 0 or sp_th_l > 0xFFFF:
             return False
     
         # Right the full 16-bit value to the register
-        self._i2c.write_word(self.address, self.kRegSpThL, spThL)
+        self._i2c.write_word(self.address, self.REG_SP_TH_L, sp_th_l)
         return True
     
     def spectral_int_enable(self, enable=True):
         """!
         Enables or disables spectral intensity measurement
 
-        @param bool enable: `True` to enable, `False` to disable
+        @param enable: **bool** `True` to enable, `False` to disable
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Read the current cfg20 register
-        intEnab = self.read_register(self.kRegIntEnab)
+        int_enab = self.read_register(self.REG_INT_ENAB)
 
         # Set the spectral intensity enable bit
         if enable:
-            intEnab |= self.kMaskIntEnabSpIen
+            int_enab |= self.MASK_INT_ENAB_SP_IEN
         else:
-            intEnab &= ~self.kMaskIntEnabSpIen
+            int_enab &= ~self.MASK_INT_ENAB_SP_IEN
 
         # Write the new INT_ENAB register value
-        self._i2c.write_byte(self.address, self.kRegIntEnab, intEnab)
+        self._i2c.write_byte(self.address, self.REG_INT_ENAB, int_enab)
         return True
     
     def spectral_int_disable(self):
@@ -913,27 +906,27 @@ class QwiicAS7343(object):
         """!
         Sets the spectral threshold channel
 
-        @param int channel: The spectral threshold channel to set
+        @param channel: **int** The spectral threshold channel to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the spectral threshold channel is valid
-        if channel not in [self.kSpectralThresholdChannel0, self.kSpectralThresholdChannel1,
-                           self.kSpectralThresholdChannel2, self.kSpectralThresholdChannel3,
-                           self.kSpectralThresholdChannel4, self.kSpectralThresholdChannel5]:
+        if channel not in [self.SPECTRAL_THRESHOLD_CHANNEL_0, self.SPECTRAL_THRESHOLD_CHANNEL_1,
+                           self.SPECTRAL_THRESHOLD_CHANNEL_2, self.SPECTRAL_THRESHOLD_CHANNEL_3,
+                           self.SPECTRAL_THRESHOLD_CHANNEL_4, self.SPECTRAL_THRESHOLD_CHANNEL_5]:
             return False
 
         # Read the current cfg12 register
-        cfg12 = self.read_register(self.kRegCfg12)
+        cfg12 = self.read_register(self.REG_CFG12)
 
         # Clear the spectral threshold channel bits
-        cfg12 &= ~self.kMaskCfg12SpThCh
+        cfg12 &= ~self.MASK_CFG12_SP_TH_CH
 
         # Set the new spectral threshold channel
-        cfg12 |= (channel << self.kShiftCfg12SpThCh) & self.kMaskCfg12SpThCh
+        cfg12 |= (channel << self.SHIFT_CFG12_SP_TH_CH) & self.MASK_CFG12_SP_TH_CH
 
         # Write the new cfg12 register value
-        self._i2c.write_byte(self.address, self.kRegCfg12, cfg12)
+        self._i2c.write_byte(self.address, self.REG_CFG12, cfg12)
         return True
 
     def get_system_interrupt_status(self):
@@ -943,10 +936,10 @@ class QwiicAS7343(object):
         @return **bool** The system interrupt status
         """
         # Read the status register
-        status = self.read_register(self.kRegStatus)
+        status = self.read_register(self.REG_STATUS)
 
         # Check if the system interrupt is set
-        return (status & self.kMaskStatusSint) == self.kMaskStatusSint
+        return (status & self.MASK_STATUS_SINT) == self.MASK_STATUS_SINT
     
     def get_spectral_channel_interrupt_status(self):
         """!
@@ -955,10 +948,10 @@ class QwiicAS7343(object):
         @return **int** The spectral channel interrupt status
         """
         # Read the status register
-        status = self.read_register(self.kRegStatus)
+        status = self.read_register(self.REG_STATUS)
 
         # Check if the spectral channel interrupt is set
-        return (status & self.kMaskStatusAint) == self.kMaskStatusAint
+        return (status & self.MASK_STATUS_AINT) == self.MASK_STATUS_AINT
     
     def get_spectral_interrupt_high_status(self):
         """!
@@ -967,10 +960,10 @@ class QwiicAS7343(object):
         @return **int** The spectral interrupt high status
         """
         # Read the status3 register
-        status3 = self.read_register(self.kRegStatus3)
+        status3 = self.read_register(self.REG_STATUS3)
 
         # Check if the spectral interrupt high is set
-        return (status3 & self.kMaskStatus3IntSpH) == self.kMaskStatus3IntSpH
+        return (status3 & self.MASK_STATUS3_INT_SP_H) == self.MASK_STATUS3_INT_SP_H
     
     def get_spectral_trigger_error_status(self):
         """!
@@ -979,16 +972,16 @@ class QwiicAS7343(object):
         @return **int** The spectral trigger error status
         """
         # Read the status4 register
-        status4 = self.read_register(self.kRegStatus4)
+        status4 = self.read_register(self.REG_STATUS4)
 
         # Check if the spectral trigger error is set
-        return (status4 & self.kMaskStatus4SpTrig) == self.kMaskStatus4SpTrig
+        return (status4 & self.MASK_STATUS4_SP_TRIG) == self.MASK_STATUS4_SP_TRIG
     
     def set_wait_time(self, wait_time):
         """!
         Sets the wait time for the AS7343
 
-        @param int wait_time: The wait time to set
+        @param wait_time: **int** The wait time to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
@@ -997,7 +990,7 @@ class QwiicAS7343(object):
             return False
 
         # Write the new wait time to the register
-        self._i2c.write_byte(self.address, self.kRegWTime, wait_time)
+        self._i2c.write_byte(self.address, self.REG_W_TIME, wait_time)
         return True
     
     def get_wait_time(self):
@@ -1007,27 +1000,27 @@ class QwiicAS7343(object):
         @return **int** The wait time
         """
         # Read the wait time register
-        return self.read_register(self.kRegWTime)
+        return self.read_register(self.REG_W_TIME)
     
     def wait_time_enable(self, enable=True):
         """!
         Enables or disables the wait time
 
-        @param bool enable: `True` to enable, `False` to disable
+        @param enable: **bool** `True` to enable, `False` to disable
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Read the current enable register
-        enable_reg = self.read_register(self.kRegEnable)
+        enable_reg = self.read_register(self.REG_ENABLE)
 
         # Set the wait time enable bit
         if enable:
-            enable_reg |= self.kMaskEnableWen
+            enable_reg |= self.MASK_ENABLE_WEN
         else:
-            enable_reg &= ~self.kMaskEnableWen
+            enable_reg &= ~self.MASK_ENABLE_WEN
 
         # Write the new enable register value
-        self._i2c.write_byte(self.address, self.kRegEnable, enable_reg)
+        self._i2c.write_byte(self.address, self.REG_ENABLE, enable_reg)
         return True
     
     def wait_time_disable(self):
@@ -1045,10 +1038,10 @@ class QwiicAS7343(object):
         @return **int** The spectral valid status
         """
         # Read the status2 register
-        status2 = self.read_register(self.kRegStatus2)
+        status2 = self.read_register(self.REG_STATUS2)
 
         # Check if the spectral valid status is set
-        return (status2 & self.kMaskStatus2Avalid) == self.kMaskStatus2Avalid
+        return (status2 & self.MASK_STATUS2_AVALID) == self.MASK_STATUS2_AVALID
     
     def read_int_enable_reg(self):
         """!
@@ -1057,31 +1050,31 @@ class QwiicAS7343(object):
         @return **int** The interrupt enable register value
         """
         # Read the interrupt enable register
-        return self.read_register(self.kRegIntEnab)
+        return self.read_register(self.REG_INT_ENAB)
     
     def set_gpio_mode(self, mode):
         """!
         Sets the GPIO mode
 
-        @param int mode: The GPIO mode to set
+        @param mode: **int** The GPIO mode to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the GPIO mode is valid
-        if mode not in [self.kGpioModeInput, self.kGpioModeOutput]:
+        if mode not in [self.GPIO_MODE_INPUT, self.GPIO_MODE_OUTPUT]:
             return False
 
         # Read the current GPIO register
-        gpio_reg = self.read_register(self.kRegGpio)
+        gpio_reg = self.read_register(self.REG_GPIO)
 
         # Set the GPIO mode
-        gpio_reg &= ~self.kMaskGpioInEn
+        gpio_reg &= ~self.MASK_GPIO_IN_EN
         
-        if mode == self.kGpioModeInput:
-            gpio_reg |= self.kMaskGpioInEn
+        if mode == self.GPIO_MODE_INPUT:
+            gpio_reg |= self.MASK_GPIO_IN_EN
 
         # Write the new GPIO register value
-        self._i2c.write_byte(self.address, self.kRegGpio, gpio_reg)
+        self._i2c.write_byte(self.address, self.REG_GPIO, gpio_reg)
         return True
     
     def get_gpio_input_status(self):
@@ -1091,32 +1084,32 @@ class QwiicAS7343(object):
         @return **int** The GPIO input status
         """
         # Read the GPIO register
-        gpio_reg = self.read_register(self.kRegGpio)
+        gpio_reg = self.read_register(self.REG_GPIO)
 
         # Check if the GPIO input status is set
-        return (gpio_reg & self.kMaskGpioIn) == self.kMaskGpioIn
+        return (gpio_reg & self.MASK_GPIO_IN) == self.MASK_GPIO_IN
     
     def set_gpio_output(self, output):
         """!
         Sets the GPIO output
 
-        @param int output: The GPIO output to set
+        @param output: **int** The GPIO output to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the GPIO output is valid
-        if output not in [self.kGpioOutputLow, self.kGpioOutputHigh]:
+        if output not in [self.GPIO_OUTPUT_LOW, self.GPIO_OUTPUT_HIGH]:
             return False
 
         # Read the current GPIO register
-        gpio_reg = self.read_register(self.kRegGpio)
+        gpio_reg = self.read_register(self.REG_GPIO)
 
         # Set the GPIO output
-        gpio_reg &= ~self.kMaskGpioOut
-        gpio_reg |= (output << self.kShiftGpioOut) & self.kMaskGpioOut
+        gpio_reg &= ~self.MASK_GPIO_OUT
+        gpio_reg |= (output << self.SHIFT_GPIO_OUT) & self.MASK_GPIO_OUT
 
         # Write the new GPIO register value
-        self._i2c.write_byte(self.address, self.kRegGpio, gpio_reg)
+        self._i2c.write_byte(self.address, self.REG_GPIO, gpio_reg)
         return True
 
     def reset(self):
@@ -1126,20 +1119,20 @@ class QwiicAS7343(object):
         @return **bool** `True` if successful, otherwise `False`
         """
         # Read the current control register
-        control_reg = self.read_register(self.kRegControl)
+        control_reg = self.read_register(self.REG_CONTROL)
 
         # Set the reset bit
-        control_reg |= self.kMaskControlSwReset
+        control_reg |= self.MASK_CONTROL_SW_RESET
 
         # Write the new control register value
-        self._i2c.write_byte(self.address, self.kRegControl, control_reg)
+        self._i2c.write_byte(self.address, self.REG_CONTROL, control_reg)
         return True 
 
     def set_spectral_int_persistence(self, persistence):
         """!
         Sets the spectral intensity persistence
 
-        @param int persistence: The spectral intensity persistence to set
+        @param persistence: **int** The spectral intensity persistence to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
@@ -1148,14 +1141,14 @@ class QwiicAS7343(object):
             return False
 
         # Read the current persistence register
-        pers_reg = self.read_register(self.kRegPers)
+        pers_reg = self.read_register(self.REG_PERS)
 
         # Set the spectral intensity persistence
-        pers_reg &= ~self.kMaskPersApers
-        pers_reg |= (persistence << self.kShiftPersApers) & self.kMaskPersApers
+        pers_reg &= ~self.MASK_PERS_APERS
+        pers_reg |= (persistence << self.SHIFT_PERS_APERS) & self.MASK_PERS_APERS
 
         # Write the new persistence register value
-        self._i2c.write_byte(self.address, self.kRegPers, pers_reg)
+        self._i2c.write_byte(self.address, self.REG_PERS, pers_reg)
         return True
     
     def clear_spectral_channel_interrupt(self):
@@ -1165,55 +1158,55 @@ class QwiicAS7343(object):
         @return **bool** `True` if successful, otherwise `False`
         """
         # Read the current status register
-        status_reg = self.read_register(self.kRegStatus)
+        status_reg = self.read_register(self.REG_STATUS)
 
         # Clear the AINT bit by writing a 1 to it
-        status_reg |= self.kMaskStatusAint
+        status_reg |= self.MASK_STATUS_AINT
 
         # Write the new status register value
-        self._i2c.write_byte(self.address, self.kRegStatus, status_reg)
+        self._i2c.write_byte(self.address, self.REG_STATUS, status_reg)
         return True
 
     def set_a_gain(self, gain):
         """!
         Sets the A gain
 
-        @param int gain: The A gain to set
+        @param gain: **int** The A gain to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Check if the A gain is valid
-        if gain < self.kAgain0_5 or gain > self.kAgain2048:
+        if gain < self.AGAIN_0_5 or gain > self.AGAIN_2048:
             return False
 
         # Read the current cfg1 register
-        cfg1 = self.read_register(self.kRegCfg1)
+        cfg1 = self.read_register(self.REG_CFG1)
 
         # Set the A gain
-        cfg1 &= ~self.kMaskCfg1Again
-        cfg1 |= (gain << self.kShiftCfg1Again) & self.kMaskCfg1Again
+        cfg1 &= ~self.MASK_CFG1_AGAIN
+        cfg1 |= (gain << self.SHIFT_CFG1_AGAIN) & self.MASK_CFG1_AGAIN
 
         # Write the new cfg1 register value
-        self._i2c.write_byte(self.address, self.kRegCfg1, cfg1)
+        self._i2c.write_byte(self.address, self.REG_CFG1, cfg1)
         return True
     
     def flicker_detection_enable(self, enable=True):
         """!
         Enables or disables flicker detection
 
-        @param bool enable: `True` to enable, `False` to disable
+        @param enable: **bool** `True` to enable, `False` to disable
         """
         # Read the current enable register
-        enable_reg = self.read_register(self.kRegEnable)
+        enable_reg = self.read_register(self.REG_ENABLE)
 
         # Set the flicker detection enable bit
         if enable:
-            enable_reg |= self.kMaskEnableFden
+            enable_reg |= self.MASK_ENABLE_FDEN
         else:
-            enable_reg &= ~self.kMaskEnableFden
+            enable_reg &= ~self.MASK_ENABLE_FDEN
 
         # Write the new enable register value
-        self._i2c.write_byte(self.address, self.kRegEnable, enable_reg)
+        self._i2c.write_byte(self.address, self.REG_ENABLE, enable_reg)
     
     def flicker_detection_disable(self):
         """!
@@ -1228,10 +1221,10 @@ class QwiicAS7343(object):
         @return **bool** The flicker detection valid status
         """
         # Read the fd status register
-        fd_status = self.read_register(self.kRegFdStatus)
+        fd_status = self.read_register(self.REG_FD_STATUS)
 
         # Check if the flicker detection valid status is set
-        return (fd_status & self.kMaskFdStatusFdMeasValid) == self.kMaskFdStatusFdMeasValid
+        return (fd_status & self.MASK_FD_STATUS_FD_MEAS_VALID) == self.MASK_FD_STATUS_FD_MEAS_VALID
     
     def get_fd_saturation_status(self):
         """!
@@ -1240,10 +1233,10 @@ class QwiicAS7343(object):
         @return **bool** The flicker detection saturation status
         """
         # Read the fd status register
-        fd_status = self.read_register(self.kRegFdStatus)
+        fd_status = self.read_register(self.REG_FD_STATUS)
 
         # Check if the flicker detection saturation status is set
-        return (fd_status & self.kMaskFdStatusFdSaturation) == self.kMaskFdStatusFdSaturation
+        return (fd_status & self.MASK_FD_STATUS_FD_SATURATION) == self.MASK_FD_STATUS_FD_SATURATION
     
     def get_fd_frequency(self):
         """!
@@ -1252,16 +1245,16 @@ class QwiicAS7343(object):
         @return **int** The flicker detection frequency
         """
         # Read the fd status register
-        fd_status = self.read_register(self.kRegFdStatus)
+        fd_status = self.read_register(self.REG_FD_STATUS)
 
         # See which frequency bit is set (fd_100hz_det or fd_120hz_det) and check
         # its corresponding valid bit (fd_100hz_valid or fd_120hz_valid) to determine the frequency
         # return the frequency value
-        if (fd_status & self.kMaskFdStatusFd100HzDet) == self.kMaskFdStatusFd100HzDet and \
-           (fd_status & self.kMaskFdStatusFd100HzValid) == self.kMaskFdStatusFd100HzValid:
+        if (fd_status & self.MASK_FD_STATUS_FD_100HZ_DET) == self.MASK_FD_STATUS_FD_100HZ_DET and \
+           (fd_status & self.MASK_FD_STATUS_FD_100HZ_VALID) == self.MASK_FD_STATUS_FD_100HZ_VALID:
             return 100
-        elif (fd_status & self.kMaskFdStatusFd120HzDet) == self.kMaskFdStatusFd120HzDet and \
-             (fd_status & self.kMaskFdStatusFd120HzValid) == self.kMaskFdStatusFd120HzValid:
+        elif (fd_status & self.MASK_FD_STATUS_FD_120HZ_DET) == self.MASK_FD_STATUS_FD_120HZ_DET and \
+             (fd_status & self.MASK_FD_STATUS_FD_120HZ_VALID) == self.MASK_FD_STATUS_FD_120HZ_VALID:
             return 120
         else:
             return 0

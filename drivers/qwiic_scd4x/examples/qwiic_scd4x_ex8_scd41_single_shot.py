@@ -36,34 +36,34 @@
 
 import qwiic_scd4x
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic SCD4x Example 8 - SCD41 Single-Shot\n")
 
 	# Create instance of device
 	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
 	# Check if it's connected
-	if mySCD4x.is_connected() == False:
+	if not mySCD4x.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device (NOTE: we do not start periodic measurements)
-	if mySCD4x.begin(measBegin=False) == False:
+	if not mySCD4x.begin(meas_begin=False):
 		print("Error while initializing device", file=sys.stderr)
 		return
 	
 	# Lets call measure_single_shot to start the first conversion
-	if mySCD4x.measure_single_shot() == False:
+	if not mySCD4x.measure_single_shot():
 		print("Error while starting single-shot measurement. Are you sure your device is a SCD41 and is connected?", file=sys.stderr)
 		return
 
 	while True:
 		# Wait for the measurement to be ready
-		while mySCD4x.read_measurement() == False:
+		while not mySCD4x.read_measurement():
 			print(".", end="")
-			time.sleep(0.5)
+			qwiic_i2c.delay_ms(500)
 		
 		# Print the single-shot data
 		print("\nCO2(ppm):", mySCD4x.get_co2())
@@ -71,27 +71,27 @@ def runExample():
 		print("Humidity(%RH):", mySCD4x.get_humidity())
 
 		# Request just the RH and the Temperature (should take ~50ms)
-		if mySCD4x.measure_single_shot_rht_only() == False:
+		if not mySCD4x.measure_single_shot_rht_only():
 			print("Failed to start single-shot RHT measurement", file=sys.stderr)
 			return
 
 		# Wait for the measurement to be ready
-		while mySCD4x.read_measurement() == False:
+		while not mySCD4x.read_measurement():
 			print(".", end="")
-			time.sleep(0.005)
+			qwiic_i2c.delay_ms(5)
 
 		# Print the single-shot data
 		print("\nTemperature(C):", mySCD4x.get_temperature())
 		print("Humidity(%RH):", mySCD4x.get_humidity())
 
 		# Do a single shot request for all the data (should take ~5seconds)
-		if mySCD4x.measure_single_shot() == False:
+		if not mySCD4x.measure_single_shot():
 			print("Failed to start single-shot measurement", file=sys.stderr)
 			return
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

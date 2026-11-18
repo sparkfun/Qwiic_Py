@@ -36,12 +36,12 @@
 
 import qwiic_cy8cmbr3
 import sys
-import time
+import qwiic_i2c
 
-oldAddress = qwiic_cy8cmbr3.QwiicCY8CMBR3.default_address  # Change this to your new address if you have modified it already
+oldAddress = qwiic_cy8cmbr3.QwiicCY8CMBR3.DEFAULT_ADDRESS  # Change this to your new address if you have modified it already
 newAddress = 0x50 # Example new address to set (addresses from 0x08 to 0x77 are valid)
 
-def runExample():
+def run_example():
 	print("\nQwiic Template Example 6 - I2C Address\n")
 
 	# Create instance of device
@@ -69,11 +69,11 @@ def runExample():
 		capacitance = mySoilSensor.get_capacitance_pf()
 		print("Soil Capacitance: " + str(capacitance) + " pF")
 		# Sleep for a second to avoid spamming the output
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

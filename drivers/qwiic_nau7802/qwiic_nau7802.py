@@ -50,7 +50,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -173,15 +174,16 @@ class QwiicNAU7802(object):
     NAU7802_CAL_IN_PROGRESS = 1
     NAU7802_CAL_FAILURE = 2
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -189,14 +191,8 @@ class QwiicNAU7802(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # Initialize other member variables
         self._zero_offset = 0
@@ -209,9 +205,7 @@ class QwiicNAU7802(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -263,7 +257,7 @@ class QwiicNAU7802(object):
     def begin_calibrate_afe(self):
         """!
         Begin asycnhronous calibration of the analog front end. Poll for
-        completion with calAFEStatus() or wait with waitForCalibrateAFE()
+        completion with cal_afe_status() or wait with wait_for_calibrate_afe()
         """
         self.set_bit(self.NAU7802_CTRL2_CALS, self.NAU7802_CTRL2)
 
@@ -287,17 +281,17 @@ class QwiicNAU7802(object):
         Wait for asynchronous AFE calibration to complete with optional timeout.
         If timeout is not specified (or set to 0), then wait indefinitely.
 
-        @param int, optional timeout_ms: Timeout in ms, defaults to 0
+        @param timeout_ms: **int, optional** Timeout in ms, defaults to 0
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        begin = self.millis()
+        begin = self._i2c.ticks_ms()
         cal_ready = self.cal_afe_status()
 
         while cal_ready == self.NAU7802_CAL_IN_PROGRESS:
-            if timeout_ms > 0 and self.millis() - begin > timeout_ms:
+            if timeout_ms > 0 and self._i2c.ticks_diff(self._i2c.ticks_ms(), begin) > timeout_ms:
                 break
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
             cal_ready = self.cal_afe_status()
 
         if cal_ready == self.NAU7802_CAL_SUCCESS:
@@ -308,7 +302,7 @@ class QwiicNAU7802(object):
         """!
         Set sample rate in Hz.
 
-        @param int rate: Sample rate in Hz. Can be NAU7802_SPS_10, NAU7802_SPS_20,
+        @param rate: **int** Sample rate in Hz. Can be NAU7802_SPS_10, NAU7802_SPS_20,
         NAU7802_SPS_40, NAU7802_SPS_80, or NAU7802_SPS_320
         """
         if rate > 0b111:
@@ -324,7 +318,7 @@ class QwiicNAU7802(object):
         """!
         Select between channel 1 and 2
 
-        @param int channel_number: Channel number. Can be NAU7802_CHANNEL_1 or
+        @param channel_number: **int** Channel number. Can be NAU7802_CHANNEL_1 or
         NAU7802_CHANNEL_2
         """
         if channel_number == self.NAU7802_CHANNEL_1:
@@ -345,7 +339,7 @@ class QwiicNAU7802(object):
         while True:
             if self.get_bit(self.NAU7802_PU_CTRL_PUR, self.NAU7802_PU_CTRL):
                 break
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
             counter += 1
             if counter > 100:
                 return False
@@ -364,14 +358,14 @@ class QwiicNAU7802(object):
         Resets all registers to power off defaults
         """
         self.set_bit(self.NAU7802_PU_CTRL_RR, self.NAU7802_PU_CTRL)
-        time.sleep(0.001)
+        self._i2c.delay_ms(1)
         self.clear_bit(self.NAU7802_PU_CTRL_RR, self.NAU7802_PU_CTRL)
 
     def set_ldo(self, ldo_value):
         """!
         Sets the onboard low-drop-out voltage regulator to a given value
 
-        @param int ldo_value: LDO voltage. Can be NAU7802_LDO_2V4, NAU7802_LDO_2V7,
+        @param ldo_value: **int** LDO voltage. Can be NAU7802_LDO_2V4, NAU7802_LDO_2V7,
         NAU7802_LDO_3V0, NAU7802_LDO_3V3, NAU7802_LDO_3V6, NAU7802_LDO_3V9,
         NAU7802_LDO_4V2, or NAU7802_LDO_4V5
         """
@@ -389,7 +383,7 @@ class QwiicNAU7802(object):
         """!
         Sets the gain
 
-        @param int gain_value: Gain. Can be NAU7802_GAIN_1, NAU7802_GAIN_2,
+        @param gain_value: **int** Gain. Can be NAU7802_GAIN_1, NAU7802_GAIN_2,
         NAU7802_GAIN_4, NAU7802_GAIN_8, NAU7802_GAIN_16, NAU7802_GAIN_32,
         NAU7802_GAIN_64, or NAU7802_GAIN_128
         """
@@ -418,7 +412,7 @@ class QwiicNAU7802(object):
 
         @return **int** Raw 24-bit reading
         """
-        raw_data = self._i2c.readBlock(self.address, self.NAU7802_ADCO_B2, 3)
+        raw_data = self._i2c.read_block(self.address, self.NAU7802_ADCO_B2, 3)
         value = (raw_data[0] << 16) | (raw_data[1] << 8) | (raw_data[2])
 
         if value >= (1 << 23):
@@ -430,14 +424,14 @@ class QwiicNAU7802(object):
         """!
         Return the average of a given number of readings. Gives up after timeout
 
-        @param int average_amount: Number of measurements to average
-        @param int, optional timeout_ms: Timeout in milliseconds, defaults to 1000
+        @param average_amount: **int** Number of measurements to average
+        @param timeout_ms: **int, optional** Timeout in milliseconds, defaults to 1000
 
         @return **float** Average measurement value
         """
         total = 0
         samples_acquired = 0
-        start_time = self.millis()
+        start_time = self._i2c.ticks_ms()
 
         while True:
             if self.available():
@@ -446,9 +440,9 @@ class QwiicNAU7802(object):
                 if samples_acquired == average_amount:
                     break
 
-            if self.millis() - start_time > timeout_ms:
+            if self._i2c.ticks_diff(self._i2c.ticks_ms(), start_time) > timeout_ms:
                 return 0
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
 
         total /= average_amount
         return total
@@ -458,7 +452,7 @@ class QwiicNAU7802(object):
         Calculates and stores zero offset measurement. Must only be called when
         zero weight is on the scale
 
-        @param int average_amount: Number of measurements to average
+        @param average_amount: **int** Number of measurements to average
         """
         self.set_zero_offset(self.get_average(average_amount))
 
@@ -467,7 +461,7 @@ class QwiicNAU7802(object):
         Sets zero offset mesaurement. Useful if the zero offset has already been
         calculated
 
-        @param float new_zero_offset: Zero offset
+        @param new_zero_offset: **float** Zero offset
         """
         self._zero_offset = new_zero_offset
 
@@ -484,8 +478,8 @@ class QwiicNAU7802(object):
         Calculates and stores calibration factor. Must only be called after zero
         offset has been set, and when a known weight is on the scale.
 
-        @param float weight_on_scale: Weight currently on the scale, without units
-        @param int average_amount: Number of measurements to average
+        @param weight_on_scale: **float** Weight currently on the scale, without units
+        @param average_amount: **int** Number of measurements to average
         """
         on_scale = self.get_average(average_amount)
         new_cal_factor = (on_scale - self._zero_offset) / weight_on_scale
@@ -496,7 +490,7 @@ class QwiicNAU7802(object):
         Sets calibration factor. Useful if the calibration factor has already
         been calculated
 
-        @param float new_cal_factor: Calibration factor
+        @param new_cal_factor: **float** Calibration factor
         """
         self._calibration_factor = new_cal_factor
 
@@ -514,9 +508,9 @@ class QwiicNAU7802(object):
         factor, so those must be set before using this. Uses a simple linear
         calculation following y=mx+b
 
-        @param bool, optional allow_negative_weights: Whether negative weights are allowed,
+        @param allow_negative_weights: **bool, optional** Whether negative weights are allowed,
         defaults to False
-        @param int, optional samples_to_take: Number of measurements to average, defaults to 8
+        @param samples_to_take: **int, optional** Number of measurements to average, defaults to 8
 
         @return **float** Weight on the scale
         """
@@ -544,8 +538,8 @@ class QwiicNAU7802(object):
         """!
         Mask & set a given bit within a register
 
-        @param int bit_number: Bit index to set
-        @param int register_address: Register address
+        @param bit_number: **int** Bit index to set
+        @param register_address: **int** Register address
         """
         value = self.get_register(register_address)
         value |= (1 << bit_number)
@@ -555,8 +549,8 @@ class QwiicNAU7802(object):
         """!
         Mask & clear a given bit within a register
 
-        @param int bit_number: Bit index to clear
-        @param int register_address: Register address
+        @param bit_number: **int** Bit index to clear
+        @param register_address: **int** Register address
         """
         value = self.get_register(register_address)
         value &= ~(1 << bit_number)
@@ -566,8 +560,8 @@ class QwiicNAU7802(object):
         """!
         Return a given bit within a register
 
-        @param int bit_number: Bit index to get
-        @param int register_address: Register address
+        @param bit_number: **int** Bit index to get
+        @param register_address: **int** Register address
 
         @return **bool** Bit value
         """
@@ -578,30 +572,17 @@ class QwiicNAU7802(object):
         """!
         Get contents of a register
 
-        @param int register_address: Register address
+        @param register_address: **int** Register address
 
         @return **int** Register value
         """
-        return self._i2c.readByte(self.address, register_address)
+        return self._i2c.read_byte(self.address, register_address)
 
     def set_register(self, register_address, value):
         """!
         Send a given value to be written to given address
 
-        @param int register_address: Register address
-        @param int value: Register value
+        @param register_address: **int** Register address
+        @param value: **int** Register value
         """
-        self._i2c.writeByte(self.address, register_address, value)
-    
-    def millis(self):
-        """!
-        Get the current time in milliseconds
-
-        @return **int** Current time in milliseconds
-        """
-        if hasattr(time, "ticks_ms"):
-	        # MicroPython: time.time() gives an integer, instead use ticks_ms()
-            return time.ticks_ms()
-        else:
-	        # Other platforms: time.time() gives a float
-            return int(round(time.time() * 1000))
+        self._i2c.write_byte(self.address, register_address, value)

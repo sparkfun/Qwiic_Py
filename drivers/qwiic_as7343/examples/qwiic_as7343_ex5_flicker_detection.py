@@ -37,9 +37,9 @@
 
 import qwiic_as7343 
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic AS7343 Example 5 - Flicker Detection\n")
 
 	# Create instance of device
@@ -62,7 +62,7 @@ def runExample():
 	print("Device powered on")
 
 	# Set AutoSmux to output all 18 channels
-	if not myAS7343.set_auto_smux(myAS7343.kAutoSmux18Channels):
+	if not myAS7343.set_auto_smux(myAS7343.AUTO_SMUX_18_CHANNELS):
 		print("Failed to set AutoSmux", file=sys.stderr)
 		return
 	print("AutoSmux set to 18 channels")
@@ -77,7 +77,7 @@ def runExample():
 
 	# Turn off the LED for use with flicker detection
 	myAS7343.set_led_off()
-	time.sleep(1) # Wait 1 second for the sensor to stabilize
+	qwiic_i2c.delay_ms(1000) # Wait 1 second for the sensor to stabilize
 
 	while True:
 		fdValid = myAS7343.get_fd_valid_status()
@@ -100,11 +100,11 @@ def runExample():
 		else:
 			print("Flicker detected at frequency: {} Hz".format(fdFrequency))
 
-		time.sleep(1) # Wait before the next reading
+		qwiic_i2c.delay_ms(1000) # Wait before the next reading
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

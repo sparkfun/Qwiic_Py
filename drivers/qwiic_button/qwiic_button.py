@@ -51,6 +51,8 @@ New to qwiic? Take a look at the entire [SparkFun Qwiic Ecosystem](https://www.s
 
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class definition
 # as class variables, making them available without having to create a class instance.
 # This allows higher level logic to rapidly create an index of qwiic devices at runtime.
@@ -78,8 +80,7 @@ class QwiicButton(object):
 
     @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The GPIO device object.
     """
@@ -129,22 +130,18 @@ class QwiicButton(object):
     clicked_is_full = 0
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver == None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c == None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else: 
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # -----------------------------------------------
     # is_connected()
@@ -156,7 +153,7 @@ class QwiicButton(object):
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return self._i2c.isDeviceConnected(self.address)
+        return self._i2c.is_device_connected(self.address)
     
     # ------------------------------------------------
     # begin()
@@ -170,9 +167,9 @@ class QwiicButton(object):
         @return **bool** Returns true if the intialization was successful, otherwise False.
         """
         if self.is_connected() == True:
-            id = self._i2c.readByte(self.address, self.ID)
+            device_id = self._i2c.read_byte(self.address, self.ID)
             
-            if id == self.DEV_ID:
+            if device_id == self.DEV_ID:
                 return True
         
         return False
@@ -189,15 +186,15 @@ class QwiicButton(object):
 
         @return **int** 16 bytes version number
         """
-        version = self._i2c.readByte(self.address, self.FIRMWARE_MAJOR) << 8
-        version |= self._i2c.readByte(self.address, self.FIRMWARE_MINOR)
+        version = self._i2c.read_byte(self.address, self.FIRMWARE_MAJOR) << 8
+        version |= self._i2c.read_byte(self.address, self.FIRMWARE_MINOR)
         return version
 
     # -------------------------------------------------
-    # set_I2C_address(new_address)
+    # set_i2c_address(new_address)
     #
     # Configures the attached device to attach to the I2C bus using the specified address
-    def set_I2C_address(self, new_address):
+    def set_i2c_address(self, new_address):
         """!
         Change the I2C address of the Qwiic Button
 
@@ -211,15 +208,15 @@ class QwiicButton(object):
             return False
         
         # Write new address to the I2C address register of the Qwiic Button
-        self._i2c.writeByte(self.address, self.I2C_ADDRESS, new_address)
+        self._i2c.write_byte(self.address, self.I2C_ADDRESS, new_address)
 
         self.address = new_address
     
     # ---------------------------------------------------
-    # get_I2C_address()
+    # get_i2c_address()
     #
     # Returns the I2C address of the device
-    def get_I2C_address(self):
+    def get_i2c_address(self):
         """!
         Returns the current I2C address of the Qwiic Button
 
@@ -238,7 +235,7 @@ class QwiicButton(object):
         @return **bool** is_pressed bit
         """
         # Read the button status register
-        button_status = self._i2c.readByte(self.address, self.BUTTON_STATUS)
+        button_status = self._i2c.read_byte(self.address, self.BUTTON_STATUS)
         # Convert to binary and clear all bits but is_pressed
         self.is_pressed = int(button_status) & ~(0xFB)
         # Shift is_pressed to the zero bit
@@ -257,7 +254,7 @@ class QwiicButton(object):
         @return **bool** has_been_clicked bit
         """
         # Read the button status register
-        button_status = self._i2c.readByte(self.address, self.BUTTON_STATUS)
+        button_status = self._i2c.read_byte(self.address, self.BUTTON_STATUS)
         # Convert to binary and clear all bits but has_been_clicked
         self.has_been_clicked = int(button_status) & ~(0xFD)
         # Shift has_been_clicked to the zero bit
@@ -276,7 +273,7 @@ class QwiicButton(object):
 
         @return **int** debounce time in milliseconds
         """
-        time_list = self._i2c.readBlock(self.address, self.BUTTON_DEBOUNCE_TIME, 2)
+        time_list = self._i2c.read_block(self.address, self.BUTTON_DEBOUNCE_TIME, 2)
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2)
         return time
         
@@ -298,12 +295,8 @@ class QwiicButton(object):
         # First check that time is not too big
         if time > 0xFFFF:
             time = 0xFFFF
-        time1 = time & ~(0xFF00)
-        time2 = time & ~(0x00FF)
-        time2 = time2 >> 8
-        time_list = [time1, time2]
         # Then write two bytes
-        self._i2c.writeWord(self.address, self.BUTTON_DEBOUNCE_TIME, time)
+        self._i2c.write_word(self.address, self.BUTTON_DEBOUNCE_TIME, time)
         
     # -------------------------------------------------------
     # enable_pressed_interrupt()
@@ -318,12 +311,12 @@ class QwiicButton(object):
         @return **Void** Nothing
         """
         # First, read the INTERRUPT_CONFIG register
-        interrupt_config = self._i2c.readByte(self.address, self.INTERRUPT_CONFIG)
+        interrupt_config = self._i2c.read_byte(self.address, self.INTERRUPT_CONFIG)
         self.pressed_enable = 1
         # Set the pressed_enable bit
         interrupt_config = interrupt_config | (self.pressed_enable << 1)
         # Write the new interrupt configure byte
-        self._i2c.writeByte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
+        self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
     
     # -------------------------------------------------------
     # disable_pressed_interrupt()
@@ -338,12 +331,12 @@ class QwiicButton(object):
         @return **Void** Nothing
         """
         # First, read the INTERRUPT_CONFIG register
-        interrupt_config = self._i2c.readByte(self.address, self.INTERRUPT_CONFIG)
+        interrupt_config = self._i2c.read_byte(self.address, self.INTERRUPT_CONFIG)
         self.pressed_enable = 0
         # Clear the pressed_enable bit
         interrupt_config = interrupt_config & ~(1 << 1)
         # Write the new interrupt configure byte
-        self._i2c.writeByte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
+        self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
 
     # -------------------------------------------------------
     # enable_clicked_interrupt()
@@ -358,12 +351,12 @@ class QwiicButton(object):
         @return **Void** Nothing
         """
         # First, read the INTERRUPT_CONFIG register
-        interrupt_config = self._i2c.readByte(self.address, self.INTERRUPT_CONFIG)
+        interrupt_config = self._i2c.read_byte(self.address, self.INTERRUPT_CONFIG)
         self.clicked_enable = 1
         # Set the clicked_enable bit
         interrupt_config = interrupt_config | self.clicked_enable
         # Write the new interrupt configure byte
-        self._i2c.writeByte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
+        self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
 
     # -------------------------------------------------------
     # disable_clicked_interrupt()
@@ -379,12 +372,12 @@ class QwiicButton(object):
         @return **Void** Nothing
         """
         # First, read the INTERRUPT_CONFIG register
-        interrupt_config = self._i2c.readByte(self.address, self.INTERRUPT_CONFIG)
+        interrupt_config = self._i2c.read_byte(self.address, self.INTERRUPT_CONFIG)
         self.clicked_enable = 0
         # Clear the clicked_enable bit
         interrupt_config = interrupt_config & (self.clicked_enable)
         # Write the new interrupt configure byte
-        self._i2c.writeByte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
+        self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
     
     # -------------------------------------------------------
     # available()
@@ -399,7 +392,7 @@ class QwiicButton(object):
             :rtye: bool
         """
         # First, read BUTTON_STATUS register
-        button_status = self._i2c.readByte(self.address, self.BUTTON_STATUS)
+        button_status = self._i2c.read_byte(self.address, self.BUTTON_STATUS)
         # Convert to binary and clear all bits but the event_available bit
         self.event_available = int(button_status) & ~(0xFE)
         # Return event_available bit as a bool
@@ -418,11 +411,11 @@ class QwiicButton(object):
         @return **Void** Nothing
         """
         # First, read BUTTON_STATUS register
-        button_status = self._i2c.readByte(self.address, self.BUTTON_STATUS)
+        button_status = self._i2c.read_byte(self.address, self.BUTTON_STATUS)
         # Convert to binary and clear the last three bits
         button_status = int(button_status) & ~(0x7)
         # Write to BUTTON_STATUS register
-        self._i2c.writeByte(self.address, self.BUTTON_STATUS, button_status)
+        self._i2c.write_byte(self.address, self.BUTTON_STATUS, button_status)
         
     # -------------------------------------------------------
     # reset_interrupt_config()
@@ -438,14 +431,14 @@ class QwiicButton(object):
         self.pressed_enable = 1
         self.clicked_enable = 1
         # write 0b11 to the INTERRUPT_CONFIG register
-        self._i2c.writeByte(self.address, self.INTERRUPT_CONFIG, 0b11)
+        self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, 0b11)
         self.event_available = 0
         # Clear has_been_clicked, is_pressed too
         # TODO: not sure if this is right
         self.has_been_clicked = 0
         self.is_pressed = 0
         # Clear the BUTTON_STATUS register by writing a 0
-        self._i2c.writeByte(self.address, self.BUTTON_STATUS, 0x00)
+        self._i2c.write_byte(self.address, self.BUTTON_STATUS, 0x00)
     
     # -------------------------------------------------------
     # is_pressed_queue_full()
@@ -459,7 +452,7 @@ class QwiicButton(object):
         @return **bool** pressed_is_full
         """
         # First, read the PRESSED_QUEUE_STATUS register
-        pressed_queue_stat = self._i2c.readByte(self.address, self.PRESSED_QUEUE_STATUS)
+        pressed_queue_stat = self._i2c.read_byte(self.address, self.PRESSED_QUEUE_STATUS)
         # Convert to binary and clear all bits but isFull
         self.pressed_is_full = int(pressed_queue_stat) & ~(0xFB)
         self.pressed_is_full = self.pressed_is_full >> 2
@@ -478,7 +471,7 @@ class QwiicButton(object):
         @return **bool** pressed_is_empty
         """
         # First, read the PRESSED_QUEUE_STATUS register
-        pressed_queue_stat = self._i2c.readByte(self.address, self.PRESSED_QUEUE_STATUS)
+        pressed_queue_stat = self._i2c.read_byte(self.address, self.PRESSED_QUEUE_STATUS)
         # Convert to binary and clear all bits but is_empty
         self.pressed_is_empty = int(pressed_queue_stat) & ~(0xFD)
         # Shift pressed_is_empty to the zero bit
@@ -499,7 +492,7 @@ class QwiicButton(object):
 
         @return **int** PRESSED_QUEUE_FRONT
         """
-        time_list = self._i2c.readBlock(self.address, self.PRESSED_QUEUE_FRONT, 4)
+        time_list = self._i2c.read_block(self.address, self.PRESSED_QUEUE_FRONT, 4)
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6) 
         return time
         
@@ -516,7 +509,7 @@ class QwiicButton(object):
 
         @return **int** PRESSED_QUEUE_BACK
         """
-        time_list = self._i2c.readBlock(self.address, self.PRESSED_QUEUE_BACK, 4)
+        time_list = self._i2c.read_block(self.address, self.PRESSED_QUEUE_BACK, 4)
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6)
         return time
         
@@ -536,11 +529,11 @@ class QwiicButton(object):
         # Get the time in milliseconds since the button was first pressed
         temp_data = self.time_since_first_press()
         # Read PRESSED_QUEUE_STATUS register
-        pressed_queue_stat = self._i2c.readByte(self.address, self.PRESSED_QUEUE_STATUS)
+        pressed_queue_stat = self._i2c.read_byte(self.address, self.PRESSED_QUEUE_STATUS)
         self.pressed_pop_request = 1
         # Set pop_request bit to 1
         pressed_queue_stat = pressed_queue_stat | (self.pressed_pop_request)
-        self._i2c.writeByte(self.address, self.PRESSED_QUEUE_STATUS, pressed_queue_stat)
+        self._i2c.write_byte(self.address, self.PRESSED_QUEUE_STATUS, pressed_queue_stat)
         return temp_data
     
     # ---------------------------------------------------------
@@ -555,7 +548,7 @@ class QwiicButton(object):
         @return **bool** clicked_is_full
         """
         # First, read the CLICKED_QUEUE_STATUS register
-        clicked_queue_stat = self._i2c.readByte(self.address, self.CLICKED_QUEUE_STATUS)
+        clicked_queue_stat = self._i2c.read_byte(self.address, self.CLICKED_QUEUE_STATUS)
         # Convert to binary and clear all bits but clicked_is_full
         self.clicked_is_full = int(clicked_queue_stat) & ~(0xFB)
         self.clicked_is_full = self.clicked_is_full >> 2
@@ -574,7 +567,7 @@ class QwiicButton(object):
         @return **bool** clicked_is_empty
         """
         # First, read the CLICKED_QUEUE_STATUS register
-        clicked_queue_stat = self._i2c.readByte(self.address, self.CLICKED_QUEUE_STATUS)
+        clicked_queue_stat = self._i2c.read_byte(self.address, self.CLICKED_QUEUE_STATUS)
         # Convert to binary and clear all bits but clicked_is_empty
         self.clicked_is_empty = int(clicked_queue_stat) & ~(0xFD)
         # Shift clicked_is_empty to the zero bit
@@ -595,7 +588,7 @@ class QwiicButton(object):
 
         @return **int** CLICKED_QUEUE_FRONT
         """
-        time_list = self._i2c.readBlock(self.address, self.CLICKED_QUEUE_FRONT, 4)
+        time_list = self._i2c.read_block(self.address, self.CLICKED_QUEUE_FRONT, 4)
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6)
         return time
         
@@ -612,7 +605,7 @@ class QwiicButton(object):
 
         @return **int** CLICKED_QUEUE_BACK
         """
-        time_list = self._i2c.readBlock(self.address, self.CLICKED_QUEUE_BACK, 4)
+        time_list = self._i2c.read_block(self.address, self.CLICKED_QUEUE_BACK, 4)
         time = int(time_list[0]) + int(time_list[1]) * 16 ** (2) + int(time_list[2]) * 16 ** (4) + int(time_list[3]) * 16 ** (6)
         return time
         
@@ -632,19 +625,19 @@ class QwiicButton(object):
         # Get the time in milliseconds since the button was first clicked
         temp_data = self.time_since_first_click()
         # Read CLICKED_QUEUE_STATUS register
-        clicked_queue_stat = self._i2c.readByte(self.address, self.CLICKED_QUEUE_STATUS)
+        clicked_queue_stat = self._i2c.read_byte(self.address, self.CLICKED_QUEUE_STATUS)
         self.clicked_pop_request = 1
         # Set pop_request bit to 1
         clicked_queue_stat = clicked_queue_stat | (self.clicked_pop_request)
-        self._i2c.writeByte(self.address, self.CLICKED_QUEUE_STATUS, clicked_queue_stat)
+        self._i2c.write_byte(self.address, self.CLICKED_QUEUE_STATUS, clicked_queue_stat)
         return temp_data
 
     # -------------------------------------------------------------
-    # LED_config(brightness, cycle_time, off_time, granularity)
+    # led_config(brightness, cycle_time, off_time, granularity)
     #
     # Configures the LED with the given max brightness, granularity
     # (1 is fine for most applications), cycle time, and off time.
-    def LED_config(self, brightness, cycle_time, off_time, granularity = 1):
+    def led_config(self, brightness, cycle_time, off_time, granularity = 1):
         """!
         Write brightness, cycle_time, off_time, and granularity
             parameters to their respective registers: LED_BRIGHTNESS,
@@ -661,19 +654,19 @@ class QwiicButton(object):
         @return **Void** Nothing
         """
         # Write brightness
-        self._i2c.writeByte(self.address, self.LED_BRIGHTNESS, brightness)
+        self._i2c.write_byte(self.address, self.LED_BRIGHTNESS, brightness)
         # Write cycle_time
-        self._i2c.writeWord(self.address, self.LED_PULSE_CYCLE_TIME, cycle_time)
+        self._i2c.write_word(self.address, self.LED_PULSE_CYCLE_TIME, cycle_time)
         # Write off_time
-        self._i2c.writeWord(self.address, self.LED_PULSE_OFF_TIME, off_time)
+        self._i2c.write_word(self.address, self.LED_PULSE_OFF_TIME, off_time)
         # Write granularity
-        self._i2c.writeByte(self.address, self.LED_PULSE_GRANULARITY, granularity)
+        self._i2c.write_byte(self.address, self.LED_PULSE_GRANULARITY, granularity)
     
     # --------------------------------------------------------------
-    # LED_off()
+    # led_off()
     #
     # Turn the onboard LED off
-    def LED_off(self):
+    def led_off(self):
         """!
         Write zero's to all the LED registers: LED_BRIGHTNESS,
             LED_PULSE_CYCLE_TIME, LED_PULSE_OFF_TIME, and LED_PULSE_GRANULARITY
@@ -681,15 +674,15 @@ class QwiicButton(object):
 
         @return **void** Nothing
         """
-        self.LED_config(0, 0, 0)
+        self.led_config(0, 0, 0)
     
     # --------------------------------------------------------------
-    # LED_on(brightness)
+    # led_on(brightness)
     #
     # Turns the onboard LED on with specified brightness. Set brightness
     # to an integer between 0 and 255, where 0 is off and 255 is max
     # brightness.
-    def LED_on(self, brightness):
+    def led_on(self, brightness):
         """!
         Set LED on without pulse
 
@@ -697,4 +690,4 @@ class QwiicButton(object):
 
         @return **Void** Nothing
         """
-        self.LED_config(brightness, 0, 0)
+        self.led_config(brightness, 0, 0)

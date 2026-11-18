@@ -36,49 +36,49 @@
 
 import qwiic_scd4x
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic SCD4x Example 4 - Skip Stop Periodic Measurement\n")
 
 	# Create instance of device
 	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
 	# Check if it's connected
-	if mySCD4x.is_connected() == False:
+	if not mySCD4x.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
 
 	# begin() has three boolean parameters:
-   	# measBegin: set to true to begin periodic measurements automatically;
+   	# meas_begin: set to true to begin periodic measurements automatically;
     #            set to false to leave periodic measurements disabled.
     #            Default is true.
-   	# autoCalibrate: set to true to leave automatic calibration enabled;
+   	# auto_calibrate: set to true to leave automatic calibration enabled;
     #                set to false to disable automatic calibration.
     #                Default is true.
-   	# skipStopPeriodicMeasurements: set to true to make begin() skip the initial call of stopPeriodicMeasurement;
+   	# skip_stop_periodic_measurement: set to true to make begin() skip the initial call of stop_periodic_measurement;
     #                               set to false to make begin() stop periodic measurements before doing anything else.
     #                               Default is false.
 
 	# When periodic measurements are enabled, the SCD4x will only repond to:
-	# readMeasurement; stopPeriodicMeasurement; setAmbientPressure; and getDataReadyStatus. All other commands are ignored.
+	# read_measurement; stop_periodic_measurement; set_ambient_pressure; and get_data_ready_status. All other commands are ignored.
 	
-	# Because begin() uses getSerialNumber to check if the SCD4x is connected, begin() would fail if a previous example had
-	# left periodic measurements enabled. So, by default, begin() will call stopPeriodicMeasurement before calling
-	# getSerialNumber. The down side to this is that stopPeriodicMeasurement takes 500ms to complete, incorporating a
+	# Because begin() uses get_serial_number to check if the SCD4x is connected, begin() would fail if a previous example had
+	# left periodic measurements enabled. So, by default, begin() will call stop_periodic_measurement before calling
+	# get_serial_number. The down side to this is that stop_periodic_measurement takes 500ms to complete, incorporating a
 	# blocking call of delay(500). If the user is confident that periodic measurements are already disabled,
-	# skipStopPeriodicMeasurements can be set to true to skip the initial call of stopPeriodicMeasurement.
+	# skip_stop_periodic_measurement can be set to true to skip the initial call of stop_periodic_measurement.
 	# In this example, we will tell begin() to: enable periodic measurements; enable auto calibration;
-	# and skip the initial stopPeriodicMeasurement to save that 500ms delay.
-	# Instead we can manually call stopPeriodicMeasurement first:
+	# and skip the initial stop_periodic_measurement to save that 500ms delay.
+	# Instead we can manually call stop_periodic_measurement first:
 	
-	#It is OK to call stopPeriodicMeasurement before begin()
+	#It is OK to call stop_periodic_measurement before begin()
 	mySCD4x.stop_periodic_measurement()
 
-	# Now we call begin() and set skipStopPeriodicMeasurement to true
-	if mySCD4x.begin(skipStopPeriodicMeasurement=True) == False:
+	# Now we call begin() and set skip_stop_periodic_measurement to true
+	if not mySCD4x.begin(skip_stop_periodic_measurement=True):
 		print("Error while initializing device", file=sys.stderr)
 		return
 
@@ -90,11 +90,11 @@ def runExample():
 		else:
 			print(".", end="")
 		
-		time.sleep(0.5) # Only check for new data every 0.5 second
+		qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 second
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

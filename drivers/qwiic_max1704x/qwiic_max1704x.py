@@ -48,6 +48,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -68,92 +70,95 @@ class QwiicMAX1704X(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Device types:
-    kDeviceTypeMAX17043 = 0
-    kDeviceTypeMAX17044 = 1
-    kDeviceTypeMAX17048 = 2
-    kDeviceTypeMAX17049 = 3
+    DEVICE_TYPE_MAX17043 = 0
+    DEVICE_TYPE_MAX17044 = 1
+    DEVICE_TYPE_MAX17048 = 2
+    DEVICE_TYPE_MAX17049 = 3
 
     # Register Map
-    kRegVcell = 0x02          # R - 12-bit A/D measurement of battery voltage
-    kRegSoc = 0x04            # R - 16-bit state of charge (SOC)
-    kRegMode = 0x06           # W - Sends special commands to IC
-    kRegVersion = 0x08        # R - Returns IC version
-    kRegHibRt = 0x0A          # R/W - (MAX17048/49) Thresholds for entering hibernate
-    kRegConfig = 0x0C         # R/W - Battery compensation (default 0x971C)
-    kRegCValrt = 0x14         # R/W - (MAX17048/49) Configures vcell range to generate alerts (default 0x00FF)
-    kRegCRate = 0x16          # R - (MAX17048/49) Charge rate 0.208%/hr
-    kRegVResetId = 0x18       # R/W - (MAX17048/49) Reset voltage and ID (default 0x96__)
-    kRegStatus = 0x1A         # R/W - (MAX17048/49) Status of ID (default 0x01__)
-    kRegCommand = 0xFE        # W - Sends special commands to IC
+    REG_VCELL = 0x02          # R - 12-bit A/D measurement of battery voltage
+    REG_SOC = 0x04            # R - 16-bit state of charge (SOC)
+    REG_MODE = 0x06           # W - Sends special commands to IC
+    REG_VERSION = 0x08        # R - Returns IC version
+    REG_HIBRT = 0x0A          # R/W - (MAX17048/49) Thresholds for entering hibernate
+    REG_CONFIG = 0x0C         # R/W - Battery compensation (default 0x971C)
+    REG_CVALRT = 0x14         # R/W - (MAX17048/49) Configures vcell range to generate alerts (default 0x00FF)
+    REG_CRATE = 0x16          # R - (MAX17048/49) Charge rate 0.208%/hr
+    REG_VRESET_ID = 0x18       # R/W - (MAX17048/49) Reset voltage and ID (default 0x96__)
+    REG_STATUS = 0x1A         # R/W - (MAX17048/49) Status of ID (default 0x01__)
+    REG_COMMAND = 0xFE        # W - Sends special commands to IC
 
     # MAX17043 Mode Coms
-    kModeQuickStart = 0x4000  # On the MAX17048/49 this also clears the EnSleep bit
+    MODE_QUICK_START = 0x4000  # On the MAX17048/49 this also clears the EnSleep bit
 
     # MAX17048 Mode Coms
-    kModeEnSleep = 0x2000  # Enables sleep mode (the SLEEP bit in the CONFIG reg engages sleep)
-    kModeHibStat = 0x1000  # Indicates when the IC is in hibernate mode
+    MODE_EN_SLEEP = 0x2000  # Enables sleep mode (the SLEEP bit in the CONFIG reg engages sleep)
+    MODE_HIB_STAT = 0x1000  # Indicates when the IC is in hibernate mode
 
     # VResetId Shifts and Masks (Only applicable for Max17048/49)
-    kVResetIdVResetShift = 9
-    kVResetIdVResetMask = 0x7F << kVResetIdVResetShift
+    VRESET_ID_VRESET_SHIFT = 9
+    VRESET_ID_VRESET_MASK = 0x7F << VRESET_ID_VRESET_SHIFT
 
-    kVResetIdComparatorDisShift = 8
-    kVResetIdComparatorDisMask = 0x01 << kVResetIdComparatorDisShift
+    VRESET_ID_COMPARATOR_DIS_SHIFT = 8
+    VRESET_ID_COMPARATOR_DIS_MASK = 0x01 << VRESET_ID_COMPARATOR_DIS_SHIFT
 
     # Status Shifts and Masks (Only applicable for Max17048/49)
-    kStatusShift = 8
-    kStatusMask = 0x7F << kStatusShift
+    STATUS_SHIFT = 8
+    STATUS_MASK = 0x7F << STATUS_SHIFT
 
-    kStatusRiShift = 8
-    kStatusRiMask = 0x01 << kStatusRiShift
+    STATUS_RI_SHIFT = 8
+    STATUS_RI_MASK = 0x01 << STATUS_RI_SHIFT
 
-    kStatusVhShift = 9
-    kStatusVhMask = 0x01 << kStatusVhShift
+    STATUS_VH_SHIFT = 9
+    STATUS_VH_MASK = 0x01 << STATUS_VH_SHIFT
 
-    kStatusVlShift = 10
-    kStatusVlMask = 0x01 << kStatusVlShift
+    STATUS_VL_SHIFT = 10
+    STATUS_VL_MASK = 0x01 << STATUS_VL_SHIFT
 
-    kStatusVrShift = 11
-    kStatusVrMask = 0x01 << kStatusVrShift
+    STATUS_VR_SHIFT = 11
+    STATUS_VR_MASK = 0x01 << STATUS_VR_SHIFT
 
-    kStatusHdShift = 12
-    kStatusHdMask = 0x01 << kStatusHdShift
+    STATUS_HD_SHIFT = 12
+    STATUS_HD_MASK = 0x01 << STATUS_HD_SHIFT
 
-    kStatusScShift = 13
-    kStatusScMask = 0x01 << kStatusScShift
+    STATUS_SC_SHIFT = 13
+    STATUS_SC_MASK = 0x01 << STATUS_SC_SHIFT
 
-    kStatusEnVrShift = 14
-    kStatusEnVrMask = 0x01 << kStatusEnVrShift
+    STATUS_EN_VR_SHIFT = 14
+    STATUS_EN_VR_MASK = 0x01 << STATUS_EN_VR_SHIFT
 
     # Config Shifts and Masks
-    kConfigAlertShift = 5
-    kConfigAlertMask = 0x01 << kConfigAlertShift
+    CONFIG_ALERT_SHIFT = 5
+    CONFIG_ALERT_MASK = 0x01 << CONFIG_ALERT_SHIFT
 
-    kConfigSocAlertShift = 6
-    kConfigSocAlertMask = 0x01 << kConfigSocAlertShift
+    CONFIG_SOC_ALERT_SHIFT = 6
+    CONFIG_SOC_ALERT_MASK = 0x01 << CONFIG_SOC_ALERT_SHIFT
 
-    kConfigSleepShift = 7
-    kConfigSleepMask = 0x01 << kConfigSleepShift
+    CONFIG_SLEEP_SHIFT = 7
+    CONFIG_SLEEP_MASK = 0x01 << CONFIG_SLEEP_SHIFT
 
-    kConfigThresholdShift = 0
-    kConfigThresholdMask = 0x1F << kConfigThresholdShift
+    CONFIG_THRESHOLD_SHIFT = 0
+    CONFIG_THRESHOLD_MASK = 0x1F << CONFIG_THRESHOLD_SHIFT
 
-    kConfigCompShift = 8
-    kConfigCompMask = 0xFF << kConfigCompShift
+    CONFIG_COMP_SHIFT = 8
+    CONFIG_COMP_MASK = 0xFF << CONFIG_COMP_SHIFT
 
     # MAX17048 Hibernate Modes
-    kMax17048HibRtEnHib = 0xFFFF  # always use hibernate mode
-    kMax17048HibRtDisHib = 0x0000  # disable hibernate mode
+    MAX17048_HIBRT_EN_HIB = 0xFFFF  # always use hibernate mode
+    MAX17048_HIBRT_DIS_HIB = 0x0000  # disable hibernate mode
 
-    def __init__(self, address=None, i2c_driver=None, device_type = kDeviceTypeMAX17043):
+    def __init__(self, address=None, i2c_bus=None, device_type = DEVICE_TYPE_MAX17043):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
+        @param device_type: **int, optional** DEVICE_TYPE_MAX17043 (default),
+            DEVICE_TYPE_MAX17044, DEVICE_TYPE_MAX17048 or DEVICE_TYPE_MAX17049
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -161,17 +166,11 @@ class QwiicMAX1704X(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # Default to MAX17043, and full-scale for MAX17043
-        self._device = self.kDeviceTypeMAX17043
+        self._device = self.DEVICE_TYPE_MAX17043
         self._full_scale = 5.12
         self.set_device(device_type)
 
@@ -184,21 +183,19 @@ class QwiicMAX1704X(object):
         # Check if connected by seeing if an ACK is received
         # TODO: If the device has a product ID register, that should be
         # checked in addition to the ACK
-        if not self._i2c.isDeviceConnected(self.address):
+        if not self._i2c.is_device_connected(self.address):
             return False
         
-        version = self.read16(self.address, self.kRegVersion)
+        version = self.read16(self.address, self.REG_VERSION)
 
         # Extra test - but only for MAX17048/9
-        if self._device >= self.kDeviceTypeMAX17048:
+        if self._device >= self.DEVICE_TYPE_MAX17048:
             # Get version should return 0x001_
             # Supported on 48/49
             if version & (1 << 4) == 0:
                 return False
         
         return True
-
-    connected = property(is_connected)
 
     def begin(self):
         """!
@@ -214,16 +211,16 @@ class QwiicMAX1704X(object):
         """!
         Set the device type. Do this after instantiation but before .begin()
 
-        @param int device_type: The device type to set
+        @param device_type: **int** The device type to set
         """
         self._device = device_type
 
         # Define the full-scale voltage for VCELL based on the device
-        if device_type == self.kDeviceTypeMAX17044:
+        if device_type == self.DEVICE_TYPE_MAX17044:
             self._full_scale = 10.24  # MAX17044 VCELL is 12-bit, 2.50mV per LSB
-        elif device_type == self.kDeviceTypeMAX17048:
+        elif device_type == self.DEVICE_TYPE_MAX17048:
             self._full_scale = 5.12  # MAX17048 VCELL is 16-bit, 78.125uV/cell per LSB
-        elif device_type == self.kDeviceTypeMAX17049:
+        elif device_type == self.DEVICE_TYPE_MAX17049:
             self._full_scale = 10.24  # MAX17049 VCELL is 16-bit, 78.125uV/cell per LSB (i.e. 156.25uV per LSB)
         else:  # Default is the MAX17043
             self._full_scale = 5.12  # MAX17043 VCELL is 12-bit, 1.25mV per LSB
@@ -239,7 +236,7 @@ class QwiicMAX1704X(object):
 
         Note: on the MAX17048/49 this will also clear / disable EnSleep bit
         """
-        self.write16(self.address, self.kRegMode, self.kModeQuickStart)
+        self.write16(self.address, self.REG_MODE, self.MODE_QUICK_START)
 
     def get_voltage(self):
         """!
@@ -248,9 +245,9 @@ class QwiicMAX1704X(object):
 
         @return **float** The voltage as a floating point value
         """
-        vcell = self.read16(self.address, self.kRegVcell)
+        vcell = self.read16(self.address, self.REG_VCELL)
         
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             # On the MAX17043/44: vCell is a 12-bit register where each bit represents:
             # 1.25mV on the MAX17043
             # 2.5mV on the MAX17044
@@ -275,7 +272,7 @@ class QwiicMAX1704X(object):
         @return **float** The state of charge as a percentage
         """
 
-        soc = self.read16(self.address, self.kRegSoc)
+        soc = self.read16(self.address, self.REG_SOC)
         percent = (soc & 0xFF00) >> 8
         percent += (soc & 0x00FF) / 256.0
         return percent
@@ -287,7 +284,7 @@ class QwiicMAX1704X(object):
 
         @return **int** The version number
         """
-        return self.read16(self.address, self.kRegVersion)
+        return self.read16(self.address, self.REG_VERSION)
 
     def get_id(self):
         """!
@@ -297,10 +294,10 @@ class QwiicMAX1704X(object):
         Writes to these bits are ignored.
         """
         
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return 0
         
-        vreset_id = self.read16(self.address, self.kRegVResetId)
+        vreset_id = self.read16(self.address, self.REG_VRESET_ID)
         return vreset_id & 0xFF
 
     def set_reset_voltage_threshold(self, threshold):
@@ -315,29 +312,29 @@ class QwiicMAX1704X(object):
         Input: [threshold] - Should be a value between 0-127.
         Output: 0 on success, positive integer on fail.
 
-        @param int threshold: The threshold value to set
+        @param threshold: **int** The threshold value to set
 
         @return  True if successful, otherwise False
         
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
         if threshold < 0 or threshold > 127:
             return False
         
-        vreset_id = self.read16(self.address, self.kRegVResetId)
-        vreset_id &= (~self.kVResetIdVResetMask)
-        vreset_id |= threshold << self.kVResetIdVResetShift
+        vreset_id = self.read16(self.address, self.REG_VRESET_ID)
+        vreset_id &= (~self.VRESET_ID_VRESET_MASK)
+        vreset_id |= threshold << self.VRESET_ID_VRESET_SHIFT
         
-        self.write16(self.address, self.kRegVResetId, vreset_id)
+        self.write16(self.address, self.REG_VRESET_ID, vreset_id)
 
     def set_reset_voltage_volts(self, threshold_volts):
         """!
         Helper function to set the reset voltage threshold in volts
 
-        @param float threshold_volts: The threshold voltage to set
+        @param threshold_volts: **float** The threshold voltage to set
 
         @return **bool** True if successful, otherwise False
         """
@@ -354,12 +351,12 @@ class QwiicMAX1704X(object):
         @return **bool** True if successful, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        vreset_id = self.read16(self.address, self.kRegVResetId)
-        vreset_id &= (~self.kVResetIdComparatorDisMask)
-        self.write16(self.address, self.kRegVResetId, vreset_id)
+        vreset_id = self.read16(self.address, self.REG_VRESET_ID)
+        vreset_id &= (~self.VRESET_ID_COMPARATOR_DIS_MASK)
+        self.write16(self.address, self.REG_VRESET_ID, vreset_id)
 
     def disable_comparator(self):
         """!
@@ -369,12 +366,12 @@ class QwiicMAX1704X(object):
         @return **bool** True if successful, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        vreset_id = self.read16(self.address, self.kRegVResetId)
-        vreset_id |= self.kVResetIdComparatorDisMask
-        self.write16(self.address, self.kRegVResetId, vreset_id)
+        vreset_id = self.read16(self.address, self.REG_VRESET_ID)
+        vreset_id |= self.VRESET_ID_COMPARATOR_DIS_MASK
+        self.write16(self.address, self.REG_VRESET_ID, vreset_id)
 
     def get_change_rate(self):
         """!
@@ -383,10 +380,10 @@ class QwiicMAX1704X(object):
         A positive rate is charging, negative is discharge.
         """
             
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return 0
         
-        crate = self.read16(self.address, self.kRegCRate)
+        crate = self.read16(self.address, self.REG_CRATE)
 
         # convert from unsinged to signed 16-bit
         if crate > 32767:
@@ -402,43 +399,43 @@ class QwiicMAX1704X(object):
         @return **int** 7-bit value indicating various alerts
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return 0
 
-        status = self.read16(self.address, self.kRegStatus)
-        return (status & self.kStatusMask) >> self.kStatusShift
+        status = self.read16(self.address, self.REG_STATUS)
+        return (status & self.STATUS_MASK) >> self.STATUS_SHIFT
     
     def clear_status_reg_bits(self, mask):
         """!
         clear_status_reg_bits() - (MAX17048/49) Clear the specified mask in the status reg
 
-        @param int mask: The mask to clear
+        @param mask: **int** The mask to clear
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
+        status = self.read16(self.address, self.REG_STATUS)
         status &= ~mask
-        self.write16(self.address, self.kRegStatus, status)
+        self.write16(self.address, self.REG_STATUS, status)
 
     def is_reset(self, clear = False):
         """!
         is_reset() - (MAX17048/49) Check if the reset bit is set in the status register
 
-        @param bool clear: If True, the reset bit is cleared
+        @param clear: **bool** If True, the reset bit is cleared
 
         @return **bool** True if the reset bit is set, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        reset = (status & self.kStatusRiMask) == self.kStatusRiMask
+        status = self.read16(self.address, self.REG_STATUS)
+        reset = (status & self.STATUS_RI_MASK) == self.STATUS_RI_MASK
 
         if clear and reset:
-            self.clear_status_reg_bits(self.kStatusRiMask)
+            self.clear_status_reg_bits(self.STATUS_RI_MASK)
         
         return reset
         
@@ -446,19 +443,19 @@ class QwiicMAX1704X(object):
         """!
         is_voltage_high() - (MAX17048/49) Check if the voltage high bit is set in the status register
 
-        @param bool clear: If True, the voltage high bit is cleared
+        @param clear: **bool** If True, the voltage high bit is cleared
 
         @return **bool** True if the voltage high bit is set, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        vh = (status & self.kStatusVhMask) == self.kStatusVhMask
+        status = self.read16(self.address, self.REG_STATUS)
+        vh = (status & self.STATUS_VH_MASK) == self.STATUS_VH_MASK
 
         if clear and vh:
-            self.clear_status_reg_bits(self.kStatusVhMask)
+            self.clear_status_reg_bits(self.STATUS_VH_MASK)
         
         return vh
 
@@ -466,19 +463,19 @@ class QwiicMAX1704X(object):
         """!
         is_voltage_low() - (MAX17048/49) Check if the voltage low bit is set in the status register
 
-        @param bool clear: If True, the voltage low bit is cleared
+        @param clear: **bool** If True, the voltage low bit is cleared
 
         @return **bool** True if the voltage low bit is set, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        vl = (status & self.kStatusVlMask) == self.kStatusVlMask
+        status = self.read16(self.address, self.REG_STATUS)
+        vl = (status & self.STATUS_VL_MASK) == self.STATUS_VL_MASK
 
         if clear and vl:
-            self.clear_status_reg_bits(self.kStatusVlMask)
+            self.clear_status_reg_bits(self.STATUS_VL_MASK)
         
         return vl
     
@@ -486,19 +483,19 @@ class QwiicMAX1704X(object):
         """!
         is_voltage_reset() - (MAX17048/49) Check if the voltage reset bit is set in the status register
 
-        @param bool clear: If True, the voltage reset bit is cleared
+        @param clear: **bool** If True, the voltage reset bit is cleared
 
         @return **bool** True if the voltage reset bit is set, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        vr = (status & self.kStatusVrMask) == self.kStatusVrMask
+        status = self.read16(self.address, self.REG_STATUS)
+        vr = (status & self.STATUS_VR_MASK) == self.STATUS_VR_MASK
 
         if clear and vr:
-            self.clear_status_reg_bits(self.kStatusVrMask)
+            self.clear_status_reg_bits(self.STATUS_VR_MASK)
         
         return vr
     
@@ -506,19 +503,19 @@ class QwiicMAX1704X(object):
         """!
         is_low() - (MAX17048/49) Check if the low bit is set in the status register
 
-        @param bool clear: If True, the low bit is cleared
+        @param clear: **bool** If True, the low bit is cleared
 
         @return **bool** True if the low bit is set, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        hd = (status & self.kStatusHdMask) == self.kStatusHdMask
+        status = self.read16(self.address, self.REG_STATUS)
+        hd = (status & self.STATUS_HD_MASK) == self.STATUS_HD_MASK
 
         if clear and hd:
-            self.clear_status_reg_bits(self.kStatusHdMask)
+            self.clear_status_reg_bits(self.STATUS_HD_MASK)
         
         return hd
     
@@ -526,46 +523,46 @@ class QwiicMAX1704X(object):
         """!
         is_change() - (MAX17048/49) Check if the change bit is set in the status register
 
-        @param bool clear: If True, the change bit is cleared
+        @param clear: **bool** If True, the change bit is cleared
 
         @return **bool** True if the change bit is set, otherwise False
         """
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        sc = (status & self.kStatusScMask) >> self.kStatusScShift
+        status = self.read16(self.address, self.REG_STATUS)
+        sc = (status & self.STATUS_SC_MASK) >> self.STATUS_SC_SHIFT
 
         if clear and sc:
-            self.clear_status_reg_bits(self.kStatusScMask)
+            self.clear_status_reg_bits(self.STATUS_SC_MASK)
         
         return sc
     
     def clear_alert(self):
         """!
-        clearAlert() - Clear the MAX1704X's ALRT alert flag.
+        clear_alert() - Clear the MAX1704X's ALRT alert flag.
         """
 
-        config = self.read16(self.address, self.kRegConfig)
-        config &= ~self.kConfigAlertMask
-        self.write16(self.address, self.kRegConfig, config)
+        config = self.read16(self.address, self.REG_CONFIG)
+        config &= ~self.CONFIG_ALERT_MASK
+        self.write16(self.address, self.REG_CONFIG, config)
 
     def get_alert(self, clear = False):
         """!
         get_alert() - Check if the MAX1704X's ALRT alert interrupt has been triggered.
 
-        @param bool clear: If True, the alert flag will be cleared if it was set
+        @param clear: **bool** If True, the alert flag will be cleared if it was set
 
         @return  True if the alert interrupt is/was triggered, otherwise False
         
         """
         
-        config = self.read16(self.address, self.kRegConfig)
-        alert = (config & self.kConfigAlertMask) == self.kConfigAlertMask
+        config = self.read16(self.address, self.REG_CONFIG)
+        alert = (config & self.CONFIG_ALERT_MASK) == self.CONFIG_ALERT_MASK
 
         if clear and alert:
-            config &= ~self.kConfigAlertMask
-            self.write16(self.address, self.kRegConfig, config)
+            config &= ~self.CONFIG_ALERT_MASK
+            self.write16(self.address, self.REG_CONFIG, config)
         
         return alert
 
@@ -576,16 +573,16 @@ class QwiicMAX1704X(object):
         @return **bool** True if successful, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        config = self.read16(self.address, self.kRegConfig)
-        config |= self.kConfigSocAlertMask
-        self.write16(self.address, self.kRegConfig, config)
+        config = self.read16(self.address, self.REG_CONFIG)
+        config |= self.CONFIG_SOC_ALERT_MASK
+        self.write16(self.address, self.REG_CONFIG, config)
 
         # TODO: this check below existed for the arduino lib, but not sure it's needed
-        config = self.read16(self.address, self.kRegConfig)
-        return (config & self.kConfigSocAlertMask) == self.kConfigSocAlertMask
+        config = self.read16(self.address, self.REG_CONFIG)
+        return (config & self.CONFIG_SOC_ALERT_MASK) == self.CONFIG_SOC_ALERT_MASK
     
     def disable_soc_alert(self):
         """!
@@ -594,16 +591,16 @@ class QwiicMAX1704X(object):
         @return **bool** True if successful, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        config = self.read16(self.address, self.kRegConfig)
-        config &= ~self.kConfigSocAlertMask
-        self.write16(self.address, self.kRegConfig, config)
+        config = self.read16(self.address, self.REG_CONFIG)
+        config &= ~self.CONFIG_SOC_ALERT_MASK
+        self.write16(self.address, self.REG_CONFIG, config)
 
         # TODO: this check below existed for the arduino lib, but not sure it's needed
-        config = self.read16(self.address, self.kRegConfig)
-        return (config & self.kConfigSocAlertMask) == 0
+        config = self.read16(self.address, self.REG_CONFIG)
+        return (config & self.CONFIG_SOC_ALERT_MASK) == 0
     
     def enable_alert(self):
         """!
@@ -614,13 +611,13 @@ class QwiicMAX1704X(object):
         the conditions described by the VRESET/ ID register.
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        status |= self.kStatusEnVrMask
+        status = self.read16(self.address, self.REG_STATUS)
+        status |= self.STATUS_EN_VR_MASK
 
-        self.write16(self.address, self.kRegStatus, status)
+        self.write16(self.address, self.REG_STATUS, status)
     
     def disable_alert(self):
         """!
@@ -631,13 +628,13 @@ class QwiicMAX1704X(object):
         the conditions described by the VRESET/ ID register.
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
 
-        status = self.read16(self.address, self.kRegStatus)
-        status &= ~self.kStatusEnVrMask
+        status = self.read16(self.address, self.REG_STATUS)
+        status &= ~self.STATUS_EN_VR_MASK
 
-        self.write16(self.address, self.kRegStatus, status)
+        self.write16(self.address, self.REG_STATUS, status)
     
     def get_threshold(self):
         """!
@@ -647,8 +644,8 @@ class QwiicMAX1704X(object):
         @return **int** An integer value between 1 and 32, representing a % that will trigger an alert interrupt.
         """
 
-        config = self.read16(self.address, self.kRegConfig)
-        thresh = (config & self.kConfigThresholdMask) >> self.kConfigThresholdShift
+        config = self.read16(self.address, self.REG_CONFIG)
+        thresh = (config & self.CONFIG_THRESHOLD_MASK) >> self.CONFIG_THRESHOLD_SHIFT
 
         # It has an LSb weight of 1%, and can be programmed from 1% to 32%.
         # The value is (32 - ATHD)%, e.g.: 00000=32%, 00001=31%, 11111=1%.
@@ -661,7 +658,7 @@ class QwiicMAX1704X(object):
         set_threshold() - Set the MAX17043's percentage threshold that will
         trigger an alert.
 
-        @param int percent: The percentage value that will trigger an alert interrupt.
+        @param percent: **int** The percentage value that will trigger an alert interrupt.
             Any value between 1 and 32 is valid. Default value is 0x1C == 4%
         """
 
@@ -677,11 +674,11 @@ class QwiicMAX1704X(object):
         percent = max(min(percent, 32.0), 0.0)
         thresh = 32 - percent
 
-        config = self.read16(self.address, self.kRegConfig)
-        config &= ~self.kConfigThresholdMask
-        config |= thresh << self.kConfigThresholdShift
+        config = self.read16(self.address, self.REG_CONFIG)
+        config &= ~self.CONFIG_THRESHOLD_MASK
+        config |= thresh << self.CONFIG_THRESHOLD_SHIFT
 
-        self.write16(self.address, self.kRegConfig, config)
+        self.write16(self.address, self.REG_CONFIG, config)
     
     def sleep(self):
         """!
@@ -697,15 +694,15 @@ class QwiicMAX1704X(object):
         @return **bool** True if successful, otherwise False
         """
 
-        if self._device > self.kDeviceTypeMAX17044:
-            self.write16(self.address, self.kRegMode, self.kModeEnSleep)
+        if self._device > self.DEVICE_TYPE_MAX17044:
+            self.write16(self.address, self.REG_MODE, self.MODE_EN_SLEEP)
         
-        config = self.read16(self.address, self.kRegConfig)
-        if config & self.kConfigSleepMask:
+        config = self.read16(self.address, self.REG_CONFIG)
+        if config & self.CONFIG_SLEEP_MASK:
             return False # Already asleep
         
-        config |= self.kConfigSleepMask
-        self.write16(self.address, self.kRegConfig, config)
+        config |= self.CONFIG_SLEEP_MASK
+        self.write16(self.address, self.REG_CONFIG, config)
 
         return True
     
@@ -717,18 +714,18 @@ class QwiicMAX1704X(object):
         """
 
         # Read config reg, so we don't modify any other values:
-        config_reg = self.read16(self.address, self.kRegConfig)
-        if not (config_reg & self.kConfigSleepMask):
+        config_reg = self.read16(self.address, self.REG_CONFIG)
+        if not (config_reg & self.CONFIG_SLEEP_MASK):
             return False  # Already awake, do nothing but return an error
 
-        config_reg &= ~self.kConfigSleepMask  # Clear sleep bit
+        config_reg &= ~self.CONFIG_SLEEP_MASK  # Clear sleep bit
 
-        self.write16(self.address, self.kRegConfig, config_reg)
+        self.write16(self.address, self.REG_CONFIG, config_reg)
 
-        if self._device > self.kDeviceTypeMAX17044:
+        if self._device > self.DEVICE_TYPE_MAX17044:
             # On the MAX17048, we should also clear the EnSleep bit in the MODE register
             # Strictly, this will clear the QuickStart bit too.
-            self.write16(self.address, self.kRegMode, 0x0000)
+            self.write16(self.address, self.REG_MODE, 0x0000)
         
         return True
     
@@ -748,7 +745,7 @@ class QwiicMAX1704X(object):
         # Output: Positive integer on success, 0 on fail.
 
         # TODO: will this upset our driver since we don't get an ack?
-        self.write16(self.address, self.kRegCommand, 0x5400)
+        self.write16(self.address, self.REG_COMMAND, 0x5400)
 
 
     def get_compensation(self):
@@ -758,11 +755,11 @@ class QwiicMAX1704X(object):
 
         @return **int** The compensation value
         """
-        return ( self.read16(self.address, self.kRegConfig) & 0xFF00 ) >> 8
+        return ( self.read16(self.address, self.REG_CONFIG) & 0xFF00 ) >> 8
     
-    def set_compensation(self, newCompensation):
+    def set_compensation(self, new_compensation):
         """!
-        set_compensation(newCompensation) - Set the 8-bit compensation value. This
+        set_compensation(new_compensation) - Set the 8-bit compensation value. This
         is an obscure 8-bit value that has some effect on Maxim's ModelGauge
         algorithm. The POR value of RCOMP is 0x97.
 
@@ -779,17 +776,17 @@ class QwiicMAX1704X(object):
         if (T > 20) { RCOMP = RCOMP0 + (T - 20) x TempCoUp;}
         else { RCOMP = RCOMP0 + (T - 20) x TempCoDown; }
 
-        : param newCompensation: The new compensation value to set
-        : type newCompensation: int
+        : param new_compensation: The new compensation value to set
+        : type new_compensation: int
 
         : return: True if successful, otherwise False
         : rtype: bool
         """
 
-        config = self.read16(self.address, self.kRegConfig)
-        config &= ~self.kConfigCompMask
-        config |= newCompensation << self.kConfigCompShift
-        self.write16(self.address, self.kRegConfig, config)
+        config = self.read16(self.address, self.REG_CONFIG)
+        config &= ~self.CONFIG_COMP_MASK
+        config |= new_compensation << self.CONFIG_COMP_SHIFT
+        self.write16(self.address, self.REG_CONFIG, config)
     
     def set_valrt_max(self, threshold = 0xFF):
         """!
@@ -800,28 +797,28 @@ class QwiicMAX1704X(object):
         Both registers have 1 LSb = 20mV. The IC alerts while
         VCELL > VALRT.MAX or VCELL < VALRT.MIN
 
-        @param int threshold: The threshold value to set
+        @param threshold: **int** The threshold value to set
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
         if threshold < 0 or threshold > 0xFFFF:
             return False
         
 
-        valrt = self.read16(self.address, self.kRegCValrt)
+        valrt = self.read16(self.address, self.REG_CVALRT)
         valrt &= 0xFF00
 
         valrt |= threshold
-        self.write16(self.address, self.kRegCValrt, valrt)
+        self.write16(self.address, self.REG_CVALRT, valrt)
     
 
     def set_valrt_max_volts(self, threshold_volts = 5.1):
         """!
         Helper function to set the MAX17048/49 VALRT Maximum threshold in volts
 
-        @param float threshold_volts: The threshold voltage to set
+        @param threshold_volts: **float** The threshold voltage to set
 
         @return **bool** True if successful, otherwise False
         """
@@ -838,10 +835,10 @@ class QwiicMAX1704X(object):
         @return **int** The threshold value
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return 0
         
-        valrt = self.read16(self.address, self.kRegCValrt)
+        valrt = self.read16(self.address, self.REG_CVALRT)
         return valrt & 0x00FF
 
     def set_valrt_min(self, threshold = 0x00 ):
@@ -853,26 +850,26 @@ class QwiicMAX1704X(object):
         Both registers have 1 LSb = 20mV. The IC alerts while
         VCELL > VALRT.MAX or VCELL < VALRT.MIN
 
-        @param int threshold: The threshold value to set
+        @param threshold: **int** The threshold value to set
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
         if threshold < 0 or threshold > 0xFFFF:
             return False
         
-        valrt = self.read16(self.address, self.kRegCValrt)
+        valrt = self.read16(self.address, self.REG_CVALRT)
         valrt &= 0x00FF
 
         valrt |= threshold << 8
-        self.write16(self.address, self.kRegCValrt, valrt)
+        self.write16(self.address, self.REG_CVALRT, valrt)
     
     def set_valrt_min_volts(self, threshold_volts = 0.0):
         """!
         Helper function to set the MAX17048/49 VALRT Minimum threshold in volts
 
-        @param float threshold_volts: The threshold voltage to set
+        @param threshold_volts: **float** The threshold voltage to set
 
         @return **bool** True if successful, otherwise False
         """
@@ -889,10 +886,10 @@ class QwiicMAX1704X(object):
         @return **int** The threshold value
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return 0
         
-        valrt = self.read16(self.address, self.kRegCValrt)
+        valrt = self.read16(self.address, self.REG_CVALRT)
         return (valrt & 0xFF00) >> 8
 
     def is_hibernating(self):
@@ -902,11 +899,11 @@ class QwiicMAX1704X(object):
         @return **bool** True if the IC is in hibernate mode, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        mode = self.read16(self.address, self.kRegMode)
-        return (mode & self.kModeHibStat) == self.kModeHibStat
+        mode = self.read16(self.address, self.REG_MODE)
+        return (mode & self.MODE_HIB_STAT) == self.MODE_HIB_STAT
     
     def get_hibrt_act_thr(self):
         """!
@@ -916,10 +913,10 @@ class QwiicMAX1704X(object):
         @return **int** The hibernate threshold
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return 0
         
-        hibrt = self.read16(self.address, self.kRegHibRt)
+        hibrt = self.read16(self.address, self.REG_HIBRT)
         return hibrt & 0xFF
     
     def set_hibrt_act_thr(self, threshold):
@@ -927,25 +924,25 @@ class QwiicMAX1704X(object):
         Set the MAX17048/49 HIBRT Active Threshold
         LSb = 1.25mV
         """
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
         if threshold < 0 or threshold > 0xFF:
             return False
         
-        hibrt = self.read16(self.address, self.kRegHibRt)
+        hibrt = self.read16(self.address, self.REG_HIBRT)
         hibrt &= 0xFF00
 
         hibrt |= threshold
-        self.write16(self.address, self.kRegHibRt, hibrt)
+        self.write16(self.address, self.REG_HIBRT, hibrt)
 
         return True
     
-    def get_hibrt_act_thr_volts(self, threshold_volts):
+    def set_hibrt_act_thr_volts(self, threshold_volts):
         """!
         Helper function to set the MAX17048/49 HIBRT ACT Threshold in volts
 
-        @param float threshold_volts: The threshold voltage to set
+        @param threshold_volts: **float** The threshold voltage to set
 
         @return **bool** True if successful, otherwise False
         """
@@ -962,10 +959,10 @@ class QwiicMAX1704X(object):
         @return **int** The hibernate threshold
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return 0
         
-        hibrt = self.read16(self.address, self.kRegHibRt)
+        hibrt = self.read16(self.address, self.REG_HIBRT)
         return (hibrt & 0xFF00) >> 8
     
     def set_hibrt_hib_thr(self, threshold):
@@ -973,26 +970,26 @@ class QwiicMAX1704X(object):
         Set the MAX17048/49 HIBRT Hibernate Threshold
         LSb = 1.25mV
         """
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
         if threshold < 0 or threshold > 0xFF:
             return False
         
-        hibrt = self.read16(self.address, self.kRegHibRt)
+        hibrt = self.read16(self.address, self.REG_HIBRT)
         hibrt &= 0x00FF
 
         hibrt |= threshold << 8
-        self.write16(self.address, self.kRegHibRt, hibrt)
+        self.write16(self.address, self.REG_HIBRT, hibrt)
 
         return True
 
-    def get_hibrt_hib_thr_percent(self, threshold_percent):
+    def set_hibrt_hib_thr_percent(self, threshold_percent):
         """!
         Helper function to set the MAX17048/49 HIBRT Hibernate Threshold in percent
         LSb = 0.208%/hr
 
-        @param float threshold_percent: The threshold percentage to set
+        @param threshold_percent: **float** The threshold percentage to set
 
         @return **bool** True if successful, otherwise False
         """
@@ -1008,10 +1005,10 @@ class QwiicMAX1704X(object):
         @return **bool** True if successful, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        self.write16(self.address, self.kRegHibRt, self.kModeEnHib)
+        self.write16(self.address, self.REG_HIBRT, self.MODE_EN_HIB)
 
         return True
     
@@ -1022,18 +1019,19 @@ class QwiicMAX1704X(object):
         @return **bool** True if successful, otherwise False
         """
 
-        if self._device <= self.kDeviceTypeMAX17044:
+        if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        self.write16(self.address, self.kRegHibRt, self.kModeDisHib)
+        self.write16(self.address, self.REG_HIBRT, self.MODE_DIS_HIB)
         return True
     
     def write16(self, address, register, data):
         """!
         Write 16-bit data to a register (big-endian)
 
-        @param int register: The register to write to
-        @param int data: The data to write
+        @param address: **int** The I2C address of the device
+        @param register: **int** The register to write to
+        @param data: **int** The data to write
         """
 
         bytes_to_write = [(data >> 8) & 0xFF, data & 0xFF]
@@ -1043,7 +1041,8 @@ class QwiicMAX1704X(object):
         """!
         Read 16-bit data from a register (big-endian)
 
-        @param int register: The register to read from
+        @param address: **int** The I2C address of the device
+        @param register: **int** The register to read from
 
         @return **int** The data read
         """

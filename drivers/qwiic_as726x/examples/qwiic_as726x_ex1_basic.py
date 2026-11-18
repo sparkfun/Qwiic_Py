@@ -36,7 +36,7 @@
 import qwiic_as726x
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic AS726x Example 1 - Basic\n")
 
 	# Create instance of device
@@ -54,7 +54,7 @@ def runExample():
 	while True:
 		myAS726x.take_measurements()
 		# Check which device is connected
-		if myAS726x.get_version() == myAS726x.kSensorTypeAs7262:
+		if myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7262:
 			# Visible readings
 			print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
 				myAS726x.get_calibrated_violet(),
@@ -65,7 +65,7 @@ def runExample():
 				myAS726x.get_calibrated_red()
 			), end="")
 		
-		elif myAS726x.get_version() == myAS726x.kSensorTypeAs7263:
+		elif myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7263:
 			# Near IR readings
 			print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
 				myAS726x.get_calibrated_r(),
@@ -80,7 +80,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

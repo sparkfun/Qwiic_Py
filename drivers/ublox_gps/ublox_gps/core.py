@@ -21,12 +21,10 @@ class PadByte:
     def __init__(self, repeat: int = 0):
         self.repeat = repeat
 
-    @property
-    def repeated_block(self):
+    def is_repeated_block(self):
         return False
 
-    @property
-    def fmt(self):
+    def get_fmt(self):
         """Return the format char for use with the struct package"""
         return 'x' * (self.repeat + 1)
 
@@ -65,12 +63,10 @@ class Field:
             raise ValueError('The provided _type of {} is not valid'.format(type_))
         self._type = type_
 
-    @property
-    def repeated_block(self):
+    def is_repeated_block(self):
         return False
 
-    @property
-    def fmt(self):
+    def get_fmt(self):
         """Return the format char for use with the struct package"""
 
         return (str(self._len) if self._len > 1 else '') + Field.__types__[self._type]
@@ -91,7 +87,7 @@ class Field:
                 resp[i] = float(resp[i])
         elif self._type == 'R8':
             for i in range(0, len):
-                resp[i] = double(resp[i])
+                resp[i] = float(resp[i])
         elif self._type == 'S':
             resp = [resp[0].decode('ascii').rstrip('\0')]
 
@@ -178,12 +174,10 @@ class BitField:
 
         self._nt = namedtuple(self.name, [f.name for f in self._subfields])
 
-    @property
-    def repeated_block(self):
+    def is_repeated_block(self):
         return False
 
-    @property
-    def fmt(self) -> str:
+    def get_fmt(self) -> str:
         """Return the format char for use with the struct package"""
         return BitField.__types__[self._type]
 
@@ -205,14 +199,12 @@ class RepeatedBlock:
         self.repeat = 0
         self._nt = namedtuple(self.name, [f.name for f in self._fields if hasattr(f, 'name')])
 
-    @property
-    def repeated_block(self):
+    def is_repeated_block(self):
         return True
 
-    @property
-    def fmt(self):
+    def get_fmt(self):
         """Return the format string for use with the struct package."""
-        return ''.join([field.fmt for field in self._fields]) * (self.repeat + 1)
+        return ''.join([field.get_fmt() for field in self._fields]) * (self.repeat + 1)
 
     def parse(self, it: Iterator) -> tuple:
         """Return a tuple representing the provided value/s"""
@@ -255,20 +247,18 @@ class Message:
         self._repeated_block = None
 
         for field in fields:
-            if field.repeated_block:
+            if field.is_repeated_block():
                 if self._repeated_block is not None:
                     raise ValueError('Cannot assign multiple repeated blocks to a message.')
                 self._repeated_block = field
 
-    @property
-    def id_(self):
+    def get_id(self):
         """Public read only access to the message id"""
         return self._id
 
-    @property
-    def fmt(self):
+    def get_fmt(self):
         """Return the format string for use with the struct package."""
-        return ''.join([field.fmt for field in self._fields])
+        return ''.join([field.get_fmt() for field in self._fields])
 
     def parse(self, payload: bytes) -> namedtuple:
         """Return a named tuple parsed from the provided payload.
@@ -285,22 +275,22 @@ class Message:
             pass
 
         while True:
-            fmt_len = struct.calcsize(self.fmt)
+            fmt_len = struct.calcsize(self.get_fmt())
 
             if fmt_len == payload_len:
                 break
 
             if fmt_len > payload_len:
                 raise ValueError('The payload length does not match the length implied by the message fields. ' +
-                                 'Expected {} actual {}'.format(struct.calcsize(self.fmt), len(payload)))
+                                 'Expected {} actual {}'.format(struct.calcsize(self.get_fmt()), len(payload)))
 
             try:
                 self._repeated_block.repeat += 1
             except AttributeError:
                 raise ValueError('The payload length does not match the length implied by the message fields. ' +
-                                 'Expected {} actual {}'.format(struct.calcsize(self.fmt), len(payload)))
+                                 'Expected {} actual {}'.format(struct.calcsize(self.get_fmt()), len(payload)))
 
-        it = iter(struct.unpack(self.fmt, payload))
+        it = iter(struct.unpack(self.get_fmt(), payload))
 
         return self.name, self._nt(**{k: v for k, v in [f.parse(it) for f in self._fields] if k is not None})
 
@@ -330,10 +320,9 @@ class Cls:
 
         self._messages = {}
         for msg in messages:
-            self._messages[msg.id_] = msg
+            self._messages[msg.get_id()] = msg
 
-    @property
-    def id_(self):
+    def get_id(self):
         """Public read only access to the class id"""
         return self._id
 
@@ -393,14 +382,14 @@ class Parser:
 
     def register_cls(self, cls: Cls):
         """Register a message  class."""
-        self.classes[cls.id_] = cls
+        self.classes[cls.get_id()] = cls
 
 
-    def receive_from(self, stream, skippreamble = False, ignoreunsupported = False) -> namedtuple:
+    def receive_from(self, stream, skip_preamble=False, ignore_unsupported=False) -> namedtuple:
         """Receive a message from a stream and return as a namedtuple.
         raise IOError or ValueError on errors.
         """
-        while not(skippreamble):
+        while not skip_preamble:
             # Search for the prefix
             buff = self._read_until(stream, terminator=self.PREFIX)
             if buff[-2:] == self.PREFIX:
@@ -418,13 +407,13 @@ class Parser:
 
         # check the packet validity
         if msg_cls not in self.classes:
-            if ignoreunsupported:
+            if ignore_unsupported:
                 return (None, None, None)
             else:
                 raise ValueError("Received message id of {:x} in unsupported class {:x}".format(msg_id, msg_cls))
 
         if msg_id not in self.classes[msg_cls]:
-            if ignoreunsupported:
+            if ignore_unsupported:
                 return (None, None, None)
             else:
                 raise ValueError("Received unsupported message id of {:x} in class {:x}".format(msg_id, msg_cls))

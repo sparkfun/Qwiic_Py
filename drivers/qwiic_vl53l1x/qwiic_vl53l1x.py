@@ -103,9 +103,9 @@
 
 # Load Necessary Modules:
 #----------------------------------------------
-import time							# Time access and conversion package
-import math							# Basic math package
 import qwiic_i2c					# I2C bus driver package
+
+__version__ = "3.0.0"
 
 # From vL53l1x_class.h Header File
 SOFT_RESET =															0x0000
@@ -436,58 +436,63 @@ class QwiicVL53L1X(object):
 
 	#----------------------------------------------
 	# Constructor
-	def __init__(self, address = None, debug = None, i2c_driver = None):
+	def __init__(self, address = None, i2c_bus = None):
 		"""!
 		This method initializes the class object. If no 'address' or
-		'i2c_driver' are inputed or 'None' is specified, the method will
+		'i2c_bus' are inputed or 'None' is specified, the method will
 		use the defaults.
 
 		@param address: The I2C address to use for the device.
 							If not provided, the method will default to
 							the first address in the
 							'available_addresses' list.
-								Default = 0x29
-		@param debug: Designated whether or not to print debug
-							statements.
-							0-	Don't print debug statements
-							1-	Print debug statements
-		@param i2c_driver: An existing i2c driver object. If not
-							provided a driver object is created from the
-							'qwiic_i2c' I2C driver of the SparkFun Qwiic
-							library.
+							Default = 0x29
+		@param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 		"""
+		# The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+		address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
 		# Did the user specify an I2C address?
 		# Defaults to 0x52 if unspecified.
 		self.address = address if address != None else self.available_addresses[0]
 
-		# Load the I2C driver if one isn't provided
-		if i2c_driver == None:
-			self._i2c = qwiic_i2c.getI2CDriver()
-	
-			if self._i2c == None:
-				print("Unable to load I2C driver for this platform.")
-				return
-		else:
-			self._i2c = i2c_driver
+		# Use the given I2C bus, or the platform's default bus
+		self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
 
-		# Do you want debug statements?
-		if debug == None:
-			self.debug = 0	# Debug Statements Disabled
-		else:
-			self.debug = debug	# Debug Statements Enabled (1)
-
-
-	def _begin(self):
+	def is_connected(self):
 		"""!
-		One time device initialization
+		Determine if a VL53L1X is connected: the address acknowledges and
+		the model ID register reads 0xEACC.
 
-		@return 	0 on success
-					#CALIBRATION_WARNING if failed
-		
+		@return **bool** True if the device is connected, otherwise False.
 		"""
-		return self.sensor_init()
+		if not self._i2c.is_device_connected(self.address):
+			return False
+
+		return self._read_id() == 0
+
+
+	def begin(self):
+		"""!
+		One time device initialization: checks the sensor is connected,
+		waits for it to boot, then loads the default configuration with
+		sensor_init().
+
+		@return **bool** True if the sensor is connected and initialized, otherwise False.
+		"""
+		if not self.is_connected():
+			return False
+
+		# Wait for the sensor to boot (up to about 100 ms)
+		for _ in range(50):
+			if self.boot_state():
+				break
+			self._i2c.delay_ms(2)
+		else:
+			return False
+
+		return self.sensor_init() == VL53L1_ERROR_NONE
 
 
 	def _read_id(self):
@@ -510,7 +515,7 @@ class QwiicVL53L1X(object):
 		@return **Integer** Distance measured by the sensor in mm
 		"""
 		self.status = 0
-		distance = self.__i2cRead(self.address,
+		distance = self.__i2c_read(self.address,
 				VL53L1_RESULT__FINAL_CROSSTALK_CORRECTED_RANGE_MM_SD0, 2)
 
 		return distance
@@ -526,29 +531,43 @@ class QwiicVL53L1X(object):
 		
 		"""
 		self.status = 0
-		sensorState = 0
+		sensor_state = 0
 		# VL53L1_Off()
 		# VL53L1_On()
 		self.status = self.set_i2c_address(address)
-	
-		if self.debug == 1:
-			byteData = self.__i2cRead(self.address, 0x010F, 1)
-			print("VL53L1X Model_ID: %s", byteData)
 
-			byteData = self.__i2cRead(self.address, 0x0110, 1)
-			print("VL53L1X Module_Type: %s", byteData)
-
-			wordData = self.__i2cRead(self.address, 0x010F, 2)
-			print("VL53L1X: %s", wordData)
-	
-	
-		while (not sensorState and not self.status):
-			sensorState = self.boot_state()
-			time.sleep(2/1000)
+		while (not sensor_state and not self.status):
+			sensor_state = self.boot_state()
+			self._i2c.delay_ms(2)
 		
 		if (not self.status):
 			self.status = self.sensor_init()
 	
+		return self.status
+
+
+
+	# VL53L1X_api_core.h functions
+	###############################################################################
+	###############################################################################
+
+	def soft_reset(self):
+		"""!
+		This function causes the device to perform a soft reset. The sensor
+		reboots with its default settings (including the default I2C address),
+		so wait for boot_state() to return 1 and call sensor_init() again before
+		ranging.
+
+		@return **Integer** 0 on success
+		"""
+		self.status = 0
+
+		self.status = self.__i2c_write(self.address, SOFT_RESET, 0, 1)
+		if (not self.status):
+			self._i2c.delay_ms(1)
+		if (not self.status):
+			self.status = self.__i2c_write(self.address, SOFT_RESET, 1, 1)
+
 		return self.status
 
 
@@ -581,7 +600,7 @@ class QwiicVL53L1X(object):
 		"""
 		self.status = 0
 
-		self.status = self.__i2cWrite(self.address, VL53L1_I2C_SLAVE__DEVICE_ADDRESS, new_address, 1)
+		self.status = self.__i2c_write(self.address, VL53L1_I2C_SLAVE__DEVICE_ADDRESS, new_address, 1)
 		self.address = new_address
 		
 		return self.status
@@ -589,6 +608,7 @@ class QwiicVL53L1X(object):
 	def sensor_init(self):
 		"""!
 		This function loads the 135 bytes default values to initialize the sensor.
+		begin() calls this after checking the sensor is connected and booted.
 
 		@return **Integer** 0 on success or error code
 		
@@ -599,7 +619,7 @@ class QwiicVL53L1X(object):
 		timeout = 0
 
 		for Addr in range(0x2D, 0x87 + 1):
-			self.status = self.__i2cWrite(self.address, Addr, VL51L1X_DEFAULT_CONFIGURATION[Addr - 0x2D], 1)
+			self.status = self.__i2c_write(self.address, Addr, VL51L1X_DEFAULT_CONFIGURATION[Addr - 0x2D], 1)
 		
 		self.status = self.start_ranging()
 		while(tmp == 0):
@@ -612,8 +632,8 @@ class QwiicVL53L1X(object):
 		tmp = 0
 		self.status = self.clear_interrupt()
 		self.status = self.stop_ranging()
-		self.status = self.__i2cWrite(self.address, VL53L1_VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND, 0x09, 1) #  two bounds VHV
-		self.status = self.__i2cWrite(self.address, 0x0B, 0, 1) #  start VHV from the previous temperature
+		self.status = self.__i2c_write(self.address, VL53L1_VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND, 0x09, 1) #  two bounds VHV
+		self.status = self.__i2c_write(self.address, 0x0B, 0, 1) #  start VHV from the previous temperature
 		
 		return self.status
 
@@ -623,22 +643,22 @@ class QwiicVL53L1X(object):
 		This function clears the interrupt, to be called after a ranging data reading to arm the interrupt for the next data ready event.
 		"""
 		self.status = 0
-		self.status = self.__i2cWrite(self.address, SYSTEM__INTERRUPT_CLEAR, 0x01, 1)
+		self.status = self.__i2c_write(self.address, SYSTEM__INTERRUPT_CLEAR, 0x01, 1)
 
 		return self.status
 
 
-	def set_interrupt_polarity(self, NewPolarity):
+	def set_interrupt_polarity(self, new_polarity):
 		"""!
 		This function programs the interrupt polarity
 
-		@param **Integer** NewPolarity: 1 = active high (default), 0 = active low
+		@param new_polarity: **Integer** 1 = active high (default), 0 = active low
 		"""
 		self.status = 0
-		Temp = self.__i2cRead(self.address, GPIO_HV_MUX__CTRL, 1)
+		Temp = self.__i2c_read(self.address, GPIO_HV_MUX__CTRL, 1)
 
 		Temp = Temp & 0xEF
-		self.status = self.__i2cWrite(self.address, GPIO_HV_MUX__CTRL, Temp | (not (NewPolarity & 1)) << 4, 1)
+		self.status = self.__i2c_write(self.address, GPIO_HV_MUX__CTRL, Temp | (not (new_polarity & 1)) << 4, 1)
 
 		return self.status
 
@@ -650,7 +670,7 @@ class QwiicVL53L1X(object):
 		@return **Integer** 1 = active high (**default**), 0 = active low
 		"""
 		self.status = 0
-		Temp = self.__i2cRead(self.address, GPIO_HV_MUX__CTRL, 1)
+		Temp = self.__i2c_read(self.address, GPIO_HV_MUX__CTRL, 1)
 		Temp = Temp & 0x10
 		pInterruptPolarity = not (Temp >> 4)
 
@@ -664,7 +684,7 @@ class QwiicVL53L1X(object):
 		1=active high (**default**), 0=active low, use set_interrupt_polarity() to change the interrupt polarity if required.
 		"""
 		self.status = 0
-		self.status = self.__i2cWrite(self.address, SYSTEM__MODE_START, 0x40, 1)	#  Enable VL53L1X
+		self.status = self.__i2c_write(self.address, SYSTEM__MODE_START, 0x40, 1)	#  Enable VL53L1X
 
 		return self.status
 
@@ -674,7 +694,7 @@ class QwiicVL53L1X(object):
 		This function stops the ranging.
 		"""
 		self.status = 0
-		self.status = self.__i2cWrite(self.address, SYSTEM__MODE_START, 0x00, 1)	#  Disable VL53L1X
+		self.status = self.__i2c_write(self.address, SYSTEM__MODE_START, 0x00, 1)	#  Disable VL53L1X
 
 		return self.status
 
@@ -688,7 +708,7 @@ class QwiicVL53L1X(object):
 		self.status = 0
 
 		IntPol = self.get_interrupt_polarity()
-		Temp = self.__i2cRead(self.address, GPIO__TIO_HV_STATUS, 1)
+		Temp = self.__i2c_read(self.address, GPIO__TIO_HV_STATUS, 1)
 		
 		# Read in the register to check if a new value is available
 		if (self.status == 0):
@@ -700,11 +720,11 @@ class QwiicVL53L1X(object):
 		return isDataReady
 
 
-	def set_timing_budget_in_ms(self, TimingBudgetInMs):
+	def set_timing_budget_in_ms(self, timing_budget_in_ms):
 		"""!
 		This function programs the timing budget in ms.
 
-		@param TimingBudgetInMs: Predefined values = 15, 20, 33, 50, 100 (**default**), 200, 500.
+		@param timing_budget_in_ms: Predefined values = 15, 20, 33, 50, 100 (**default**), 200, 500.
 		"""
 		self.status = 0
 
@@ -712,49 +732,49 @@ class QwiicVL53L1X(object):
 		if (DM == 0):
 			return 1
 		elif (DM == 1):	# Short DistanceMode
-			if TimingBudgetInMs == 15: # only available in short distance mode
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x01D, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0027, 2)
-			elif TimingBudgetInMs == 20:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x0051, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x006E, 2)
-			elif TimingBudgetInMs == 33:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x00D6, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x006E, 2)
-			elif TimingBudgetInMs == 50:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x1AE, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x01E8, 2)
-			elif TimingBudgetInMs == 100:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x02E1, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0388, 2)
-			elif TimingBudgetInMs == 200:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x03E1, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0496, 2)
-			elif TimingBudgetInMs == 500:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x0591, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x05C1, 2)
+			if timing_budget_in_ms == 15: # only available in short distance mode
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x01D, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0027, 2)
+			elif timing_budget_in_ms == 20:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x0051, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x006E, 2)
+			elif timing_budget_in_ms == 33:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x00D6, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x006E, 2)
+			elif timing_budget_in_ms == 50:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x1AE, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x01E8, 2)
+			elif timing_budget_in_ms == 100:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x02E1, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0388, 2)
+			elif timing_budget_in_ms == 200:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x03E1, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0496, 2)
+			elif timing_budget_in_ms == 500:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x0591, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x05C1, 2)
 			else:
 				self.status = 1
 			
 		else:
-			if TimingBudgetInMs == 20:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x001E, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0022, 2)
-			elif TimingBudgetInMs == 33:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x0060, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x006E, 2)
-			elif TimingBudgetInMs == 50:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x00AD, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x00C6, 2)
-			elif TimingBudgetInMs == 100:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x01CC, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x01EA, 2)
-			elif TimingBudgetInMs == 200:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x02D9, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x02F8, 2)
-			elif TimingBudgetInMs == 500:
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x048F, 2)
-				self.__i2cWrite(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x04A4, 2)
+			if timing_budget_in_ms == 20:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x001E, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x0022, 2)
+			elif timing_budget_in_ms == 33:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x0060, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x006E, 2)
+			elif timing_budget_in_ms == 50:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x00AD, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x00C6, 2)
+			elif timing_budget_in_ms == 100:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x01CC, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x01EA, 2)
+			elif timing_budget_in_ms == 200:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x02D9, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x02F8, 2)
+			elif timing_budget_in_ms == 500:
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 0x048F, 2)
+				self.__i2c_write(self.address, RANGE_CONFIG__TIMEOUT_MACROP_B_HI, 0x04A4, 2)
 			else:
 				self.status = 1
 		
@@ -767,7 +787,7 @@ class QwiicVL53L1X(object):
 		"""
 		self.status = 0
 
-		Temp = self.__i2cRead(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 2)
+		Temp = self.__i2c_read(self.address, RANGE_CONFIG__TIMEOUT_MACROP_A_HI, 2)
 
 		def get_timing_budget_in_ms_switch(var):
 			switcher = {
@@ -791,34 +811,31 @@ class QwiicVL53L1X(object):
 		return pTimingBudget
 
 
-	def set_distance_mode(self, DM):
+	def set_distance_mode(self, distance_mode):
 		"""!
 		This function programs the distance mode (1=short, 2=long(default)).
 
-		@param Integer DM: Distance Mode
+		@param distance_mode: **Integer** Distance Mode
 			* 1- Short mode max distance is limited to 1.3 m but better ambient immunity
 			* 2- Long mode can range up to 4 m in the dark with 200 ms timing budget (**default**)
 		"""
 		self.status = 0
 
 		TB = self.get_timing_budget_in_ms()
-		if DM == 1:
-			self.status = self.__i2cWrite(self.address, PHASECAL_CONFIG__TIMEOUT_MACROP, 0x14, 1)
-			self.status = self.__i2cWrite(self.address, RANGE_CONFIG__VCSEL_PERIOD_A, 0x07, 1)
-			self.status = self.__i2cWrite(self.address, RANGE_CONFIG__VCSEL_PERIOD_B, 0x05, 1)
-			self.status = self.__i2cWrite(self.address, RANGE_CONFIG__VALID_PHASE_HIGH, 0x38, 1)
-			self.status = self.__i2cWrite(self.address, SD_CONFIG__WOI_SD0, 0x0705, 2)
-			self.status = self.__i2cWrite(self.address, SD_CONFIG__INITIAL_PHASE_SD0, 0x0606, 2)
-		elif DM == 2:
-			self.status = self.__i2cWrite(self.address, PHASECAL_CONFIG__TIMEOUT_MACROP, 0x0A, 1)
-			self.status = self.__i2cWrite(self.address, RANGE_CONFIG__VCSEL_PERIOD_A, 0x0F, 1)
-			self.status = self.__i2cWrite(self.address, RANGE_CONFIG__VCSEL_PERIOD_B, 0x0D, 1)
-			self.status = self.__i2cWrite(self.address, RANGE_CONFIG__VALID_PHASE_HIGH, 0xB8, 1)
-			self.status = self.__i2cWrite(self.address, SD_CONFIG__WOI_SD0, 0x0F0D, 2)
-			self.status = self.__i2cWrite(self.address, SD_CONFIG__INITIAL_PHASE_SD0, 0x0E0E, 2)
-		else:
-			if self.debug == 1:
-				print("Invalid DIstance Mode")
+		if distance_mode == 1:
+			self.status = self.__i2c_write(self.address, PHASECAL_CONFIG__TIMEOUT_MACROP, 0x14, 1)
+			self.status = self.__i2c_write(self.address, RANGE_CONFIG__VCSEL_PERIOD_A, 0x07, 1)
+			self.status = self.__i2c_write(self.address, RANGE_CONFIG__VCSEL_PERIOD_B, 0x05, 1)
+			self.status = self.__i2c_write(self.address, RANGE_CONFIG__VALID_PHASE_HIGH, 0x38, 1)
+			self.status = self.__i2c_write(self.address, SD_CONFIG__WOI_SD0, 0x0705, 2)
+			self.status = self.__i2c_write(self.address, SD_CONFIG__INITIAL_PHASE_SD0, 0x0606, 2)
+		elif distance_mode == 2:
+			self.status = self.__i2c_write(self.address, PHASECAL_CONFIG__TIMEOUT_MACROP, 0x0A, 1)
+			self.status = self.__i2c_write(self.address, RANGE_CONFIG__VCSEL_PERIOD_A, 0x0F, 1)
+			self.status = self.__i2c_write(self.address, RANGE_CONFIG__VCSEL_PERIOD_B, 0x0D, 1)
+			self.status = self.__i2c_write(self.address, RANGE_CONFIG__VALID_PHASE_HIGH, 0xB8, 1)
+			self.status = self.__i2c_write(self.address, SD_CONFIG__WOI_SD0, 0x0F0D, 2)
+			self.status = self.__i2c_write(self.address, SD_CONFIG__INITIAL_PHASE_SD0, 0x0E0E, 2)
 
 		self.status = self.set_timing_budget_in_ms(TB)
 		return self.status
@@ -834,7 +851,7 @@ class QwiicVL53L1X(object):
 		"""
 		self.status = 0
 
-		TempDM = self.__i2cRead(self.address,PHASECAL_CONFIG__TIMEOUT_MACROP, 1)
+		TempDM = self.__i2c_read(self.address,PHASECAL_CONFIG__TIMEOUT_MACROP, 1)
 		if (TempDM == 0x14):
 			DM=1
 		if(TempDM == 0x0A):
@@ -842,20 +859,20 @@ class QwiicVL53L1X(object):
 		return DM
 
 
-	def set_inter_measurement_in_ms(self, InterMeasMs):
+	def set_inter_measurement_in_ms(self, inter_meas_ms):
 		"""!
 		This function programs the Intermeasurement period in ms.
 
-		@param InterMeasMs: Intermeasurement period must be >/= timing budget. This condition is not checked by the API,
+		@param inter_meas_ms: Intermeasurement period must be >/= timing budget. This condition is not checked by the API,
 							the customer has the duty to check the condition. **Default = 100 ms**
 		"""
 		self.status = 0
 
-		ClockPLL = self.__i2cRead(self.address, VL53L1_RESULT__OSC_CALIBRATE_VAL, 2)
+		ClockPLL = self.__i2c_read(self.address, VL53L1_RESULT__OSC_CALIBRATE_VAL, 2)
 		ClockPLL = ClockPLL&0x3FF
 
-		self.status = self.__i2cWrite(self.address, VL53L1_SYSTEM__INTERMEASUREMENT_PERIOD,
-				int(ClockPLL * InterMeasMs * 1.075), 4)
+		self.status = self.__i2c_write(self.address, VL53L1_SYSTEM__INTERMEASUREMENT_PERIOD,
+				int(ClockPLL * inter_meas_ms * 1.075), 4)
 
 		return self.status
 
@@ -870,8 +887,8 @@ class QwiicVL53L1X(object):
 		ClockPLL = 0
 		pIM = 0
 
-		tmp = self.__i2cRead(self.address, VL53L1_SYSTEM__INTERMEASUREMENT_PERIOD, 4)
-		ClockPLL = self.__i2cRead(self.address, VL53L1_RESULT__OSC_CALIBRATE_VAL, 2)
+		tmp = self.__i2c_read(self.address, VL53L1_SYSTEM__INTERMEASUREMENT_PERIOD, 4)
+		ClockPLL = self.__i2c_read(self.address, VL53L1_RESULT__OSC_CALIBRATE_VAL, 2)
 		ClockPLL = ClockPLL&0x3FF
 		pIM= (tmp/(ClockPLL*1.065))
 
@@ -889,7 +906,7 @@ class QwiicVL53L1X(object):
 		self.status = 0
 		state = 0
 
-		state = self.__i2cRead(self.address,VL53L1_FIRMWARE__SYSTEM_STATUS, 1)
+		state = self.__i2c_read(self.address,VL53L1_FIRMWARE__SYSTEM_STATUS, 1)
 
 		return state
 
@@ -903,7 +920,7 @@ class QwiicVL53L1X(object):
 		self.status = 0
 		sensorId = 0
 
-		sensorId = self.__i2cRead(self.address, VL53L1_IDENTIFICATION__MODEL_ID, 2)
+		sensorId = self.__i2c_read(self.address, VL53L1_IDENTIFICATION__MODEL_ID, 2)
 
 		return sensorId
 
@@ -918,9 +935,9 @@ class QwiicVL53L1X(object):
 		self.status = 0
 		SpNb=1
 
-		signal = self.__i2cRead(self.address,
+		signal = self.__i2c_read(self.address,
 			VL53L1_RESULT__PEAK_SIGNAL_COUNT_RATE_CROSSTALK_CORRECTED_MCPS_SD0, 2)
-		SpNb = self.__i2cRead(self.address,
+		SpNb = self.__i2c_read(self.address,
 			VL53L1_RESULT__DSS_ACTUAL_EFFECTIVE_SPADS_SD0, 2)
 		signalRate = (2000.0*signal/SpNb)
 
@@ -937,8 +954,8 @@ class QwiicVL53L1X(object):
 		self.status = 0
 		SpNb=1
 
-		AmbientRate = self.__i2cRead(self.address, RESULT__AMBIENT_COUNT_RATE_MCPS_SD, 2)
-		SpNb = self.__i2cRead(self.address, VL53L1_RESULT__DSS_ACTUAL_EFFECTIVE_SPADS_SD0, 2)
+		AmbientRate = self.__i2c_read(self.address, RESULT__AMBIENT_COUNT_RATE_MCPS_SD, 2)
+		SpNb = self.__i2c_read(self.address, VL53L1_RESULT__DSS_ACTUAL_EFFECTIVE_SPADS_SD0, 2)
 		ambPerSp=(2000.0 * AmbientRate / SpNb)
 		
 		return ambPerSp
@@ -952,7 +969,7 @@ class QwiicVL53L1X(object):
 		
 		"""
 		self.status = 0
-		tmp = self.__i2cRead(self.address,
+		tmp = self.__i2c_read(self.address,
 			VL53L1_RESULT__PEAK_SIGNAL_COUNT_RATE_CROSSTALK_CORRECTED_MCPS_SD0, 2)
 		signal = tmp*8
 		
@@ -967,7 +984,7 @@ class QwiicVL53L1X(object):
 		
 		"""
 		self.status = 0
-		tmp = self.__i2cRead(self.address,
+		tmp = self.__i2c_read(self.address,
 					VL53L1_RESULT__DSS_ACTUAL_EFFECTIVE_SPADS_SD0, 2)
 		spNb = tmp >> 8
 		
@@ -982,7 +999,7 @@ class QwiicVL53L1X(object):
 		
 		"""
 		self.status = 0
-		tmp = self.__i2cRead(self.address, RESULT__AMBIENT_COUNT_RATE_MCPS_SD, 2)
+		tmp = self.__i2c_read(self.address, RESULT__AMBIENT_COUNT_RATE_MCPS_SD, 2)
 		ambRate = tmp*8
 		
 		return ambRate
@@ -1000,7 +1017,7 @@ class QwiicVL53L1X(object):
 						* 7- wrap-around
 		"""
 		self.status = 0
-		RgSt = self.__i2cRead(self.address, VL53L1_RESULT__RANGE_STATUS, 1)
+		RgSt = self.__i2c_read(self.address, VL53L1_RESULT__RANGE_STATUS, 1)
 		RgSt = RgSt&0x1F
 
 		def get_range_status_switch(var):
@@ -1025,19 +1042,19 @@ class QwiicVL53L1X(object):
 		return rangeStatus
 
 
-	def set_offset(self, OffsetValue):
+	def set_offset(self, offset_value):
 		"""!
 		This function programs the offset correction in mm
 
-		@param OffsetValue: The offset correction value to program in mm
+		@param offset_value: The offset correction value to program in mm
 		"""
 		self.status = 0
-		Temp = OffsetValue*4
+		Temp = offset_value*4
 
-		self.__i2cWrite(self.address, ALGO__PART_TO_PART_RANGE_OFFSET_MM,
+		self.__i2c_write(self.address, ALGO__PART_TO_PART_RANGE_OFFSET_MM,
 				Temp, 2)
-		self.__i2cWrite(self.address, MM_CONFIG__INNER_OFFSET_MM, 0x0, 2)
-		self.__i2cWrite(self.address, MM_CONFIG__OUTER_OFFSET_MM, 0x0, 2)
+		self.__i2c_write(self.address, MM_CONFIG__INNER_OFFSET_MM, 0x0, 2)
+		self.__i2c_write(self.address, MM_CONFIG__OUTER_OFFSET_MM, 0x0, 2)
 
 		return self.status
 
@@ -1049,7 +1066,7 @@ class QwiicVL53L1X(object):
 		@return **Integer** Offset correction value in mm
 		"""
 		self.status = 0
-		Temp = self.__i2cRead(self.address,ALGO__PART_TO_PART_RANGE_OFFSET_MM, 2)
+		Temp = self.__i2c_read(self.address,ALGO__PART_TO_PART_RANGE_OFFSET_MM, 2)
 		Temp = Temp << 3
 		Temp = Temp >> 5
 		offset = Temp
@@ -1057,22 +1074,22 @@ class QwiicVL53L1X(object):
 		return offset
 
 
-	def set_xtalk(self, XtalkValue):
+	def set_xtalk(self, xtalk_value):
 		"""!
 		This function programs the xtalk correction value in cps (Count Per Second).
 		This is the number of photons reflected back from the cover glass in cps.
 
-		@param XTalkValue: xtalk correction value in count per second to avoid float type
+		@param xtalk_value: xtalk correction value in count per second to avoid float type
 		"""
 		self.status = 0
 		
-		self.status = self.__i2cWrite(self.address,
+		self.status = self.__i2c_write(self.address,
 				ALGO__CROSSTALK_COMPENSATION_X_PLANE_GRADIENT_KCPS,
 				0x0000, 2)
-		self.status = self.__i2cWrite(self.address, ALGO__CROSSTALK_COMPENSATION_Y_PLANE_GRADIENT_KCPS,
+		self.status = self.__i2c_write(self.address, ALGO__CROSSTALK_COMPENSATION_Y_PLANE_GRADIENT_KCPS,
 				0x0000, 2)
-		self.status = self.__i2cWrite(self.address, ALGO__CROSSTALK_COMPENSATION_PLANE_OFFSET_KCPS,
-				(XtalkValue << 9)/1000, 2) # << 9 (7.9 format) and /1000 to convert cps to kpcs
+		self.status = self.__i2c_write(self.address, ALGO__CROSSTALK_COMPENSATION_PLANE_OFFSET_KCPS,
+				(xtalk_value << 9)/1000, 2) # << 9 (7.9 format) and /1000 to convert cps to kpcs
 		
 		return self.status
 
@@ -1085,27 +1102,27 @@ class QwiicVL53L1X(object):
 		
 		"""
 		self.status = 0
-		tmp = self.__i2cRead(self.address,ALGO__CROSSTALK_COMPENSATION_PLANE_OFFSET_KCPS, 2)
+		tmp = self.__i2c_read(self.address,ALGO__CROSSTALK_COMPENSATION_PLANE_OFFSET_KCPS, 2)
 		xtalk = (tmp*1000) >> 9 # 1000 to convert kcps to cps and >> 9 (7.9 format)
 
 		return xtalk
 
 
 	def set_distance_threshold(self,
-					ThreshLow,
-					ThreshHigh, Window,
-					IntOnNoTarget):
+					thresh_low,
+					thresh_high, window,
+					int_on_no_target):
 		"""!
 		This function programs the threshold detection mode
 
-		@param mm ThreshLow: The threshold under which one the device raises an interrupt if Window = 0
-		@param mm ThreshHigh: The threshold above which one the device raises an interrupt if Window = 1
-		@param Window: Window detection mode:
+		@param thresh_low: **int** The threshold, in mm, under which the device raises an interrupt if window = 0
+		@param thresh_high: **int** The threshold, in mm, above which the device raises an interrupt if window = 1
+		@param window: window detection mode:
 										* 0- below
 										* 1- above
 										* 2- out
 										* 3- in
-		@param IntOnNoTarget: 1 (No longer used - just set to 1)
+		@param int_on_no_target: 1 (No longer used - just set to 1)
 
 		Example:
 			* self.set_distance_threshold(100,300,0,1): Below 100 
@@ -1116,17 +1133,17 @@ class QwiicVL53L1X(object):
 		self.status = 0
 		Temp = 0
 
-		Temp = self.__i2cRead(self.address, SYSTEM__INTERRUPT_CONFIG_GPIO, 1)
+		Temp = self.__i2c_read(self.address, SYSTEM__INTERRUPT_CONFIG_GPIO, 1)
 		Temp = Temp & 0x47
-		if (IntOnNoTarget == 0):
-			self.status = self.__i2cWrite(self.address, SYSTEM__INTERRUPT_CONFIG_GPIO,
-					(Temp | (Window & 0x07)), 1)
+		if (int_on_no_target == 0):
+			self.status = self.__i2c_write(self.address, SYSTEM__INTERRUPT_CONFIG_GPIO,
+					(Temp | (window & 0x07)), 1)
 		else:
-			self.status = self.__i2cWrite(self.address, SYSTEM__INTERRUPT_CONFIG_GPIO,
-					((Temp | (Window & 0x07)) | 0x40), 1)
+			self.status = self.__i2c_write(self.address, SYSTEM__INTERRUPT_CONFIG_GPIO,
+					((Temp | (window & 0x07)) | 0x40), 1)
 		
-		self.status = self.__i2cWrite(self.address, SYSTEM__THRESH_HIGH, ThreshHigh, 2)
-		self.status = self.__i2cWrite(self.address, SYSTEM__THRESH_LOW, ThreshLow, 2)
+		self.status = self.__i2c_write(self.address, SYSTEM__THRESH_HIGH, thresh_high, 2)
+		self.status = self.__i2c_write(self.address, SYSTEM__THRESH_LOW, thresh_low, 2)
 		
 		return self.status
 
@@ -1135,14 +1152,14 @@ class QwiicVL53L1X(object):
 		"""!
 		This function returns the window detection mode (0=below 1=above 2=out 3=in)
 
-		@return **Integer** Window detection mode
+		@return **Integer** window detection mode
 			* 0- below
 			* 1- above
 			* 2- out
 			* 3- in
 		"""
 		self.status = 0
-		tmp = self.__i2cRead(self.address,SYSTEM__INTERRUPT_CONFIG_GPIO, 1)
+		tmp = self.__i2c_read(self.address,SYSTEM__INTERRUPT_CONFIG_GPIO, 1)
 		window = (tmp & 0x7)
 		
 		return window
@@ -1155,7 +1172,7 @@ class QwiicVL53L1X(object):
 		@return **Integer** Low threshold in mm
 		"""
 		self.status = 0
-		low = self.__i2cRead(self.address,SYSTEM__THRESH_LOW, 2)
+		low = self.__i2c_read(self.address,SYSTEM__THRESH_LOW, 2)
 		
 		return low
 
@@ -1167,14 +1184,14 @@ class QwiicVL53L1X(object):
 		@return **Integer** High threshold in mm
 		"""
 		self.status = 0
-		high = self.__i2cRead(self.address,SYSTEM__THRESH_HIGH, 2)
+		high = self.__i2c_read(self.address,SYSTEM__THRESH_HIGH, 2)
 		
 		return high
 
 
-	def set_roi(self, X, Y, OpticalCenter = 199):
+	def set_roi(self, x, y, optical_center = 199):
 		"""!
-		This function programs the ROI (Region of Interest). The height and width of the ROI (X, Y) are set in SPADs; the smallest acceptable ROI size = 4 (4 x 4). The optical center is set based on table below.
+		This function programs the ROI (Region of Interest). The height and width of the ROI (x, y) are set in SPADs; the smallest acceptable ROI size = 4 (4 x 4). The optical center is set based on table below.
 		To set the center, use the pad that is to the right and above (i.e. upper right of) the exact center of the region you'd like to measure as your optical center.
 
 		Table of Optical Centers:
@@ -1199,22 +1216,22 @@ class QwiicVL53L1X(object):
 			
 			(Each SPAD has a number which is not obvious.)
 
-		@param X: ROI Width
-		@param Y: ROI Height
-		@param OpticalCenter: The pad that is to the upper right of the exact center of the ROI (see table above). (default=199)
+		@param x: ROI Width
+		@param y: ROI Height
+		@param optical_center: The pad that is to the upper right of the exact center of the ROI (see table above). (default=199)
 		"""
 		self.status = 0
-		# OpticalCenter =self.__i2cRead(self.address, VL53L1_ROI_CONFIG__MODE_ROI_CENTRE_SPAD, 1)
-		if (X > 16):
-			X = 16
-		if (Y > 16):
-			Y = 16
-		if (X > 10 or Y > 10):
-			OpticalCenter = 199
+		# optical_center =self.__i2c_read(self.address, VL53L1_ROI_CONFIG__MODE_ROI_CENTRE_SPAD, 1)
+		if (x > 16):
+			x = 16
+		if (y > 16):
+			y = 16
+		if (x > 10 or y > 10):
+			optical_center = 199
 
-		self.status = self.__i2cWrite(self.address, ROI_CONFIG__USER_ROI_CENTRE_SPAD, OpticalCenter, 1)
-		self.status = self.__i2cWrite(self.address, ROI_CONFIG__USER_ROI_REQUESTED_GLOBAL_XY_SIZE,
-				(Y - 1) << 4 | (X - 1), 1)
+		self.status = self.__i2c_write(self.address, ROI_CONFIG__USER_ROI_CENTRE_SPAD, optical_center, 1)
+		self.status = self.__i2c_write(self.address, ROI_CONFIG__USER_ROI_REQUESTED_GLOBAL_XY_SIZE,
+				(y - 1) << 4 | (x - 1), 1)
 		
 		return self.status
 
@@ -1226,22 +1243,22 @@ class QwiicVL53L1X(object):
 		@return **List** Region of Interest Width (X) and Height (Y)
 		"""
 		self.status = 0
-		tmp = self.__i2cRead(self.address,ROI_CONFIG__USER_ROI_REQUESTED_GLOBAL_XY_SIZE, 1)
+		tmp = self.__i2c_read(self.address,ROI_CONFIG__USER_ROI_REQUESTED_GLOBAL_XY_SIZE, 1)
 		ROI_X = (tmp & 0x0F) + 1
 		ROI_Y = ((tmp & 0xF0) >> 4) + 1
 
 		return [ROI_X, ROI_Y]
 
 
-	def set_signal_threshold(self, Signal):
+	def set_signal_threshold(self, signal):
 		"""!
 		This function programs a new signal threshold in kcps (default=1024 kcps)
 
-		@param Signal: Signal threshold in kcps (**default=1024 kcps**)
+		@param signal: signal threshold in kcps (**default=1024 kcps**)
 		"""
 		self.status = 0
 
-		self.__i2cWrite(self.address,RANGE_CONFIG__MIN_COUNT_RATE_RTN_LIMIT_MCPS,Signal >> 3, 2)
+		self.__i2c_write(self.address,RANGE_CONFIG__MIN_COUNT_RATE_RTN_LIMIT_MCPS,signal >> 3, 2)
 		
 		return self.status
 
@@ -1254,25 +1271,25 @@ class QwiicVL53L1X(object):
 		
 		"""
 		self.status = 0
-		tmp = self.__i2cRead(self.address,
+		tmp = self.__i2c_read(self.address,
 					RANGE_CONFIG__MIN_COUNT_RATE_RTN_LIMIT_MCPS, 2)
 		signal = tmp << 3
 		return signal
 
 
-	def set_sigma_threshold(self, Sigma):
+	def set_sigma_threshold(self, sigma):
 		"""!
 		This function programs a new sigma threshold in mm (default=15 mm)
 
-		@param Sigma: Sigma threshold in mm (**default=15 mm**)
+		@param sigma: sigma threshold in mm (**default=15 mm**)
 		"""
 		self.status = 0
 
-		if(Sigma>(0xFFFF >> 2)):
+		if(sigma>(0xFFFF >> 2)):
 			return 1
 		
 		# 16 bits register 14.2 format
-		self.status = self.__i2cWrite(self.address,RANGE_CONFIG__SIGMA_THRESH,Sigma << 2, 2)
+		self.status = self.__i2c_write(self.address,RANGE_CONFIG__SIGMA_THRESH,sigma << 2, 2)
 
 		return self.status
 
@@ -1285,7 +1302,7 @@ class QwiicVL53L1X(object):
 		"""
 		self.status = 0
 		
-		tmp = self.__i2cRead(self.address,RANGE_CONFIG__SIGMA_THRESH, 2)
+		tmp = self.__i2c_read(self.address,RANGE_CONFIG__SIGMA_THRESH, 2)
 		sigma = tmp >> 2
 
 		return sigma
@@ -1300,8 +1317,8 @@ class QwiicVL53L1X(object):
 		self.status = 0
 		tmp=0
 
-		self.status = self.__i2cWrite(self.address,VL53L1_VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND,0x81, 1) #  full VHV
-		self.status = self.__i2cWrite(self.address,0x0B,0x92, 1)
+		self.status = self.__i2c_write(self.address,VL53L1_VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND,0x81, 1) #  full VHV
+		self.status = self.__i2c_write(self.address,0x0B,0x92, 1)
 		self.status = self.start_ranging()
 		while(tmp==0):
 			tmp = self.check_for_data_ready()
@@ -1309,8 +1326,8 @@ class QwiicVL53L1X(object):
 		tmp = 0
 		self.status = self.clear_interrupt()
 		self.status = self.stop_ranging()
-		self.status = self.__i2cWrite(self.address, VL53L1_VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND, 0x09, 1) #  two bounds VHV
-		self.status = self.__i2cWrite(self.address, 0x0B, 0, 1) #  start VHV from the previous temperature
+		self.status = self.__i2c_write(self.address, VL53L1_VHV_CONFIG__TIMEOUT_MACROP_LOOP_BOUND, 0x09, 1) #  two bounds VHV
+		self.status = self.__i2c_write(self.address, 0x0B, 0, 1) #  start VHV from the previous temperature
 
 		return self.status
 
@@ -1320,12 +1337,12 @@ class QwiicVL53L1X(object):
 	###############################################################################
 	###############################################################################
 
-	def calibrate_offset(self, TargetDistInMm):
+	def calibrate_offset(self, target_dist_in_mm):
 		"""!
 		This function performs the offset calibration.
 		The function returns the offset value found and programs the offset compensation into the device.
 
-		@param TargetDistInMm: * Target distance in mm, ST recommended 100 mm
+		@param target_dist_in_mm: * Target distance in mm, ST recommended 100 mm
 								* Target reflectance = grey17%
 
 		@return int status: 0 if no error, other if error
@@ -1334,9 +1351,9 @@ class QwiicVL53L1X(object):
 		AverageDistance = 0
 		self.status = 0
 
-		self.status = self.__i2cWrite(self.address, ALGO__PART_TO_PART_RANGE_OFFSET_MM, 0x0, 2)
-		self.status = self.__i2cWrite(self.address, MM_CONFIG__INNER_OFFSET_MM, 0x0, 2)
-		self.status = self.__i2cWrite(self.address, MM_CONFIG__OUTER_OFFSET_MM, 0x0, 2)
+		self.status = self.__i2c_write(self.address, ALGO__PART_TO_PART_RANGE_OFFSET_MM, 0x0, 2)
+		self.status = self.__i2c_write(self.address, MM_CONFIG__INNER_OFFSET_MM, 0x0, 2)
+		self.status = self.__i2c_write(self.address, MM_CONFIG__OUTER_OFFSET_MM, 0x0, 2)
 		self.status = self.start_ranging()	# Enable VL53L1X sensor
 		for i in range(0, 50):
 			while (tmp == 0):
@@ -1349,18 +1366,18 @@ class QwiicVL53L1X(object):
 		
 		self.status = self.stop_ranging()
 		AverageDistance = AverageDistance / 50
-		offset = TargetDistInMm - AverageDistance
-		self.status = self.__i2cWrite(self.address, ALGO__PART_TO_PART_RANGE_OFFSET_MM, offset*4, 2)
+		offset = target_dist_in_mm - AverageDistance
+		self.status = self.__i2c_write(self.address, ALGO__PART_TO_PART_RANGE_OFFSET_MM, offset*4, 2)
 
 		return self.status #,offset???
 
 
-	def calibrate_xtalk(self, TargetDistInMm):
+	def calibrate_xtalk(self, target_dist_in_mm):
 		"""!
 		This function performs the xtalk calibration.
 		The function returns the xtalk value found and programs the xtalk compensation to the device
 
-		@param TargetDistInMm: Target distance in mm
+		@param target_dist_in_mm: Target distance in mm
 		* The target distance is the distance where the sensor start to "under range" due to the influence of the photons reflected back from the cover glass becoming strong (also called the inflection point).
 		* Target reflectance = grey 17%
 
@@ -1373,7 +1390,7 @@ class QwiicVL53L1X(object):
 		distance = 0
 		self.status = 0
 
-		self.status = self.__i2cWrite(self.address, 0x0016,0, 2)
+		self.status = self.__i2c_write(self.address, 0x0016,0, 2)
 		self.status = self.start_ranging()
 		for i in range(0, 50):
 			while (tmp == 0):
@@ -1393,8 +1410,8 @@ class QwiicVL53L1X(object):
 		AverageSpadNb = AverageSpadNb / 50
 		AverageSignalRate = AverageSignalRate / 50
 		# Calculate Xtalk value
-		xtalk = (512*(AverageSignalRate*(1-(AverageDistance/TargetDistInMm)))/AverageSpadNb)
-		self.status = self.__i2cWrite(self.address, 0x0016, xtalk, 2)
+		xtalk = (512*(AverageSignalRate*(1-(AverageDistance/target_dist_in_mm)))/AverageSpadNb)
+		self.status = self.__i2c_write(self.address, 0x0016, xtalk, 2)
 		
 		return self.status #,xtalk???
 
@@ -1417,12 +1434,12 @@ class QwiicVL53L1X(object):
 
 
 	def __wait_us(self, wait_us):
-		time.sleep(wait_us/1000/1000)
+		self._i2c.delay_us(wait_us)
 		return VL53L1_ERROR_NONE
 
 
 	def __wait_ms(self, wait_ms):
-		time.sleep(wait_ms/1000)
+		self._i2c.delay_ms(wait_ms)
 		return VL53L1_ERROR_NONE
 	
 
@@ -1453,7 +1470,7 @@ class QwiicVL53L1X(object):
 			(found == 0)):
 
 			if (self.status == VL53L1_ERROR_NONE):
-				byte_value = self.__i2cRead(self.address, index, 1)
+				byte_value = self.__i2c_read(self.address, index, 1)
 
 			if ((byte_value & mask) == value):
 				found = 1
@@ -1465,7 +1482,7 @@ class QwiicVL53L1X(object):
 
 			# Update polling time (Compare difference rather than absolute to negate 32bit wrap around issue)
 			current_time_ms = self.__get_tick_count()
-			polling_time_ms = current_time_ms - start_time_ms
+			polling_time_ms = self._i2c.ticks_diff(current_time_ms, start_time_ms)
 
 		if (found == 0 and self.status == VL53L1_ERROR_NONE):
 			self.status = VL53L1_ERROR_TIME_OUT
@@ -1477,9 +1494,9 @@ class QwiicVL53L1X(object):
 ###############################################################################
 ###############################################################################
 
-	def __i2cWrite(self, address, register, data, nbytes):
+	def __i2c_write(self, address, register, data, nbytes):
 		"""!
-		A wrapper for the I2C driver since device needs 16-bit register addresses. Formats register and data values so that they can be written to device as a block for proper I2C transactions.
+		A wrapper for the I2C bus since device needs 16-bit register addresses. Formats register and data values so that they can be written to device as a block for proper I2C transactions.
 
 		@param register: 16-bit register address
 							(can be 8-bit, just writes 0x00 byte prior to value)
@@ -1507,19 +1524,16 @@ class QwiicVL53L1X(object):
 		elif nbytes == 1:
 			buffer.append( data )
 		else:
-			if self.debug == 1:
-				print("in __i2cWriteBlock, nbytes entered invalid")
-			
 			return
-		
-		self.status = self._i2c.writeBlock(address, registerMSB, buffer)
+
+		self.status = self._i2c.write_block(address, registerMSB, buffer)
 
 		return self.status
 	
 
-	def __i2cRead(self, address, register, nbytes):
+	def __i2c_read(self, address, register, nbytes):
 		"""!
-		A wrapper for the I2C driver since device needs 16-bit register addresses. Formats register and data values so that they can be written to device as a block for proper I2C transactions.
+		A wrapper for the I2C bus since device needs 16-bit register addresses. Formats register and data values so that they can be written to device as a block for proper I2C transactions.
 
 		@param register: 16-bit register address
 							(can be 8-bit, just writes 0x00 byte prior to value)
@@ -1534,8 +1548,6 @@ class QwiicVL53L1X(object):
 		registerLSB = register & 0xFF
 
 		if nbytes not in [1, 2, 4]:
-			if self.debug == 1:
-				print("in __i2cWriteBlock, nbytes entered invalid")
 			return
 
 		# Setup for read/write transactions on smbus 2
@@ -1544,7 +1556,7 @@ class QwiicVL53L1X(object):
 
 		# self._i2c.i2c_rdwr(write, read)
 		# read_data = self._i2c.__i2c_rdwr__(address, [registerMSB, registerLSB], nbytes)
-		read_data = self._i2c.write_read_block(address, [registerMSB, registerLSB], nbytes)
+		read_data = self._i2c.read_block(address, [registerMSB, registerLSB], nbytes)
 		buffer = list(read_data)
 
 		for i in range(0, nbytes):

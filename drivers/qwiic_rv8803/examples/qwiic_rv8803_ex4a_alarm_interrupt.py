@@ -36,12 +36,12 @@
 
 import qwiic_rv8803
 import sys
-import time
+import qwiic_i2c
 
 # Make sure to change these values to the decimal values that you want to match
 minuteAlarmValue = 55  # 0-60, change this to a minute or two from now to see the alarm get generated
 hourAlarmValue = 0  # 0-24
-weekdayAlarmValue = qwiic_rv8803.QwiicRV8803.kSunday | qwiic_rv8803.QwiicRV8803.kSaturday  # Or together days of the week to enable the alarm on those days.
+weekdayAlarmValue = qwiic_rv8803.QwiicRV8803.SUNDAY | qwiic_rv8803.QwiicRV8803.SATURDAY  # Or together days of the week to enable the alarm on those days.
 dateAlarmValue = 0  # 1-31
 
 # Define which alarm registers we want to match, make sure you only enable weekday or date alarm, enabling both will default to a date alarm
@@ -51,7 +51,7 @@ hourAlarmEnable = False
 weekdayAlarmEnable = False
 dateAlarmEnable = False
 
-def runExample():
+def run_example():
 	print("\nQwiic RV8803 Example 4a - Alarm Interrupt\n")
 
 	# Create instance of device
@@ -74,23 +74,23 @@ def runExample():
 	myRTC.set_alarm_hours(hourAlarmValue)
 	myRTC.set_alarm_weekday(weekdayAlarmValue)
 	# myRTC.set_alarm_date(dateAlarmValue) # uncomment this line if you want to set a date alarm instead of weekday
-	myRTC.enable_hardware_interrupt(myRTC.kAlarmInterrupt)
+	myRTC.enable_hardware_interrupt(myRTC.ALARM_INTERRUPT)
 
 	while True:
-		if myRTC.get_interrupt_flag(myRTC.kFlagAlarm):
+		if myRTC.get_interrupt_flag(myRTC.FLAG_ALARM):
 			print("Alarm Triggered! Clearing flag...")
-			myRTC.clear_interrupt_flag(myRTC.kFlagAlarm)
+			myRTC.clear_interrupt_flag(myRTC.FLAG_ALARM)
 		else:
 			myRTC.update_time()
 			print("Waiting for alarm to trigger. Current Time: ", end="")
 			print (myRTC.string_date_usa(), end="")
 			print (" ", myRTC.string_time())
 
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

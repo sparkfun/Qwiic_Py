@@ -32,7 +32,7 @@
 # SOFTWARE.
 #==================================================================================
 #-----------------------------------------------------------------------------
-# this package encapsulates the resources used for the Micro OLED board
+# this package encapsulates the resources used for u-blox GPS modules
 #
 #-----------------------------------------------------------------------------
 
@@ -49,11 +49,14 @@ sparkfun_ublox_gps
 Python module for the [SparkFun GPS-RTK Dead Reckoning Phat
 ZED-F9R](https://www.sparkfun.com/products/16475) and the others found
 [here](https://www.sparkfun.com/gps), as long as you use
-Serial and SPI.
+Serial and SPI. Linux (CPython) only.
 
 This python package is a port of the existing [SparkFun Ublox Arduino
 Library](https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library).
 """
 
-from .ublox_gps import UbloxGps
+__version__ = "3.0.0"
+
+from .ublox_gps import UbloxGPS
+from .spi_wrapper import SPIWrapper
 from .core import *

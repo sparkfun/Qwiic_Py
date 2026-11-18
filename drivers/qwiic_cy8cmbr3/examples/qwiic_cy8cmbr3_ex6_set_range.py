@@ -34,12 +34,11 @@
 # SOFTWARE.
 #===============================================================================
 
-from random import choice
 import qwiic_cy8cmbr3
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic Template Example 6 - Set Range\n")
 
 	# Create instance of device
@@ -90,7 +89,7 @@ def runExample():
 				print("WARNING: Raw counts are saturated! Consider recalibrating the sensor to adjust the range.\n")
 			
 			# Sleep for a second to avoid spamming the output
-			time.sleep(1)
+			qwiic_i2c.delay_ms(1000)
 		if prompting:
 			choice = input(
 				"\nSelect one of the following:\n"
@@ -126,7 +125,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

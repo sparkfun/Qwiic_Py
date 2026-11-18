@@ -38,7 +38,7 @@
 # Example 1
 
 import qwiic_led_stick
-import time
+import qwiic_i2c
 import sys
 
 def run_example():
@@ -52,16 +52,16 @@ def run_example():
         return
     print("\nLED Stick ready!")
     
-    my_stick.set_all_LED_brightness(15)
+    my_stick.set_all_led_brightness(15)
 
     while True:
         
         # Turn on all the LEDs to white
-        my_stick.set_all_LED_color(50, 50, 50)
-        time.sleep(1)
+        my_stick.set_all_led_color(50, 50, 50)
+        qwiic_i2c.delay_ms(1000)
         # Turn off all LEDs
-        my_stick.LED_off()
-        time.sleep(1)
+        my_stick.led_off()
+        qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
     try:

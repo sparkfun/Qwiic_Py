@@ -48,8 +48,6 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
-import os
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -67,6 +65,29 @@ _AVAILABLE_I2C_ADDRESS.extend(range(0x08, 0x78))  # Add all possible addresses, 
 _REVISION_ID = 0x02
 _DEVICE_ID = 0xF0
 
+# Firmware and configuration files, shipped in vl53l5cx_bin/ next to this module
+_DATA_FILES = ('firmware.bin', 'default_configuration.bin', 'default_xtalk.bin', 'get_nvm_cmd.bin')
+
+# Where mip and circup install the package on MicroPython and CircuitPython boards
+_DEFAULT_DATA_DIR = "/lib/qwiic_vl53l5cx/vl53l5cx_bin"
+
+def _module_data_dir():
+    """!
+    The vl53l5cx_bin directory next to this module, found from __file__ with
+    string operations (the os module isn't available on every platform).
+
+    @return **str** The directory path with "/" separators, or `None` if __file__ isn't set
+    """
+    try:
+        path = __file__
+    except NameError:
+        return None
+    path = path.replace("\\", "/")
+    slash = path.rfind("/")
+    if slash < 0:
+        return "vl53l5cx_bin"
+    return path[:slash + 1] + "vl53l5cx_bin"
+
 # This class contains the results from a ranging operation
 class RangingDataResults(object):
     """!
@@ -77,19 +98,19 @@ class RangingDataResults(object):
     """
     # TODO: these constants are also contained in the main class below, might be better to
     # abandon this class completely and just pull all the variables into the main class
-    kResolution8x8 = 64
-    kNbTartgetPerZone = 1
+    RESOLUTION_8X8 = 64
+    NB_TARGET_PER_ZONE = 1
 
     def __init__(self):
         self.ambient_per_spad = [0] * 64
-        self.ambient_per_spad = [0] * self.kResolution8x8
-        self.nb_target_detected = [0] * self.kResolution8x8  # Number of valid target detected for 1 zone
-        self.nb_spads_enabled = [0] * self.kResolution8x8  # Number of spads enabled for this ranging
-        self.signal_per_spad = [0] * (self.kResolution8x8 * self.kNbTartgetPerZone)  # Signal returned to the sensor in kcps/spads
-        self.range_sigma_mm = [0] * (self.kResolution8x8 * self.kNbTartgetPerZone)  # Sigma of the current distance in mm
-        self.distance_mm = [0] * (self.kResolution8x8 * self.kNbTartgetPerZone)  # Measured distance in mm
-        self.reflectance = [0] * (self.kResolution8x8 * self.kNbTartgetPerZone)  # Estimated reflectance in percent
-        self.target_status = [0] * (self.kResolution8x8 * self.kNbTartgetPerZone)  # Status indicating the measurement validity (5 & 9 means ranging OK)
+        self.ambient_per_spad = [0] * self.RESOLUTION_8X8
+        self.nb_target_detected = [0] * self.RESOLUTION_8X8  # Number of valid target detected for 1 zone
+        self.nb_spads_enabled = [0] * self.RESOLUTION_8X8  # Number of spads enabled for this ranging
+        self.signal_per_spad = [0] * (self.RESOLUTION_8X8 * self.NB_TARGET_PER_ZONE)  # Signal returned to the sensor in kcps/spads
+        self.range_sigma_mm = [0] * (self.RESOLUTION_8X8 * self.NB_TARGET_PER_ZONE)  # Sigma of the current distance in mm
+        self.distance_mm = [0] * (self.RESOLUTION_8X8 * self.NB_TARGET_PER_ZONE)  # Measured distance in mm
+        self.reflectance = [0] * (self.RESOLUTION_8X8 * self.NB_TARGET_PER_ZONE)  # Estimated reflectance in percent
+        self.target_status = [0] * (self.RESOLUTION_8X8 * self.NB_TARGET_PER_ZONE)  # Status indicating the measurement validity (5 & 9 means ranging OK)
 
         # Motion Indicator Vars
         self.global_indicator_1 = 0
@@ -110,101 +131,103 @@ class QwiicVL53L5CX(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # VL53L5CX API Status defines
-    kStatusOK = 0
-    kMCUError = 1
-    kStatusInvalidParam = 127
-    kStatusError = 255
+    STATUS_OK = 0
+    MCU_ERROR = 1
+    STATUS_INVALID_PARAM = 127
+    STATUS_ERROR = 255
 
-    kResolution4x4 = 16
-    kResolution8x8 = 64
+    RESOLUTION_4X4 = 16
+    RESOLUTION_8X8 = 64
 
-    kOffsetDataSize = 488
-    kXTalkDataSize = 776
-    kTempBufferSize = 1440
+    OFFSET_DATA_SIZE = 488
+    XTALK_DATA_SIZE = 776
+    TEMP_BUFFER_SIZE = 1440
 
-    kUiCmdStatus = 0x2C00
-    kUiCmdStart = 0x2C04
-    kUiCmdEnd = 0x2FFF
+    UI_CMD_STATUS = 0x2C00
+    UI_CMD_START = 0x2C04
+    UI_CMD_END = 0x2FFF
 
-    kDciFreqHz = 0x5458
+    DCI_FREQ_HZ = 0x5458
 
-    kDciDssConfig = 0xAD38
-    kDciZoneConfig = 0x5450
+    DCI_DSS_CONFIG = 0xAD38
+    DCI_ZONE_CONFIG = 0x5450
 
 
-    kDciRangingMode = 0xAD30
-    kRangingModeContinous = 1
-    kRangingModeAutonomous = 3
-    kDciSingleRange = 0xCD5C
+    DCI_RANGING_MODE = 0xAD30
+    RANGING_MODE_CONTINUOUS = 1
+    RANGING_MODE_AUTONOMOUS = 3
+    DCI_SINGLE_RANGE = 0xCD5C
 
-    kDciPipeControl = 0xCF78
+    DCI_PIPE_CONTROL = 0xCF78
 
     # Masks and shifts for the Block_header union
-    kBlockHeaderTypeShift = 0
-    kBlockHeaderTypeMask = 0x0F << kBlockHeaderTypeShift
-    kBlockHeaderSizeShift = 4
-    kBlockHeaderSizeMask = 0xFFF << kBlockHeaderSizeShift
-    kBlockHeaderIdxShift = 16
-    kBlockHeaderIdxMask = 0xFFFF << kBlockHeaderIdxShift
+    BLOCK_HEADER_TYPE_SHIFT = 0
+    BLOCK_HEADER_TYPE_MASK = 0x0F << BLOCK_HEADER_TYPE_SHIFT
+    BLOCK_HEADER_SIZE_SHIFT = 4
+    BLOCK_HEADER_SIZE_MASK = 0xFFF << BLOCK_HEADER_SIZE_SHIFT
+    BLOCK_HEADER_IDX_SHIFT = 16
+    BLOCK_HEADER_IDX_MASK = 0xFFFF << BLOCK_HEADER_IDX_SHIFT
 
     # Definitions for Range results block headers
-    kStartBh = 0x0000000D
-    kMetadataBh = 0x54B400C0
-    kCommonDataBh = 0x54C00040
-    kAmbientRateBh = 0x54D00104
-    kSpadCountBh = 0x55D00404
-    kNbTargetDetectedBh = 0xCF7C0401
-    kSignalRateBh = 0xCFBC0404
-    kRangeSigmaMmBh = 0xD2BC0402
-    kDistanceBh = 0xD33C0402
-    kReflectanceBh = 0xD43C0401
-    kTargetStatusBh = 0xD47C0401
-    kMotionDetectBh = 0xCC5008C0
+    START_BH = 0x0000000D
+    METADATA_BH = 0x54B400C0
+    COMMON_DATA_BH = 0x54C00040
+    AMBIENT_RATE_BH = 0x54D00104
+    SPAD_COUNT_BH = 0x55D00404
+    NB_TARGET_DETECTED_BH = 0xCF7C0401
+    SIGNAL_RATE_BH = 0xCFBC0404
+    RANGE_SIGMA_MM_BH = 0xD2BC0402
+    DISTANCE_BH = 0xD33C0402
+    REFLECTANCE_BH = 0xD43C0401
+    TARGET_STATUS_BH = 0xD47C0401
+    MOTION_DETECT_BH = 0xCC5008C0
 
-    kNbTargetPerZone = 1
+    NB_TARGET_PER_ZONE = 1
 
-    kDciOutputConfig = 0xCD60
-    kDciOutputEnables = 0xCD68
-    kDciOutputList = 0xCD78
+    DCI_OUTPUT_CONFIG = 0xCD60
+    DCI_OUTPUT_ENABLES = 0xCD68
+    DCI_OUTPUT_LIST = 0xCD78
 
-    kMetadataIdx = 0x54B4
-    kSpadCountIdx = 0x55D0
-    kAmbientRateIdx = 0x54D0
-    kNbTargetDetectedIdx = 0xCF7C
-    kSignalRateIdx = 0xCFBC
-    kRangeSigmaMmIdx = 0xD2BC
-    kDistanceIdx = 0xD33C
-    kReflectanceEstPcIdx = 0xD43C
-    kTargetStatusIdx = 0xD47C
-    kMotionDetectIdx = 0xCC50
+    METADATA_IDX = 0x54B4
+    SPAD_COUNT_IDX = 0x55D0
+    AMBIENT_RATE_IDX = 0x54D0
+    NB_TARGET_DETECTED_IDX = 0xCF7C
+    SIGNAL_RATE_IDX = 0xCFBC
+    RANGE_SIGMA_MM_IDX = 0xD2BC
+    DISTANCE_IDX = 0xD33C
+    REFLECTANCE_EST_PC_IDX = 0xD43C
+    TARGET_STATUS_IDX = 0xD47C
+    MOTION_DETECT_IDX = 0xCC50
 
-    kPowerModeSleep = 0
-    kPowerModeWakeup = 1
+    POWER_MODE_SLEEP = 0
+    POWER_MODE_WAKEUP = 1
 
-    kDciIntegrationTime = 0x545C
-    kDciSharpenerPercent = 0xAED8
-    kDciTargetOrder = 0xAE64
+    DCI_INTEGRATION_TIME = 0x545C
+    DCI_SHARPENER_PERCENT = 0xAED8
+    DCI_TARGET_ORDER = 0xAE64
 
-    kTargetOrderClosest = 1
-    kTargetOrderStrongest = 2
+    TARGET_ORDER_CLOSEST = 1
+    TARGET_ORDER_STRONGEST = 2
 
-    kNvmDataSize = 492
-    kConfigurationSize = 972
-    kOffsetBufferSize = 488
-    kXTalkBufferSize = 776
+    NVM_DATA_SIZE = 492
+    CONFIGURATION_SIZE = 972
+    OFFSET_BUFFER_SIZE = 488
+    XTALK_BUFFER_SIZE = 776
 
-    kNvmCmdSize = 40
+    NVM_CMD_SIZE = 40
 
-    def __init__(self, address=None, i2c_driver=None, dataPath = "/lib/qwiic_vl53l5cx/vl53l5cx_bin"):
+    def __init__(self, address=None, i2c_bus=None, data_path=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
-        @param str dataPath: The absolute path to the data directory.
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
+        @param data_path: **str, optional** The directory holding the firmware and configuration
+            .bin files. If not provided, the vl53l5cx_bin directory installed with this package is used
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -212,59 +235,38 @@ class QwiicVL53L5CX(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-        self._dataPath = dataPath
+        self._data_path = data_path
 
         # Lists from the cpp lib
-        self.offset_data = [0] * self.kOffsetDataSize
-        self.xtalk_data = [0] * self.kXTalkDataSize
-        self.temp_buffer = [0] * self.kTempBufferSize
+        self.offset_data = [0] * self.OFFSET_DATA_SIZE
+        self.xtalk_data = [0] * self.XTALK_DATA_SIZE
+        self.temp_buffer = [0] * self.TEMP_BUFFER_SIZE
 
         self.data_read_size = 0
         self.stream_count = 0
 
-    def _check_if_exists(self, filename):
+    def _has_data_files(self, data_dir):
         """!
-        Checks if a file or directory exists. Works on MicroPython and CircuitPython
-        which do not have os.path functions (as well as Linux which does).
+        Checks that a directory holds every firmware and configuration file.
+        Opens each file rather than using os, which isn't available on every platform.
+
+        @param data_dir: **str** The directory to check
+
+        @return **bool** `True` if every file can be opened, otherwise `False`
         """
-        try:
-            os.stat(filename)
-            return True
-        except:
+        if not data_dir:
             return False
-        
-    def _find_data_dir(self, guess_dir):
-        """!
-        Finds the data directory containing the necessary binaries. If provided guess_dir is incorrect, 
-        will look in a default directory based on script location.
-
-        @param str guess_dir: The directory to start searching in
-
-        @return **str** The absolute path to the data directory or `None` if not found
-        """
-        if self._check_if_exists(guess_dir):
-            return guess_dir
-        else:
+        if data_dir[-1] != '/':
+            data_dir += '/'
+        for name in _DATA_FILES:
             try:
-                # This will only work on Linux/Raspberry Pi not CircuitPython or MicroPython.
-                # Those should provide the correct path in the guess_dir parameter and will 
-                # be installed in the correct default location by the package managers
-                data_dir = os.path.join(os.path.dirname(__file__), 'vl53l5cx_bin')
-                if os.path.isdir(data_dir):
-                    return data_dir
-                else:
-                    return None
-            except:
-                return None    
+                open(data_dir + name, 'rb').close()
+            except OSError:
+                return False
+        return True
 
     def is_connected(self):
         """!
@@ -272,34 +274,22 @@ class QwiicVL53L5CX(object):
 
         @return **bool** `True` if connected, otherwise `False`
         """
-        return self._i2c.isDeviceConnected(self.address)
-            
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def check_data_directory(self):
         """!
-        Checks if the data directory exists and contains the necessary files
+        Finds the data directory and checks it contains the necessary files. Tries the
+        data_path given to the constructor, then the vl53l5cx_bin directory next to this
+        module, then /lib/qwiic_vl53l5cx/vl53l5cx_bin.
 
-        @return **bool** `True` if the data directory exists and contains the necessary files, otherwise `False`
+        @return **bool** `True` if a data directory with every file was found, otherwise `False`
         """
+        for data_dir in (self._data_path, _module_data_dir(), _DEFAULT_DATA_DIR):
+            if self._has_data_files(data_dir):
+                self._data_path = data_dir
+                return True
 
-        # Try to find a valid data directory
-        self._dataPath = self._find_data_dir(self._dataPath)
-        if self._dataPath is None:
-            print("ERROR: Could not find data directory! Please provide a valid path for /vl53l5cx_bin on object creation.")
-            return False
-
-        # Validate the binaries are present
-        for file in ['firmware.bin', 
-                     'default_configuration.bin', 
-                     'default_xtalk.bin', 
-                     'get_nvm_cmd.bin']:
-            # Since micropython does not have os.isfile or os.isdir, we use this more convoluted way to check the files exist:
-            if len([fname for fname in os.listdir(self._dataPath) if file == fname]) <= 0:
-                print("ERROR: Malformed data directory! Missing file: " + file)
-                return False
-        
-        return True
+        return False
 
     def begin(self):
         """!
@@ -319,7 +309,7 @@ class QwiicVL53L5CX(object):
             return False
         
         # Contents of the "vl53l5cx_init" function in the cpp lib
-        pipe_ctrl = [self.kNbTargetPerZone, 0x00, 0x01, 0x00]
+        pipe_ctrl = [self.NB_TARGET_PER_ZONE, 0x00, 0x01, 0x00]
         single_range = 0x01
 
         # Sw reboot sequence
@@ -339,13 +329,13 @@ class QwiicVL53L5CX(object):
         self.wr_byte(self.address, 0x0103, 0x01)
         self.wr_byte(self.address, 0x000C, 0x00)
         self.wr_byte(self.address, 0x000F, 0x43)
-        time.sleep(0.001)
+        self._i2c.delay_ms(1)
 
         self.wr_byte(self.address, 0x000F, 0x40)
         self.wr_byte(self.address, 0x000A, 0x01)
-        time.sleep(1)
+        self._i2c.delay_ms(1000)
         
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
         # Wait for sensor booted (several ms required to get sensor ready)
         self.wr_byte(self.address, 0x7FFF, 0x00)
@@ -417,37 +407,37 @@ class QwiicVL53L5CX(object):
         self.wr_byte(self.address, 0x7fff, 0x02)
 
         # Get offset NVM data and store them into the offset buffer
-        self.write_out_large_file(0x2fd8, 'get_nvm_cmd.bin', 0, self.kNvmCmdSize)
-        status |= self.poll_for_answer(4, 0, self.kUiCmdStatus, 0xff, 0x02)
+        self.write_out_large_file(0x2fd8, 'get_nvm_cmd.bin', 0, self.NVM_CMD_SIZE)
+        status |= self.poll_for_answer(4, 0, self.UI_CMD_STATUS, 0xff, 0x02)
 
-        self.temp_buffer[:self.kNvmDataSize] = self.rd_multi(self.address, self.kUiCmdStart, self.kNvmDataSize)
-        self.offset_data[:self.kOffsetBufferSize] = self.temp_buffer[:self.kOffsetBufferSize]
+        self.temp_buffer[:self.NVM_DATA_SIZE] = self.rd_multi(self.address, self.UI_CMD_START, self.NVM_DATA_SIZE)
+        self.offset_data[:self.OFFSET_BUFFER_SIZE] = self.temp_buffer[:self.OFFSET_BUFFER_SIZE]
 
-        self.send_offset_data(self.kResolution4x4)
+        self.send_offset_data(self.RESOLUTION_4X4)
 
         # Set default Xtalk shape. Send Xtalk to sensor
-        self.xtalk_data = self.get_buffer_from_file('default_xtalk.bin')[:self.kXTalkBufferSize]
+        self.xtalk_data = self.get_buffer_from_file('default_xtalk.bin')[:self.XTALK_BUFFER_SIZE]
 
-        status |= self.send_xtalk_data(self.kResolution4x4)
+        status |= self.send_xtalk_data(self.RESOLUTION_4X4)
 
         # Send default configuration to VL53L5CX firmware
-        self.write_out_large_file(0x2c34, 'default_configuration.bin', 0, self.kConfigurationSize)
+        self.write_out_large_file(0x2c34, 'default_configuration.bin', 0, self.CONFIGURATION_SIZE)
 
-        status |= self.poll_for_answer(4, 1, self.kUiCmdStatus, 0xff, 0x03)
+        status |= self.poll_for_answer(4, 1, self.UI_CMD_STATUS, 0xff, 0x03)
         
-        status |= self.dci_write_data(pipe_ctrl, self.kDciPipeControl, len(pipe_ctrl))
+        status |= self.dci_write_data(pipe_ctrl, self.DCI_PIPE_CONTROL, len(pipe_ctrl))
         
-        status |= self.dci_write_data(self.uint32_list_to_byte_list([single_range]), self.kDciSingleRange, 4)
+        status |= self.dci_write_data(self.uint32_list_to_byte_list([single_range]), self.DCI_SINGLE_RANGE, 4)
         
-        return (status == self.kStatusOK)
+        return (status == self.STATUS_OK)
     
 
     def swap_buffer(self, buffer, size):
         """!
         Used to swap a buffer. The buffer size is always a multiple of 4 (4, 8, 12, 16, ...).
 
-        @param list buffer: The byte buffer to swap
-        @param int size: Buffer size to swap
+        @param buffer: **list** The byte buffer to swap
+        @param size: **int** Buffer size to swap
         """
         for i in range (0, size, 4):
             buffer[i], buffer[i+1], buffer[i+2], buffer[i+3] = buffer[i+3], buffer[i+2], buffer[i+1], buffer[i]
@@ -457,15 +447,15 @@ class QwiicVL53L5CX(object):
         """!
         This function is used to wait for an answer from the VL53L5CX sensor.
 
-        @param int size: The number of bytes to read
-        @param int pos: The position in the buffer to check against expected_value
-        @param int address: The address to read from
-        @param int mask: The mask to apply to the value read (at pos) before comparing to expected_value
-        @param int expected_value: The value to compare against the value read (at pos)
+        @param size: **int** The number of bytes to read
+        @param pos: **int** The position in the buffer to check against expected_value
+        @param addr: **int** The register address to read from
+        @param mask: **int** The mask to apply to the value read (at pos) before comparing to expected_value
+        @param expected_value: **int** The value to compare against the value read (at pos)
 
-        @return **int** kStatusOk on success, other on failure
+        @return **int** STATUS_OK on success, other on failure
         """
-        status = self.kStatusOK
+        status = self.STATUS_OK
         timeout = 0
 
         while True: # Equivalent of the do-while loop in the cpp lib
@@ -473,13 +463,13 @@ class QwiicVL53L5CX(object):
 
             self.temp_buffer[:size] = data
 
-            time.sleep(0.010)
+            self._i2c.delay_ms(10)
             if timeout > 200: # 2s timeout
                 status |= self.temp_buffer[2]
                 return status # TODO: cpp lib doesn't have this, but probably should so that we break out on timeout
             else:
                 if (size >= 4) and (self.temp_buffer[2] >= 0x7F):
-                    status |= self.kMCUError
+                    status |= self.MCU_ERROR
                 else:
                     timeout += 1
 
@@ -492,16 +482,16 @@ class QwiicVL53L5CX(object):
         """!
         This function is used to set the offset data gathered from NVM.
 
-        @param int resolution: The resolution of the sensor
+        @param resolution: **int** The resolution of the sensor
 
             Allowable values for resolution:
-            - kResolution4x4
-            - kResolution8x8
+            - RESOLUTION_4X4
+            - RESOLUTION_8X8
 
-        @return  kStatusOk on success, other on failure
+        @return  STATUS_OK on success, other on failure
         
         """
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
         signal_grid = [0] * 64
         range_grid = [0] * 64
@@ -512,9 +502,9 @@ class QwiicVL53L5CX(object):
         self.temp_buffer[:len(self.offset_data)] = self.offset_data
 
         # Data extrapolation is required for 4X4 offset
-        if resolution == self.kResolution4x4:
+        if resolution == self.RESOLUTION_4X4:
             self.temp_buffer[0x10:0x10+8] = dds_4x4
-            self.swap_buffer(self.temp_buffer, self.kOffsetDataSize)
+            self.swap_buffer(self.temp_buffer, self.OFFSET_DATA_SIZE)
             signal_grid = self.temp_buffer[0x3C:0x3C+64]
             range_grid = self.temp_buffer[0x140:0x140+64]
 
@@ -539,14 +529,14 @@ class QwiicVL53L5CX(object):
             signal_grid[0x10:] = [0] * len(signal_grid[0x10:])
             self.temp_buffer[0x3C:0x3C+64] = signal_grid
             self.temp_buffer[0x140:0x140+64] = range_grid
-            self.swap_buffer(self.temp_buffer, self.kOffsetDataSize)
+            self.swap_buffer(self.temp_buffer, self.OFFSET_DATA_SIZE)
         
-        for i in range (self.kOffsetDataSize - 4):
+        for i in range (self.OFFSET_DATA_SIZE - 4):
             self.temp_buffer[i] = self.temp_buffer[i + 8]
 
         self.temp_buffer[0x1E0:0x1E0+8] = footer
-        self.wr_multi(self.address, 0x2e18, self.temp_buffer[:self.kOffsetDataSize])
-        status |= self.poll_for_answer(4, 1, self.kUiCmdStatus, 0xff, 0x03)
+        self.wr_multi(self.address, 0x2e18, self.temp_buffer[:self.OFFSET_DATA_SIZE])
+        status |= self.poll_for_answer(4, 1, self.UI_CMD_STATUS, 0xff, 0x03)
 
         return status
     
@@ -554,16 +544,16 @@ class QwiicVL53L5CX(object):
         """!
         This function is used to set the Xtalk data from generic configuration, or user's calibration.
 
-        @param int resolution: The resolution of the sensor
+        @param resolution: **int** The resolution of the sensor
 
             Allowable values for resolution:
-            - kResolution4x4
-            - kResolution8x8
+            - RESOLUTION_4X4
+            - RESOLUTION_8X8
 
-        @return  kStatusOk on success, other on failure
+        @return  STATUS_OK on success, other on failure
         
         """
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
         res4x4 = [0x0F, 0x04, 0x04, 0x17, 0x08, 0x10, 0x10, 0x07]
         dss_4x4 = [0x00, 0x78, 0x00, 0x08, 0x00, 0x00, 0x00, 0x08]
@@ -573,10 +563,10 @@ class QwiicVL53L5CX(object):
         self.temp_buffer[:len(self.xtalk_data)] = self.xtalk_data
         
         # Data extrapolation is required for 4x4 Xtalk
-        if resolution == self.kResolution4x4:
+        if resolution == self.RESOLUTION_4X4:
             self.temp_buffer[0x08:0x08+8] = res4x4
             self.temp_buffer[0x20:0x20+8] = dss_4x4
-            self.swap_buffer(self.temp_buffer, self.kXTalkDataSize)
+            self.swap_buffer(self.temp_buffer, self.XTALK_DATA_SIZE)
 
             signal_grid = self.temp_buffer[0x34:0x34+64]
             for j in range(4):
@@ -592,12 +582,12 @@ class QwiicVL53L5CX(object):
             # It's possible these were located at known memory locations in the cpp lib and we wanted to zero out the stuff directly after them as well
             signal_grid[0x10:] = [0] * len(signal_grid[0x10:])
             self.temp_buffer[0x34:0x34+64] = signal_grid
-            self.swap_buffer(self.temp_buffer, self.kXTalkDataSize)
+            self.swap_buffer(self.temp_buffer, self.XTALK_DATA_SIZE)
             self.temp_buffer[0x134:0x134+4] = profile_4x4
             self.temp_buffer[0x078:0x078+4] = [0] * 4
             
-        self.wr_multi(self.address, 0x2cf8, self.temp_buffer[:self.kXTalkDataSize])
-        status |= self.poll_for_answer(4, 1, self.kUiCmdStatus, 0xff, 0x03)
+        self.wr_multi(self.address, 0x2cf8, self.temp_buffer[:self.XTALK_DATA_SIZE])
+        status |= self.poll_for_answer(4, 1, self.UI_CMD_STATUS, 0xff, 0x03)
 
         return status
 
@@ -606,24 +596,24 @@ class QwiicVL53L5CX(object):
             This function can be used to write 'extra data' to DCI. The data can
             be simple data, or casted structure.
 
-            @param list data: This field can be a casted structure, or a simple
+            @param data: **list** This field can be a casted structure, or a simple
             array. Please note that the FW only accept data of 32 bits. So field data can
             only have a size of 32, 64, 96, 128, bits ..
-            @param int index: Index of required value.
-            @param int data_size: This field must be the structure or array size
+            @param index: **int** Index of required value.
+            @param data_size: **int** This field must be the structure or array size
 
             @return **int** status: 0 if OK
             """
-        status = self.kStatusOK
+        status = self.STATUS_OK
         headers = [0x00, 0x00, 0x00, 0x00]
         footer = [0x00, 0x00, 0x00, 0x0f, 0x05, 0x01,
                   (data_size + 8) >> 8,
                   (data_size + 8) & 0xFF]
         
-        address = self.kUiCmdEnd - (data_size + 12) + 1
+        address = self.UI_CMD_END - (data_size + 12) + 1
         # Check if cmd buffer is large enough
-        if data_size + 12 > self.kTempBufferSize:
-            status |= self.kStatusError
+        if data_size + 12 > self.TEMP_BUFFER_SIZE:
+            status |= self.STATUS_ERROR
         else:
             headers[0] = index >> 8
             headers[1] = index & 0xff
@@ -641,7 +631,7 @@ class QwiicVL53L5CX(object):
 
             # Send data to FW
             self.wr_multi(self.address, address, self.temp_buffer[:data_size + 12])
-            status |= self.poll_for_answer(4, 1, self.kUiCmdStatus, 0xff, 0x03)
+            status |= self.poll_for_answer(4, 1, self.UI_CMD_STATUS, 0xff, 0x03)
 
             self.swap_buffer(data, data_size)
         
@@ -652,24 +642,24 @@ class QwiicVL53L5CX(object):
             This function can be used to read 'extra data' from DCI. Using a known
             index, the function fills the casted structure passed in argument.
 
-            @param list data: This field can be a casted structure, or a simple
+            @param data: **list** This field can be a casted structure, or a simple
             array. Please note that the FW only accept data of 32 bits. So field data can
             only have a size of 32, 64, 96, 128, bits ....
-            @param int index: Index of required value.
-            @param int data_size: This field must be the structure or array size
+            @param index: **int** Index of required value.
+            @param data_size: **int** This field must be the structure or array size
 
             @return **int** status: 0 if OK
             """
 
-        status = self.kStatusOK
+        status = self.STATUS_OK
         rd_size = data_size + 12
         cmd = [0x00, 0x00, 0x00, 0x00,
                0x00, 0x00, 0x00, 0x0f,
                0x00, 0x02, 0x00, 0x08]
 
         # Check if tmp buffer is large enough
-        if (data_size + 12) > self.kTempBufferSize:
-            status |= self.kStatusError
+        if (data_size + 12) > self.TEMP_BUFFER_SIZE:
+            status |= self.STATUS_ERROR
         else:
             cmd[0] = index >> 8
             cmd[1] = index & 0xff
@@ -677,11 +667,11 @@ class QwiicVL53L5CX(object):
             cmd[3] = (data_size & 0xf) << 4
 
             # Request data reading from FW
-            self.wr_multi(self.address, self.kUiCmdEnd - 11, cmd)
-            status |= self.poll_for_answer(4, 1, self.kUiCmdStatus, 0xff, 0x03)
+            self.wr_multi(self.address, self.UI_CMD_END - 11, cmd)
+            status |= self.poll_for_answer(4, 1, self.UI_CMD_STATUS, 0xff, 0x03)
 
             # Read new data sent (4 bytes header + data_size + 8 bytes footer)
-            self.temp_buffer[:rd_size] = self.rd_multi(self.address, self.kUiCmdStart, rd_size)
+            self.temp_buffer[:rd_size] = self.rd_multi(self.address, self.UI_CMD_START, rd_size)
             self.swap_buffer(self.temp_buffer, rd_size)
 
             for i in range(data_size):
@@ -694,18 +684,18 @@ class QwiicVL53L5CX(object):
             This function can be used to replace 'extra data' in DCI. The data can
             be simple data, or casted structure.
 
-            @param list data: This field can be a casted structure, or a simple array. 
+            @param data: **list** This field can be a casted structure, or a simple array.
                         Please note that the FW only accepts data of 32 bits. 
                         So field data can only have a size of 32, 64, 96, 128 bits, etc.
-            @param int index: Index of required value.
-            @param int data_size: This field must be the structure or array size.
-            @param list new_data: Contains the new fields.
-            @param int new_data_size: New data size.
-            @param int new_data_pos: New data position into the buffer.
+            @param index: **int** Index of required value.
+            @param data_size: **int** This field must be the structure or array size.
+            @param new_data: **list** Contains the new fields.
+            @param new_data_size: **int** New data size.
+            @param new_data_pos: **int** New data position into the buffer.
 
             @return **int** status: 0 if OK
             """
-        status = self.kStatusOK
+        status = self.STATUS_OK
         status |= self.dci_read_data(data, index, data_size)
         data[new_data_pos:new_data_pos+new_data_size] = new_data
         status |= self.dci_write_data(data, index, data_size)
@@ -729,7 +719,7 @@ class QwiicVL53L5CX(object):
         """!
         Set the I2C address of the device
 
-        @param int i2c_address: The new I2C address to use
+        @param i2c_address: **int** The new I2C address to use
 
         @return **bool** True if the address was set successfully, otherwise False
         """
@@ -756,7 +746,7 @@ class QwiicVL53L5CX(object):
             corresponds to the measurements frequency. This setting depends on
             the resolution, so please select your resolution before using this function.
 
-            @param int frequency_hz: Contains the ranging frequency in Hz.
+            @param frequency_hz: **int** Contains the ranging frequency in Hz.
                 - For 4x4, min and max allowed values are: [1;60]
                 - For 8x8, min and max allowed values are: [1;15]
 
@@ -764,10 +754,10 @@ class QwiicVL53L5CX(object):
         
             """
 
-        status = self.kStatusOK
-        status |= self.dci_replace_data(self.temp_buffer, self.kDciFreqHz, 4, [frequency_hz], 1, 0x01)
+        status = self.STATUS_OK
+        status |= self.dci_replace_data(self.temp_buffer, self.DCI_FREQ_HZ, 4, [frequency_hz], 1, 0x01)
 
-        return status == self.kStatusOK
+        return status == self.STATUS_OK
 
     def get_ranging_frequency_hz(self):
         """!
@@ -776,49 +766,49 @@ class QwiicVL53L5CX(object):
 
         @return **int** The current ranging frequency in Hz.
         """
-        status = self.dci_read_data(self.temp_buffer, self.kDciFreqHz, 4)
+        status = self.dci_read_data(self.temp_buffer, self.DCI_FREQ_HZ, 4)
         return self.temp_buffer[0x01]
     
     def set_resolution(self, resolution):
         """!
             This function sets a new resolution (4x4 or 8x8).
 
-            @param int resolution: Use kResolution4x4 or kResolution8x8 to set the resolution.
+            @param resolution: **int** Use RESOLUTION_4X4 or RESOLUTION_8X8 to set the resolution.
 
             @return **int** status: 0 if set resolution is OK.
             """
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
-        if resolution == self.kResolution4x4:
-            status |= self.dci_read_data(self.temp_buffer, self.kDciDssConfig, 16)
+        if resolution == self.RESOLUTION_4X4:
+            status |= self.dci_read_data(self.temp_buffer, self.DCI_DSS_CONFIG, 16)
             self.temp_buffer[0x04] = 64
             self.temp_buffer[0x06] = 64
             self.temp_buffer[0x09] = 4
-            status |= self.dci_write_data(self.temp_buffer, self.kDciDssConfig, 16)
+            status |= self.dci_write_data(self.temp_buffer, self.DCI_DSS_CONFIG, 16)
 
-            status |= self.dci_read_data(self.temp_buffer, self.kDciZoneConfig, 8)
+            status |= self.dci_read_data(self.temp_buffer, self.DCI_ZONE_CONFIG, 8)
             self.temp_buffer[0x00] = 4
             self.temp_buffer[0x01] = 4
             self.temp_buffer[0x04] = 8
             self.temp_buffer[0x05] = 8
-            status |= self.dci_write_data(self.temp_buffer, self.kDciZoneConfig, 8)
+            status |= self.dci_write_data(self.temp_buffer, self.DCI_ZONE_CONFIG, 8)
 
-        elif resolution == self.kResolution8x8:
-            status |= self.dci_read_data(self.temp_buffer, self.kDciDssConfig, 16)
+        elif resolution == self.RESOLUTION_8X8:
+            status |= self.dci_read_data(self.temp_buffer, self.DCI_DSS_CONFIG, 16)
             self.temp_buffer[0x04] = 16
             self.temp_buffer[0x06] = 16
             self.temp_buffer[0x09] = 1
-            status |= self.dci_write_data(self.temp_buffer, self.kDciDssConfig, 16)
+            status |= self.dci_write_data(self.temp_buffer, self.DCI_DSS_CONFIG, 16)
 
-            status |= self.dci_read_data(self.temp_buffer, self.kDciZoneConfig, 8)
+            status |= self.dci_read_data(self.temp_buffer, self.DCI_ZONE_CONFIG, 8)
             self.temp_buffer[0x00] = 8
             self.temp_buffer[0x01] = 8
             self.temp_buffer[0x04] = 4
             self.temp_buffer[0x05] = 4
-            status |= self.dci_write_data(self.temp_buffer, self.kDciZoneConfig, 8)
+            status |= self.dci_write_data(self.temp_buffer, self.DCI_ZONE_CONFIG, 8)
 
         else:
-            status = self.kStatusInvalidParam
+            status = self.STATUS_INVALID_PARAM
 
         status |= self.send_offset_data(resolution)
         status |= self.send_xtalk_data(resolution)
@@ -831,14 +821,14 @@ class QwiicVL53L5CX(object):
 
             @return **int** The current resolution. 16 for 4x4 mode, and 64 for 8x8 mode.
             """
-        self.dci_read_data(self.temp_buffer, self.kDciZoneConfig, 8)
+        self.dci_read_data(self.temp_buffer, self.DCI_ZONE_CONFIG, 8)
         return self.temp_buffer[0x00] * self.temp_buffer[0x01]
     
     def uint32_list_to_byte_list(self, uint32_list):
         """!
             This function converts a list of uint32 values to a list of bytes.
 
-            @param list uint32_list: The list of uint32 values to convert.
+            @param uint32_list: **list** The list of uint32 values to convert.
 
             @return  The list of bytes.
         
@@ -856,7 +846,7 @@ class QwiicVL53L5CX(object):
         """!
             This function converts a list of bytes to a single uint32 value
 
-            @param list byte_list: The list of bytes to convert.
+            @param byte_list: **list** The list of bytes to convert.
 
             @return  The uint32 value
         
@@ -867,8 +857,8 @@ class QwiicVL53L5CX(object):
         """!
             This function converts a list of bytes into uint32 values and places at the start of the uint32 list.
 
-            @param list byte_list: The list of bytes to convert.
-            @param list uint32_list: The list of uint32 values to convert.
+            @param byte_list: **list** The list of bytes to convert.
+            @param uint32_list: **list** The list of uint32 values to convert.
 
             @return  0 if successful, -1 if the byte list is not a multiple of 4, or if the uint32 list is too small.
         
@@ -888,8 +878,8 @@ class QwiicVL53L5CX(object):
         """!
             This function converts a list of bytes to a list of uint16 values and places at the start of the uint16 list.
 
-            @param list byte_list: The list of bytes to convert.
-            @param list uint16_list: The list of uint16 values to convert.
+            @param byte_list: **list** The list of bytes to convert.
+            @param uint16_list: **list** The list of uint16 values to convert.
 
             @return  0 if successful, -1 if the byte list is not a multiple of 2, or if the uint16 list is too small.
         
@@ -909,8 +899,8 @@ class QwiicVL53L5CX(object):
         """!
             This function converts a list of bytes to a list of int16 values and places at the start of the int16 list.
 
-            @param list byte_list: The list of bytes to convert.
-            @param list int16_list: The list of int16 values to convert.
+            @param byte_list: **list** The list of bytes to convert.
+            @param int16_list: **list** The list of int16 values to convert.
 
             @return  0 if successful, -1 if the byte list is not a multiple of 2, or if the int16 list is too small.
         
@@ -935,27 +925,27 @@ class QwiicVL53L5CX(object):
             available using ULD: Continuous and autonomous. The default
             mode is Autonomous.
 
-            @param int ranging_mode: Use kRangingModeAutonomous, kRangingModeContinous
+            @param ranging_mode: **int** Use RANGING_MODE_AUTONOMOUS, RANGING_MODE_CONTINUOUS
 
             @return **int** status: 0 if set ranging mode is OK.
             """
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
-        status |= self.dci_read_data(self.temp_buffer, self.kDciRangingMode, 8)
+        status |= self.dci_read_data(self.temp_buffer, self.DCI_RANGING_MODE, 8)
 
-        if ranging_mode == self.kRangingModeContinous:
+        if ranging_mode == self.RANGING_MODE_CONTINUOUS:
             self.temp_buffer[0x01] = 0x1
             self.temp_buffer[0x03] = 0x3
             single_range = self.uint32_list_to_byte_list([0])
-        elif ranging_mode == self.kRangingModeAutonomous:
+        elif ranging_mode == self.RANGING_MODE_AUTONOMOUS:
             self.temp_buffer[0x01] = 0x3
             self.temp_buffer[0x03] = 0x2
             single_range = self.uint32_list_to_byte_list([1])
         else:
-            status = self.kStatusInvalidParam
+            status = self.STATUS_INVALID_PARAM
 
-        status |= self.dci_write_data(self.temp_buffer, self.kDciRangingMode, 8)
-        status |= self.dci_write_data(single_range, self.kDciSingleRange, len(single_range))
+        status |= self.dci_write_data(self.temp_buffer, self.DCI_RANGING_MODE, 8)
+        status |= self.dci_write_data(single_range, self.DCI_SINGLE_RANGE, len(single_range))
         
         return status
 
@@ -967,12 +957,12 @@ class QwiicVL53L5CX(object):
 
             @return **int** The current ranging mode.
             """
-        self.dci_read_data(self.temp_buffer, self.kDciRangingMode, 8)
+        self.dci_read_data(self.temp_buffer, self.DCI_RANGING_MODE, 8)
 
         if self.temp_buffer[0x01] == 0x1:
-            return self.kRangingModeContinous
+            return self.RANGING_MODE_CONTINUOUS
         else:
-            return self.kRangingModeAutonomous
+            return self.RANGING_MODE_AUTONOMOUS
 
     def start_ranging(self):
         """!
@@ -982,7 +972,7 @@ class QwiicVL53L5CX(object):
             @return **int** status: 0 if start is OK.
             """
     
-        status = self.kStatusOK
+        status = self.STATUS_OK
         header_config = [0,0]
 
         cmd = [0x00, 0x03, 0x00, 0x00]
@@ -1000,18 +990,18 @@ class QwiicVL53L5CX(object):
 
         # Send addresses of possible output
         output = [
-            self.kStartBh,
-            self.kMetadataBh,
-            self.kCommonDataBh,
-            self.kAmbientRateBh,
-            self.kSpadCountBh,
-            self.kNbTargetDetectedBh,
-            self.kSignalRateBh,
-            self.kRangeSigmaMmBh,
-            self.kDistanceBh,
-            self.kReflectanceBh,
-            self.kTargetStatusBh,
-            self.kMotionDetectBh
+            self.START_BH,
+            self.METADATA_BH,
+            self.COMMON_DATA_BH,
+            self.AMBIENT_RATE_BH,
+            self.SPAD_COUNT_BH,
+            self.NB_TARGET_DETECTED_BH,
+            self.SIGNAL_RATE_BH,
+            self.RANGE_SIGMA_MM_BH,
+            self.DISTANCE_BH,
+            self.REFLECTANCE_BH,
+            self.TARGET_STATUS_BH,
+            self.MOTION_DETECT_BH
         ]
 
         # Enable selected outputs
@@ -1030,19 +1020,19 @@ class QwiicVL53L5CX(object):
             if (output[i] == 0) or ((output_bh_enable[i//32] & (1 << (i%32))) == 0):
                continue
 
-            bh_ptr_type = (output[i] & self.kBlockHeaderTypeMask) >> self.kBlockHeaderTypeShift
-            bh_ptr_size = (output[i] & self.kBlockHeaderSizeMask) >> self.kBlockHeaderSizeShift
-            bh_ptr_idx = (output[i] & self.kBlockHeaderIdxMask) >> self.kBlockHeaderIdxShift
+            bh_ptr_type = (output[i] & self.BLOCK_HEADER_TYPE_MASK) >> self.BLOCK_HEADER_TYPE_SHIFT
+            bh_ptr_size = (output[i] & self.BLOCK_HEADER_SIZE_MASK) >> self.BLOCK_HEADER_SIZE_SHIFT
+            bh_ptr_idx = (output[i] & self.BLOCK_HEADER_IDX_MASK) >> self.BLOCK_HEADER_IDX_SHIFT
 
             if (bh_ptr_type >= 0x01) and (bh_ptr_type < 0x0d):
                 if (bh_ptr_type >= 0x54d0) and (bh_ptr_idx < 0x54d0 + 960):
                     bh_ptr_size = resolution
-                    output[i] &= ~self.kBlockHeaderSizeMask
-                    output[i] |= (resolution << self.kBlockHeaderSizeShift)
+                    output[i] &= ~self.BLOCK_HEADER_SIZE_MASK
+                    output[i] |= (resolution << self.BLOCK_HEADER_SIZE_SHIFT)
                 else:
-                    bh_ptr_size = resolution * self.kNbTargetPerZone
-                    output[i] &= ~self.kBlockHeaderSizeMask
-                    output[i] |= ( (resolution * self.kNbTargetPerZone) << self.kBlockHeaderSizeShift )
+                    bh_ptr_size = resolution * self.NB_TARGET_PER_ZONE
+                    output[i] &= ~self.BLOCK_HEADER_SIZE_MASK
+                    output[i] |= ( (resolution * self.NB_TARGET_PER_ZONE) << self.BLOCK_HEADER_SIZE_SHIFT )
                 
                 self.data_read_size += bh_ptr_type * bh_ptr_size
             else:
@@ -1052,13 +1042,13 @@ class QwiicVL53L5CX(object):
 
         self.data_read_size += 20
 
-        status |= self.dci_write_data(self.uint32_list_to_byte_list(output), self.kDciOutputList, len(output) * 4)
+        status |= self.dci_write_data(self.uint32_list_to_byte_list(output), self.DCI_OUTPUT_LIST, len(output) * 4)
 
         header_config[0] = self.data_read_size
         header_config[1] = i + 2
 
-        status |= self.dci_write_data(self.uint32_list_to_byte_list(header_config), self.kDciOutputConfig, 8)
-        status |= self.dci_write_data(self.uint32_list_to_byte_list(output_bh_enable), self.kDciOutputEnables, 16)
+        status |= self.dci_write_data(self.uint32_list_to_byte_list(header_config), self.DCI_OUTPUT_CONFIG, 8)
+        status |= self.dci_write_data(self.uint32_list_to_byte_list(output_bh_enable), self.DCI_OUTPUT_ENABLES, 16)
 
         # Start xshut bypass (interrupt mode)
         self.wr_byte(self.address, 0x7FFF, 0x00)
@@ -1066,8 +1056,8 @@ class QwiicVL53L5CX(object):
         self.wr_byte(self.address, 0x7FFF, 0x02)
 
         # Start ranging session
-        self.wr_multi(self.address, self.kUiCmdEnd - (4 - 1), cmd)
-        status |= self.poll_for_answer(4, 1, self.kUiCmdStatus, 0xff, 0x03)
+        self.wr_multi(self.address, self.UI_CMD_END - (4 - 1), cmd)
+        status |= self.poll_for_answer(4, 1, self.UI_CMD_STATUS, 0xff, 0x03)
 
         return status
 
@@ -1078,7 +1068,7 @@ class QwiicVL53L5CX(object):
 
             @return **int** status: 0 if stop is OK.
             """
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
         auto_stop_flag = self.rd_multi(self.address, 0x2FFC, 4)
         
@@ -1095,12 +1085,12 @@ class QwiicVL53L5CX(object):
             tmp = 0 
             while (tmp & 0x80) >> 7 == 0x00:
                 tmp = self.rd_byte(self.address, 0x6)
-                time.sleep(0.010)
+                self._i2c.delay_ms(10)
                 timeout += 1
 
                 # Timeout reached after 5 seconds
                 if timeout > 500:
-                    status = self.kStatusError
+                    status = self.STATUS_ERROR
                     break
 
         # Undo MCU stop
@@ -1145,7 +1135,7 @@ class QwiicVL53L5CX(object):
 
         @return **RangingDataResults** The ranging data
         """
-        status = self.kStatusOK
+        status = self.STATUS_OK
         data = RangingDataResults()
 
         # Get the data
@@ -1156,9 +1146,9 @@ class QwiicVL53L5CX(object):
         # Start conversion at position 16 to avoid headers
         for i in range(16, self.data_read_size, 4):
             block_header = self.byte_list_to_uint32(self.temp_buffer[i:i+4])
-            bh_ptr_type = (block_header & self.kBlockHeaderTypeMask) >> self.kBlockHeaderTypeShift
-            bh_ptr_size = (block_header & self.kBlockHeaderSizeMask) >> self.kBlockHeaderSizeShift
-            bh_ptr_idx = (block_header & self.kBlockHeaderIdxMask) >> self.kBlockHeaderIdxShift
+            bh_ptr_type = (block_header & self.BLOCK_HEADER_TYPE_MASK) >> self.BLOCK_HEADER_TYPE_SHIFT
+            bh_ptr_size = (block_header & self.BLOCK_HEADER_SIZE_MASK) >> self.BLOCK_HEADER_SIZE_SHIFT
+            bh_ptr_idx = (block_header & self.BLOCK_HEADER_IDX_MASK) >> self.BLOCK_HEADER_IDX_SHIFT
 
             if (bh_ptr_type > 0x01) and (bh_ptr_type < 0x0d):
                 msize = bh_ptr_type * bh_ptr_size
@@ -1166,23 +1156,23 @@ class QwiicVL53L5CX(object):
                 msize = bh_ptr_size
             
             # TODO: could optionally check the return of each of these functions to make sure they're successful
-            if bh_ptr_idx == self.kAmbientRateIdx:
+            if bh_ptr_idx == self.AMBIENT_RATE_IDX:
                 self.byte_list_to_uint32_list(self.temp_buffer[i + 4:i + 4 + msize], data.ambient_per_spad)
-            elif bh_ptr_idx == self.kSpadCountIdx:
+            elif bh_ptr_idx == self.SPAD_COUNT_IDX:
                 self.byte_list_to_uint32_list(self.temp_buffer[i + 4:i + 4 + msize], data.nb_spads_enabled)
-            elif bh_ptr_idx == self.kNbTargetDetectedIdx:
+            elif bh_ptr_idx == self.NB_TARGET_DETECTED_IDX:
                 data.nb_target_detected[0:msize] = self.temp_buffer[i + 4:i + 4 + msize]
-            elif bh_ptr_idx == self.kSignalRateIdx:
+            elif bh_ptr_idx == self.SIGNAL_RATE_IDX:
                 self.byte_list_to_uint32_list(self.temp_buffer[i + 4:i + 4 + msize], data.signal_per_spad)
-            elif bh_ptr_idx == self.kRangeSigmaMmIdx:
+            elif bh_ptr_idx == self.RANGE_SIGMA_MM_IDX:
                 self.byte_list_to_uint16_list(self.temp_buffer[i + 4:i + 4 + msize], data.range_sigma_mm)
-            elif bh_ptr_idx == self.kDistanceIdx:
+            elif bh_ptr_idx == self.DISTANCE_IDX:
                 self.byte_list_to_int16_list(self.temp_buffer[i + 4:i + 4 + msize], data.distance_mm)
-            elif bh_ptr_idx == self.kReflectanceEstPcIdx:
+            elif bh_ptr_idx == self.REFLECTANCE_EST_PC_IDX:
                 data.reflectance[0:msize] = self.temp_buffer[i + 4:i + 4 + msize]
-            elif bh_ptr_idx == self.kTargetStatusIdx:
+            elif bh_ptr_idx == self.TARGET_STATUS_IDX:
                 data.target_status[0:msize] = self.temp_buffer[i + 4:i + 4 + msize]
-            elif bh_ptr_idx == self.kMotionDetectIdx:
+            elif bh_ptr_idx == self.MOTION_DETECT_IDX:
                 # TODO: check endianness and packing here...
                 data.global_indicator_1 = self.byte_list_to_uint32(self.temp_buffer[i + 4:i + 4 + 4])
                 data.global_indicator_2 = self.byte_list_to_uint32(self.temp_buffer[i + 8:i + 8 + 4])
@@ -1195,19 +1185,19 @@ class QwiicVL53L5CX(object):
             i += msize
 
         # Convert data into their real format 
-        for i in range (self.kResolution8x8):
+        for i in range (self.RESOLUTION_8X8):
             data.ambient_per_spad[i] = data.ambient_per_spad[i] // 2048
         
-        for i in range (self.kResolution8x8 * self.kNbTargetPerZone):
+        for i in range (self.RESOLUTION_8X8 * self.NB_TARGET_PER_ZONE):
             if data.distance_mm[i] < 0:
                 data.distance_mm[i] = 0
             data.range_sigma_mm[i] = data.range_sigma_mm[i] // 128
             data.signal_per_spad[i] = data.signal_per_spad[i] // 2048
         
-        for i in range (self.kResolution8x8):
+        for i in range (self.RESOLUTION_8X8):
             if data.nb_target_detected[i] == 0:
-                for j in range (self.kNbTargetPerZone):
-                    data.target_status[i * self.kNbTargetPerZone + j] = 255
+                for j in range (self.NB_TARGET_PER_ZONE):
+                    data.target_status[i * self.NB_TARGET_PER_ZONE + j] = 255
 
         for i in range(32):
             data.motion[i] = data.motion[i] // 65535
@@ -1223,14 +1213,14 @@ class QwiicVL53L5CX(object):
         self.wr_byte(self.address, 0x7FFF, 0x00)
         tmp = self.rd_byte(self.address, 0x009)
 
-        power_mode = self.kStatusError
+        power_mode = self.STATUS_ERROR
 
         if tmp == 0x4:
-            power_mode = self.kPowerModeWakeup
+            power_mode = self.POWER_MODE_WAKEUP
         elif tmp == 0x2:
-            power_mode = self.kPowerModeSleep
+            power_mode = self.POWER_MODE_SLEEP
         else:
-            power_mode = self.kStatusError
+            power_mode = self.STATUS_ERROR
 
         self.wr_byte(self.address, 0x7FFF, 0x02)
 
@@ -1239,30 +1229,30 @@ class QwiicVL53L5CX(object):
     def set_power_mode(self, power_mode):
         """!
             This function is used to set the sensor in Low Power mode, for example if the sensor is not used during a long time. 
-            The macro kPowerModeSleep can be used to enable the low power mode. When user wants to restart the sensor, 
-            they can use the macro kPowerModeWakeup. Please ensure that the device is not streaming before calling the function.
+            The macro POWER_MODE_SLEEP can be used to enable the low power mode. When user wants to restart the sensor, 
+            they can use the macro POWER_MODE_WAKEUP. Please ensure that the device is not streaming before calling the function.
 
-            @param int power_mode: Selected power mode (kPowerModeSleep or kPowerModeWakeup)
+            @param power_mode: **int** Selected power mode (POWER_MODE_SLEEP or POWER_MODE_WAKEUP)
 
             @return **int** status: 0 if set power mode is OK.
             """
 
-        status = self.kStatusOK
+        status = self.STATUS_OK
         
         current_power_mode = self.get_power_mode()
         
         if power_mode != current_power_mode:
-            if power_mode == self.kPowerModeWakeup:
+            if power_mode == self.POWER_MODE_WAKEUP:
                 self.wr_byte(self.address, 0x7FFF, 0x00)
                 self.wr_byte(self.address, 0x09, 0x04)
                 status |= self.poll_for_answer(1, 0, 0x06, 0x01, 1)
 
-            elif power_mode == self.kPowerModeSleep:
+            elif power_mode == self.POWER_MODE_SLEEP:
                 self.wr_byte(self.address, 0x7FFF, 0x00)
                 self.wr_byte(self.address, 0x09, 0x02)
                 status |= self.poll_for_answer(1, 0, 0x06, 0x01, 0)
             else:
-                status = self.kStatusError
+                status = self.STATUS_ERROR
 
             self.wr_byte(self.address, 0x7FFF, 0x02)
         
@@ -1274,7 +1264,7 @@ class QwiicVL53L5CX(object):
 
             @return **int** The current integration time in ms.
             """
-        self.dci_read_data(self.temp_buffer, self.kDciIntegrationTime, 20)
+        self.dci_read_data(self.temp_buffer, self.DCI_INTEGRATION_TIME, 20)
 
         p_time_ms = self.byte_list_to_uint32(self.temp_buffer[0:4])
         return p_time_ms // 1000
@@ -1285,20 +1275,20 @@ class QwiicVL53L5CX(object):
             be computed to be lower than the ranging period, for a selected resolution.
             Please note that this function has no impact on ranging mode continuous.
 
-            @param int integration_time_ms: Contains the integration time in ms. For all
+            @param integration_time_ms: **int** Contains the integration time in ms. For all
                 resolutions and frequency, the minimum value is 2ms, and the maximum is
                 1000ms.
 
             @return **int** status: 0 if set integration time is OK.
             """
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
         integration = integration_time_ms 
         if (integration < 2) or (integration > 1000):
-            status |= self.kStatusInvalidParam 
+            status |= self.STATUS_INVALID_PARAM 
         else:
             integration = integration * 1000
-            status |= self.dci_replace_data(self.temp_buffer, self.kDciIntegrationTime, 20, self.uint32_list_to_byte_list([int(integration)]), 4, 0x00)
+            status |= self.dci_replace_data(self.temp_buffer, self.DCI_INTEGRATION_TIME, 20, self.uint32_list_to_byte_list([int(integration)]), 4, 0x00)
         
         return status
     
@@ -1310,7 +1300,7 @@ class QwiicVL53L5CX(object):
             @return **int** The current sharpener in percent.
             """
 
-        self.dci_read_data(self.temp_buffer, self.kDciSharpenerPercent, 16)
+        self.dci_read_data(self.temp_buffer, self.DCI_SHARPENER_PERCENT, 16)
         
         return (self.temp_buffer[0xD] * 100) // 255
 
@@ -1320,18 +1310,18 @@ class QwiicVL53L5CX(object):
             changed to blur more or less zones depending on the application. Min value is
             0 (disabled), and max is 99.
 
-            @param int sharpener_percent: Value between 0 (disabled) and 99%.
+            @param sharpener_percent: **int** Value between 0 (disabled) and 99%.
 
             @return **int** status: 0 if set sharpener is OK.
             """
 
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
         if sharpener_percent >= 100:
-            status |= self.kStatusInvalidParam
+            status |= self.STATUS_INVALID_PARAM
         else:
             sharpener = (sharpener_percent * 255) // 100
-            status |= self.dci_replace_data(self.temp_buffer, self.kDciSharpenerPercent, 16, self.uint32_list_to_byte_list([sharpener]), 1, 0xD)
+            status |= self.dci_replace_data(self.temp_buffer, self.DCI_SHARPENER_PERCENT, 16, self.uint32_list_to_byte_list([sharpener]), 1, 0xD)
 
         return status
     
@@ -1342,7 +1332,7 @@ class QwiicVL53L5CX(object):
             @return **int** The current target order.
             """
 
-        self.dci_read_data(self.temp_buffer, self.kDciTargetOrder, 4)
+        self.dci_read_data(self.temp_buffer, self.DCI_TARGET_ORDER, 4)
 
         return self.temp_buffer[0x0]
     
@@ -1353,54 +1343,57 @@ class QwiicVL53L5CX(object):
             the new output order. By default, the sensor is configured with the strongest
             output.
 
-            @param int target_order: Required target order.
+            @param target_order: **int** Required target order.
 
             @return **int** status: 0 if set target order is OK, or 127 if target order is unknown.
             """
         
-        status = self.kStatusOK
+        status = self.STATUS_OK
 
-        if (target_order == self.kTargetOrderClosest) or (target_order == self.kTargetOrderStronges):
-            status |= self.dci_replace_data(self.temp_buffer, self.kDciTargetOrder, 4, [target_order], 1, 0x0)
+        if (target_order == self.TARGET_ORDER_CLOSEST) or (target_order == self.TARGET_ORDER_STRONGES):
+            status |= self.dci_replace_data(self.temp_buffer, self.DCI_TARGET_ORDER, 4, [target_order], 1, 0x0)
         else:
-            status = self.kStatusInvalidParam
+            status = self.STATUS_INVALID_PARAM
 
         return status
     
 
-    def wr_multi(self, addr, reg, values, chunkSize = 30): # chunkSize of 30 lines up with 2 register bytes and the 32 byte limit from Arduino
+    def wr_multi(self, addr, reg, values, chunk_size = 30): # chunk_size of 30 lines up with 2 register bytes and the 32 byte limit from Arduino
         """!
             This function writes multiple bytes to a register. Enables 16 bit register address writes.
 
-            @param int reg: The 16-bit register to write to.
-            @param list values: The values to write to the register.
+            @param addr: **int** The I2C address of the device.
+            @param reg: **int** The 16-bit register to write to.
+            @param values: **list** The values to write to the register.
+            @param chunk_size: **int** The max size of the chunks to write at a time.
             """
-        for i in range(0, len(values), chunkSize):
-            currentReg = reg + i
-            regToWrite = [(currentReg >> 8) & 0xff, currentReg & 0xff]
-            endByte = min(i + chunkSize, len(values))
-            self._i2c.write_block(addr, regToWrite[0], regToWrite[1:] + values[i:endByte])
+        for i in range(0, len(values), chunk_size):
+            current_reg = reg + i
+            reg_to_write = [(current_reg >> 8) & 0xff, current_reg & 0xff]
+            end_byte = min(i + chunk_size, len(values))
+            self._i2c.write_block(addr, reg_to_write[0], reg_to_write[1:] + values[i:end_byte])
 
-    def rd_multi(self, addr, reg, numBytes, chunkSize = 32):
+    def rd_multi(self, addr, reg, num_bytes, chunk_size = 32):
         """!
             This function reads multiple bytes from a register. Enables 16 bit register address reads.
 
-            @param int reg: The 16-bit register to read from.
-            @param int numBytes: The number of bytes to read from the register.
-            @param int chunkSize: The max size of the chunks to read at a time.
+            @param addr: **int** The I2C address of the device.
+            @param reg: **int** The 16-bit register to read from.
+            @param num_bytes: **int** The number of bytes to read from the register.
+            @param chunk_size: **int** The max size of the chunks to read at a time.
 
             @return **list** The values read from the register.
             """
 
-        bytesToWrite = [(reg >> 8) & 0xff, reg & 0xff]
-        self._i2c.write_byte(addr, bytesToWrite[0], bytesToWrite[1])
+        bytes_to_write = [(reg >> 8) & 0xff, reg & 0xff]
+        self._i2c.write_byte(addr, bytes_to_write[0], bytes_to_write[1])
 
-        numRead = 0
-        data = [0] * numBytes
-        while numRead < numBytes:
-            tryRead = min(chunkSize, numBytes - numRead)
-            data[numRead:numRead + tryRead] = list(self._i2c.read_block(addr, None, tryRead))
-            numRead += tryRead
+        num_read = 0
+        data = [0] * num_bytes
+        while num_read < num_bytes:
+            try_read = min(chunk_size, num_bytes - num_read)
+            data[num_read:num_read + try_read] = list(self._i2c.read_block(addr, None, try_read))
+            num_read += try_read
 
         return data
 
@@ -1408,96 +1401,100 @@ class QwiicVL53L5CX(object):
         """!
             This function writes a byte to a register. Enables 16 bit register address writes.
 
-            @param int reg: The 16-bit register to write to.
-            @param int value: The value to write to the register.
+            @param addr: **int** The I2C address of the device.
+            @param reg: **int** The 16-bit register to write to.
+            @param value: **int** The value to write to the register.
             """
-        bytesToWrite = [(reg >> 8) & 0xff, reg & 0xff, value]
-        self._i2c.write_block(addr, bytesToWrite[0], bytesToWrite[1:])
+        bytes_to_write = [(reg >> 8) & 0xff, reg & 0xff, value]
+        self._i2c.write_block(addr, bytes_to_write[0], bytes_to_write[1:])
 
     def rd_byte(self, addr, reg):
         """!
             This function reads a single byte from a register. Enables 16 bit register address reads.
 
-            @param int reg: The 16-bit register to read from.
+            @param addr: **int** The I2C address of the device.
+            @param reg: **int** The 16-bit register to read from.
 
             @return **int** The value read from the register.
             """
-        bytesToWrite = [(reg >> 8) & 0xff, reg & 0xff]
-        self._i2c.write_byte(addr, bytesToWrite[0], bytesToWrite[1])
+        bytes_to_write = [(reg >> 8) & 0xff, reg & 0xff]
+        self._i2c.write_byte(addr, bytes_to_write[0], bytes_to_write[1])
         # self._i2c.write_block(addr, bytes_to_write[0], bytes_to_write[1])
         return self._i2c.read_byte(addr, None)
     
-    def get_buffer_from_open_file(self, f, startByte = 0, endByte = None):
+    def get_buffer_from_open_file(self, f, start_byte = 0, end_byte = None):
         """!
         This function gets the buffer from an open file.
-        If endByte is None, the function will read until the end of the file.
-        Bytes returned will be [startByte, endByte) (endByte not included)
+        If end_byte is None, the function will read until the end of the file.
+        Bytes returned will be [start_byte, end_byte) (end_byte not included)
 
-        @param open binary file f: The file to read from.
-        @param int startByte: The start byte to read from the file.
-        @param int endByte: The end byte to read from the file.
+        @param f: **file** The open binary file to read from.
+        @param start_byte: **int** The start byte to read from the file.
+        @param end_byte: **int** The end byte to read from the file.
 
         @return **list** The buffer read from the file.
         """
-        f.seek(startByte)
-        if endByte is None:
+        f.seek(start_byte)
+        if end_byte is None:
             return list(f.read())
         else:
-            return list(f.read(endByte - startByte))
+            return list(f.read(end_byte - start_byte))
 
-    def get_absolute_data_path(self, fileName):
+    def get_absolute_data_path(self, file_name):
         """!
             This function gets the absolute path to a data file.
 
-            @param str fileName: The relative path of the data file to get the absolute path for.
+            @param file_name: **str** The relative path of the data file to get the absolute path for.
 
             @return **str** The absolute path to the file.
             """
-        fName = self._dataPath 
-        if self._dataPath[-1] != '/':
-            fName += '/'
-        fName += fileName
-        return fName
+        f_name = self._data_path
+        if self._data_path[-1] != '/':
+            f_name += '/'
+        f_name += file_name
+        return f_name
 
-    def get_buffer_from_file(self, fileName, startByte = 0, endByte = None):
+    def get_buffer_from_file(self, file_name, start_byte = 0, end_byte = None):
         """!
             This function gets the buffer from the file. 
-            If endByte is None, the function will read until the end of the file.
-            Bytes returned will be [startByte, endByte) (endByte not included)
+            If end_byte is None, the function will read until the end of the file.
+            Bytes returned will be [start_byte, end_byte) (end_byte not included)
 
-            @param str fileName: The name of the file to read from. 
-            fileName should be relative to the dataPath set in the constructor.
-            @param int startByte: The start byte to read from the file.
-            @param int endByte: The end byte to read from the file.
+            @param file_name: **str** The name of the file to read from.
+            file_name should be relative to the data directory (see check_data_directory()).
+            @param start_byte: **int** The start byte to read from the file.
+            @param end_byte: **int** The end byte to read from the file.
 
             @return **list** The buffer read from the file.
             """
-        fName = self.get_absolute_data_path(fileName)
+        f_name = self.get_absolute_data_path(file_name)
 
-        with open(fName, 'rb') as f:
-            return self.get_buffer_from_open_file(f, startByte, endByte)
+        with open(f_name, 'rb') as f:
+            return self.get_buffer_from_open_file(f, start_byte, end_byte)
     
     # TODO: This could still use some optimization...
-    def write_out_large_file(self, reg, fileName, startByte = 0, size = 0, writeChunkSize = 31, readChunkSize = 4096):
+    def write_out_large_file(self, reg, file_name, start_byte = 0, size = 0, write_chunk_size = 31, read_chunk_size = 4096):
         """!
             This function writes out a large buffer file to i2c bus. 
-            The function will write out the file in chunks of chunkSize bytes.
+            The function will write out the file in chunks of write_chunk_size bytes.
 
-            @param str fileName: The name of the file to write from
-            fileName should be relative to the dataPath set in the constructor.
-            @param int startByte: The start byte to write from the file.
-            @param int size: How many bytes of the file to write.
-            @param int chunkSize: The size of the chunks to write out.
+            @param reg: **int** The register to write to
+            @param file_name: **str** The name of the file to write from
+            file_name should be relative to the data directory (see check_data_directory()).
+            @param start_byte: **int** The start byte to write from the file.
+            @param size: **int** How many bytes of the file to write.
+            @param write_chunk_size: **int** The size of the chunks to write out.
+            @param read_chunk_size: **int** The size of the chunks to read from the file.
             """
-        currentReg = reg
+        current_reg = reg
         
-        # Read files out in readChunkSize and write them out over i2c in writeChunkSize
-        with open(self.get_absolute_data_path(fileName), 'rb') as f:
-            for readStart in range(startByte, startByte + size, readChunkSize):
-                endByte = min(readStart + readChunkSize, startByte + size)
-                data = self.get_buffer_from_open_file(f, readStart, endByte)
-                for writeStart in range(0, len(data), writeChunkSize):
-                    regToWrite = [(currentReg >> 8) & 0xff, currentReg & 0xff]
-                    endByte = min(writeStart + writeChunkSize, len(data))
-                    self._i2c.write_block(self.address, regToWrite[0], regToWrite[1:] + data[writeStart:endByte])
-                    currentReg += len(data[writeStart:endByte])
+        # Read files out in read_chunk_size and write them out over i2c in write_chunk_size
+        with open(self.get_absolute_data_path(file_name), 'rb') as f:
+            for read_start in range(start_byte, start_byte + size, read_chunk_size):
+                end_byte = min(read_start + read_chunk_size, start_byte + size)
+                data = self.get_buffer_from_open_file(f, read_start, end_byte)
+                for write_start in range(0, len(data), write_chunk_size):
+                    reg_to_write = [(current_reg >> 8) & 0xff, current_reg & 0xff]
+                    end_byte = min(write_start + write_chunk_size, len(data))
+                    self._i2c.write_block(self.address, reg_to_write[0], reg_to_write[1:] + data[write_start:end_byte])
+                    current_reg += len(data[write_start:end_byte])

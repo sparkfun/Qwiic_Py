@@ -55,8 +55,9 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 # Load Necessary Modules:
 #----------------------------------------------
-import time							# Time access and conversion package
 import qwiic_i2c					# I2C bus driver package
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
@@ -67,21 +68,20 @@ _DEFAULT_NAME = "Qwiic Mux"
 # Some devices have multiple availabel addresses - this is a list of these addresses (0x70 - 0x77).
 # NOTE: The first address in this list is considered the default I2C address for the
 # device (0x70).
-_AVAILABLE_I2C_ADDRESS = range(0x70,0x77 + 1)
+_AVAILABLE_I2C_ADDRESS = list(range(0x70,0x77 + 1))
 
 class QwiicTCA9548A(object):
 	"""!
-	Initialise the TCA9548A chip at ``address`` with ``i2c_driver``.
+	Initialise the TCA9548A chip at ``address`` with ``i2c_bus``.
 
 	@param address: The I2C address to use for the device.
 						If not provided, the default address is
 						used.
-	@param i2c_driver: An existing i2c driver object. If not
-						provided a driver object is created.
+	@param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
 	@return **Bool** Constructor Initialization
 						True-	Successful
-						False-	Issue loading I2C driver
+						False-	Issue loading I2C bus
 	"""
 
 	#----------------------------------------------
@@ -92,64 +92,52 @@ class QwiicTCA9548A(object):
 	# Available Addresses:
 	available_addresses = _AVAILABLE_I2C_ADDRESS
 
-    #----------------------------------------------
+	#----------------------------------------------
 	# Available Channels:
-	available_channels = range(0,7+1)
+	available_channels = list(range(0,7+1))
 
 	#----------------------------------------------
 	# Constructor
-	def __init__(self, address = None, debug = None, i2c_driver = None):
+	def __init__(self, address = None, i2c_bus = None):
 		"""!
 		This method initializes the class object. If no 'address' or
-		'i2c_driver' are inputed or 'None' is specified, the method will
+		'i2c_bus' are inputed or 'None' is specified, the method will
 		use the defaults.
 
 		@param address: The I2C address to use for the device.
 							If not provided, the method will default to
 							the first address in the
 							'available_addresses' list.
-								Default = 0x29
-		@param debug: Designated whether or not to print debug
-							statements.
-							0-	Don't print debug statements
-							1-	Print debug statements
-		@param i2c_driver: An existing i2c driver object. If not
-							provided a driver object is created from the
-							'qwiic_i2c' I2C driver of the SparkFun Qwiic
-							library.
+							Default = 0x70
+		@param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 		"""
+		# The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+		address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
 		# Did the user specify an I2C address?
 		# Defaults to 0x70 if unspecified.
-		self.address = address if address != None else self.available_addresses[0]
+		self.address = address if address is not None else self.available_addresses[0]
 
-		# Load the I2C driver if one isn't provided
-		if i2c_driver == None:
-			self._i2c = qwiic_i2c.getI2CDriver()
+		# Use the given I2C bus, or the platform's default bus
+		self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-			if self._i2c == None:
-				print("Unable to load I2C driver for this platform.")
-				return
-		else:
-			self._i2c = i2c_driver
-
-		# Do you want debug statements?
-		if debug == None:
-			self.debug = 0	# Debug Statements Disabled
-		else:
-			self.debug = debug	# Debug Statements Enabled (1)
-
-
-    #--------------------------------------------------------------------------
+	#--------------------------------------------------------------------------
 	def is_connected(self):
 		"""!
-			Determine if the device is conntected to the system.
+			Determine if the device is connected to the system.
 
 			@return **bool** True if the device is connected, otherwise False.
 			"""
-		return qwiic_i2c.isDeviceConnected(self.address)
+		return qwiic_i2c.is_device_connected(self.address)
 
-	connected = property(is_connected)
+	def begin(self):
+		"""!
+		Initialize the operation of the Qwiic Mux. There is nothing to
+		configure, so this only checks the connection.
+
+		@return **bool** True if the device is connected, otherwise False.
+		"""
+		return self.is_connected()
 
 	def get_enabled_channels(self):
 		"""!
@@ -159,7 +147,7 @@ class QwiicTCA9548A(object):
 		"""
 
 		# Return enabled channels
-		return self._i2c.readByte(self.address, None) # Note, passing "None" will simply read from device rather than targetting a specific register
+		return self._i2c.read_byte(self.address, None) # Note, passing "None" will simply read from device rather than targetting a specific register
 
 	def enable_channels(self, enable):
 		"""!
@@ -172,49 +160,46 @@ class QwiicTCA9548A(object):
 							an individual integer into a list.
 							Range- 0 to 7
 		"""
-		command = self.get_enabled_channels()
 		# If entry is an integer and not a list; turn it into a list of (1)
 		if type(enable) is not list: enable = [ enable ]
 
+		command = self.get_enabled_channels()
+
 		# Iterate through list
 		for entry in enable:
-			if type(entry) != int:
-				print("TypeError: Entries must be integers.")
-			elif entry < 0 or 7 < entry:
-				print("Entries must be in range of available channels (0-7).")
-			else:
-				# Set bit to 1
-				command = command | (1<<entry)
+			# Skip entries that aren't channel numbers (0-7)
+			if type(entry) is not int or entry < 0 or 7 < entry:
+				continue
+			# Set bit to 1
+			command = command | (1<<entry)
 
-		self._i2c.writeCommand(self.address, command)
+		self._i2c.write_byte(self.address, None, command)
 
 	def disable_channels(self, disable):
 		"""!
 		This method disables the connection of specific channels on the
 		Qwiic Mux.
 
-		@param enable: Channel(s) to disable on the Qwiic Mux.
+		@param disable: Channel(s) to disable on the Qwiic Mux.
 							Input must be either an individual integer
 							or list. The method will automatically
 							convert an individual integer into a list.
 							Range- 0 to 7
 		"""
-		command = self.get_enabled_channels()
-
 		# If entry is an integer and not a list; turn it into a list of (1)
 		if type(disable) is not list: disable = [ disable ]
 
+		command = self.get_enabled_channels()
+
 		# Iterate through list
 		for entry in disable:
-			if type(entry) != int:
-				print("TypeError: Entries must be integers.")
-			elif entry < 0 or 7 < entry:
-				print("Entries must be in range of available channels (0-7).")
-			else:
-				# Clear bit to 0
-				command = command & ~(1 << entry)
+			# Skip entries that aren't channel numbers (0-7)
+			if type(entry) is not int or entry < 0 or 7 < entry:
+				continue
+			# Clear bit to 0
+			command = command & ~(1 << entry)
 
-		self._i2c.writeCommand(self.address, command)
+		self._i2c.write_byte(self.address, None, command & 0xFF)
 
 	def enable_all(self):
 		"""!
@@ -223,7 +208,7 @@ class QwiicTCA9548A(object):
 		"""
 
 		# Enable all channels
-		self._i2c.writeCommand(self.address, 0xFF)
+		self._i2c.write_byte(self.address, None, 0xFF)
 
 	def disable_all(self):
 		"""!
@@ -232,20 +217,18 @@ class QwiicTCA9548A(object):
 		"""
 
 		# Disable all channels
-		self._i2c.writeCommand(self.address, 0x00)
+		self._i2c.write_byte(self.address, None, 0x00)
 
 	def list_channels(self):
 		"""!
-		This method lists all the available channels and their current
-		configuration (enabled or disabled) on the Qwiic Mux.
+		This method lists the channels that are currently enabled on the
+		Qwiic Mux.
+
+		@return **list** The enabled channel numbers (0 to 7), in
+					ascending order. Channels not in the list are
+					disabled.
 		"""
 
 		enabled_channels = self.get_enabled_channels()
 
-		for x in self.available_channels:
-			if (enabled_channels & (1 << x)) >> x == 0:
-				print("Channel %d: Disabled" % x)
-			elif (enabled_channels & (1 << x)) >> x == 1:
-				print("Channel %d: Enabled" % x)
-			else:
-				print("Channel %d: ??? (check configuration)" % x)
+		return [x for x in self.available_channels if (enabled_channels >> x) & 1]

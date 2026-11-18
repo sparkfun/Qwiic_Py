@@ -36,7 +36,7 @@
 import qwiic_as726x
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic AS726x Example 3 - Bulb\n")
 
 	# Create instance of device
@@ -49,20 +49,20 @@ def runExample():
 		return
 
 	# Set a desired custom Gain or Measurement Mode here, to be passed to the begin() function
-	gain = myAS726x.kGain16x
-	measurementMode = myAS726x.kMeasurementMode4Chan # 4-channel reading 
+	gain = myAS726x.GAIN_16X
+	measurement_mode = myAS726x.MEASUREMENT_MODE_4CHAN # 4-channel reading 
 													 # on the as7262: V, B, G, Y (O and R will be 0)
 						 							 # on the as7263: S, T, U, V (R and W will be 0)
 
 	# Initialize the device with non-default settings
-	myAS726x.begin(gain, measurementMode)
+	myAS726x.begin(gain, measurement_mode)
 
 	while True:
 		# Enable the bulb for our measurements
 		myAS726x.take_measurements_with_bulb()
 
 		# Check which device is connected
-		if myAS726x.get_version() == myAS726x.kSensorTypeAs7262:
+		if myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7262:
 			# Visible readings
 			print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
 				myAS726x.get_calibrated_violet(),
@@ -73,7 +73,7 @@ def runExample():
 				myAS726x.get_calibrated_red()
 			), end="")
 		
-		elif myAS726x.get_version() == myAS726x.kSensorTypeAs7263:
+		elif myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7263:
 			# Near IR readings
 			print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
 				myAS726x.get_calibrated_r(),
@@ -88,7 +88,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

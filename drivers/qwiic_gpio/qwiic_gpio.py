@@ -51,8 +51,9 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 """
 #-----------------------------------------------------------------------------
 
-import math
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion 
 # as class variables, making them avilable without having to create a class instance.
@@ -77,8 +78,7 @@ class QwiicGPIO(object):
 
     @param address: The I2C address to use for the device. 
                     If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided 
-                    a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The GPIO device object.
     """
@@ -105,20 +105,15 @@ class QwiicGPIO(object):
     NUM_GPIO = 8
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
-        self.address = address if address != None else self.available_addresses[0]
+        self.address = address if address is not None else self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver == None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c == None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # This list will hold the inversion status of each pin
         self.inversions = [self.NO_INVERT] * self.NUM_GPIO 
@@ -127,17 +122,17 @@ class QwiicGPIO(object):
         self.in_statuses = [self.GPIO_LO] * self.NUM_GPIO # These are the input settings for each pin
 
     # ----------------------------------
-    # isConnected()
+    # is_connected()
     #
     # Is an actual board connected to our system?
 
-    def isConnected(self):
+    def is_connected(self):
         """!
-        Determine if a Qwiic GPIO device is connected to the system..
+        Determine if a Qwiic GPIO device is connected to the system.
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
+        return qwiic_i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -150,110 +145,110 @@ class QwiicGPIO(object):
         @return **bool** Returns true of the initializtion was successful, otherwise False.
         """
         
-        return self.isConnected()
+        return self.is_connected()
 
     #----------------------------------------------------------------
-    # setMode()
+    # set_mode()
     #
     # Set the mode (input/output) for all GPIO
-    def setMode(self):
+    def set_mode(self):
         """!
-        Sends all 8 pin modes (input or output) to the GPIO to set all 8 pins. Setting the value to input or output is done using myGPIO.modes[0] = myGPIO.GPIO_OUT
+        Sends all 8 pin modes (input or output) to the GPIO to set all 8 pins. Setting the value to input or output is done using my_gpio.modes[0] = my_gpio.GPIO_OUT
 
         @return  No return value
         """
-        tempData = 0
+        temp_data = 0
 
         for i in range (self.NUM_GPIO):
-            tempData |= self.modes[i] << i
+            temp_data |= self.modes[i] << i
 
-        self._i2c.writeByte(self.address, self.REG_CONFIGURATION, tempData)
+        self._i2c.write_byte(self.address, self.REG_CONFIGURATION, temp_data)
 
     #----------------------------------------------------------------
-    # getMode()
+    # get_mode()
     #
     # Get the mode (input/output) for all GPIO
-    def getMode(self):
+    def get_mode(self):
         """!
         Updates mode_X variables with values from Qwiic GPIO
 
         @return **8 bit unsigned integer** The value of the mode register.
         """
-        tempData = self._i2c.readByte(self.address, self.REG_CONFIGURATION)
+        temp_data = self._i2c.read_byte(self.address, self.REG_CONFIGURATION)
 
         for i in range(self.NUM_GPIO):
-            self.modes[i] = (tempData & (1 << i)) >> i
+            self.modes[i] = (temp_data & (1 << i)) >> i
         
-        return tempData
+        return temp_data
 
     #----------------------------------------------------------------
-    # setInversion()
+    # set_inversion()
     # 
     # Set whether a GPIO will invert an incoming signal
 
-    def setInversion(self):
+    def set_inversion(self):
         """!
-        Send the inversion modes of all pins. This function must be called after editing modes using myGPIO.inversions[0] = myGPIO.INVERT
+        Send the inversion modes of all pins. This function must be called after editing modes using my_gpio.inversions[0] = my_gpio.INVERT
 
         @return  No return value
         """
-        tempData = 0
+        temp_data = 0
 
         for i in range(self.NUM_GPIO):
-            tempData |= self.inversions[i] << i
+            temp_data |= self.inversions[i] << i
 
-        self._i2c.writeByte(self.address, self.REG_INVERSION, tempData)
+        self._i2c.write_byte(self.address, self.REG_INVERSION, temp_data)
 
     #----------------------------------------------------------------
-    # getInversion()
+    # get_inversion()
     # 
     # Get inversion settings from each GPIO.
 
-    def getInversion(self):
+    def get_inversion(self):
         """!
         Updates inversion_X variables with values from Qwiic GPIO
 
         @return **8 bit unsigned integer** The value of the inversion register.
         """
-        tempData = self._i2c.readByte(self.address, self.REG_INVERSION)
+        temp_data = self._i2c.read_byte(self.address, self.REG_INVERSION)
 
         for i in range(self.NUM_GPIO):
-            self.inversions[i] = (tempData & (1 << i)) >> i
+            self.inversions[i] = (temp_data & (1 << i)) >> i
 
-        return tempData
+        return temp_data
 
     #----------------------------------------------------------------
-    # setGPIO()
+    # set_gpio()
     # 
     # Sends all GPIO outputs to the Qwiic GPIO 
 
-    def setGPIO(self):
+    def set_gpio(self):
         """!
-        Send all current output settings to the GPIO. This should be called after calling myGPIO.out_statuses[0] = myGPIO.GPIO_HI to set the GPIO.
+        Send all current output settings to the GPIO. This should be called after calling my_gpio.out_statuses[0] = my_gpio.GPIO_HI to set the GPIO.
 
         @return  No return value
         """
-        tempData = 0
+        temp_data = 0
 
         for i in range(self.NUM_GPIO):
-            tempData |= self.out_statuses[i] << i
+            temp_data |= self.out_statuses[i] << i
 
-        self._i2c.writeByte(self.address, self.REG_OUTPUT_PORT, tempData)
+        self._i2c.write_byte(self.address, self.REG_OUTPUT_PORT, temp_data)
 
-    def getGPIO(self):
+    def get_gpio(self):
         """!
         Updates mode_X variables with values from Qwiic GPIO
 
         @return **8 bit unsigned integer** The value of the mode register.
         """
-        tempData = self._i2c.readByte(self.address, self.REG_INPUT_PORT)
+        temp_data = self._i2c.read_byte(self.address, self.REG_INPUT_PORT)
 
         for i in range(self.NUM_GPIO):
-            self.in_statuses[i] = (tempData & (1 << i)) >> i
+            self.in_statuses[i] = (temp_data & (1 << i)) >> i
 
-        return tempData
+        return temp_data
     
-    def pinMode (self, pin, mode):
+    def pin_mode (self, pin, mode):
         """!
         Set the mode of a single pin.
 
@@ -269,24 +264,24 @@ class QwiicGPIO(object):
             return
         
         self.modes[pin] = mode
-        self.setMode()
+        self.set_mode()
     
-    def pinModePort (self, gpioPinModeList):
+    def pin_mode_port (self, gpio_pin_mode_list):
         """!
         Set the mode of a list of pins.
 
-        @param gpioPinModeList: A list of boolean modes to set the pins at each index to.
+        @param gpio_pin_mode_list: A list of boolean modes to set the pins at each index to.
 
         @return  No return value
         """
 
-        if len(gpioPinModeList) != 8:
+        if len(gpio_pin_mode_list) != 8:
             return
         
-        self.modes = gpioPinModeList
-        self.setMode()
+        self.modes = gpio_pin_mode_list
+        self.set_mode()
     
-    def invertPin(self, pin, invert):
+    def invert_pin(self, pin, invert):
         """!
         Set the inversion of a single pin.
 
@@ -299,24 +294,24 @@ class QwiicGPIO(object):
             return
         
         self.inversions[pin] = invert
-        self.setInversion()
+        self.set_inversion()
     
-    def invertPinPort (self, gpioInversionList):
+    def invert_pin_port (self, gpio_inversion_list):
         """!
         Set the inversion of a list of pins.
 
-        @param gpioInversionList: A list of boolean inversions to set the pins at each index to.
+        @param gpio_inversion_list: A list of boolean inversions to set the pins at each index to.
 
         @return  No return value
         """
 
-        if len(gpioInversionList) != 8:
+        if len(gpio_inversion_list) != 8:
             return
         
-        self.inversions = gpioInversionList
-        self.setInversion()
+        self.inversions = gpio_inversion_list
+        self.set_inversion()
     
-    def digitalWrite(self, pin, value):
+    def digital_write(self, pin, value):
         """!
         Set the output value of a single pin.
 
@@ -329,24 +324,24 @@ class QwiicGPIO(object):
             return
         
         self.out_statuses[pin] = value
-        self.setGPIO()
+        self.set_gpio()
     
-    def digitalWritePort (self, gpioOutputList):
+    def digital_write_port (self, gpio_output_list):
         """!
         Set the output value of a list of pins.
 
-        @param gpioOutputList: A list of boolean output values to set the pins at each index to.
+        @param gpio_output_list: A list of boolean output values to set the pins at each index to.
 
         @return  No return value
         """
 
-        if len(gpioOutputList) != 8:
+        if len(gpio_output_list) != 8:
             return
         
-        self.out_statuses = gpioOutputList
-        self.setGPIO()
+        self.out_statuses = gpio_output_list
+        self.set_gpio()
 
-    def digitalRead(self, pin):
+    def digital_read(self, pin):
         """!
         Get the input value of a single pin.
 
@@ -357,14 +352,14 @@ class QwiicGPIO(object):
         if pin < 0 or pin > 7:
             return
         
-        self.getGPIO()
+        self.get_gpio()
         return self.in_statuses[pin]
     
-    def digitalReadPort (self):
+    def digital_read_port (self):
         """!
         Get the input value of all pins.
 
         @return  A list of boolean input values of all pins.
         """
-        self.getGPIO()
+        self.get_gpio()
         return self.in_statuses

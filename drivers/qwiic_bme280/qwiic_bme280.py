@@ -58,8 +58,11 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 #-----------------------------------------------------------------------------
 import math
-import time
 import qwiic_i2c
+
+__version__ = "3.0.0"
+
+_LN10 = math.log(10)
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
@@ -90,14 +93,13 @@ _validChipIDs = [0x58, 0x60]
 # device is encapsulated by this class. The device class should be the only value exported
 # from this module.
 
-class QwiicBme280(object):
+class QwiicBME280(object):
     """!
-    QwiicBme280
+    QwiicBME280
 
     @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The BME280 device object.
     """
@@ -159,24 +161,18 @@ class QwiicBme280(object):
     BME280_HUMIDITY_LSB_REG =       0xFE # Humidity LSB
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
-
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # create a dictionary to stash our calibration data for the sensor
         self.calibration={}
@@ -192,13 +188,11 @@ class QwiicBme280(object):
 
     def is_connected(self):
         """!
-        Determine if a BME280 device is conntected to the system..
+        Determine if a BME280 device is connected to the system.
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -211,9 +205,8 @@ class QwiicBme280(object):
         @return **bool** Returns true of the initializtion was successful, otherwise False.
         """
         # are we who we need to be?
-        chipID = self._i2c.readByte(self.address, self.BME280_CHIP_ID_REG)
-        if chipID not in _validChipIDs:
-            print("Invalid Chip ID: 0x%.2X" % chipID)
+        chip_id = self._i2c.read_byte(self.address, self.BME280_CHIP_ID_REG)
+        if chip_id not in _validChipIDs:
             return False
         
 
@@ -244,26 +237,26 @@ class QwiicBme280(object):
             return n - 2**8 if n >= 2**7 else n
 
         # Reading all compensation data, range 0x88:A1, 0xE1:E7
-        self.calibration["dig_T1"] = (self._i2c.readByte(self.address, self.BME280_DIG_T1_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_T1_LSB_REG)
-        self.calibration["dig_T2"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_T2_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_T2_LSB_REG))
-        self.calibration["dig_T3"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_T3_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_T3_LSB_REG))
+        self.calibration["dig_T1"] = (self._i2c.read_byte(self.address, self.BME280_DIG_T1_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_T1_LSB_REG)
+        self.calibration["dig_T2"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_T2_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_T2_LSB_REG))
+        self.calibration["dig_T3"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_T3_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_T3_LSB_REG))
 
-        self.calibration["dig_P1"] = (self._i2c.readByte(self.address, self.BME280_DIG_P1_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P1_LSB_REG)
-        self.calibration["dig_P2"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P2_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P2_LSB_REG))
-        self.calibration["dig_P3"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P3_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P3_LSB_REG))
-        self.calibration["dig_P4"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P4_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P4_LSB_REG))
-        self.calibration["dig_P5"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P5_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P5_LSB_REG))
-        self.calibration["dig_P6"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P6_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P6_LSB_REG))
-        self.calibration["dig_P7"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P7_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P7_LSB_REG))
-        self.calibration["dig_P8"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P8_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P8_LSB_REG))
-        self.calibration["dig_P9"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_P9_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_P9_LSB_REG))
+        self.calibration["dig_P1"] = (self._i2c.read_byte(self.address, self.BME280_DIG_P1_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P1_LSB_REG)
+        self.calibration["dig_P2"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P2_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P2_LSB_REG))
+        self.calibration["dig_P3"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P3_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P3_LSB_REG))
+        self.calibration["dig_P4"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P4_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P4_LSB_REG))
+        self.calibration["dig_P5"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P5_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P5_LSB_REG))
+        self.calibration["dig_P6"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P6_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P6_LSB_REG))
+        self.calibration["dig_P7"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P7_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P7_LSB_REG))
+        self.calibration["dig_P8"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P8_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P8_LSB_REG))
+        self.calibration["dig_P9"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_P9_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_P9_LSB_REG))
 
-        self.calibration["dig_H1"] = self._i2c.readByte(self.address, self.BME280_DIG_H1_REG)
-        self.calibration["dig_H2"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_H2_MSB_REG) << 8) + self._i2c.readByte(self.address, self.BME280_DIG_H2_LSB_REG))
-        self.calibration["dig_H3"] = self._i2c.readByte(self.address, self.BME280_DIG_H3_REG)
-        self.calibration["dig_H4"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_H4_MSB_REG) << 4) + (self._i2c.readByte(self.address, self.BME280_DIG_H4_LSB_REG) & 0x0F))
-        self.calibration["dig_H5"] = unsigned_short_to_signed_short((self._i2c.readByte(self.address, self.BME280_DIG_H5_MSB_REG) << 4) + ((self._i2c.readByte(self.address, self.BME280_DIG_H4_LSB_REG) >> 4) & 0x0F))
-        self.calibration["dig_H6"] = unsigned_char_to_signed_char(self._i2c.readByte(self.address, self.BME280_DIG_H6_REG))
+        self.calibration["dig_H1"] = self._i2c.read_byte(self.address, self.BME280_DIG_H1_REG)
+        self.calibration["dig_H2"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_H2_MSB_REG) << 8) + self._i2c.read_byte(self.address, self.BME280_DIG_H2_LSB_REG))
+        self.calibration["dig_H3"] = self._i2c.read_byte(self.address, self.BME280_DIG_H3_REG)
+        self.calibration["dig_H4"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_H4_MSB_REG) << 4) + (self._i2c.read_byte(self.address, self.BME280_DIG_H4_LSB_REG) & 0x0F))
+        self.calibration["dig_H5"] = unsigned_short_to_signed_short((self._i2c.read_byte(self.address, self.BME280_DIG_H5_MSB_REG) << 4) + ((self._i2c.read_byte(self.address, self.BME280_DIG_H4_LSB_REG) >> 4) & 0x0F))
+        self.calibration["dig_H6"] = unsigned_char_to_signed_char(self._i2c.read_byte(self.address, self.BME280_DIG_H6_REG))
 
         # Most of the time the sensor will be init with default values
         # But in case user has old/deprecated code, use the _settings.x values
@@ -272,7 +265,7 @@ class QwiicBme280(object):
         self.set_filter(_settings["filter"])
         self.set_pressure_oversample(_settings["pressOverSample"]) # Default of 1x oversample
         self.set_humidity_oversample(_settings["humidOverSample"]) # Default of 1x oversample
-        self.set_tempature_oversample(_settings["tempOverSample"]) # Default of 1x oversample
+        self.set_temperature_oversample(_settings["tempOverSample"]) # Default of 1x oversample
 
         self.set_mode(self.MODE_NORMAL) #Go!
 
@@ -280,7 +273,7 @@ class QwiicBme280(object):
         # equation in section 9.1 of the datasheet, it should take no longer
         # than 9.3ms to finish the first measurement at 1x oversampling on all
         # sensors. So wat 10ms to be safe
-        time.sleep(0.01)
+        self._i2c.delay_ms(10)
 
         return True
 
@@ -299,10 +292,10 @@ class QwiicBme280(object):
         if mode > 0b11:
             mode = 0  # Error check. Default to sleep mode
 
-        controlData = self._i2c.readByte(self.address, self.BME280_CTRL_MEAS_REG)
+        controlData = self._i2c.read_byte(self.address, self.BME280_CTRL_MEAS_REG)
         controlData &= (~( (1<<1) | (1<<0) ) ) & 0xFF # Clear the mode[1:0] bits - note we just want a byte
         controlData |= mode   # Set
-        self._i2c.writeByte(self.address, self.BME280_CTRL_MEAS_REG, controlData)
+        self._i2c.write_byte(self.address, self.BME280_CTRL_MEAS_REG, controlData)
 
 
     def get_mode(self):
@@ -311,11 +304,9 @@ class QwiicBme280(object):
 
         @return **MODE_SLEEP, MODE_FORCED, or MODE_NORMAL** The current operational mode
         """
-        controlData = self._i2c.readByte(self.address, self.BME280_CTRL_MEAS_REG)
+        controlData = self._i2c.read_byte(self.address, self.BME280_CTRL_MEAS_REG)
         return controlData & 0b00000011
 
-    # Make the mode a property of this object
-    mode = property(get_mode, set_mode)
 
     #----------------------------------------------------------------
     # Set the standby bits in the config register
@@ -328,11 +319,11 @@ class QwiicBme280(object):
     #   5, 1000ms
     #   6, 10ms
     #   7, 20ms
-    def set_standby_time(self, timeSetting):
+    def set_standby_time(self, time_setting):
         """!
         Set the standby bits in the BME280s config register
 
-        @param timeSetting: The standby time bits - acceptable values
+        @param time_setting: The standby time bits - acceptable values
                         0 = 0.5ms
                         1 = 62.5ms
                         2 = 125ms
@@ -345,17 +336,14 @@ class QwiicBme280(object):
         @return No return value
         """
 
-        if timeSetting > 0b111 :
-            timeSetting = 0 # Error check. Default to 0.5ms
+        if time_setting > 0b111 :
+            time_setting = 0 # Error check. Default to 0.5ms
 
-        controlData = self._i2c.readByte(self.address, self.BME280_CONFIG_REG)
+        controlData = self._i2c.read_byte(self.address, self.BME280_CONFIG_REG)
         controlData &= ( ~( (1<<7) | (1<<6) | (1<<5) )) & 0xff # Clear the 7/6/5 bits
-        controlData |= (timeSetting << 5) # Align with bits 7/6/5
-        self._i2c.writeByte(self.address, self.BME280_CONFIG_REG, controlData)
+        controlData |= (time_setting << 5) # Align with bits 7/6/5
+        self._i2c.write_byte(self.address, self.BME280_CONFIG_REG, controlData)
 
-    # Make standby time a property
-    standby_time = property()
-    standby_time = standby_time.setter(set_standby_time)
 
     #----------------------------------------------------------------
     # Set the filter bits in the config register
@@ -365,11 +353,11 @@ class QwiicBme280(object):
     #   2, coefficients = 4
     #   3, coefficients = 8
     #   4, coefficients = 16
-    def set_filter(self, filterSetting):
+    def set_filter(self, filter_setting):
         """!
         Set the filter bits in the BME280s config register
 
-        @param filterSetting: The filter bits for the BME280. Acceptable values
+        @param filter_setting: The filter bits for the BME280. Acceptable values
                         0 = filter off
                         1 = coefficients = 2
                         2 = coefficients = 4
@@ -378,108 +366,100 @@ class QwiicBme280(object):
 
         @return No return value
         """
-        if filterSetting > 0b111 :
-            filterSetting = 0 # Error check. Default to filter off
+        if filter_setting > 0b111 :
+            filter_setting = 0 # Error check. Default to filter off
 
-        controlData = self._i2c.readByte(self.address, self.BME280_CONFIG_REG)
+        controlData = self._i2c.read_byte(self.address, self.BME280_CONFIG_REG)
         controlData &= (~( (1<<4) | (1<<3) | (1<<2) ) ) & 0xFF # Clear the 4/3/2 bits
-        controlData |= (filterSetting << 2) # Align with bits 4/3/2
-        self._i2c.writeByte(self.address, self.BME280_CONFIG_REG, controlData)
+        controlData |= (filter_setting << 2) # Align with bits 4/3/2
+        self._i2c.write_byte(self.address, self.BME280_CONFIG_REG, controlData)
 
-    filter = property()
-    filter = filter.setter(set_filter)
 
     #----------------------------------------------------------------
     # Set the temperature oversample value
     # 0 turns off temp sensing
     # 1 to 16 are valid over sampling values
-    def set_tempature_oversample(self, overSampleAmount):
+    def set_temperature_oversample(self, over_sample_amount):
         """!
         Set the temperature oversample value
 
-        @param overSampleAmount: The temperature oversample value. Acceptable values
+        @param over_sample_amount: The temperature oversample value. Acceptable values
                 0 = turns off temp sensing
                 1 to 16 are valid over sampling values
 
         @return No return value
         """
-        overSampleAmount = self.check_sample_value(overSampleAmount) # Error check
+        over_sample_amount = self.check_sample_value(over_sample_amount) # Error check
 
         originalMode = self.get_mode() # Get the current mode so we can go back to it at the end
 
         self.set_mode(self.MODE_SLEEP) # Config will only be writeable in sleep mode, so first go to sleep mode
 
-        # Set the osrs_t bits (7, 6, 5) to overSampleAmount
-        controlData = self._i2c.readByte(self.address, self.BME280_CTRL_MEAS_REG)
+        # Set the osrs_t bits (7, 6, 5) to over_sample_amount
+        controlData = self._i2c.read_byte(self.address, self.BME280_CTRL_MEAS_REG)
         controlData &= (~( (1<<7) | (1<<6) | (1<<5) )) & 0xFF # Clear bits 765
-        controlData |= overSampleAmount << 5 # Align overSampleAmount to bits 7/6/5
-        self._i2c.writeByte(self.address, self.BME280_CTRL_MEAS_REG, controlData)
+        controlData |= over_sample_amount << 5 # Align over_sample_amount to bits 7/6/5
+        self._i2c.write_byte(self.address, self.BME280_CTRL_MEAS_REG, controlData)
 
         self.set_mode(originalMode) # Return to the original user's choice
 
-    tempature_oversample = property()
-    tempature_oversample = tempature_oversample.setter(set_tempature_oversample)
 
     # Set the pressure oversample value
     # 0 turns off pressure sensing
     # 1 to 16 are valid over sampling values
-    def set_pressure_oversample(self, overSampleAmount):
+    def set_pressure_oversample(self, over_sample_amount):
         """!
         Set the pressure oversample value
 
-        @param overSampleAmount: The pressure oversample value. Acceptable values
+        @param over_sample_amount: The pressure oversample value. Acceptable values
                 0 = turns off pressure sensing
                 1 to 16 are valid over sampling values
 
         @return No return value
         """
-        overSampleAmount = self.check_sample_value(overSampleAmount) # Error check
+        over_sample_amount = self.check_sample_value(over_sample_amount) # Error check
 
         originalMode = self.get_mode() # Get the current mode so we can go back to it at the end
 
         self.set_mode(self.MODE_SLEEP) # Config will only be writeable in sleep mode, so first go to sleep mode
 
-        # Set the osrs_p bits (4, 3, 2) to overSampleAmount
-        controlData = self._i2c.readByte(self.address, self.BME280_CTRL_MEAS_REG)
+        # Set the osrs_p bits (4, 3, 2) to over_sample_amount
+        controlData = self._i2c.read_byte(self.address, self.BME280_CTRL_MEAS_REG)
         controlData &= (~( (1<<4) | (1<<3) | (1<<2) )) & 0xFF  # Clear bits 432
-        controlData |= overSampleAmount << 2 # Align overSampleAmount to bits 4/3/2
-        self._i2c.writeByte(self.address, self.BME280_CTRL_MEAS_REG, controlData)
+        controlData |= over_sample_amount << 2 # Align over_sample_amount to bits 4/3/2
+        self._i2c.write_byte(self.address, self.BME280_CTRL_MEAS_REG, controlData)
 
         self.set_mode(originalMode) # Return to the original user's choice
 
-    pressure_oversample = property()
-    pressure_oversample = pressure_oversample.setter(set_pressure_oversample)
 
     #----------------------------------------------------------------
     # Set the humidity oversample value
     # 0 turns off humidity sensing
     # 1 to 16 are valid over sampling values
-    def set_humidity_oversample(self, overSampleAmount):
+    def set_humidity_oversample(self, over_sample_amount):
         """!
         Set the humidity oversample value
 
-        @param overSampleAmount: The humidity oversample value. Acceptable values
+        @param over_sample_amount: The humidity oversample value. Acceptable values
                 0 = turns off humidity sensing
                 1 to 16 are valid over sampling values
 
         @return No return value
         """
-        overSampleAmount = self.check_sample_value(overSampleAmount) # Error check
+        over_sample_amount = self.check_sample_value(over_sample_amount) # Error check
 
         originalMode = self.get_mode() # Get the current mode so we can go back to it at the end
 
         self.set_mode(self.MODE_SLEEP) # Config will only be writeable in sleep mode, so first go to sleep mode
 
-        # Set the osrs_h bits (2, 1, 0) to overSampleAmount
-        controlData = self._i2c.readByte(self.address, self.BME280_CTRL_HUMIDITY_REG)
+        # Set the osrs_h bits (2, 1, 0) to over_sample_amount
+        controlData = self._i2c.read_byte(self.address, self.BME280_CTRL_HUMIDITY_REG)
         controlData &= (~( (1<<2) | (1<<1) | (1<<0) )) & 0xFF # Clear bits 2/1/0
-        controlData |= overSampleAmount << 0 # Align overSampleAmount to bits 2/1/0
-        self._i2c.writeByte(self.address, self.BME280_CTRL_HUMIDITY_REG, controlData)
+        controlData |= over_sample_amount << 0 # Align over_sample_amount to bits 2/1/0
+        self._i2c.write_byte(self.address, self.BME280_CTRL_HUMIDITY_REG, controlData)
 
         self.set_mode(originalMode) # Return to the original user's choice
 
-    humidity_oversample = property()
-    humidity_oversample = humidity_oversample.setter(set_humidity_oversample)
 
     #----------------------------------------------------------------
     # Validates an over sample value
@@ -487,11 +467,11 @@ class QwiicBme280(object):
     # These are used in the humidty, pressure, and temp oversample functions
     #
     # pylint: disable=no-self-use
-    def check_sample_value(self, userValue):
+    def check_sample_value(self, user_value):
         """!
         Validates an over sample value
 
-        @param userValue: The oversample value to check.
+        @param user_value: The oversample value to check.
                 Allowed values are 0 to 16
                 These are used in the humidty, pressure, and temp oversample functions
 
@@ -499,7 +479,7 @@ class QwiicBme280(object):
         """
         _valueMap = { 0: 0, 1: 1, 2: 2, 4: 3, 8: 4, 16: 5}
 
-        return _valueMap[userValue] if userValue in _valueMap.keys() else 1
+        return _valueMap[user_value] if user_value in _valueMap.keys() else 1
 
     # pylint: enable=no-self-use
     # Check the measuring bit and return true while device is taking measurement
@@ -511,7 +491,7 @@ class QwiicBme280(object):
         :rvalue: boolean
         """
 
-        stat = self._i2c.readByte(self.address, self.BME280_STAT_REG)
+        stat = self._i2c.read_byte(self.address, self.BME280_STAT_REG)
         return  True if stat & (1<<3) else False # If the measuring bit (3) is set, return true
 
 
@@ -521,7 +501,7 @@ class QwiicBme280(object):
         Resets the sensor. If called, the begin method must be called before
         using the sensor.
         """
-        self._i2c.writeByte(self.address, self.BME280_RST_REG, 0xB6)
+        self._i2c.write_byte(self.address, self.BME280_RST_REG, 0xB6)
 
     # ****************************************************************************#
     #
@@ -538,7 +518,7 @@ class QwiicBme280(object):
         # Read temperature to update t_fine
         self.get_temperature_celsius()
 
-        data_buffer = self._i2c.readBlock(self.address, self.BME280_PRESSURE_MSB_REG, 3)
+        data_buffer = self._i2c.read_block(self.address, self.BME280_PRESSURE_MSB_REG, 3)
         adc_P = (data_buffer[0] << 12) | (data_buffer[1] << 4) | ((data_buffer[2] >> 4) & 0x0F)
 
         var1 = self.t_fine - 128000
@@ -560,19 +540,18 @@ class QwiicBme280(object):
 
         return p_acc / 256.0
 
-    pressure = property(read_pressure)
 
     #----------------------------------------------------------------
     # Sets the internal variable _referencePressure so the
-    def set_reference_pressure(self, refPressure):
+    def set_reference_pressure(self, ref_pressure):
         """!
         Sets the referance pressure for the sensor measurments.
 
-        @param refPressure: The referance pressure to use.
+        @param ref_pressure: The referance pressure to use.
 
         @return No return value
         """
-        self._referencePressure = float(refPressure)
+        self._referencePressure = float(ref_pressure)
 
     # Return the local reference pressure
     def get_reference_pressure(self):
@@ -583,7 +562,6 @@ class QwiicBme280(object):
         """
         return self._referencePressure
 
-    reference_pressure = property(get_reference_pressure, set_reference_pressure)
 
     #----------------------------------------------------------------
     def get_altitude_meters( self ):
@@ -593,9 +571,8 @@ class QwiicBme280(object):
         @return **float** The current altitude in meters
         """
 
-        return (-44330.77)*(math.pow((self.pressure/self._referencePressure), 0.190263) - 1.0) # Corrected, see issue 30
+        return (-44330.77)*(math.pow((self.read_pressure()/self._referencePressure), 0.190263) - 1.0) # Corrected, see issue 30
 
-    altitude_meters = property(get_altitude_meters)
 
     #----------------------------------------------------------------
     def get_altitude_feet( self ):
@@ -606,7 +583,6 @@ class QwiicBme280(object):
         """
         return self.get_altitude_meters() * 3.28084
 
-    altitude_feet = property(get_altitude_feet)
 
 
     # ****************************************************************************#
@@ -624,7 +600,7 @@ class QwiicBme280(object):
         # Read temperature to update t_fine
         self.get_temperature_celsius()
 
-        data_buffer = self._i2c.readBlock(self.address, self.BME280_HUMIDITY_MSB_REG, 2)
+        data_buffer = self._i2c.read_block(self.address, self.BME280_HUMIDITY_MSB_REG, 2)
         adc_H = (data_buffer[0] << 8) | data_buffer[1]
 
         var1 = (self.t_fine - 76800)
@@ -638,7 +614,6 @@ class QwiicBme280(object):
 
         return (var1>>12) / 1024.0
 
-    humidity = property(read_humidity)
 
     # ****************************************************************************#
     #
@@ -656,7 +631,7 @@ class QwiicBme280(object):
 
         # get the reading (adc_T);
 
-        data_buffer = self._i2c.readBlock(self.address, self.BME280_TEMPERATURE_MSB_REG, 3)
+        data_buffer = self._i2c.read_block(self.address, self.BME280_TEMPERATURE_MSB_REG, 3)
         adc_T = (data_buffer[0] << 12) | (data_buffer[1] << 4) | ((data_buffer[2] >> 4) & 0x0F)
 
         # By datasheet, calibrate
@@ -669,7 +644,6 @@ class QwiicBme280(object):
 
         return output / 100 + _settings["tempCorrection"]
 
-    temperature_celsius = property(get_temperature_celsius)
 
     #----------------------------------------------------------------
     def get_temperature_fahrenheit( self ):
@@ -679,10 +653,9 @@ class QwiicBme280(object):
 
         @return **float** The current temperature in F.
         """
-        output = self.temperature_celsius
+        output = self.get_temperature_celsius()
         return (output * 9) / 5 + 32
 
-    temperature_fahrenheit = property(get_temperature_fahrenheit)
 
     # ****************************************************************************#
     #
@@ -703,17 +676,16 @@ class QwiicBme280(object):
 
         RATIO = 373.15 / (273.15 + celsius)
         RHS = -7.90298 * (RATIO - 1)
-        RHS += 5.02808 * math.log10(RATIO)
+        RHS += 5.02808 * (math.log(RATIO) / _LN10)
         RHS += -1.3816e-7 * (math.pow(10, (11.344 * (1 - 1/RATIO ))) - 1)
         RHS += 8.1328e-3 * (math.pow(10, (-3.49149 * (RATIO - 1))) - 1)
-        RHS += math.log10(1013.246)
+        RHS += (math.log(1013.246) / _LN10)
                #  factor -3 is to adjust units - Vapor Pressure SVP * humidity
         VP = math.pow(10, RHS - 3) * humidity
                #  (2) DEWPOINT = F(Vapor Pressure)
         T = math.log(VP/0.61078)   #  temp var
         return (241.88 * T) / (17.558 - T)
 
-    dewpoint_celsius = property(get_dewpoint_celsius)
 
     #----------------------------------------------------------------
     #  Returns Dew point in DegF
@@ -725,4 +697,3 @@ class QwiicBme280(object):
         """
         return self.get_dewpoint_celsius() * 1.8 + 32 # Convert C to F
 
-    dewpoint_fahrenheit = property(get_dewpoint_fahrenheit)

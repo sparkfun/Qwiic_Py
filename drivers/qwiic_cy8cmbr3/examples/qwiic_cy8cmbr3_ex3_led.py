@@ -36,12 +36,12 @@
 
 import qwiic_cy8cmbr3
 import sys
-import time
+import qwiic_i2c
 
 # Define soil moisture threshold for LED control
 threshold = 8 # Example threshold for dry soil
 
-def runExample():
+def run_example():
 	print("\nQwiic Template Example 3 - LED Control\n")
 
 	# Create instance of device
@@ -70,11 +70,11 @@ def runExample():
 			mySoilSensor.led_off()  # Turn LED off for moist soil
 			print("LED OFF - Capacitance above threshold\n")
 		# Sleep for a second to avoid spamming the output
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

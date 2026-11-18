@@ -40,7 +40,7 @@
 # Example 1
 
 import qwiic_sgp40
-import time
+import qwiic_i2c
 import sys
 
 def run_example():
@@ -48,8 +48,9 @@ def run_example():
 	print("\nSparkFun Qwiic Air Quality Sensor - SGP40, Example 1\n")
 	my_sgp40 = qwiic_sgp40.QwiicSGP40()
 	
-	if my_sgp40.begin() != 0:
-		print("\nThe Qwiic SGP40 isn't connected to the system. Please check your connection", \
+	print("\nWaiting 10 seconds for the SGP40 to warm-up.")
+	if not my_sgp40.begin():
+		print("\nThe Qwiic SGP40 isn't connected to the system or failed its self test. Please check your connection", \
 			file=sys.stderr)
 		return
 	
@@ -57,9 +58,9 @@ def run_example():
 	
 	while True:
 		
-		print("\nVOC Index is: " + str(my_sgp40.get_VOC_index()))
+		print("\nVOC Index is: " + str(my_sgp40.get_voc_index()))
 		
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:

@@ -37,19 +37,18 @@
 
 import qwiic_tmp117
 import sys
-import time
 
 def conv_avg_mode_to_string(conv_avg_mode):
-	if conv_avg_mode == qwiic_tmp117.QwiicTMP117.kConvAvgNone:
+	if conv_avg_mode == qwiic_tmp117.QwiicTMP117.CONV_AVG_NONE:
 		return "No Averaging"
-	elif conv_avg_mode == qwiic_tmp117.QwiicTMP117.kConvAvg8:
+	elif conv_avg_mode == qwiic_tmp117.QwiicTMP117.CONV_AVG_8:
 		return "8 Averaged Conversions"
-	elif conv_avg_mode == qwiic_tmp117.QwiicTMP117.kConvAvg32:
+	elif conv_avg_mode == qwiic_tmp117.QwiicTMP117.CONV_AVG_32:
 		return "32 Averaged Conversions"
-	elif conv_avg_mode == qwiic_tmp117.QwiicTMP117.kConvAvg64:
+	elif conv_avg_mode == qwiic_tmp117.QwiicTMP117.CONV_AVG_64:
 		return "64 Averaged Conversions"
 
-def runExample():
+def run_example():
 	print("\nQwiic TMP117 Example 6 - Set Conversion Cycle Time\n")
 
 	# Create instance of device
@@ -116,7 +115,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

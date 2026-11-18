@@ -36,9 +36,9 @@
 
 import qwiic_rv8803
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic RV8803 Example 3 - Set Hundredths\n")
 
 	# Create instance of device
@@ -55,13 +55,13 @@ def runExample():
 
 	# Configure EVI event capture with button debounce so we can catch button presses on the RTC
 	myRTC.set_evi_event_capture(True)
-	myRTC.set_evi_debounce_time(myRTC.kEviDebounce256Hz)
+	myRTC.set_evi_debounce_time(myRTC.EVI_DEBOUNCE_256HZ)
 
 	while True:
-		if myRTC.get_interrupt_flag(myRTC.kFlagEvi):
+		if myRTC.get_interrupt_flag(myRTC.FLAG_EVI):
 			print("Button pressed, resetting hundredths to 0!")
 			myRTC.set_hundredths_to_zero()
-			myRTC.clear_interrupt_flag(myRTC.kFlagEvi)
+			myRTC.clear_interrupt_flag(myRTC.FLAG_EVI)
 			
 
 		myRTC.update_time()
@@ -70,11 +70,11 @@ def runExample():
 		print (myRTC.string_date_usa())
 		print (" ", myRTC.string_time(), " hundredths =", hundredths)
 
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

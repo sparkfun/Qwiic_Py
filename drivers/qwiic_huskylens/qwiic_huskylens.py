@@ -46,12 +46,17 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 _DEFAULT_NAME = "Qwiic HuskyLens"
 
 # Some devices have multiple available addresses - this is a list of these
 # addresses. NOTE: The first address in this list is considered the default I2C
 # address for the device.
 _AVAILABLE_I2C_ADDRESS = [0x32]
+
+# How long to wait for the first byte of a response, in milliseconds
+_RESPONSE_TIMEOUT_MS = 1000
 
 class QwiicHuskyLens(object):
     # Set default name and I2C address(es)
@@ -75,58 +80,56 @@ class QwiicHuskyLens(object):
     # 5. Analyze returned data and take action
 
     # Commands
-    kCommandRequest = 0x20 # Request all blocks and arrows from the HUSKYLENS
-    kCommandRequestBlocks = 0x21 # Request all blocks from the HUSKYLENS
-    kCommandRequestArrows = 0x22 # Request all arrows from the HUSKYLENS
-    kCommandRequestLearned = 0x23 # Request all learned blocks/arrows from the HUSKYLENS
-    kCommandRequestBlocksLearned = 0x24 # Request all learned blocks from the HUSKYLENS
-    kCommandRequestArrowsLearned = 0x25 # Request all learned arrows from the HUSKYLENS
-    kCommandRequestById = 0x26 # Request block or arrow by ID from the HUSKYLENS
-    kCommandRequestBlocksById = 0x27 # Request block by ID from the HUSKYLENS
-    kCommandRequestArrowsById = 0x28 # Request arrow by ID from the HUSKYLENS
-    kCommandReturnInfo = 0x29 # Return the number of blocks and arrows from the HUSKYLENS
-    kCommandReturnBlock = 0x2A # Return the block information from the HUSKYLENS
-    kCommandReturnArrow = 0x2B # Return the arrow information from the HUSKYLENS
-    kCommandRequestKnock = 0x2C # Used to check if the HUSKYLENS is connected
-    kCommandRequestAlgorithm = 0x2D # Change the algorithm of the HUSKYLENS
-    kCommandReturnOk = 0x2E # Return result of request_algorithm or request_knock
-    kCommandRequestCustomNames = 0x2F # Set a custom name for a learned object from the HUSKYLENS
-    kCommandRequestPhoto = 0x30 # Save a photo on the HUSKYLENS SD Card
-    kCommandRequestSendKnowledges = 0x32 # Save the current algorithms model to the SD Card
-    kCommandRequestReceiveKnowledges = 0x33 # Load a model file from the SD Card to the current algorithm
-    kCommandRequestCustomText = 0x34 # Place a string of text on the HUSKYLENS UI
-    kCommandRequestClearText = 0x35 # Clear and delete all custom UI texts from the screen
-    kCommandRequestLearn = 0x36 # Learn the current recognized object on screen with a chosen ID
-    kCommandRequestForget = 0x37 # Forget learned objects for the current running algorithm
-    kCommandRequestSaveScreenshot = 0x39 # Save a screenshot of the current UI to the HUSKYLENS SD Card
-    kCommandRequestIsPro = 0x3B # Check what model your HUSKYLENS is
-    kCommandReturnIsPro = 0x3B # Return the model of the HUSKYLENS
-    kCommandRequestFirmwareVersion = 0x3C # Request the firmware version of the HUSKYLENS
-    kCommandReturnBusy = 0x3D # Return busy if multiple commands are sent without waiting for OK
-    kCommandReturnNeedPro = 0x3E # Return need pro if a pro only command is sent to the HUSKYLENS
+    COMMAND_REQUEST = 0x20 # Request all blocks and arrows from the HUSKYLENS
+    COMMAND_REQUEST_BLOCKS = 0x21 # Request all blocks from the HUSKYLENS
+    COMMAND_REQUEST_ARROWS = 0x22 # Request all arrows from the HUSKYLENS
+    COMMAND_REQUEST_LEARNED = 0x23 # Request all learned blocks/arrows from the HUSKYLENS
+    COMMAND_REQUEST_BLOCKS_LEARNED = 0x24 # Request all learned blocks from the HUSKYLENS
+    COMMAND_REQUEST_ARROWS_LEARNED = 0x25 # Request all learned arrows from the HUSKYLENS
+    COMMAND_REQUEST_BY_ID = 0x26 # Request block or arrow by ID from the HUSKYLENS
+    COMMAND_REQUEST_BLOCKS_BY_ID = 0x27 # Request block by ID from the HUSKYLENS
+    COMMAND_REQUEST_ARROWS_BY_ID = 0x28 # Request arrow by ID from the HUSKYLENS
+    COMMAND_RETURN_INFO = 0x29 # Return the number of blocks and arrows from the HUSKYLENS
+    COMMAND_RETURN_BLOCK = 0x2A # Return the block information from the HUSKYLENS
+    COMMAND_RETURN_ARROW = 0x2B # Return the arrow information from the HUSKYLENS
+    COMMAND_REQUEST_KNOCK = 0x2C # Used to check if the HUSKYLENS is connected
+    COMMAND_REQUEST_ALGORITHM = 0x2D # Change the algorithm of the HUSKYLENS
+    COMMAND_RETURN_OK = 0x2E # Return result of set_algorithm or request_knock
+    COMMAND_REQUEST_CUSTOM_NAMES = 0x2F # Set a custom name for a learned object from the HUSKYLENS
+    COMMAND_REQUEST_PHOTO = 0x30 # Save a photo on the HUSKYLENS SD Card
+    COMMAND_REQUEST_SEND_KNOWLEDGES = 0x32 # Save the current algorithms model to the SD Card
+    COMMAND_REQUEST_RECEIVE_KNOWLEDGES = 0x33 # Load a model file from the SD Card to the current algorithm
+    COMMAND_REQUEST_CUSTOM_TEXT = 0x34 # Place a string of text on the HUSKYLENS UI
+    COMMAND_REQUEST_CLEAR_TEXT = 0x35 # Clear and delete all custom UI texts from the screen
+    COMMAND_REQUEST_LEARN = 0x36 # Learn the current recognized object on screen with a chosen ID
+    COMMAND_REQUEST_FORGET = 0x37 # Forget learned objects for the current running algorithm
+    COMMAND_REQUEST_SAVE_SCREENSHOT = 0x39 # Save a screenshot of the current UI to the HUSKYLENS SD Card
+    COMMAND_REQUEST_IS_PRO = 0x3B # Check what model your HUSKYLENS is
+    COMMAND_RETURN_IS_PRO = 0x3B # Return the model of the HUSKYLENS
+    COMMAND_REQUEST_FIRMWARE_VERSION = 0x3C # Request the firmware version of the HUSKYLENS
+    COMMAND_RETURN_BUSY = 0x3D # Return busy if multiple commands are sent without waiting for OK
+    COMMAND_RETURN_NEED_PRO = 0x3E # Return need pro if a pro only command is sent to the HUSKYLENS
 
     # Algorithms 
     # Note, algorithms are 16-bit values, but existing commands only use the low byte and have 0 for the high byte
-    kAlgorithmFaceRecognition = 0x00
-    kAlgorithmObjectTracking = 0x01
-    kAlgorithmObjectRecognition = 0x02
-    kAlgorithmLineTracking = 0x03
-    kAlgorithmColorRecognition = 0x04
-    kAlgorithmTagRecognition = 0x05
-    kAlgorithmObjectClassification = 0x06
+    ALGORITHM_FACE_RECOGNITION = 0x00
+    ALGORITHM_OBJECT_TRACKING = 0x01
+    ALGORITHM_OBJECT_RECOGNITION = 0x02
+    ALGORITHM_LINE_TRACKING = 0x03
+    ALGORITHM_COLOR_RECOGNITION = 0x04
+    ALGORITHM_TAG_RECOGNITION = 0x05
+    ALGORITHM_OBJECT_CLASSIFICATION = 0x06
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int address: The I2C address to use for the device
+        @param address: **int** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
-        @param int nLearned: The number of objects already learned.
-            The HuskyLens will assign IDs to learned objects starting from nLearned + 1.
-            It is assumed by the protocol that the IDs are consecutive.
+        @param i2c_bus: **I2CBus** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -134,25 +137,19 @@ class QwiicHuskyLens(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
-        
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
+
         self.blocks = [] # The blocks (objects, faces, etc.) detected by the HuskyLens
         self.arrows = [] # The arrows (lines) detected by the HuskyLens
-        self.nLearned = 0 # The number of objects/IDs already learned
-        self.idToName = {} # A dictionary of IDs to names for learned objects
+        self.n_learned = 0 # The number of objects/IDs already learned
+        self.id_to_name = {} # A dictionary of IDs to names for learned objects
 
     def _checksum(self, pkt):
         """!
         Calculate the checksum for a packet to be sent to the HuskyLens
 
-        @param list pkt: The I2C address to use for the device
+        @param pkt: **list** The I2C address to use for the device
             If not provided, the default address is used
         """
         # The checksum is the low-byte of the sum of all bytes in the packet, including the header and address
@@ -162,8 +159,8 @@ class QwiicHuskyLens(object):
         """!
         Send a command to the HuskyLens
 
-        @param int command: The command to send
-        @param list data: The data to send with the command (optional)
+        @param command: **int** The command to send
+        @param data: **list** The data to send with the command (optional)
         """
 
         dlen = 0
@@ -184,6 +181,12 @@ class QwiicHuskyLens(object):
     
     class _Response:
         def __init__(self, pkt):
+            if pkt is None:
+                # No response before the timeout
+                self.header = self.header2 = self.address = self.dlen = self.command = self.checksum = None
+                self.data = []
+                self.valid = False
+                return
             self.header = pkt[0]
             self.header2 = pkt[1]
             self.address = pkt[2]
@@ -197,23 +200,26 @@ class QwiicHuskyLens(object):
         """!
         Get a response from the HuskyLens
 
-        @param int command: The command to send
-        @return _Response: The response from the HuskyLens
+        @return _Response: The response from the HuskyLens. It is not valid
+            if no response started within _RESPONSE_TIMEOUT_MS
         """
         # Sometimes we receive some invalid bytes before the address so we want to read until we get the first header byte
-        readBytes = [0]
-        while readBytes[0] != 0x55:
-            readBytes[0] = self._i2c.read_byte(self.address)
+        read_bytes = [0]
+        start = self._i2c.ticks_ms()
+        while read_bytes[0] != 0x55:
+            if self._i2c.ticks_diff(self._i2c.ticks_ms(), start) > _RESPONSE_TIMEOUT_MS:
+                return self._Response(None)
+            read_bytes[0] = self._i2c.read_byte(self.address)
 
         # First read the header, address, data length and command bytes
         # so we know how much data we expect.
-        readBytes.extend(list(self._i2c.read_block(self.address, None, 4)))
+        read_bytes.extend(list(self._i2c.read_block(self.address, None, 4)))
 
         # Read the rest of the data
-        leftToRead = readBytes[3] + 1 # Data length + 1 byte for checksum
-        readBytes.extend(list(self._i2c.read_block(self.address, None, leftToRead)))
+        left_to_read = read_bytes[3] + 1 # Data length + 1 byte for checksum
+        read_bytes.extend(list(self._i2c.read_block(self.address, None, left_to_read)))
 
-        return self._Response(readBytes)
+        return self._Response(read_bytes)
 
     def request_knock(self):
         """!
@@ -222,11 +228,11 @@ class QwiicHuskyLens(object):
         @return **bool** `True` if successful, otherwise `False`
         """
         # Send the request
-        self._send_command(self.kCommandRequestKnock)
+        self._send_command(self.COMMAND_REQUEST_KNOCK)
 
         # Get the response
         response = self._get_response()
-        return response.valid and response.command == self.kCommandReturnOk
+        return response.valid and response.command == self.COMMAND_RETURN_OK
 
     def is_connected(self):
         """!
@@ -235,15 +241,13 @@ class QwiicHuskyLens(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        if not self._i2c.isDeviceConnected(self.address):
+        if not self._i2c.is_device_connected(self.address):
             return False
     
         if not self.request_knock():
             return False
         
         return True
-
-    connected = property(is_connected)
 
     def begin(self):
         """!
@@ -261,44 +265,44 @@ class QwiicHuskyLens(object):
     # TODO: We might want to move these out of the class or make them functions returning dicts
     class _ReturnInfo():
         def __init__(self, resp):
-            self.nBlocksAndArrows = resp.data[0] + (resp.data[1] << 8)
-            self.nIDs = resp.data[2] + (resp.data[3] << 8)
-            self.frameNumber = resp.data[4] + (resp.data[5] << 8)
+            self.n_blocks_and_arrows = resp.data[0] + (resp.data[1] << 8)
+            self.n_ids = resp.data[2] + (resp.data[3] << 8)
+            self.frame_number = resp.data[4] + (resp.data[5] << 8)
     
     class Block():
         def __init__(self, resp):
-            self.xCenter = resp.data[0] + (resp.data[1] << 8)
-            self.yCenter = resp.data[2] + (resp.data[3] << 8)
+            self.x_center = resp.data[0] + (resp.data[1] << 8)
+            self.y_center = resp.data[2] + (resp.data[3] << 8)
             self.width = resp.data[4] + (resp.data[5] << 8)
             self.height = resp.data[6] + (resp.data[7] << 8)
             self.id = resp.data[8] + (resp.data[9] << 8)
     
     class Arrow():
         def __init__(self, resp):
-            self.xOrigin = resp.data[0] + (resp.data[1] << 8)
-            self.yOrigin = resp.data[2] + (resp.data[3] << 8)
-            self.xTarget = resp.data[4] + (resp.data[5] << 8)
-            self.yTarget = resp.data[6] + (resp.data[7] << 8)
+            self.x_origin = resp.data[0] + (resp.data[1] << 8)
+            self.y_origin = resp.data[2] + (resp.data[3] << 8)
+            self.x_target = resp.data[4] + (resp.data[5] << 8)
+            self.y_target = resp.data[6] + (resp.data[7] << 8)
             self.id = resp.data[8] + (resp.data[9] << 8)
 
     def _handle_response_blocks(self, response):
         """!
         Handle a response that contains block information (return info and blocks)
 
-        @param _Response response: The response from the HuskyLens
+        @param response: **_Response** The response from the HuskyLens
         """
-        if not response.valid or response.command != self.kCommandReturnInfo:
+        if not response.valid or response.command != self.COMMAND_RETURN_INFO:
             return False
         
-        returnInfo = self._ReturnInfo(response)
+        return_info = self._ReturnInfo(response)
 
         # Get the blocks
-        self.blocks = [None] * returnInfo.nBlocksAndArrows
-        self.nLearned = returnInfo.nIDs
+        self.blocks = [None] * return_info.n_blocks_and_arrows
+        self.n_learned = return_info.n_ids
 
-        for i in range(returnInfo.nBlocksAndArrows):
+        for i in range(return_info.n_blocks_and_arrows):
             response = self._get_response()
-            if not response.valid or response.command != self.kCommandReturnBlock:
+            if not response.valid or response.command != self.COMMAND_RETURN_BLOCK:
                 return False
 
             self.blocks[i] = self.Block(response)
@@ -309,20 +313,20 @@ class QwiicHuskyLens(object):
         """!
         Handle a response that contains arrow information (return info and arrows)
 
-        @param _Response response: The response from the HuskyLens
+        @param response: **_Response** The response from the HuskyLens
         """
-        if not response.valid or response.command != self.kCommandReturnInfo:
+        if not response.valid or response.command != self.COMMAND_RETURN_INFO:
             return False
         
-        returnInfo = self._ReturnInfo(response)
+        return_info = self._ReturnInfo(response)
 
         # Get the arrows
-        self.arrows = [None] * returnInfo.nBlocksAndArrows
-        self.nLearned = returnInfo.nIDs
+        self.arrows = [None] * return_info.n_blocks_and_arrows
+        self.n_learned = return_info.n_ids
 
-        for i in range(returnInfo.nBlocksAndArrows):
+        for i in range(return_info.n_blocks_and_arrows):
             response = self._get_response()
-            if not response.valid or response.command != self.kCommandReturnArrow:
+            if not response.valid or response.command != self.COMMAND_RETURN_ARROW:
                 return False
 
             self.arrows[i] = self.Arrow(response)
@@ -333,26 +337,26 @@ class QwiicHuskyLens(object):
         """!
         Handle a response that contains both block and arrow information (return info, blocks, and arrows)
         
-        @param _Response response: The response from the HuskyLens
+        @param response: **_Response** The response from the HuskyLens
         """
-        if not response.valid or response.command != self.kCommandReturnInfo:
+        if not response.valid or response.command != self.COMMAND_RETURN_INFO:
             return False
         
-        returnInfo = self._ReturnInfo(response)
+        return_info = self._ReturnInfo(response)
 
         # Get the blocks and arrows
         self.blocks = []
         self.arrows = []
-        self.nLearned = returnInfo.nIDs
+        self.n_learned = return_info.n_ids
 
-        for i in range(returnInfo.nBlocksAndArrows):
+        for i in range(return_info.n_blocks_and_arrows):
             response = self._get_response()
             if not response.valid:
                 return False
 
-            if response.command == self.kCommandReturnBlock:
+            if response.command == self.COMMAND_RETURN_BLOCK:
                 self.blocks.append(self.Block(response))
-            elif response.command == self.kCommandReturnArrow:
+            elif response.command == self.COMMAND_RETURN_ARROW:
                 self.arrows.append(self.Arrow(response))
             else:
                 return False
@@ -368,7 +372,7 @@ class QwiicHuskyLens(object):
         @return **bool** `True` if successful, otherwise `False`
         """
         # Send the request
-        self._send_command(self.kCommandRequest)
+        self._send_command(self.COMMAND_REQUEST)
 
         # Get the response
         return self._handle_response_mixed(self._get_response())
@@ -397,8 +401,8 @@ class QwiicHuskyLens(object):
 
         Returned objects have the following properties:
         - id: The ID of the object
-        - xCenter: The x-coordinate of the center of the object
-        - yCenter: The y-coordinate of the center of the object
+        - x_center: The x-coordinate of the center of the object
+        - y_center: The y-coordinate of the center of the object
         - width: The width of the object
         - height: The height of the object
 
@@ -413,10 +417,10 @@ class QwiicHuskyLens(object):
 
         Returned objects have the following properties:
         - id: The ID of the object
-        - xOrigin: The x-coordinate of the origin of the line
-        - yOrigin: The y-coordinate of the origin of the line
-        - xTarget: The x-coordinate of the target of the line
-        - yTarget: The y-coordinate of the target of the line
+        - x_origin: The x-coordinate of the origin of the line
+        - y_origin: The y-coordinate of the origin of the line
+        - x_target: The x-coordinate of the target of the line
+        - y_target: The y-coordinate of the target of the line
 
         @return **list** A list of Arrow objects
         """
@@ -432,7 +436,7 @@ class QwiicHuskyLens(object):
         @return **bool** `True` if successful, otherwise `False`
         """
         # Send the request
-        self._send_command(self.kCommandRequestBlocks)
+        self._send_command(self.COMMAND_REQUEST_BLOCKS)
 
         # Get the response
         return self._handle_response_blocks(self._get_response())
@@ -446,7 +450,7 @@ class QwiicHuskyLens(object):
         @return **bool** `True` if successful, otherwise `False`
         """
         # Send the request
-        self._send_command(self.kCommandRequestArrows)
+        self._send_command(self.COMMAND_REQUEST_ARROWS)
 
         # Get the response
         return self._handle_response_arrows(self._get_response())
@@ -456,7 +460,7 @@ class QwiicHuskyLens(object):
         Request all learned blocks and arrows from the HuskyLens
         """
         # Send the request
-        self._send_command(self.kCommandRequestLearned)
+        self._send_command(self.COMMAND_REQUEST_LEARNED)
         
         # Get the response
         return self._handle_response_mixed(self._get_response())
@@ -466,7 +470,7 @@ class QwiicHuskyLens(object):
         Request all learned blocks from the HuskyLens
         """
         # Send the request
-        self._send_command(self.kCommandRequestBlocksLearned)
+        self._send_command(self.COMMAND_REQUEST_BLOCKS_LEARNED)
         
         # Get the response
         return self._handle_response_blocks(self._get_response())
@@ -476,7 +480,7 @@ class QwiicHuskyLens(object):
         Request all learned arrows from the HuskyLens
         """
         # Send the request
-        self._send_command(self.kCommandRequestArrowsLearned)
+        self._send_command(self.COMMAND_REQUEST_ARROWS_LEARNED)
         
         # Get the response
         return self._handle_response_arrows(self._get_response())
@@ -487,10 +491,10 @@ class QwiicHuskyLens(object):
 
         This will fill self.blocks or self.arrows with the returned information
 
-        @param int id: The ID to request
+        @param id: **int** The ID to request
         """
         # Send the request
-        self._send_command(self.kCommandRequestById, [id & 0xFF, id >> 8])
+        self._send_command(self.COMMAND_REQUEST_BY_ID, [id & 0xFF, id >> 8])
 
         # Get the response
         self._handle_response_mixed(self._get_response())
@@ -501,10 +505,10 @@ class QwiicHuskyLens(object):
 
         This will fill self.blocks with the returned information
 
-        @param int id: The ID to request
+        @param id: **int** The ID to request
         """
         # Send the request
-        self._send_command(self.kCommandRequestBlocksById, [id & 0xFF, id >> 8])
+        self._send_command(self.COMMAND_REQUEST_BLOCKS_BY_ID, [id & 0xFF, id >> 8])
 
         # Get the response
         self._handle_response_blocks(self._get_response())
@@ -515,60 +519,50 @@ class QwiicHuskyLens(object):
 
         This will fill self.arrows with the returned information
 
-        @param int id: The ID to request
+        @param id: **int** The ID to request
         """
         # Send the request
-        self._send_command(self.kCommandRequestArrowsById, [id & 0xFF, id >> 8])
+        self._send_command(self.COMMAND_REQUEST_ARROWS_BY_ID, [id & 0xFF, id >> 8])
 
         # Get the response
         self._handle_response_arrows(self._get_response())
 
-    def request_algorithm(self, algorithm):
+    def set_algorithm(self, algorithm):
         """!
         Change the algorithm of the HuskyLens and return the result.
 
-        @param int algorithm: The algorithm to set. See the kAlgorithm constants.
+        @param algorithm: **int** The algorithm to set. See the ALGORITHM_* constants.
 
         @return **bool** `True` if successful, otherwise `False`.
         """
-        if algorithm not in [self.kAlgorithmFaceRecognition, 
-                            self.kAlgorithmObjectTracking, 
-                            self.kAlgorithmObjectRecognition, 
-                            self.kAlgorithmLineTracking, 
-                            self.kAlgorithmColorRecognition, 
-                            self.kAlgorithmTagRecognition, 
-                            self.kAlgorithmObjectClassification]:
+        if algorithm not in [self.ALGORITHM_FACE_RECOGNITION, 
+                            self.ALGORITHM_OBJECT_TRACKING, 
+                            self.ALGORITHM_OBJECT_RECOGNITION, 
+                            self.ALGORITHM_LINE_TRACKING, 
+                            self.ALGORITHM_COLOR_RECOGNITION, 
+                            self.ALGORITHM_TAG_RECOGNITION, 
+                            self.ALGORITHM_OBJECT_CLASSIFICATION]:
             return False
 
         # Send the request
-        self._send_command(self.kCommandRequestAlgorithm, [algorithm & 0xFF, algorithm >> 8])
+        self._send_command(self.COMMAND_REQUEST_ALGORITHM, [algorithm & 0xFF, algorithm >> 8])
 
         # Get the response
         response = self._get_response()
-        return response.valid and response.command == self.kCommandReturnOk
-
-    def set_algorithm(self, algorithm):
-        """!
-        Change the algorithm of the HuskyLens
-
-        @param int algorithm: The algorithm to set. See the kAlgorithm constants.
-
-        @return **bool** `True` if successful, otherwise `False`.
-        """
-        return self.request_algorithm(algorithm)
+        return response.valid and response.command == self.COMMAND_RETURN_OK
 
     def request_custom_names(self, id, name):
         """!
         Set a custom name for a learned object from the HuskyLens
 
-        @param int id: The ID of the object
-        @param str name: The name to set
+        @param id: **int** The ID of the object
+        @param name: **str** The name to set
         """
         data = [id, len(name) + 1]
         data.extend([ord(c) for c in name])
         data.append(0)
-        self._send_command(self.kCommandRequestCustomNames, data)
-        self.idToName[id] = name
+        self._send_command(self.COMMAND_REQUEST_CUSTOM_NAMES, data)
+        self.id_to_name[id] = name
     
     def get_name_for_id(self, id):
         """!
@@ -576,54 +570,56 @@ class QwiicHuskyLens(object):
 
         Note: This will does not query the device and is based on internal program state, so it will not persist across program runs.
 
-        @param int id: The ID of the object
+        @param id: **int** The ID of the object
         @return **str** The name of the object, or `None` if not found
         """
         # We store the names in a dictionary, so we can look them up by ID
         # The device doesn't return this in any way so we have to keep track of it ourselves
         # The device will show the names on screen however
-        if id not in self.idToName:
+        if id not in self.id_to_name:
             return None
         
-        return self.idToName[id]
+        return self.id_to_name[id]
 
     def name_last(self, name):
         """!
         Set a custom name for the last learned object from the HuskyLens
 
-        @param str name: The name to set
+        @param name: **str** The name to set
         """
-        self.request_custom_names(self.nLearned, name)
+        self.request_custom_names(self.n_learned, name)
 
     def request_photo(self):
         """!
         Save a photo on the HuskyLens SD Card
         """
-        self._send_command(self.kCommandRequestPhoto)
+        self._send_command(self.COMMAND_REQUEST_PHOTO)
 
-    def request_send_knowledges(self, fileNum):
+    def request_send_knowledges(self, file_num):
         """!
         Save the current algorithms model to the SD Card
 
-        @param int fileNum: The file number to save
+        @param file_num: **int** The file number to save
         """
-        self._send_command(self.kCommandRequestSendKnowledges, [fileNum & 0xFF, fileNum >> 8])
+        self._send_command(self.COMMAND_REQUEST_SEND_KNOWLEDGES, [file_num & 0xFF, file_num >> 8])
 
-    def request_receive_knowledges(self, fileNum):
+    def request_receive_knowledges(self, file_num):
         """!
         Load a model file from the SD Card to the current algorithm
 
-        @param int fileNum: The file number to load
+        @param file_num: **int** The file number to load
         """
-        self._send_command(self.kCommandRequestReceiveKnowledges, [fileNum & 0xFF, fileNum >> 8])
+        self._send_command(self.COMMAND_REQUEST_RECEIVE_KNOWLEDGES, [file_num & 0xFF, file_num >> 8])
 
-    def request_custom_text(self, text, x=0, y=0):
+    def write_to_screen(self, text, x=0, y=0):
         """!
         Place a string of text on the HuskyLens UI
 
-        @param str text: The text to display
-        @param int x: The x-coordinate of the text
-        @param int y: The y-coordinate of the text
+        @param text: **str** The text to display, up to 20 characters
+        @param x: **int** The x-coordinate of the text
+        @param y: **int** The y-coordinate of the text
+
+        @return **bool** `True` if the text was sent, `False` if it is too long
         """
         if len(text) > 20:
             return False
@@ -634,72 +630,50 @@ class QwiicHuskyLens(object):
             data = [len(text), 0, x, y]
 
         data.extend([ord(c) for c in text])
-        self._send_command(self.kCommandRequestCustomText, data)
+        self._send_command(self.COMMAND_REQUEST_CUSTOM_TEXT, data)
 
         return True
 
-    def write_to_screen(self, text, x=0, y=0):
-        """!
-        Place a string of text on the HuskyLens UI
-
-        @param str text: The text to display
-        @param int x: The x-coordinate of the text
-        @param int y: The y-coordinate of the text
-        """
-        self.request_custom_text(text, x, y)
-
-    def request_clear_text(self):
-        """!
-        Clear and delete all custom UI texts from the screen
-        """
-        self._send_command(self.kCommandRequestClearText)
-    
     def clear_screen(self):
         """!
         Clear and delete all custom UI texts from the screen
         """
-        self.request_clear_text()
+        self._send_command(self.COMMAND_REQUEST_CLEAR_TEXT)
     
     def request_learn(self, id):
         """!
         Learn a current recognized object on screen based on its ID
 
-        @param int id: The ID to assign to the object
+        @param id: **int** The ID to assign to the object
         """
-        self._send_command(self.kCommandRequestLearn, [id & 0xFF, id >> 8])
+        self._send_command(self.COMMAND_REQUEST_LEARN, [id & 0xFF, id >> 8])
         
     def learn_new(self):
         """!
-        Learn the current recognized object on screen. It will be assigned an ID starting from nLearned + 1.
+        Learn the current recognized object on screen. It will be assigned an ID starting from n_learned + 1.
         """
-        self.nLearned += 1
-        self.request_learn(self.nLearned)
+        self.n_learned += 1
+        self.request_learn(self.n_learned)
     
     def learn_same(self):
         """!
         Learn the current recognized object on screen with the same ID as the last learn call.
         """
-        self.request_learn(self.nLearned)
+        self.request_learn(self.n_learned)
 
-    def request_forget(self):
-        """!
-        Forget learned objects for the current running algorithm
-        """
-        self.nLearned = 0
-        self.idToName = {}
-        self._send_command(self.kCommandRequestForget)
-    
     def forget(self):
         """!
         Forget all learned objects for the current running algorithm
         """
-        self.request_forget()
+        self.n_learned = 0
+        self.id_to_name = {}
+        self._send_command(self.COMMAND_REQUEST_FORGET)
     
     def request_save_screenshot(self):
         """!
         Save a screenshot of the current UI to the HuskyLens SD Card
         """
-        self._send_command(self.kCommandRequestSaveScreenshot)
+        self._send_command(self.COMMAND_REQUEST_SAVE_SCREENSHOT)
 
     def request_is_pro(self):
         """!
@@ -707,10 +681,10 @@ class QwiicHuskyLens(object):
 
         @return **bool** `True` if the HuskyLens is a pro model, otherwise `False`
         """
-        self._send_command(self.kCommandRequestIsPro)
+        self._send_command(self.COMMAND_REQUEST_IS_PRO)
 
         response = self._get_response()
-        if not response.valid or response.command != self.kCommandReturnIsPro:
+        if not response.valid or response.command != self.COMMAND_RETURN_IS_PRO:
             return False
         
         return response.data[0] == 1
@@ -719,7 +693,7 @@ class QwiicHuskyLens(object):
     #     """!
     #     Request the firmware version of the HuskyLens. Not specified where this goes...
     #     """
-    #     self._send_command(self.kCommandRequestFirmwareVersion)
+    #     self._send_command(self.COMMAND_REQUEST_FIRMWARE_VERSION)
 
         # The ICD is blank for the response to this or where this goes...
         # response = self._get_response()

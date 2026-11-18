@@ -58,10 +58,9 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 """
 #-----------------------------------------------------------------------------
-from __future__ import print_function
-import struct
-
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
@@ -90,8 +89,8 @@ QDER_TURN_INT_TIMEOUT = 0x0F
 QDER_CHANGE_ADDRESS = 0x11
 QDER_LIMIT = 0x12
 
-_statusEncoderMovedBit = 0
-_enableInterruptEncoderBit = 0
+_STATUS_ENCODER_MOVED_BIT = 0
+_ENABLE_INTERRUPT_ENCODER_BIT = 0
 
 # define the class that encapsulates the device being created. All information associated with this
 # device is encapsulated by this class. The device class should be the only value exported
@@ -103,8 +102,7 @@ class QwiicDualEncoderReader(object):
 
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         :return: The QwiicDualEncoderReader device object.
         :rtype: Object
     """
@@ -113,37 +111,31 @@ class QwiicDualEncoderReader(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address is not None else self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ----------------------------------
-    # isConnected()
+    # is_connected()
     #
     # Is an actual board connected to our system?
 
     def is_connected(self):
         """
-            Determine if a device is conntected to the system..
+            Determine if a device is connected to the system.
 
             :return: True if the device is connected, otherwise False.
             :rtype: bool
 
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
+        return qwiic_i2c.is_device_connected(self.address)
 
-    connected = property(is_connected)
     # ----------------------------------
     # begin()
     #
@@ -173,7 +165,7 @@ class QwiicDualEncoderReader(object):
             :return: No return Value
 
         """
-        self._i2c.writeByte(self.address, QDER_STATUS, 0)
+        self._i2c.write_byte(self.address, QDER_STATUS, 0)
 
     #----------------------------------------------------------------
     # get_count1()
@@ -188,7 +180,7 @@ class QwiicDualEncoderReader(object):
             :rtype: word as integer
 
         """
-        c1 = self._i2c.readWord(self.address, QDER_COUNT1)
+        c1 = self._i2c.read_word(self.address, QDER_COUNT1)
         # encoder reader returns a SIGNED 16 bit int
         # python receives this as simply 16 bits of data
         # we need to accept negative values
@@ -209,7 +201,7 @@ class QwiicDualEncoderReader(object):
             :rtype: word as integer
 
         """
-        c2 = self._i2c.readWord(self.address, QDER_COUNT2)
+        c2 = self._i2c.read_word(self.address, QDER_COUNT2)
         # encoder reader returns a SIGNED 16 bit int
         # python receives this as simply 16 bits of data
         # we need to accept negative values
@@ -230,7 +222,7 @@ class QwiicDualEncoderReader(object):
 
         """
 
-        return self._i2c.writeWord(self.address, QDER_COUNT1, amount)
+        return self._i2c.write_word(self.address, QDER_COUNT1, amount)
 
     #----------------------------------------------------------------
     # set_count2()
@@ -245,10 +237,7 @@ class QwiicDualEncoderReader(object):
 
         """
 
-        return self._i2c.writeWord(self.address, QDER_COUNT2, amount)        
-
-    count1 = property(get_count1, set_count1)
-    count2 = property(get_count2, set_count2)
+        return self._i2c.write_word(self.address, QDER_COUNT2, amount)
 
     #----------------------------------------------------------------
     # get_limit()
@@ -263,7 +252,7 @@ class QwiicDualEncoderReader(object):
             :rtype: integer
 
         """
-        return self._i2c.readWord(self.address, QDER_LIMIT)
+        return self._i2c.read_word(self.address, QDER_LIMIT)
 
 
     #----------------------------------------------------------------
@@ -278,9 +267,7 @@ class QwiicDualEncoderReader(object):
             :return: no return value
 
         """
-        return self._i2c.writeWord(self.address, QDER_LIMIT, amount)
-
-    limit = property(get_limit, set_limit)
+        return self._i2c.write_word(self.address, QDER_LIMIT, amount)
 
     #----------------------------------------------------------------
     # get_diff()
@@ -291,16 +278,16 @@ class QwiicDualEncoderReader(object):
         """
             Returns the number of ticks since last check
 
-            :param clearValue: Set to True to clear the current value. Default is False
+            :param clear_value: Set to True to clear the current value. Default is False
 
             :return: the difference
             :rtype: integer
 
         """
-        difference = self._i2c.readWord(self.address, QDER_DIFFERENCE1)
+        difference = self._i2c.read_word(self.address, QDER_DIFFERENCE1)
 
         if clear_value:
-            self._i2c.writeWord(self.address, QDER_DIFFERENCE1, 0)
+            self._i2c.write_word(self.address, QDER_DIFFERENCE1, 0)
 
         return difference
 
@@ -317,14 +304,13 @@ class QwiicDualEncoderReader(object):
             :rtype: Boolean
 
         """
-        status = self._i2c.readByte(self.address, QDER_STATUS)
+        status = self._i2c.read_byte(self.address, QDER_STATUS)
 
-        self._i2c.writeByte(self.address, QDER_STATUS, \
-                        status & ~(1 << _statusEncoderMovedBit))
+        self._i2c.write_byte(self.address, QDER_STATUS, \
+                        status & ~(1 << _STATUS_ENCODER_MOVED_BIT))
 
-        return (status & (1 << _statusEncoderMovedBit)) != 0
+        return (status & (1 << _STATUS_ENCODER_MOVED_BIT)) != 0
 
-    moved = property(has_moved)
     #----------------------------------------------------------------
     # since_last_movement()
     #
@@ -335,17 +321,17 @@ class QwiicDualEncoderReader(object):
             Returns the number of milliseconds since the last encoder movement
             By default, clear the current value
 
-            :param clearValue: Clear out the value? True by default
+            :param clear_value: Clear out the value? True by default
 
             :return: time since last encoder movement
             :rtype: integer
 
         """
-        time_elapsed = self._i2c.readWord(self.address, QDER_LAST_ENCODER_EVENT)
+        time_elapsed = self._i2c.read_word(self.address, QDER_LAST_ENCODER_EVENT)
 
         # Clear the current value if requested
         if clear_value:
-            self._i2c.writeWord(QDER_LAST_ENCODER_EVENT, 0)
+            self._i2c.write_word(QDER_LAST_ENCODER_EVENT, 0)
 
         return time_elapsed
 
@@ -361,9 +347,7 @@ class QwiicDualEncoderReader(object):
         :return: The firmware version
         :rtype: integer
         """
-        return self._i2c.readWord(self.address, QDER_VERSION)
-
-    version = property(get_version)
+        return self._i2c.read_word(self.address, QDER_VERSION)
     
 
     #----------------------------------------------------------------
@@ -380,7 +364,7 @@ class QwiicDualEncoderReader(object):
             :return: No return value
 
         """
-        self._i2c.writeWord(self.address, QDER_TURN_INT_TIMEOUT, timeout)
+        self._i2c.write_word(self.address, QDER_TURN_INT_TIMEOUT, timeout)
 
     #----------------------------------------------------------------
     # get_int_timeout()
@@ -395,6 +379,4 @@ class QwiicDualEncoderReader(object):
             :rtype: integer
 
         """
-        return self._i2c.readWord(self.address, QDER_TURN_INT_TIMEOUT)
-
-    int_timeout = property(get_int_timeout, set_int_timeout)
+        return self._i2c.read_word(self.address, QDER_TURN_INT_TIMEOUT)

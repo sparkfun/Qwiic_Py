@@ -37,13 +37,13 @@
 
 import qwiic_max1704x
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic MAX1704X Example 4 - MAX17048 Kitchen Sink\n")
 
 	# Create instance of device
-	myLipo = qwiic_max1704x.QwiicMAX1704X(qwiic_max1704x.QwiicMAX1704X.kDeviceTypeMAX17048)
+	myLipo = qwiic_max1704x.QwiicMAX1704X(qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
 
 	# Check if it's connected
 	if myLipo.is_connected() == False:
@@ -57,7 +57,7 @@ def runExample():
 	# Just because we can, let's reset the MAX17048
 	print("Resetting the MAX17048...")
 	myLipo.reset()
-	time.sleep(1) # Give it time to get its act back together
+	qwiic_i2c.delay_ms(1000) # Give it time to get its act back together
 
 	# Read and print the reset indicator
 	ri = myLipo.is_reset(True)
@@ -152,11 +152,11 @@ def runExample():
 		
 		print("Hibernating: {}".format(myLipo.is_hibernating()))  # Print the alert flag
 		
-		time.sleep(0.5)
+		qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

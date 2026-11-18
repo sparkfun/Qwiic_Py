@@ -35,9 +35,9 @@
 
 import qwiic_nau7802
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic NAU7802 Example 4 - Low Power\n")
 
 	# Create instance of device
@@ -58,21 +58,21 @@ def runExample():
 		my_scale.power_down()
 
 		# Wait a little bit while in low power mode
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 		# Power up again
 		my_scale.power_up()
 
 		# Wait for new reading to become available, and time how long it takes
-		start_time = my_scale.millis()
+		start_time = qwiic_i2c.ticks_ms()
 		while my_scale.available() == False:
-			time.sleep(0.001)
+			qwiic_i2c.delay_ms(1)
 		
 		# Measurement finished, stop the timer!
-		finish_time = my_scale.millis()
+		finish_time = qwiic_i2c.ticks_ms()
 		
 		# Print data
-		print("Start up time (ms):", finish_time - start_time)
+		print("Start up time (ms):", qwiic_i2c.ticks_diff(finish_time, start_time))
 		print("Reading:", my_scale.get_reading())
 
 		# Give some space between prints
@@ -80,7 +80,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

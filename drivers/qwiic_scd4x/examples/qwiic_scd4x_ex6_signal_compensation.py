@@ -37,21 +37,21 @@
 
 import qwiic_scd4x
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic SCD4x Example 6 - Signal Compensation\n")
 
 	# Create instance of device
 	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
 	# Check if it's connected
-	if mySCD4x.is_connected() == False:
+	if not mySCD4x.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	if mySCD4x.begin() == False:
+	if not mySCD4x.begin():
 		print("Error while initializing device", file=sys.stderr)
 		return
 	
@@ -73,17 +73,17 @@ def runExample():
 	if mySCD4x.set_ambient_pressure(98700):
 		print("Ambient pressure set")
 
-	# The signal compensation settings are stored in RAM by default and will reset if reInit is called
+	# The signal compensation settings are stored in RAM by default and will reset if reinit() is called
   	# or if the power is cycled. To store the settings in EEPROM we can call:
 	# mySCD4x.persist_settings() # Uncomment this line to store the sensor settings in EEPROM
 
 	# Just for giggles, while the periodic measurements are stopped, let's read the sensor serial number
-	serialNumber = mySCD4x.get_serial_number()
-	if serialNumber is None:
+	serial_number = mySCD4x.get_serial_number()
+	if serial_number is None:
 		print("Error while reading serial number", file=sys.stderr)
 		return
 	
-	print("The sensor's serial number is:", "0x" + serialNumber)
+	print("The sensor's serial number is:", "0x" + serial_number)
 
 	# Finally, we need to restart periodic measurements
 	mySCD4x.start_periodic_measurement()
@@ -97,11 +97,11 @@ def runExample():
 		else:
 			print(".", end="")
 		
-		time.sleep(0.5) # Only check for new data every 0.5 second
+		qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 second
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

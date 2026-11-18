@@ -39,25 +39,24 @@
 # Example 6
 
 import qwiic_led_stick
-import time
 import sys
 
-def color_gradient(LED_stick, r1, b1, g1, r2, g2, b2, LED_length):
-    # Subtract 1 from LED_length because there is one less transition color
+def color_gradient(led_stick, r1, b1, g1, r2, g2, b2, led_length):
+    # Subtract 1 from led_length because there is one less transition color
     # than length of LEDs
-    LED_length = LED_length - 1
+    led_length = led_length - 1
     # Calculate the slope of the line between r/g/b1 and r/g/b2
-    r_slope = (r2 - r1) / LED_length
-    g_slope = (g2 - g1) / LED_length
-    b_slope = (b2 - b1) / LED_length
+    r_slope = (r2 - r1) / led_length
+    g_slope = (g2 - g1) / led_length
+    b_slope = (b2 - b1) / led_length
     # Set the color for each pixel on your LED Stick
-    for i in range(0, LED_length):
+    for i in range(0, led_length):
         # Evaluate the ith point on the line between r/g/b1 and r/g/b2
         r_value = r1 + r_slope * i
         g_value = g1 + g_slope * i
         b_value = b1 + b_slope * i
         # Set the pixel to the calculated color
-        LED_stick.set_single_LED_color(i + 1, r_value, g_value, b_value)
+        led_stick.set_single_led_color(i + 1, r_value, g_value, b_value)
 
 def run_example():
 

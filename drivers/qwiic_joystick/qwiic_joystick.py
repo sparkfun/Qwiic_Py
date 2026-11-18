@@ -57,6 +57,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
 # This allows higher level logic to rapidly create a index of qwiic devices at
@@ -94,8 +96,7 @@ class QwiicJoystick(object):
 
     @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return The
     """
@@ -104,23 +105,18 @@ class QwiicJoystick(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ----------------------------------
     # is_connected()
@@ -129,13 +125,12 @@ class QwiicJoystick(object):
 
     def is_connected(self):
         """!
-        Determine if a Joystick device is conntected to the system..
+        Determine if a Joystick device is connected to the system.
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return self._i2c.isDeviceConnected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
-    connected = property(is_connected)
 
     # ----------------------------------
     # begin()
@@ -163,12 +158,11 @@ class QwiicJoystick(object):
 
         @return **byte as integer** The next button value
         """
-        msb = self._i2c.readByte(self.address, JOYSTICK_X_MSB)
-        lsb = self._i2c.readByte(self.address, JOYSTICK_X_LSB)
+        msb = self._i2c.read_byte(self.address, JOYSTICK_X_MSB)
+        lsb = self._i2c.read_byte(self.address, JOYSTICK_X_LSB)
 
         return ((msb << 8) | lsb)>>6
 
-    horizontal = property(get_horizontal)
     #----------------------------------------------------------------
     # get_vertical()
     #
@@ -180,12 +174,11 @@ class QwiicJoystick(object):
 
         @return **byte as integer** The next button value
         """
-        msb = self._i2c.readByte(self.address, JOYSTICK_Y_MSB)
-        lsb = self._i2c.readByte(self.address, JOYSTICK_Y_LSB)
+        msb = self._i2c.read_byte(self.address, JOYSTICK_Y_MSB)
+        lsb = self._i2c.read_byte(self.address, JOYSTICK_Y_LSB)
 
         return ((msb << 8) | lsb)>>6
 
-    vertical = property(get_vertical)
     #----------------------------------------------------------------
     # get_button()
     #
@@ -197,27 +190,26 @@ class QwiicJoystick(object):
         @return **integer** button status
         """
 
-        return self._i2c.readByte(self.address, JOYSTICK_BUTTON)
+        return self._i2c.read_byte(self.address, JOYSTICK_BUTTON)
 
-    button = property(get_button)
     #----------------------------------------------------------------
     # check_button()
     #
-    # Returns 1 if button was pressed between reads of .getButton() or .checkButton()
+    # Returns 1 if button was pressed between reads of get_button() or check_button()
     # the register is then cleared after read.
 
     def check_button(self):
         """!
-        Returns 1 if button was pressed between reads of .getButton() or .checkButton()
+        Returns 1 if button was pressed between reads of get_button() or check_button()
             the register is then cleared after read.
 
         @return **integer** button status
         """
 
-        status = self._i2c.readByte(self.address, JOYSTICK_STATUS)
+        status = self._i2c.read_byte(self.address, JOYSTICK_STATUS)
 
         # We've read this status bit, now clear it
-        self._i2c.writeByte(self.address, JOYSTICK_STATUS, 0x00)
+        self._i2c.write_byte(self.address, JOYSTICK_STATUS, 0x00)
 
         return status
 
@@ -233,9 +225,8 @@ class QwiicJoystick(object):
 
         @return **string** The firmware version
         """
-        vMajor = self._i2c.readByte(self.address, JOYSTICK_VERSION1)
-        vMinor = self._i2c.readByte(self.address, JOYSTICK_VERSION2)
+        v_major = self._i2c.read_byte(self.address, JOYSTICK_VERSION1)
+        v_minor = self._i2c.read_byte(self.address, JOYSTICK_VERSION2)
 
-        return "v %d.%d" % (vMajor, vMinor)
+        return "v %d.%d" % (v_major, v_minor)
 
-    version = property(get_version)

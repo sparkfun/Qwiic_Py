@@ -35,31 +35,10 @@
 
 import qwiic_rv8803
 import sys
-import time
+import qwiic_i2c
 
-# These helper functions are just to provide us with a platform-independent way to get the current time in microseconds (from our microcontroller, not the RTC)
-# The CircuitPython time module has time.monotonic_ns()
-# The MicroPython time module has time.time_ns()
-# RasPi time module has both
-
-def check_has_monotonic_ns():
-	try:
-		time.monotonic_ns()
-		return True 
-	except AttributeError:
-		return False
-	
-def get_microseconds(use_monotonic_ns):
-	if use_monotonic_ns:
-		return time.monotonic_ns() // 1000 # works in CircuitPython and RasPi
-	else:
-		return time.time_ns() // 1000 # only works in MicroPython
-
-def runExample():
+def run_example():
 	print("\nQwiic RV8803 Example 4c - Periodic Interrupt\n")
-
-	# First we'll check if the time module for current platform has the monotonic_ns() function
-	useMono = check_has_monotonic_ns()
 
 	# Create instance of device
 	myRTC = qwiic_rv8803.QwiicRV8803()
@@ -75,20 +54,21 @@ def runExample():
 
 	myRTC.disable_all_interrupts()
 	myRTC.clear_all_interrupt_flags() # Clear all flags in case any interrupts have occurred.
-	myRTC.set_periodic_time_update_frequency(myRTC.kTimeUpdate1Second) # Another option is kTimeUpdate1Minute
-	myRTC.enable_hardware_interrupt(myRTC.kUpdateInterrupt)
-	lastInterruptTime = get_microseconds(useMono)
+	myRTC.set_periodic_time_update_frequency(myRTC.TIME_UPDATE_1_SECOND) # Another option is TIME_UPDATE_1_MINUTE
+	myRTC.enable_hardware_interrupt(myRTC.UPDATE_INTERRUPT)
+	lastInterruptTime = qwiic_i2c.ticks_ms() # Time from our microcontroller, not the RTC
 
 	while True:
-		if myRTC.get_interrupt_flag(myRTC.kFlagUpdate):
-			timeSinceLastInterrupt = get_microseconds(useMono) - lastInterruptTime
-			lastInterruptTime = get_microseconds(useMono)
-			myRTC.clear_interrupt_flag(myRTC.kFlagUpdate)
-			print("Periodic 1s interrupt triggered. Time since last interrupt: ", timeSinceLastInterrupt, " uS")
+		if myRTC.get_interrupt_flag(myRTC.FLAG_UPDATE):
+			now = qwiic_i2c.ticks_ms()
+			timeSinceLastInterrupt = qwiic_i2c.ticks_diff(now, lastInterruptTime)
+			lastInterruptTime = now
+			myRTC.clear_interrupt_flag(myRTC.FLAG_UPDATE)
+			print("Periodic 1s interrupt triggered. Time since last interrupt: ", timeSinceLastInterrupt, " ms")
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

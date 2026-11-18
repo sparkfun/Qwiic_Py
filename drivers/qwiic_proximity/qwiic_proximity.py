@@ -51,10 +51,10 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 """
 
-from __future__ import print_function
-
 # load the i2c bus driver package
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 #
 # The name of this device
@@ -94,8 +94,7 @@ class QwiicProximity(object):
 
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         :return: The Proximity device object.
         :rtype: Object
     """
@@ -196,34 +195,28 @@ class QwiicProximity(object):
     VCNL4040_INT_FLAG_CLOSE = (1 << 1)
     VCNL4040_INT_FLAG_AWAY = (1 << 0)
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address is not None else self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     #----------------------------------------------
     def is_connected(self):
         """
-            Determine if a Proximity device is conntected to the system..
+            Determine if a Proximity device is connected to the system.
 
             :return: True if the device is connected, otherwise False.
             :rtype: bool
 
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
+        return qwiic_i2c.is_device_connected(self.address)
 
-    connected = property(is_connected)
     #----------------------------------------------
     # //Check comm with sensor and set it to default init settings
     def begin(self):
@@ -250,7 +243,7 @@ class QwiicProximity(object):
 
         self.set_prox_resolution(16) # Set to 16-bit output
 
-        self.enable_smart_persistance() #Turn on smart presistance
+        self.enable_smart_persistence() #Turn on smart persistence
 
         self.power_on_proximity() #Turn on prox sensing
 
@@ -264,78 +257,72 @@ class QwiicProximity(object):
     # //ratio, the faster the response time achieved with higher power
     # //consumption. For example, PS_Duty = 1/320, peak IRED current = 100 mA,
     # //averaged current consumption is 100 mA/320 = 0.3125 mA.
-    def set_ir_dutycycle(self, dutyValue):
+    def set_ir_dutycycle(self, duty_value):
         """
             Set the duty cycle of the IR LED. The higher the duty
             ratio, the faster the response time achieved with higher power
             consumption. For example, PS_Duty = 1/320, peak IRED current = 100 mA,
             averaged current consumption is 100 mA/320 = 0.3125 mA.
 
-            :param dutyValue: The duty cycle value for the IR LED on the sensor
+            :param duty_value: The duty cycle value for the IR LED on the sensor
             :return: No return value
 
         """
-        if dutyValue > 320 - 1:
-            dutyValue = self.VCNL4040_PS_DUTY_320
-        elif dutyValue > 160 - 1:
-            dutyValue = self.VCNL4040_PS_DUTY_160
-        elif dutyValue > 80 - 1:
-            dutyValue = self.VCNL4040_PS_DUTY_80
+        if duty_value > 320 - 1:
+            duty_value = self.VCNL4040_PS_DUTY_320
+        elif duty_value > 160 - 1:
+            duty_value = self.VCNL4040_PS_DUTY_160
+        elif duty_value > 80 - 1:
+            duty_value = self.VCNL4040_PS_DUTY_80
         else:
-            dutyValue = self.VCNL4040_PS_DUTY_40
+            duty_value = self.VCNL4040_PS_DUTY_40
 
-        self._bitMask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_DUTY_MASK, dutyValue)
+        self._bit_mask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_DUTY_MASK, duty_value)
 
-    duty_cycle = property()
-    duty_cycle = duty_cycle.setter(set_ir_dutycycle)
 
     #----------------------------------------------
-    # //Set the Prox interrupt persistance value
+    # //Set the Prox interrupt persistence value
     # //The PS persistence function (PS_PERS, 1, 2, 3, 4) helps to avoid
     # //false trigger of the PS INT. It defines the amount of
     # //consecutive hits needed in order for a PS interrupt event to be triggered.
-    def set_prox_interrupt_persistance(self, persValue):
+    def set_prox_interrupt_persistence(self, pers_value):
         """
-            Set the Prox interrupt persistance value
+            Set the Prox interrupt persistence value
             The PS persistence function (PS_PERS, 1, 2, 3, 4) helps to avoid
             false trigger of the PS INT. It defines the amount of
             consecutive hits needed in order for a PS interrupt event to be triggered.
 
-            :param persValue: The persistance value
+            :param pers_value: The persistence value
             :return: No return value
 
         """
-        self._bitMask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_PERS_MASK, persValue)
+        self._bit_mask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_PERS_MASK, pers_value)
 
-    prox_interrupt_persistance = property()
-    prox_interrupt_persistance = prox_interrupt_persistance.setter(set_prox_interrupt_persistance)
     #----------------------------------------------
-    # //Set the Ambient interrupt persistance value
+    # //Set the Ambient interrupt persistence value
     # //The ALS persistence function (ALS_PERS, 1, 2, 4, 8) helps to avoid
     # //false trigger of the ALS INT. It defines the amount of
     # //consecutive hits needed in order for a ALS interrupt event to be triggered.
-    def set_ambient_interrupt_persistance(self, persValue):
+    def set_ambient_interrupt_persistence(self, pers_value):
         """
-            Set the Ambient interrupt persistance value
+            Set the Ambient interrupt persistence value
             The ALS persistence function (ALS_PERS, 1, 2, 4, 8) helps to avoid
             false trigger of the ALS INT. It defines the amount of
             consecutive hits needed in order for a ALS interrupt event to be triggered.
 
-            :param persValue: The ambiant interrupt persistance value
+            :param pers_value: The ambient interrupt persistence value
             :return: No return value
 
         """
-        self._bitMask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_PERS_MASK, persValue)
+        self._bit_mask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_PERS_MASK, pers_value)
 
-    ambient_interrupt_persistance = property()
-    ambient_interrupt_persistance = ambient_interrupt_persistance.setter(set_ambient_interrupt_persistance)
     def enable_ambient_interrupts(self):
         """
             Enable Ambient Interrupts
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_INT_EN_MASK, self.VCNL4040_ALS_INT_ENABLE)
+        self._bit_mask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_INT_EN_MASK, self.VCNL4040_ALS_INT_ENABLE)
 
     def disable_ambient_interrupts(self):
         """
@@ -343,7 +330,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_INT_EN_MASK, self.VCNL4040_ALS_INT_DISABLE)
+        self._bit_mask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_INT_EN_MASK, self.VCNL4040_ALS_INT_DISABLE)
 
     # Power on or off the ambient light sensing portion of the sensor
     def power_on_ambient(self):
@@ -352,7 +339,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_SD_MASK, self.VCNL4040_ALS_SD_POWER_ON)
+        self._bit_mask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_SD_MASK, self.VCNL4040_ALS_SD_POWER_ON)
 
     def power_off_ambient(self):
         """
@@ -360,54 +347,50 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_SD_MASK, self.VCNL4040_ALS_SD_POWER_OFF)
+        self._bit_mask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_SD_MASK, self.VCNL4040_ALS_SD_POWER_OFF)
 
     # Sets the integration time for the ambient light sensor
-    def set_ambient_integration_time(self, timeValue):
+    def set_ambient_integration_time(self, time_value):
         """
             Sets the integration time for the ambient light sensor
 
-            :param timeValue: The integration time
+            :param time_value: The integration time
             :return: No return value
         """
 
-        if timeValue > 640 - 1:
-            timeValue = self.VCNL4040_ALS_IT_640MS
-        elif timeValue > 320 - 1:
-            timeValue = self.VCNL4040_ALS_IT_320MS
-        elif timeValue > 160 - 1:
-            timeValue = self.VCNL4040_ALS_IT_160MS
+        if time_value > 640 - 1:
+            time_value = self.VCNL4040_ALS_IT_640MS
+        elif time_value > 320 - 1:
+            time_value = self.VCNL4040_ALS_IT_320MS
+        elif time_value > 160 - 1:
+            time_value = self.VCNL4040_ALS_IT_160MS
         else:
-            timeValue = self.VCNL4040_ALS_IT_80MS
+            time_value = self.VCNL4040_ALS_IT_80MS
 
-        self._bitMask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_IT_MASK, timeValue)
+        self._bit_mask(VCNL4040_ALS_CONF, LOWER, self.VCNL4040_ALS_IT_MASK, time_value)
 
-    ambient_integration_time = property()
-    ambient_integration_time = ambient_integration_time.setter(set_ambient_integration_time)
 
     # Sets the integration time for the proximity sensor
-    def set_prox_integration_time(self, timeValue):
+    def set_prox_integration_time(self, time_value):
         """
             Sets the integration time for the proximity sensor
 
-            :param timeValue: The integration time
+            :param time_value: The integration time
             :return: No return value
         """
-        if timeValue > 8 - 1:
-            timeValue = self.VCNL4040_PS_IT_8T
-        elif timeValue > 4 - 1:
-            timeValue = self.VCNL4040_PS_IT_4T
-        elif timeValue > 3 - 1:
-            timeValue = self.VCNL4040_PS_IT_3T
-        elif timeValue > 2 - 1:
-            timeValue = self.VCNL4040_PS_IT_2T
+        if time_value > 8 - 1:
+            time_value = self.VCNL4040_PS_IT_8T
+        elif time_value > 4 - 1:
+            time_value = self.VCNL4040_PS_IT_4T
+        elif time_value > 3 - 1:
+            time_value = self.VCNL4040_PS_IT_3T
+        elif time_value > 2 - 1:
+            time_value = self.VCNL4040_PS_IT_2T
         else:
-            timeValue = self.VCNL4040_PS_IT_1T
+            time_value = self.VCNL4040_PS_IT_1T
 
-        self._bitMask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_IT_MASK, timeValue)
+        self._bit_mask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_IT_MASK, time_value)
 
-    prox_integration_time = property()
-    prox_integration_time = prox_integration_time.setter(set_prox_integration_time)
 
     # Power on the prox sensing portion of the device
     def power_on_proximity(self):
@@ -416,7 +399,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_SD_MASK, self.VCNL4040_PS_SD_POWER_ON)
+        self._bit_mask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_SD_MASK, self.VCNL4040_PS_SD_POWER_ON)
 
     # Power off the prox sensing portion of the device
     def power_off_proximity(self):
@@ -425,61 +408,57 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_SD_MASK, self.VCNL4040_PS_SD_POWER_OFF)
+        self._bit_mask(VCNL4040_PS_CONF1, LOWER, self.VCNL4040_PS_SD_MASK, self.VCNL4040_PS_SD_POWER_OFF)
 
     # Sets the proximity resolution
-    def set_prox_resolution(self, resolutionValue):
+    def set_prox_resolution(self, resolution_value):
         """
             Sets the proximity resolution
 
-            :param resolutionValue: The resolution time
+            :param resolution_value: The resolution time
             :return: No return value
         """
-        if resolutionValue > 16 - 1:
-            resolutionValue = self.VCNL4040_PS_HD_16_BIT
+        if resolution_value > 16 - 1:
+            resolution_value = self.VCNL4040_PS_HD_16_BIT
         else:
-            resolutionValue = self.VCNL4040_PS_HD_12_BIT
+            resolution_value = self.VCNL4040_PS_HD_12_BIT
 
-        self._bitMask(VCNL4040_PS_CONF2, UPPER, self.VCNL4040_PS_HD_MASK, resolutionValue)
+        self._bit_mask(VCNL4040_PS_CONF2, UPPER, self.VCNL4040_PS_HD_MASK, resolution_value)
 
-    prox_resolution = property()
-    prox_resolution = prox_resolution.setter(set_prox_resolution)
 
     # Sets the proximity interrupt type
-    def set_prox_interrupt_type(self, interruptValue):
+    def set_prox_interrupt_type(self, interrupt_value):
         """
             Sets the proximity interrupt type
 
-            :param interruptValue: The interupt type
+            :param interrupt_value: The interupt type
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF2, UPPER, self.VCNL4040_PS_INT_MASK, interruptValue)
+        self._bit_mask(VCNL4040_PS_CONF2, UPPER, self.VCNL4040_PS_INT_MASK, interrupt_value)
 
-    prox_interrupt_type = property()
-    prox_interrupt_type = prox_interrupt_type.setter(set_prox_interrupt_type)
 
-    # Enable smart persistance
+    # Enable smart persistence
     # To accelerate the PS response time, smart
     # persistence prevents the misjudgment of proximity sensing
     # but also keeps a fast response time.
-    def enable_smart_persistance(self):
+    def enable_smart_persistence(self):
         """
-            Enable smart persistance
+            Enable smart persistence
             To accelerate the PS response time, smart
             persistence prevents the misjudgment of proximity sensing
             but also keeps a fast response time.
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_SMART_PERS_MASK, self.VCNL4040_PS_SMART_PERS_ENABLE)
+        self._bit_mask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_SMART_PERS_MASK, self.VCNL4040_PS_SMART_PERS_ENABLE)
 
-    def disable_smart_persistance(self):
+    def disable_smart_persistence(self):
         """
-            Disable smart persistance
+            Disable smart persistence
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_SMART_PERS_MASK, self.VCNL4040_PS_SMART_PERS_DISABLE)
+        self._bit_mask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_SMART_PERS_MASK, self.VCNL4040_PS_SMART_PERS_DISABLE)
 
     # Enable active force mode
     # An extreme power saving way to use PS is to apply PS active force mode.
@@ -498,7 +477,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_AF_MASK, self.VCNL4040_PS_AF_ENABLE)
+        self._bit_mask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_AF_MASK, self.VCNL4040_PS_AF_ENABLE)
 
     def disable_active_force_mode(self):
         """
@@ -506,7 +485,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_AF_MASK, self.VCNL4040_PS_AF_DISABLE)
+        self._bit_mask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_AF_MASK, self.VCNL4040_PS_AF_DISABLE)
 
     # Set trigger bit so sensor takes a force mode measurement and returns to standby
     def take_single_prox_measurement(self):
@@ -515,7 +494,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_TRIG_MASK, self.VCNL4040_PS_TRIG_TRIGGER)
+        self._bit_mask(VCNL4040_PS_CONF3, LOWER, self.VCNL4040_PS_TRIG_MASK, self.VCNL4040_PS_TRIG_TRIGGER)
 
     # Enable the white measurement channel
     def enable_white_channel(self):
@@ -524,7 +503,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_MS, UPPER, self.VCNL4040_WHITE_EN_MASK, self.VCNL4040_WHITE_ENABLE)
+        self._bit_mask(VCNL4040_PS_MS, UPPER, self.VCNL4040_WHITE_EN_MASK, self.VCNL4040_WHITE_ENABLE)
 
     def disable_white_channel(self):
         """
@@ -532,7 +511,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_MS, UPPER, self.VCNL4040_WHITE_EN_MASK, self.VCNL4040_WHITE_ENABLE)
+        self._bit_mask(VCNL4040_PS_MS, UPPER, self.VCNL4040_WHITE_EN_MASK, self.VCNL4040_WHITE_ENABLE)
 
     # Enable the proximity detection logic output mode
     # When this mode is selected, the INT pin is pulled low when an object is
@@ -551,7 +530,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_MS, UPPER, self.VCNL4040_PS_MS_MASK, self.VCNL4040_PS_MS_ENABLE)
+        self._bit_mask(VCNL4040_PS_MS, UPPER, self.VCNL4040_PS_MS_MASK, self.VCNL4040_PS_MS_ENABLE)
 
     def disable_prox_logic_mode(self):
         """
@@ -559,53 +538,49 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bitMask(VCNL4040_PS_MS, UPPER, self.VCNL4040_PS_MS_MASK, self.VCNL4040_PS_MS_DISABLE)
+        self._bit_mask(VCNL4040_PS_MS, UPPER, self.VCNL4040_PS_MS_MASK, self.VCNL4040_PS_MS_DISABLE)
 
 
     # Set the IR LED sink current to one of 8 settings
-    def set_led_current(self, currentValue):
+    def set_led_current(self, current_value):
         """
             Set the IR LED sink current to one of 8 settings
 
-            :param currentValue: The new current value. Valid values are VCNL4040_LED_50MA thru VCNL4040_LED_200MA at 25MA increments
+            :param current_value: The new current value. Valid values are VCNL4040_LED_50MA thru VCNL4040_LED_200MA at 25MA increments
             :return: No return value
         """
 
-        if currentValue > 200 - 1:
-            currentValue = self.VCNL4040_LED_200MA
-        elif currentValue > 180 - 1:
-            currentValue = self.VCNL4040_LED_180MA
-        elif currentValue > 160 - 1:
-            currentValue = self.VCNL4040_LED_160MA
-        elif currentValue > 140 - 1:
-            currentValue = self.VCNL4040_LED_140MA
-        elif currentValue > 120 - 1:
-            currentValue = self.VCNL4040_LED_120MA
-        elif currentValue > 100 - 1:
-            currentValue = self.VCNL4040_LED_100MA
-        elif currentValue > 75 - 1:
-            currentValue = self.VCNL4040_LED_75MA
+        if current_value > 200 - 1:
+            current_value = self.VCNL4040_LED_200MA
+        elif current_value > 180 - 1:
+            current_value = self.VCNL4040_LED_180MA
+        elif current_value > 160 - 1:
+            current_value = self.VCNL4040_LED_160MA
+        elif current_value > 140 - 1:
+            current_value = self.VCNL4040_LED_140MA
+        elif current_value > 120 - 1:
+            current_value = self.VCNL4040_LED_120MA
+        elif current_value > 100 - 1:
+            current_value = self.VCNL4040_LED_100MA
+        elif current_value > 75 - 1:
+            current_value = self.VCNL4040_LED_75MA
         else:
-            currentValue = self.VCNL4040_LED_50MA
+            current_value = self.VCNL4040_LED_50MA
 
-        self._bitMask(VCNL4040_PS_MS, UPPER, self.VCNL4040_LED_I_MASK, currentValue)
+        self._bit_mask(VCNL4040_PS_MS, UPPER, self.VCNL4040_LED_I_MASK, current_value)
 
-    led_current = property()
-    led_current = led_current.setter(set_led_current)
 
     # Set the proximity sensing cancelation value - helps reduce cross talk
     # with ambient light
-    def set_prox_cancellation(self, cancelValue):
+    def set_prox_cancellation(self, cancel_value):
         """
             Set the proximity sensing cancelation value - helps reduce cross talk with ambient light
 
-            :param cancelValue: the new cancelation value
+            :param cancel_value: the new cancelation value
             :return: No return value
         """
-        self._i2c.writeWord(self.address, VCNL4040_PS_CANC, cancelValue)
+        self._i2c.write_word(self.address, VCNL4040_PS_CANC, cancel_value)
 
-    prox_cancellation = property()
-    prox_cancellation = prox_cancellation.setter(set_prox_cancellation)
 
     # Value that ALS must go above to trigger an interrupt
     def set_als_high_threshold(self, threshold):
@@ -615,10 +590,8 @@ class QwiicProximity(object):
             :param threshold: the new trigger threshold value for ALS
             :return: No return value
         """
-        self._i2c.writeWord(self.address, VCNL4040_ALS_THDH, threshold)
+        self._i2c.write_word(self.address, VCNL4040_ALS_THDH, threshold)
 
-    als_high_threshold = property()
-    als_high_threshold = als_high_threshold.setter(set_als_high_threshold)
 
     # Value that ALS must go below to trigger an interrupt
     def set_als_low_threshold(self, threshold):
@@ -628,10 +601,8 @@ class QwiicProximity(object):
             :param threshold: the new trigger threshold value for ALS
             :return: No return value
         """
-        self._i2c.writeWord(self.address, VCNL4040_ALS_THDL, threshold)
+        self._i2c.write_word(self.address, VCNL4040_ALS_THDL, threshold)
 
-    als_low_threshold = property()
-    als_low_threshold = als_low_threshold.setter(set_als_low_threshold)
 
     # Value that Proximity Sensing must go above to trigger an interrupt
     def set_prox_high_threshold(self, threshold):
@@ -641,10 +612,8 @@ class QwiicProximity(object):
             :param threshold: The new Proximity High Value
             :return: No return value
         """
-        self._i2c.writeWord(self.address, VCNL4040_PS_THDH, threshold)
+        self._i2c.write_word(self.address, VCNL4040_PS_THDH, threshold)
 
-    prox_high_threshold = property()
-    prox_high_threshold = prox_high_threshold.setter(set_prox_high_threshold)
 
     # Value that Proximity Sensing must go below to trigger an interrupt
     def set_prox_low_threshold(self, threshold):
@@ -654,10 +623,8 @@ class QwiicProximity(object):
             :param threshold: The new Proximity Low Value
             :return: No return value
         """
-        self._i2c.writeWord(self.address, VCNL4040_PS_THDL, threshold)
+        self._i2c.write_word(self.address, VCNL4040_PS_THDL, threshold)
 
-    prox_low_threshold = property()
-    prox_low_threshold = prox_low_threshold.setter(set_prox_low_threshold)
     #--------------------------------------------------------------------------
     # Read Value methods
     #--------------------------------------------------------------------------
@@ -671,11 +638,8 @@ class QwiicProximity(object):
             :return: The current proximity value
             :rtype: integer
         """
-        return self._i2c.readWord(self.address, VCNL4040_PS_DATA)
+        return self._i2c.read_word(self.address, VCNL4040_PS_DATA)
 
-
-    # prox as a readonly prop
-    proximity = property(get_proximity)
 
     # Read the Ambient light value
     def get_ambient(self):
@@ -685,10 +649,7 @@ class QwiicProximity(object):
             :return: The current ambient value value
             :rtype: integer
         """
-        return self._i2c.readWord(self.address, VCNL4040_ALS_DATA)
-
-    # Ambient as a readonly prop
-    ambient = property(get_ambient)
+        return self._i2c.read_word(self.address, VCNL4040_ALS_DATA)
 
 
     # Read the Whilte light value
@@ -699,10 +660,7 @@ class QwiicProximity(object):
             :return: The current white value value
             :rtype: integer
         """
-        return self._i2c.readWord(self.address, VCNL4040_WHITE_DATA)
-
-    # White light as a readonly prop
-    white_light = property(get_white)
+        return self._i2c.read_word(self.address, VCNL4040_WHITE_DATA)
 
 
     # Read the sensors ID
@@ -713,10 +671,7 @@ class QwiicProximity(object):
             :return: The sensor ID
             :rtype: integer
         """
-        return self._i2c.readWord(self.address, VCNL4040_ID)
-
-    # Sensor ID as a readonly prop
-    sensor_id = property(get_id)
+        return self._i2c.read_word(self.address, VCNL4040_ID)
 
 
     # Returns true if the prox value rises above the upper threshold
@@ -727,11 +682,8 @@ class QwiicProximity(object):
             :return: True if close
             :rtype: boolean
         """
-        interruptFlags = self._readCommandUpper(VCNL4040_INT_FLAG)
-        return (interruptFlags & self.VCNL4040_INT_FLAG_CLOSE) != 0
-
-    # is_close as a readonly prop
-    is_close = property(is_close)
+        interrupt_flags = self._read_command_upper(VCNL4040_INT_FLAG)
+        return (interrupt_flags & self.VCNL4040_INT_FLAG_CLOSE) != 0
 
 
     # Returns true if the prox value drops below the lower threshold
@@ -742,11 +694,8 @@ class QwiicProximity(object):
             :return: True if away
             :rtype: boolean
         """
-        interruptFlags = self._readCommandUpper(VCNL4040_INT_FLAG)
-        return (interruptFlags & self.VCNL4040_INT_FLAG_AWAY) != 0
-
-    # is_away as a readonly prop
-    is_away = property(is_away)
+        interrupt_flags = self._read_command_upper(VCNL4040_INT_FLAG)
+        return (interrupt_flags & self.VCNL4040_INT_FLAG_AWAY) != 0
 
     # Returns true if the prox value rises above the upper threshold
     def is_light(self):
@@ -756,11 +705,8 @@ class QwiicProximity(object):
             :return: True if value light
             :rtype: boolean
         """
-        interruptFlags = self._readCommandUpper(VCNL4040_INT_FLAG)
-        return (interruptFlags & self.VCNL4040_INT_FLAG_ALS_HIGH) != 0
-
-    # is_light as a readonly prop
-    is_light = property(is_light)
+        interrupt_flags = self._read_command_upper(VCNL4040_INT_FLAG)
+        return (interrupt_flags & self.VCNL4040_INT_FLAG_ALS_HIGH) != 0
 
     #Returns true if the ALS value drops below the lower threshold
     def is_dark(self):
@@ -770,82 +716,79 @@ class QwiicProximity(object):
             :return: True if dark
             :rtype: boolean
         """
-        interruptFlags = self._readCommandUpper(VCNL4040_INT_FLAG)
-        return (interruptFlags & self.VCNL4040_INT_FLAG_ALS_LOW) != 0
-
-    # is_dark as a readonly prop
-    is_dark = property(is_dark)
+        interrupt_flags = self._read_command_upper(VCNL4040_INT_FLAG)
+        return (interrupt_flags & self.VCNL4040_INT_FLAG_ALS_LOW) != 0
 
     #--------------------------------------------------------------------------
     # internal I2C Utility Routines
     #--------------------------------------------------------------------------
 
     #--------------------------------------------------------------------------
-    # _writeCommandLower()
+    # _write_command_lower()
     #
     # Given a command code (address) write to the upper byte without affecting the upper byte
-    def _writeCommandLower(self, commandCode, newValue):
+    def _write_command_lower(self, command_code, new_value):
 
-        commandValue = self._i2c.readWord(self.address, commandCode)
-        commandValue &= 0xFF00    #Remove lower 8 bits
-        commandValue |= newValue    #Mask in
+        command_value = self._i2c.read_word(self.address, command_code)
+        command_value &= 0xFF00    #Remove lower 8 bits
+        command_value |= new_value    #Mask in
 
-        return self._i2c.writeWord(self.address, commandCode, commandValue)
+        return self._i2c.write_word(self.address, command_code, command_value)
     #--------------------------------------------------------------------------
-    # _writeCommandUpper()
+    # _write_command_upper()
     #
     # Given a command code (address) write to the upper byte without affecting the lower byte
-    def _writeCommandUpper(self, commandCode, newValue):
+    def _write_command_upper(self, command_code, new_value):
 
-        commandValue = self._i2c.readWord(self.address, commandCode)
-        commandValue &= 0x00FF    #Remove upper 8 bits
-        commandValue |= newValue << 8   #Mask in
+        command_value = self._i2c.read_word(self.address, command_code)
+        command_value &= 0x00FF    #Remove upper 8 bits
+        command_value |= new_value << 8   #Mask in
 
-        return self._i2c.writeWord(self.address, commandCode, commandValue)
+        return self._i2c.write_word(self.address, command_code, command_value)
     #--------------------------------------------------------------------------
-    # _readCommandLower()
+    # _read_command_lower()
     #
     # Given a command code (address) read the lower byte
-    def _readCommandLower(self, commandCode):
+    def _read_command_lower(self, command_code):
 
-        commandValue = self._i2c.readWord(self.address, commandCode)
+        command_value = self._i2c.read_word(self.address, command_code)
 
-        return commandValue & 0xFF
+        return command_value & 0xFF
 
     #--------------------------------------------------------------------------
-    # _readCommandUpper()
+    # _read_command_upper()
     #
     # Given a command code (address) read the upper byte
-    def _readCommandUpper(self, commandCode):
+    def _read_command_upper(self, command_code):
 
-        commandValue = self._i2c.readWord(self.address, commandCode)
+        command_value = self._i2c.read_word(self.address, command_code)
 
-        return commandValue >> 8
+        return command_value >> 8
 
     #--------------------------------------------------------------------------
-    # _bitMask()
+    # _bit_mask()
     #
     # Given a register, read it, mask it, and then set the thing
-    # commandHeight is used to select between the upper or lower byte of command register
+    # command_height is used to select between the upper or lower byte of command register
     # Example:
-    # Write dutyValue into PS_CONF1, lower byte, using the Duty_Mask
-    # _bitMask(VCNL4040_PS_CONF1, LOWER, VCNL4040_PS_DUTY_MASK, dutyValue);
-    def _bitMask(self, commandAddress, commandHeight, mask, thing):
+    # Write duty_value into PS_CONF1, lower byte, using the Duty_Mask
+    # _bit_mask(VCNL4040_PS_CONF1, LOWER, VCNL4040_PS_DUTY_MASK, duty_value);
+    def _bit_mask(self, command_address, command_height, mask, thing):
 
         # Grab current register context
-        if commandHeight == LOWER:
-            registerContents = self._readCommandLower(commandAddress)
+        if command_height == LOWER:
+            register_contents = self._read_command_lower(command_address)
         else:
-            registerContents = self._readCommandUpper(commandAddress)
+            register_contents = self._read_command_upper(command_address)
 
         # Zero-out the portions of the register we're interested in
-        registerContents &= mask
+        register_contents &= mask
 
         # Mask in new thing
-        registerContents |= thing
+        register_contents |= thing
 
         # Change contents
-        if commandHeight == LOWER:
-            self._writeCommandLower(commandAddress, registerContents)
+        if command_height == LOWER:
+            self._write_command_lower(command_address, register_contents)
         else:
-            self._writeCommandUpper(commandAddress, registerContents)
+            self._write_command_upper(command_address, register_contents)

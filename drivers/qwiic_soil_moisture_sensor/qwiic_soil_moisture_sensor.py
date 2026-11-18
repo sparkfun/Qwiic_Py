@@ -12,6 +12,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 #======================================================================
 # Basic setup of I2C commands and available I2C Addresses
 #
@@ -47,8 +49,7 @@ class QwiicSoilMoistureSensor(object):
 
     @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-    @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+    @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
 
     @return **Object** The Soil Moisture Sensor device object.
     """
@@ -56,22 +57,18 @@ class QwiicSoilMoistureSensor(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         if address in self.available_addresses:
             self.address = address
         else:
             self.address = self.available_addresses[0]
 
-        # load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ----------------------------------
     # is_connected()
@@ -80,13 +77,11 @@ class QwiicSoilMoistureSensor(object):
 
     def is_connected(self):
         """!
-        Determine if a Soil MoistureSensor device is conntected to the system..
+        Determine if a Soil Moisture Sensor device is connected to the system.
 
         @return **bool** True if the device is connected, otherwise False.
         """        
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -117,7 +112,7 @@ class QwiicSoilMoistureSensor(object):
         Reads the results from the sensor and stores internally
         """
         
-        data = self._i2c.readBlock(self.address, COMMAND_GET_VALUE, 2)
+        data = self._i2c.read_block(self.address, COMMAND_GET_VALUE, 2)
         self.level = data[1] << 8 | data[0]
         
     #----------------------------------------------------
@@ -129,7 +124,7 @@ class QwiicSoilMoistureSensor(object):
         @return **integer** value of Error bit
         """
         # return the status bit
-        value = self._i2c.readByte(self.address, SENSOR_STATUS)
+        value = self._i2c.read_byte(self.address, SENSOR_STATUS)
 
         return value & 1 << 0
 
@@ -144,7 +139,7 @@ class QwiicSoilMoistureSensor(object):
 
         @return **void** Nothing
         """
-        self._i2c.writeCommand(self.address, 0x00)
+        self._i2c.write_byte(self.address, None, 0x00)
     
     # --------------------------------------------------------------
     # led_on
@@ -156,28 +151,25 @@ class QwiicSoilMoistureSensor(object):
 
         @return **void** Nothing
         """
-        self._i2c.writeCommand(self.address, 0x01)
+        self._i2c.write_byte(self.address, None, 0x01)
 
 
     # ----------------------------------------------
-    # change_address(newAddress)
+    # change_address(new_address)
     #
     # This function changes the I2C address of the Qwiic Soil Moisture Sensor. The address
     # is written to the memory location in EEPROM that determines its address.
-    def change_address(self, newAddress):
+    def change_address(self, new_address):
         """!
         Changes the I2C address of the Qwiic Soil Moisture Sensor reader
 
-        @param newAddress: the new address to set the Soil Moisture Sensor reader to
+        @param new_address: the new address to set the Soil Moisture Sensor reader to
         
         @return **bool** False if the address is out of range
         """
-        if newAddress < 0x08 or newAddress > 0x3F:
+        if new_address < 0x08 or new_address > 0x3F:
             return False
         
-        self._i2c.writeByte(self.address, COMMAND_CHANGE_ADDRESS, newAddress)
+        self._i2c.write_byte(self.address, COMMAND_CHANGE_ADDRESS, new_address)
         
-        self.address = newAddress
-
-
-
+        self.address = new_address

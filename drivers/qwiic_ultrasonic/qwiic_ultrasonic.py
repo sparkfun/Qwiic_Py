@@ -51,6 +51,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -73,22 +75,23 @@ class QwiicUltrasonic(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Range of available I2C addresses of the Qwiic Ultrasonic
-    kMinAddress = 0x20
-    kMaxAddress = 0x2F
-    kDefaultAddress = 0x2F
+    MIN_ADDRESS = 0x20
+    MAX_ADDRESS = 0x2F
+    DEFAULT_ADDRESS = 0x2F
 
     # Register to trigger a new measurement and read the previous one
-    kRegisterTrigger = 0x01
+    REGISTER_TRIGGER = 0x01
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -96,14 +99,8 @@ class QwiicUltrasonic(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     def is_connected(self):
         """!
@@ -112,9 +109,7 @@ class QwiicUltrasonic(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -135,27 +130,27 @@ class QwiicUltrasonic(object):
 
         @return **int** Distance in mm
         """
-        self._i2c.writeCommand(self.address, self.kRegisterTrigger)
-        raw_data = self._i2c.readBlock(self.address, self.kRegisterTrigger, 2)
+        self._i2c.write_byte(self.address, None, self.REGISTER_TRIGGER)
+        raw_data = self._i2c.read_block(self.address, self.REGISTER_TRIGGER, 2)
         return (raw_data[0] << 8) | raw_data[1]
     
     def change_address(self, address):
         """!
         Changes the I2C address of the Qwiic Ultrasonic sensor
 
-        @param int address: New address, must be in the range 0x20 to 0x2F
+        @param address: **int** New address, must be in the range 0x20 to 0x2F
 
         @return **bool** Returns `True` if successful, otherwise `False`
         """
         # Check whether the address is valid
-        if address < self.kMinAddress or address > self.kMaxAddress:
+        if address < self.MIN_ADDRESS or address > self.MAX_ADDRESS:
             return False
 
         # The first bit of the address must be set to 1
         address |= 0x80
 
         # Write the new address to the device
-        self._i2c.writeCommand(self.address, address)
+        self._i2c.write_byte(self.address, None, address)
 
         # Update the address of this object
         self.address = address

@@ -38,9 +38,9 @@
 
 import qwiic_ads1015
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic ADS1015 Example 4 - Differential\n")
 
 	myAds = qwiic_ads1015.QwiicADS1015()
@@ -57,16 +57,16 @@ def runExample():
 		input = myAds.get_differential() # default (i.e. no arguments)
   		
 		# Optional "commented out" examples below show how to read differential readings between other pins
-		# input = myAds.get_differential(myAds.kConfigMuxDiffP0N3)
-		# input = myAds.get_differential(myAds.kConfigMuxDiffP1N3)
-		# input = myAds.get_differential(myAds.kConfigMuxDiffP2N3)
+		# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P0N3)
+		# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P1N3)
+		# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P2N3)
 
 		print("Differential: ", input)
-		time.sleep(0.30)
+		qwiic_i2c.delay_ms(300)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example 4")
 		sys.exit(0)

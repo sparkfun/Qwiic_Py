@@ -39,9 +39,7 @@
 #=======================================================================
 # Example 3
 
-from __future__ import print_function
 import qwiic_eeprom
-import time
 import sys
 
 def run_example():
@@ -49,9 +47,9 @@ def run_example():
     EEPROM_ADDRESS = 0b1010001 # 0b1010(A2 A1 A0): A standard I2C EEPROM with the ADR0 bit set to VCC
 
     print("\nSparkFun Qwiic EEPROM, Example 3\n")
-    my_eeprom = qwiic_eeprom.QwiicEEPROM(0x51)
+    my_eeprom = qwiic_eeprom.QwiicEEPROM(EEPROM_ADDRESS)
 
-    if my_eeprom.begin() != True:
+    if not my_eeprom.begin():
         print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
@@ -69,5 +67,5 @@ if __name__ == '__main__':
     try:
         run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
+        print("\nEnding Example 3")
         sys.exit(0)

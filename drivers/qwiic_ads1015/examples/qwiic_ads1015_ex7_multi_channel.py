@@ -42,9 +42,8 @@
 
 import qwiic_ads1015
 import sys
-import time
 
-def runExample():
+def run_example():
 	print("\nQwiic ADS1015 Example 7 - MultiChannel\n")
 
 	myAds = qwiic_ads1015.QwiicADS1015()
@@ -59,25 +58,25 @@ def runExample():
 
 	# Set the gain
 	# Possible Values are: 
-		# kConfigPgaTwoThirds,
-		# kConfigPga1,
-		# kConfigPga2,
-		# kConfigPga4,
-		# kConfigPga8,
-		# kConfigPga16
+		# CONFIG_PGA_TWO_THIRDS,
+		# CONFIG_PGA_1,
+		# CONFIG_PGA_2,
+		# CONFIG_PGA_4,
+		# CONFIG_PGA_8,
+		# CONFIG_PGA_16
 
-	myAds.set_gain(myAds.kConfigPga2)
+	myAds.set_gain(myAds.CONFIG_PGA_2)
 
 	# Set the Sample Rate
 	# Possible Values are:
-		# kConfigRate128Hz
-		# kConfigRate250Hz
-		# kConfigRate490Hz
-		# kConfigRate920Hz
-		# kConfigRate1600Hz
-		# kConfigRate2400Hz
-		# kConfigRate3300Hz
-	myAds.set_sample_rate(myAds.kConfigRate1600Hz)
+		# CONFIG_RATE_128HZ
+		# CONFIG_RATE_250HZ
+		# CONFIG_RATE_490HZ
+		# CONFIG_RATE_920HZ
+		# CONFIG_RATE_1600HZ
+		# CONFIG_RATE_2400HZ
+		# CONFIG_RATE_3300HZ
+	myAds.set_sample_rate(myAds.CONFIG_RATE_1600HZ)
 
 	# 	For the fastest conversion timing, we need to check the Config Register Operational Status bit
 	#   to see when the conversion is complete - instead of using a fixed delay.
@@ -94,12 +93,12 @@ def runExample():
 		channel_A1_mV = myAds.get_single_ended_millivolts(1)
 		
 		# get_differential options are:
-			# kConfigMuxDiffP0N1 # A0-A1 (default)
-			# kConfigMuxDiffP0N3 # A0-A3
-			# kConfigMuxDiffP1N3 # A1-A3
-			# kConfigMuxDiffP2N3 # A2-A3
-		channel_A0_A1 = myAds.get_differential(myAds.kConfigMuxDiffP0N1)
-		channel_A0_A1_mV = myAds.get_differential_millivolts(myAds.kConfigMuxDiffP0N1)
+			# CONFIG_MUX_DIFF_P0N1 # A0-A1 (default)
+			# CONFIG_MUX_DIFF_P0N3 # A0-A3
+			# CONFIG_MUX_DIFF_P1N3 # A1-A3
+			# CONFIG_MUX_DIFF_P2N3 # A2-A3
+		channel_A0_A1 = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P0N1)
+		channel_A0_A1_mV = myAds.get_differential_millivolts(myAds.CONFIG_MUX_DIFF_P0N1)
 
 
 		print("A0: ", channel_A0, "(", channel_A0_mV, "mv)", end = '\t')
@@ -109,7 +108,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example 7")
 		sys.exit(0)

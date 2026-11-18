@@ -36,7 +36,7 @@
 import qwiic_as7265x
 import sys
 
-def runExample():
+def run_example():
     print("\nQwiic Spectral Triad Example 6 - Read Temperature\n")
 
     # Create instance of device
@@ -60,7 +60,7 @@ def runExample():
 
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example")
         sys.exit(0)

@@ -57,7 +57,12 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 """
 
-from .qwiic_oled_base  import QwiicOledBase
-from .qwiic_micro_oled import QwiicMicroOled
-from .qwiic_oled_display import QwiicOledDisplay
-from .qwiic_large_oled import QwiicLargeOled
+__version__ = "3.0.0"
+
+from .qwiic_oled_base import QwiicOLEDBase
+from .qwiic_micro_oled import QwiicMicroOLED
+from .qwiic_oled_display import QwiicOLEDDisplay
+from .qwiic_large_oled import QwiicLargeOLED
+from .oled_fonts import OLEDFont
+from . import oled_fonts
+from . import oled_logos

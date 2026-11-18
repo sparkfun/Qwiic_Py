@@ -36,20 +36,20 @@
 import qwiic_cap1203
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic CAP1203 Example 7 - Set Sensitivity\n")
 
 	# Create instance of device
-	myDevice = qwiic_cap1203.QwiicCAP1203()
+	my_device = qwiic_cap1203.QwiicCAP1203()
 
 	# Check if it's connected
-	if myDevice.is_connected() == False:
+	if my_device.is_connected() == False:
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myDevice.begin()
+	my_device.begin()
 
 	# Set the sensitivity multiplier for different applications,
 	# such as different sized touch pads. The default sensitivity 
@@ -64,21 +64,21 @@ def runExample():
 	# SENSITIVITY_4X
 	# SENSITIVITY_2X
 	# SENSITIVITY_1X    # Least sensitive
-	myDevice.set_sensitivity(myDevice.SENSITIVITY_4X)
+	my_device.set_sensitivity(my_device.SENSITIVITY_4X)
 
 	# Returns the sensitivity multiplier for the
 	# current sensitivity settings.
-	print("Sensitivity Multiplier:", myDevice.get_sensitivity(), "x")
+	print("Sensitivity Multiplier:", my_device.get_sensitivity(), "x")
 
 	while True:
-		if myDevice.is_touched():
+		if my_device.is_touched():
 			print("Touch")
-			while myDevice.is_touched():
+			while my_device.is_touched():
 				pass
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

@@ -36,21 +36,21 @@
 
 import qwiic_scd4x
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic SCD4x Example 2 - Low Power\n")
 
 	# Create instance of device
 	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
 	# Check if it's connected
-	if mySCD4x.is_connected() == False:
+	if not mySCD4x.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	if mySCD4x.begin() == False:
+	if not mySCD4x.begin():
 		print("Error while initializing device", file=sys.stderr)
 		return
 	
@@ -61,7 +61,7 @@ def runExample():
 	mySCD4x.stop_periodic_measurement()
 
 	# Now we can enable low power periodic measurements
-	if mySCD4x.start_low_power_periodic_measurement() == False:
+	if not mySCD4x.start_low_power_periodic_measurement():
 		print("Error while starting low power periodic measurement", file=sys.stderr)
 		return
 	
@@ -74,11 +74,11 @@ def runExample():
 		else:
 			print(".", end="")
 
-		time.sleep(1) # Only check for new data every 1 second
+		qwiic_i2c.delay_ms(1000) # Only check for new data every 1 second
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

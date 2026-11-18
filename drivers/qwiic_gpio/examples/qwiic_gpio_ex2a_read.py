@@ -39,31 +39,31 @@
 # ==================================================================================
 
 import qwiic_gpio
-import time
+import qwiic_i2c
 import sys
 
 
-def runExample():
+def run_example():
 
     print("\nSparkFun Qwiic GPIO Example 2a\n")
-    myGPIO = qwiic_gpio.QwiicGPIO()
+    my_gpio = qwiic_gpio.QwiicGPIO()
 
-    if myGPIO.isConnected() == False:
+    if not my_gpio.is_connected():
         print("The Qwiic GPIO isn't connected to the system. Please check your connection",
               file=sys.stderr)
         return
 
-    myGPIO.begin()
-    myGPIO.pinMode(0, myGPIO.GPIO_IN)
+    my_gpio.begin()
+    my_gpio.pin_mode(0, my_gpio.GPIO_IN)
 
     while True:
-        gpioState = myGPIO.digitalRead(0)
-        print("HIGH" if gpioState == myGPIO.GPIO_HI else "LOW")
-        time.sleep(.25)
+        gpio_state = my_gpio.digital_read(0)
+        print("HIGH" if gpio_state == my_gpio.GPIO_HI else "LOW")
+        qwiic_i2c.delay_ms(250)
 
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example 2a")
         sys.exit(0)

@@ -40,103 +40,89 @@
 #=======================================================================
 # Example 4
 
-from __future__ import print_function
 import qwiic_eeprom
-import time
+import qwiic_i2c
 import sys
-# TODO: remove this?
-from collections import namedtuple
-from dataclasses import *
 
 LOCATION_SETTINGS = 0
-SETTINGS_SIZE = 10 # 2 ints + 2 bools = 10 bytes total
+SETTINGS_SIZE = 10 # 1 int + 2 bytes + 1 float = 10 bytes total
 
-# Load the current settings from EEPROM into the settings struct
+# The settings we keep in EEPROM, with their defaults
+class Settings(object):
+    def __init__(self, baud_rate=115200, log_date=False, enable_imu=True, cal_value=-5.17):
+        self.baud_rate = baud_rate
+        self.log_date = log_date
+        self.enable_imu = enable_imu
+        self.cal_value = cal_value
+
+# Load the current settings from EEPROM into the settings object
 def load_user_settings(my_mem, settings):
     # Uncomment these lines to forcibly erase the EEPROM and see how the defaults are set
     # print("\nErasing EEPROM, be patient please")
-    # my_mem.erase()    
+    # my_mem.erase()
 
     # Check to see if EEPROM is blank. If the first four spots are zeros then we can assume the EEPROM is blank.
-    num_bytes = 4
-    if (my_mem.read_int(LOCATION_SETTINGS) == 0):     # (EEPROM address to read, thing to read to)
-        # At power on, settings are set to defaults within the tuple
-        # So go record the tuple as it currently exists so that defaults are set
+    if my_mem.read_int(LOCATION_SETTINGS) == 0:
+        # At power on, settings are set to defaults within the object
+        # So go record the object as it currently exists so that defaults are set
         record_user_settings(my_mem, settings)
 
         print("\nDefault settings applied")
     else:
-        
-        settings.baud_rate == my_mem.read_int(0)
-        settings.log_date == my_mem.read_byte(4)
-        settings.enable_IMU == my_mem.read_byte(5)
-        cal_val_temp = my_mem.read_float(6)
+        settings.baud_rate == my_mem.read_int(LOCATION_SETTINGS)
+        settings.log_date == bool(my_mem.read_byte(LOCATION_SETTINGS + 4))
+        settings.enable_imu == bool(my_mem.read_byte(LOCATION_SETTINGS + 5))
         # Round to 2-decimal point precision
-        settings.cal_value == round(cal_val_temp, 2)
+        settings.cal_value == round(my_mem.read_float(LOCATION_SETTINGS + 6), 2)
 
 # Record the current settings into EEPROM
 def record_user_settings(my_mem, settings):
-    # Use our individual write functions to make writing this class easier
-    my_mem.write_int(0, settings.baud_rate)
-    time.sleep(0.1)
-    my_mem.write_byte(4, settings.log_date)
-    time.sleep(0.1)
-    my_mem.write_byte(5, settings.enable_IMU)
-    time.sleep(0.1)
-    my_mem.write_float(6, settings.cal_value)
-    time.sleep(0.1)
+    # Use our individual write functions to make writing this object easier
+    my_mem.write_int(LOCATION_SETTINGS, settings.baud_rate)
+    qwiic_i2c.delay_ms(100)
+    my_mem.write_byte(LOCATION_SETTINGS + 4, int(settings.log_date))
+    qwiic_i2c.delay_ms(100)
+    my_mem.write_byte(LOCATION_SETTINGS + 5, int(settings.enable_imu))
+    qwiic_i2c.delay_ms(100)
+    my_mem.write_float(LOCATION_SETTINGS + 6, settings.cal_value)
+    qwiic_i2c.delay_ms(100)
 
 def run_example():
 
     print("\nSparkFun Qwiic EEPROM, Example 4\n")
     my_eeprom = qwiic_eeprom.QwiicEEPROM()
 
-    if my_eeprom.begin() != True:
-        print("\nThe Qwiic EEPROM isn't connected to the syste. Please check your connection", \
+    if not my_eeprom.begin():
+        print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
-    
+
     print("\nEEPROM ready!")
-    
-    @dataclass
-    class Settings:
-        baud_rate: int
-        log_date: bool
-        enable_IMU: bool
-        cal_value: float
-        
-    default_settings = Settings(115200, False, True, -5.17)
 
-    load_user_settings(my_eeprom, default_settings)
-        
-    print("\nBaud rate: " + str(default_settings.baud_rate))
+    settings = Settings()
 
-    log_str = ""
-    if default_settings.log_date == True:
-        log_str = "True"
-    else:
-        log_str = "False"
-    print("\nlog_date: " + log_str)
+    load_user_settings(my_eeprom, settings)
 
-    print("\ncal_value: " + str(default_settings.cal_value))
+    print("\nBaud rate: " + str(settings.baud_rate))
+    print("\nlog_date: " + str(settings.log_date))
+    print("\ncal_value: " + str(settings.cal_value))
 
     # Now we can change something
     print("\nEnter a new baud rate (1200 to 115200): ")
-    new_baud = input()
-    if int(new_baud) < 1200 or int(new_baud) > 115200:
+    new_baud = int(input())
+    if new_baud < 1200 or new_baud > 115200:
         print("\nError: baud rate out of range!")
     else:
-        default_settings = replace(default_settings, baud_rate = int(new_baud))
-        
+        settings.baud_rate = new_baud
+
         print("\nThis is the new baud rate: ")
-        print(default_settings.baud_rate)
-        
-        record_user_settings(my_eeprom, default_settings)
+        print(settings.baud_rate)
+
+        record_user_settings(my_eeprom, settings)
 
 if __name__ == '__main__':
     try:
         run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
+        print("\nEnding Example 4")
         sys.exit(0)
-    

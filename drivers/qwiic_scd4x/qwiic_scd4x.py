@@ -45,7 +45,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -67,52 +68,53 @@ class QwiicSCD4x(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Basic Commands
-    kComStartPeriodicMeasurement = 0x21b1
-    kComReadMeasurement = 0xec05  # execution time: 1ms
-    kComStopPeriodicMeasurement = 0x3f86  # execution time: 500ms
+    COM_START_PERIODIC_MEASUREMENT = 0x21b1
+    COM_READ_MEASUREMENT = 0xec05  # execution time: 1ms
+    COM_STOP_PERIODIC_MEASUREMENT = 0x3f86  # execution time: 500ms
 
     # On-chip output signal compensation
-    kComSetTemperatureOffset = 0x241d  # execution time: 1ms
-    kComGetTemperatureOffset = 0x2318  # execution time: 1ms
-    kComSetSensorAltitude = 0x2427  # execution time: 1ms
-    kComGetSensorAltitude = 0x2322  # execution time: 1ms
-    kComSetAmbientPressure = 0xe000  # execution time: 1ms
+    COM_SET_TEMPERATURE_OFFSET = 0x241d  # execution time: 1ms
+    COM_GET_TEMPERATURE_OFFSET = 0x2318  # execution time: 1ms
+    COM_SET_SENSOR_ALTITUDE = 0x2427  # execution time: 1ms
+    COM_GET_SENSOR_ALTITUDE = 0x2322  # execution time: 1ms
+    COM_SET_AMBIENT_PRESSURE = 0xe000  # execution time: 1ms
 
     # Field calibration
-    kComPerformForcedCalibration = 0x362f  # execution time: 400ms
-    kComSetAutomaticSelfCalibrationEnabled = 0x2416  # execution time: 1ms
-    kComGetAutomaticSelfCalibrationEnabled = 0x2313  # execution time: 1ms
+    COM_PERFORM_FORCED_CALIBRATION = 0x362f  # execution time: 400ms
+    COM_SET_AUTOMATIC_SELF_CALIBRATION_ENABLED = 0x2416  # execution time: 1ms
+    COM_GET_AUTOMATIC_SELF_CALIBRATION_ENABLED = 0x2313  # execution time: 1ms
 
     # Low power
-    kComStartLowPowerPeriodicMeasurement = 0x21ac
-    kComGetDataReadyStatus = 0xe4b8  # execution time: 1ms
+    COM_START_LOW_POWER_PERIODIC_MEASUREMENT = 0x21ac
+    COM_GET_DATA_READY_STATUS = 0xe4b8  # execution time: 1ms
 
     # Advanced features
-    kComPersistSettings = 0x3615  # execution time: 800ms
-    kComGetSerialNumber = 0x3682  # execution time: 1ms
-    kComPerformSelfTest = 0x3639  # execution time: 10000ms
-    kComPerformFactoryReset = 0x3632  # execution time: 1200ms
-    kComReinit = 0x3646  # execution time: 20ms
-    kComGetFeatureSetVersion = 0x202F  # execution time: 1ms
+    COM_PERSIST_SETTINGS = 0x3615  # execution time: 800ms
+    COM_GET_SERIAL_NUMBER = 0x3682  # execution time: 1ms
+    COM_PERFORM_SELF_TEST = 0x3639  # execution time: 10000ms
+    COM_PERFORM_FACTORY_RESET = 0x3632  # execution time: 1200ms
+    COM_REINIT = 0x3646  # execution time: 20ms
+    COM_GET_FEATURE_SET_VERSION = 0x202F  # execution time: 1ms
 
     # Low power single shot - SCD41 only
-    kComMeasureSingleShot = 0x219d  # execution time: 5000ms
-    kComMeasureSingleShotRhtOnly = 0x2196  # execution time: 50ms
+    COM_MEASURE_SINGLE_SHOT = 0x219d  # execution time: 5000ms
+    COM_MEASURE_SINGLE_SHOT_RHT_ONLY = 0x2196  # execution time: 50ms
 
     # Sensor types 
-    kTypeSCD40 = 0
-    kTypeSCD41 = 1
-    kTypeSDC4xInvalid = 2
+    TYPE_SCD40 = 0
+    TYPE_SCD41 = 1
+    TYPE_SCD4X_INVALID = 2
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -120,17 +122,11 @@ class QwiicSCD4x(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-        self._sensorType = self.kTypeSCD40
-        self._doingPeriodicMeasurement = False
+        self._sensor_type = self.TYPE_SCD40
+        self._doing_periodic_measurement = False
 
         # Set by read_measurement
         self._co2 = 0
@@ -144,13 +140,16 @@ class QwiicSCD4x(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        return self._i2c.isDeviceConnected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
-    connected = property(is_connected)
-
-    def begin(self, measBegin = True, autoCalibrate = True, skipStopPeriodicMeasurement = False, pollAndSetDeviceType = True):
+    def begin(self, meas_begin = True, auto_calibrate = True, skip_stop_periodic_measurement = False, poll_and_set_device_type = True):
         """!
         Initializes this device with default parameters
+
+        @param meas_begin: **bool** Start periodic measurements at the end of begin()
+        @param auto_calibrate: **bool** Enable automatic self calibration
+        @param skip_stop_periodic_measurement: **bool** Don't stop periodic measurements first
+        @param poll_and_set_device_type: **bool** Read the feature set version to detect SCD40 or SCD41
 
         @return **bool** Returns `True` if successful, otherwise `False`
         """
@@ -160,8 +159,8 @@ class QwiicSCD4x(object):
 
         # If periodic measurements are already running, get_serial_number will fail...
         # To be safe, let's stop period measurements before we do anything else
-        # The user can override this by setting skipStopPeriodicMeasurements to True
-        if skipStopPeriodicMeasurement == False:
+        # The user can override this by setting skip_stop_periodic_measurement to True
+        if not skip_stop_periodic_measurement:
             self.stop_periodic_measurement()
 
         success = True
@@ -169,13 +168,13 @@ class QwiicSCD4x(object):
         serial_number = self.get_serial_number()
         success &= (serial_number is not None)
         
-        if pollAndSetDeviceType:
+        if poll_and_set_device_type:
             success &= self.get_feature_set_version()
         
-        success &= self.set_automatic_self_calibration_enabled(autoCalibrate)
-        success &= (self.get_automatic_self_calibration_enabled() == autoCalibrate)
+        success &= self.set_automatic_self_calibration_enabled(auto_calibrate)
+        success &= (self.get_automatic_self_calibration_enabled() == auto_calibrate)
 
-        if measBegin:
+        if meas_begin:
             self.start_periodic_measurement()
 
         return True
@@ -185,19 +184,19 @@ class QwiicSCD4x(object):
         Start periodic measurements. See 3.5.1
         signal update interval is 5 seconds.
         """
-        self.send_command(self.kComStartPeriodicMeasurement)
-        self._doingPeriodicMeasurement = True
+        self.send_command(self.COM_START_PERIODIC_MEASUREMENT)
+        self._doing_periodic_measurement = True
 
-    def stop_periodic_measurement(self, delayMillis = 500):
+    def stop_periodic_measurement(self, delay_millis = 500):
         """!
         stop_periodic_measurement can be called before begin() if required
         Note that the sensor will only respond to other commands after waiting 500 ms after issuing the stop_periodic_measurement command.
 
-        @param int delayMillis: The delay in milliseconds to wait after stopping the measurement
+        @param delay_millis: **int** The delay in milliseconds to wait after stopping the measurement
         """
-        self.send_command(self.kComStopPeriodicMeasurement)
-        self._doingPeriodicMeasurement = False
-        time.sleep(delayMillis / 1000)
+        self.send_command(self.COM_STOP_PERIODIC_MEASUREMENT)
+        self._doing_periodic_measurement = False
+        self._i2c.delay_ms(delay_millis)
     
     def read_measurement(self):
         """!
@@ -216,11 +215,11 @@ class QwiicSCD4x(object):
         if self.get_data_ready_status() == False:
             return False
 
-        self.send_command(self.kComReadMeasurement)
+        self.send_command(self.COM_READ_MEASUREMENT)
 
-        time.sleep(0.001) # specified by datasheet
+        self._i2c.delay_ms(1) # specified by datasheet
 
-        bytes_read = self._i2c.readBlock(self.address, None, 9) # By passing "None" we perform a general read. Requires new version of qwiic_i2c
+        bytes_read = self._i2c.read_block(self.address, None, 9) # Passing None as the register reads without writing a register first
         co2_bytes = bytes_read[0:3]
         temperature_bytes = bytes_read[3:6]
         humidity_bytes = bytes_read[6:9]
@@ -267,31 +266,31 @@ class QwiicSCD4x(object):
         """
         return self._temperature
     
-    def set_temperature_offset(self, offset, delayMillis = 1):
+    def set_temperature_offset(self, offset, delay_millis = 1):
         """!
         Set the temperature offset (C). See 3.6.1
         Max command duration: 1ms
-        The user can set delayMillis to zero if they want the function to return immediately.
+        The user can set delay_millis to zero if they want the function to return immediately.
         The temperature offset has no influence on the SCD4x CO2 accuracy.
         Setting the temperature offset of the SCD4x inside the customer device correctly allows the user
         to leverage the RH and T output signal.
 
-        @param int offset: The temperature offset to set. Must be between 0 and 175
-        @param int delayMillis: The delay in milliseconds to wait after setting the offset
+        @param offset: **int** The temperature offset to set. Must be between 0 and 175
+        @param delay_millis: **int** The delay in milliseconds to wait after setting the offset
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
 
         if offset < 0 or offset >= 175:
             return False
         
         offset_word = int(offset * 65536 / 175) # Toffset [°C] * 2^16 / 175
-        self.send_command(self.kComSetTemperatureOffset, offset_word)
+        self.send_command(self.COM_SET_TEMPERATURE_OFFSET, offset_word)
         
-        if delayMillis > 0:
-            time.sleep(delayMillis / 1000)
+        if delay_millis > 0:
+            self._i2c.delay_ms(delay_millis)
 
         return True
     
@@ -301,35 +300,35 @@ class QwiicSCD4x(object):
 
         @return **int** The temperature offset or None if unsuccessful
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return None
         
-        offset = self.read_register(self.kComGetTemperatureOffset)
+        offset = self.read_register(self.COM_GET_TEMPERATURE_OFFSET)
         if offset is None:
             return None
         
         return offset * 175 / 65536 # TODO: Arduino uses 65535 here but datasheet and other functions says 65536
 
-    def set_sensor_altitude(self, altitude, delayMillis = 1):
+    def set_sensor_altitude(self, altitude, delay_millis = 1):
         """!
         Set the sensor altitude (metres above sea level). See 3.6.3
         Max command duration: 1ms
-        The user can set delayMillis to zero if they want the function to return immediately.
+        The user can set delay_millis to zero if they want the function to return immediately.
         Reading and writing of the sensor altitude must be done while the SCD4x is in idle mode.
         Typically, the sensor altitude is set once after device installation. To save the setting to the EEPROM,
         the persist setting (see chapter 3.9.1) command must be issued.
         Per default, the sensor altitude is set to 0 meter above sea-level.
 
-        @param int altitude: The altitude to set
-        @param int delayMillis: The delay in milliseconds to wait after setting the altitude
+        @param altitude: **int** The altitude to set
+        @param delay_millis: **int** The delay in milliseconds to wait after setting the altitude
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComSetSensorAltitude, altitude)
+        self.send_command(self.COM_SET_SENSOR_ALTITUDE, altitude)
 
-        if delayMillis > 0:
-            time.sleep(delayMillis / 1000)
+        if delay_millis > 0:
+            self._i2c.delay_ms(delay_millis)
 
     def get_sensor_altitude(self):
         """!
@@ -337,12 +336,12 @@ class QwiicSCD4x(object):
 
         @return **int** The sensor altitude or None if unsuccessful
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return None
         
-        return self.read_register(self.kComGetSensorAltitude)
+        return self.read_register(self.COM_GET_SENSOR_ALTITUDE)
     
-    def set_ambient_pressure(self, pressure, delayMillis = 1):
+    def set_ambient_pressure(self, pressure, delay_millis = 1):
         """!
         Set the ambient pressure (Pa). See 3.6.5
         Max command duration: 1ms
@@ -350,20 +349,20 @@ class QwiicSCD4x(object):
         Define the ambient pressure in Pascals, so RH and CO2 are compensated for atmospheric pressure
         set_ambient_pressure overrides set_sensor_altitude
 
-        The user can set delayMillis to zero if they want the function to return immediately.
+        The user can set delay_millis to zero if they want the function to return immediately.
         The set_ambient_pressure command can be sent during periodic measurements to enable continuous pressure compensation.
         set_ambient_pressure overrides set_sensor_altitude
 
-        @param int pressure: The pressure to set. Must be between 0 and 6553500
-        @param int delayMillis: The delay in milliseconds to wait after setting the pressure
+        @param pressure: **int** The pressure to set. Must be between 0 and 6553500
+        @param delay_millis: **int** The delay in milliseconds to wait after setting the pressure
         """
         if pressure < 0 or pressure >= 6553500:
             return False
 
         pressure_word = int(pressure / 100)
-        self.send_command(self.kComSetAmbientPressure, pressure_word)
-        if delayMillis > 0:
-            time.sleep(delayMillis / 1000)
+        self.send_command(self.COM_SET_AMBIENT_PRESSURE, pressure_word)
+        if delay_millis > 0:
+            self._i2c.delay_ms(delay_millis)
 
         return True
 
@@ -379,18 +378,18 @@ class QwiicSCD4x(object):
         (i.e. the magnitude of the correction) after waiting for 400 ms for the command to complete.
         A return value of 0xffff indicates that the forced recalibration has failed.
 
-        @param int concentration: The concentration to recalibrate to
+        @param concentration: **int** The concentration to recalibrate to
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComPerformForcedCalibration, concentration)
+        self.send_command(self.COM_PERFORM_FORCED_CALIBRATION, concentration)
         
-        time.sleep(0.4) # specified by datasheet
+        self._i2c.delay_ms(400) # specified by datasheet
         
-        read_bytes = self._i2c.readBlock(self.address, None, 3) # By passing "None" we perform a general read. Requires new version of qwiic_i2c
+        read_bytes = self._i2c.read_block(self.address, None, 3) # Passing None as the register reads without writing a register first
         
         if self.compute_crc8(read_bytes[0:2]) != read_bytes[2]:
             return False
@@ -406,11 +405,11 @@ class QwiicSCD4x(object):
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComStartLowPowerPeriodicMeasurement)
-        self._doingPeriodicMeasurement = True
+        self.send_command(self.COM_START_LOW_POWER_PERIODIC_MEASUREMENT)
+        self._doing_periodic_measurement = True
         return True
 
     def get_data_ready_status(self):
@@ -419,7 +418,7 @@ class QwiicSCD4x(object):
 
         @return **bool** `True` if data is ready, otherwise `False`
         """
-        response = self.read_register(self.kComGetDataReadyStatus)
+        response = self.read_register(self.COM_GET_DATA_READY_STATUS)
         if response is None:
             return False
         
@@ -427,7 +426,7 @@ class QwiicSCD4x(object):
         # else → data ready for read-out
         return (response & 0x07FF) != 0
     
-    def persist_settings(self, delayMillis = 800):
+    def persist_settings(self, delay_millis = 800):
         """!
         Persist settings: copy settings (e.g. temperature offset) from RAM to EEPROM. See 3.9.1
         
@@ -439,16 +438,16 @@ class QwiicSCD4x(object):
         and if actual changes to the configuration have been made. The EEPROM is guaranteed to endure at least 2000 write
         cycles before failure.
 
-        @param int delayMillis: The delay in milliseconds to wait after persisting the settings
+        @param delay_millis: **int** The delay in milliseconds to wait after persisting the settings
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComPersistSettings)
-        if delayMillis > 0:
-            time.sleep(delayMillis / 1000)
+        self.send_command(self.COM_PERSIST_SETTINGS)
+        if delay_millis > 0:
+            self._i2c.delay_ms(delay_millis)
         
         return True
 
@@ -456,18 +455,16 @@ class QwiicSCD4x(object):
         """!
         Get the serial number of the sensor
 
-        @param int serialNumber: The serial number of the sensor
-
         @return **str** Serial Number if successful, otherwise `None`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return None
         
-        self.send_command(self.kComGetSerialNumber)
+        self.send_command(self.COM_GET_SERIAL_NUMBER)
         
-        time.sleep(0.001) # specified by datasheet
+        self._i2c.delay_ms(1) # specified by datasheet
 
-        bytes_read = self._i2c.readBlock(self.address, None, 9) # By passing "None" we perform a general read. Requires new version of qwiic_i2c
+        bytes_read = self._i2c.read_block(self.address, None, 9) # Passing None as the register reads without writing a register first
         
         # Bytes are returned as 3 big-endian words, each with a CRC8 byte after
         bytes_to_crc0 = bytes_read[0:3]
@@ -490,7 +487,7 @@ class QwiicSCD4x(object):
         """!
         Convert a hex digit to its ASCII representation
 
-        @param int digit: The hex digit to convert
+        @param digit: **int** The hex digit to convert
 
         @return **str** The ASCII representation of the hex digit
         """
@@ -507,34 +504,34 @@ class QwiicSCD4x(object):
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        response = self.read_register(self.kComPerformSelfTest, 10000)
+        response = self.read_register(self.COM_PERFORM_SELF_TEST, 10000)
 
         return response == 0x0000
     
-    def perform_factory_reset(self, delayMillis = 1200):
+    def perform_factory_reset(self, delay_millis = 1200):
         """!
         Peform factory reset. See 3.9.4
         The perform_factory_reset command resets all configuration settings stored in the EEPROM
         and erases the FRC and ASC algorithm history.
 
-        @param int delayMillis: The delay in milliseconds to wait after performing the factory reset
+        @param delay_millis: **int** The delay in milliseconds to wait after performing the factory reset
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComPerformFactoryReset)
+        self.send_command(self.COM_PERFORM_FACTORY_RESET)
 
-        if delayMillis > 0:
-            time.sleep(delayMillis / 1000)
+        if delay_millis > 0:
+            self._i2c.delay_ms(delay_millis)
         
         return True
     
-    def reinit(self, delayMillis = 20):
+    def reinit(self, delay_millis = 20):
         """!
         Re-initialize the sensor, load settings from EEPROM. See 3.9.5
 
@@ -543,17 +540,17 @@ class QwiicSCD4x(object):
         If the reinit command does not trigger the desired re-initialization,
         a power-cycle should be applied to the SCD4x
 
-        @param int delayMillis: The delay in milliseconds to wait after re-initializing
+        @param delay_millis: **int** The delay in milliseconds to wait after re-initializing
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComReinit)
+        self.send_command(self.COM_REINIT)
 
-        if delayMillis > 0:
-            time.sleep(delayMillis / 1000)
+        if delay_millis > 0:
+            self._i2c.delay_ms(delay_millis)
         
         return True
 
@@ -572,13 +569,13 @@ class QwiicSCD4x(object):
         @return **bool** `True` if successful, otherwise `False`
         """
 
-        if self._sensorType != self.kTypeSCD41:
+        if self._sensor_type != self.TYPE_SCD41:
             return False
 
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComMeasureSingleShot)
+        self.send_command(self.COM_MEASURE_SINGLE_SHOT)
 
         return True
     
@@ -591,32 +588,32 @@ class QwiicSCD4x(object):
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._sensorType != self.kTypeSCD41:
+        if self._sensor_type != self.TYPE_SCD41:
             return False
         
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        self.send_command(self.kComMeasureSingleShotRhtOnly)
+        self.send_command(self.COM_MEASURE_SINGLE_SHOT_RHT_ONLY)
 
         return True
 
     def get_sensor_type(self):
         """!
-        Get the sensor type. Allowable versions are kTypeSCD40, kTypeSCD41, and kTypeSDC4xInvalid
+        Get the sensor type. Allowable versions are TYPE_SCD40, TYPE_SCD41, and TYPE_SCD4X_INVALID
 
         @return **int** The sensor type
         """
-        return self._sensorType
+        return self._sensor_type
     
-    def set_sensor_type(self, sensorType):
+    def set_sensor_type(self, sensor_type):
         """!
-        Set the sensor type. Allowable versions are kTypeSCD40, kTypeSCD41, and kTypeSDC4xInvalid
+        Set the sensor type. Allowable versions are TYPE_SCD40, TYPE_SCD41, and TYPE_SCD4X_INVALID
 
-        @param int sensorType: The sensor type to set
+        @param sensor_type: **int** The sensor type to set
         """
-        if sensorType == self.kTypeSCD40 or sensorType == self.kTypeSCD41 or sensorType == self.kTypeSDC4xInvalid:
-            self._sensorType = sensorType
+        if sensor_type == self.TYPE_SCD40 or sensor_type == self.TYPE_SCD41 or sensor_type == self.TYPE_SCD4X_INVALID:
+            self._sensor_type = sensor_type
 
     def get_feature_set_version(self):
         """!
@@ -624,42 +621,42 @@ class QwiicSCD4x(object):
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        feature_set = self.read_register(self.kComGetFeatureSetVersion)
+        feature_set = self.read_register(self.COM_GET_FEATURE_SET_VERSION)
         
         if feature_set is None:
             return False
         
         read_type = ( (feature_set & 0x1000) >> 12 )
 
-        if read_type == self.kTypeSCD40:
-            self._sensorType = self.kTypeSCD40
-        elif read_type == self.kTypeSCD41:
-            self._sensorType = self.kTypeSCD41
+        if read_type == self.TYPE_SCD40:
+            self._sensor_type = self.TYPE_SCD40
+        elif read_type == self.TYPE_SCD41:
+            self._sensor_type = self.TYPE_SCD41
         else:
-            self._sensorType = self.kTypeSDC4xInvalid
+            self._sensor_type = self.TYPE_SCD4X_INVALID
         
         return True
 
-    def set_automatic_self_calibration_enabled(self, enabled, delayMillis = 1):
+    def set_automatic_self_calibration_enabled(self, enabled, delay_millis = 1):
         """!
         Enable/disable automatic self calibration. See 3.7.2
         Set the current state (enabled / disabled) of the automatic self-calibration. By default, ASC is enabled.
         To save the setting to the EEPROM, the persist_setting (see chapter 3.9.1) command must be issued.
 
-        @param bool enabled: `True` to enable, `False` to disable
-        @param int delayMillis: The delay in milliseconds to wait after setting the calibration
+        @param enabled: **bool** `True` to enable, `False` to disable
+        @param delay_millis: **int** The delay in milliseconds to wait after setting the calibration
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
         enabled_word = 0x0001 if enabled else 0x0000
-        self.send_command(self.kComSetAutomaticSelfCalibrationEnabled, enabled_word)
-        time.sleep(delayMillis / 1000)
+        self.send_command(self.COM_SET_AUTOMATIC_SELF_CALIBRATION_ENABLED, enabled_word)
+        self._i2c.delay_ms(delay_millis)
         return True
     
     def get_automatic_self_calibration_enabled(self):
@@ -669,10 +666,10 @@ class QwiicSCD4x(object):
         @return  `True` if enabled, otherwise `False`
         
         """
-        if self._doingPeriodicMeasurement:
+        if self._doing_periodic_measurement:
             return False
         
-        return ( self.read_register(self.kComGetAutomaticSelfCalibrationEnabled) == 0x0001 )
+        return ( self.read_register(self.COM_GET_AUTOMATIC_SELF_CALIBRATION_ENABLED) == 0x0001 )
         
     def compute_crc8(self, data):
         """!
@@ -682,7 +679,7 @@ class QwiicSCD4x(object):
         Tested with: http://www.sunshine2k.de/coding/javascript/crc/crc_js.html
         x^8+x^5+x^4+1 = 0x31
 
-        @param list of int data: The data to compute the CRC for
+        @param data: **list of int** The data to compute the CRC for
 
         @return **int** The computed CRC8 value
         """
@@ -703,8 +700,8 @@ class QwiicSCD4x(object):
         """!
         Sends a command along with arguments and CRC
 
-        @param int command: The command to send
-        @param int arguments: A 16 bit value containing the arguments to send
+        @param command: **int** The command to send
+        @param arguments: **int** A 16 bit value containing the arguments to send
         """
 
         bytes_to_write = [command >> 8, command & 0xFF]
@@ -714,24 +711,23 @@ class QwiicSCD4x(object):
             crc = self.compute_crc8(arguments_to_wrte)
             bytes_to_write += [arguments_to_wrte[0], arguments_to_wrte[1], crc]
         
-        # we don't have an explicit way in the I2C drivers to write not to a specific register, 
-        # but if we write the first as the register it should behave the same
-        self._i2c.writeBlock(self.address, bytes_to_write[0], bytes_to_write[1:])
+        # A command, not a register write: send the bytes with no register
+        self._i2c.write_block(self.address, None, bytes_to_write)
 
-    def read_register(self, registerAddress, delayMillis = 1):
+    def read_register(self, register_address, delay_millis = 1):
         """!
         Read a register from the sensor. Gets two bytes from SCD4x plus CRC
 
-        @param int registerAddress: The address of the register to read
-        @param int delayMillis: The delay in milliseconds to wait after reading the register
+        @param register_address: **int** The address of the register to read
+        @param delay_millis: **int** The delay in milliseconds to wait after reading the register
 
         @return **int** The value of the register if successful, otherwise `None`
         """
-        self.send_command(registerAddress)
+        self.send_command(register_address)
         
-        time.sleep(delayMillis / 1000)
+        self._i2c.delay_ms(delay_millis)
 
-        bytes_read = self._i2c.readBlock(self.address, None, 3) # By passing "None" we perform a general read. Requires new version of qwiic_i2c
+        bytes_read = self._i2c.read_block(self.address, None, 3) # Passing None as the register reads without writing a register first
         
         if self.compute_crc8(bytes_read[0:2]) != bytes_read[2]:
             return None

@@ -18,7 +18,7 @@
 #------------------------------------------------------------------------
 # Written by SparkFun Electronics, July 2020
 #
-# Do you like this library? Help suphard_port SparkFun. Buy a board!
+# Do you like this library? Help support SparkFun. Buy a board!
 #==================================================================================
 # GNU GPL License 3.0
 # Copyright (c) 2020 SparkFun Electronics
@@ -43,9 +43,7 @@
 # pylint: disable=line-too-long, bad-whitespace, invalid-name, too-many-public-methods
 #
 
-import struct
 import serial
-import spidev
 
 import threading
 import time
@@ -53,18 +51,20 @@ import time
 import collections
 
 import sys
-import traceback
 
-from . import sfeSpiWrapper
+# spidev only exists on Linux; it is needed only for SPI
+try:
+    import spidev
+except ImportError:
+    spidev = None
+
+from . import spi_wrapper
 from . import sparkfun_predefines as sp
 from . import core
 
-_DEFAULT_NAME = "Qwiic GPS"
-_AVAILABLE_I2C_ADDRESS = [0x42]
-
-class UbloxGps(object):
+class UbloxGPS(object):
     """
-    UbloxGps
+    UbloxGPS
 
     Initialize the library with the given port.
 
@@ -72,29 +72,24 @@ class UbloxGps(object):
                         can be a serial or SPI port. If no port is given, then the library
                         assumes serial at a 38400 baud rate.
 
-    :return:            The UbloxGps object.
+    :return:            The UbloxGPS object.
     :rtype:             Object
     """
     MAX_NMEA_LINES = 50
     MAX_ERRORS = 5
 
-
-
-    device_name = _DEFAULT_NAME
-    available_addresses = _AVAILABLE_I2C_ADDRESS
-
     def __init__(self, hard_port = None):
         if hard_port is None:
             self.hard_port = serial.Serial("/dev/serial0/", 38400, timeout=1)
-        elif type(hard_port) == spidev.SpiDev:
-            sfeSpi = sfeSpiWrapper(hard_port)
-            self.hard_port = sfeSpi
+        elif spidev is not None and isinstance(hard_port, spidev.SpiDev):
+            sfe_spi = spi_wrapper(hard_port)
+            self.hard_port = sfe_spi
         else:
             self.hard_port = hard_port
 
-        self.nmea_line_buffer = collections.deque(maxlen=UbloxGps.MAX_NMEA_LINES)
+        self.nmea_line_buffer = collections.deque(maxlen=UbloxGPS.MAX_NMEA_LINES)
 
-        self.worker_exception_buffer = collections.deque(maxlen=UbloxGps.MAX_ERRORS)
+        self.worker_exception_buffer = collections.deque(maxlen=UbloxGPS.MAX_ERRORS)
         self.pckt_scl = {
             'lon' : (10**-7),
             'lat' :  (10**-7),
@@ -162,7 +157,7 @@ class UbloxGps(object):
                 tmp_all_cls.append(v)
                 self.packets[v.name] = {}
                 self.cls_ms_auto[v.name] = []
-                self.cls_ms[v.name] = (v.id_, {})
+                self.cls_ms[v.name] = (v.get_id(), {})
 
                 for (mk, mv) in v._messages.items():
                     self.cls_ms[v.name][1][mv.name] = mk
@@ -221,7 +216,7 @@ class UbloxGps(object):
                     nmea_data = core.Parser._read_until(self.hard_port, b'\x0d\x0a')
                     try:
                         self.nmea_line_buffer.append('$' + nmea_data.decode('utf-8').rstrip(' \r\n'))
-                    except:
+                    except UnicodeDecodeError:
                         pass #we just ignore bad messages, we don't ignore communication issues though
 
                     c2 = b''
@@ -236,7 +231,7 @@ class UbloxGps(object):
 
                 time.sleep(0.01)
 
-            except: # catch *all* exceptions
+            except Exception: # catch all errors and hand them to the caller
                 self.worker_exception_buffer.append(sys.exc_info())
 
                 if (self.stopping):
@@ -249,7 +244,7 @@ class UbloxGps(object):
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, tb):
+    def __exit__(self, exc_type, exc_value, tb):
         self.stop()
 
     def send_message(self, cls_name, msg_name, ubx_payload = None):
@@ -332,13 +327,13 @@ class UbloxGps(object):
         :rtype: packet
         """
         dict_packet = packet._asdict()
-        isdirty = False
+        is_dirty = False
         for (k,v) in dict_packet.items():
             if k in self.pckt_scl:
-                isdirty = True
+                is_dirty = True
                 dict_packet[k] = self.pckt_scl[k] * v
 
-        return type(packet)(**dict_packet) if isdirty else packet #we only need to reallocate and rebuild packet if it was changed
+        return type(packet)(**dict_packet) if is_dirty else packet #we only need to reallocate and rebuild packet if it was changed
 
 
     def stream_nmea(self, wait_for_nmea = True):
@@ -368,14 +363,14 @@ class UbloxGps(object):
         if layer != 7:
             layer = 0
 
-        payloadCfg = [0,layer,0,0,
+        payload_cfg = [0,layer,0,0,
             (key_id) & 255,
             (key_id >> 8) & 255,
             (key_id >> 16) & 255,
             (key_id >> 24) & 255
         ]
 
-        return self.request_standard_packet('CFG', 'VALGET', bytes(payloadCfg), wait_time = wait_time) #we return result immediately, hope get_val request won't overlap
+        return self.request_standard_packet('CFG', 'VALGET', bytes(payload_cfg), wait_time = wait_time) #we return result immediately, hope get_val request won't overlap
 
     def ubx_set_val(self, key_id, ubx_payload, layer = 7, wait_time = 2500):
         """
@@ -400,14 +395,14 @@ class UbloxGps(object):
             return
 
 
-        payloadCfg = [0,layer,0,0,
+        payload_cfg = [0,layer,0,0,
             (key_id) & 255,
             (key_id >> 8) & 255,
             (key_id >> 16) & 255,
             (key_id >> 24) & 255
         ]
 
-        self.request_standard_packet('CFG', 'VALSET', bytes(payloadCfg) + ubx_payload, wait_time = wait_time)
+        self.request_standard_packet('CFG', 'VALSET', bytes(payload_cfg) + ubx_payload, wait_time = wait_time)
 
     def set_auto_msg(self, cls_name, msg_name, freq, wait_time = 2500):
         ubx_class_id = self.cls_ms[cls_name][0] #convert names to ids
@@ -426,9 +421,9 @@ class UbloxGps(object):
         if freq > 0:
             self.cls_ms_auto[cls_name].append(msg_name)
 
-        payloadCfg = [ubx_class_id, ubx_id, freq]
+        payload_cfg = [ubx_class_id, ubx_id, freq]
 
-        self.request_standard_packet('CFG', 'MSG', payloadCfg, wait_time = wait_time)
+        self.request_standard_packet('CFG', 'MSG', payload_cfg, wait_time = wait_time)
 
     def geo_coords(self, wait_time = 2500):
         """
@@ -440,7 +435,7 @@ class UbloxGps(object):
         """
         return self.request_standard_packet('NAV', 'PVT', wait_time = wait_time)
 
-    def get_DOP(self, wait_time = 2500):
+    def get_dop(self, wait_time = 2500):
         """
 -       Sends a poll request for NAV class and the DOP Message 
 +       The response is then passed on to the user.
@@ -559,6 +554,16 @@ class UbloxGps(object):
         :rtype: namedtuple
         """
         return self.request_standard_packet('ESF', 'STATUS', wait_time = wait_time)
+
+    def rawx_measurements(self, wait_time = 2500):
+        """
+-       Sends a poll request for RXM class and the RAWX Message
++       The response is then passed on to the user.
+
+        :return: ublox payload
+        :rtype: namedtuple
+        """
+        return self.request_standard_packet('RXM', 'RAWX', wait_time = wait_time)
 
     def port_settings(self, wait_time = 2500):
         """

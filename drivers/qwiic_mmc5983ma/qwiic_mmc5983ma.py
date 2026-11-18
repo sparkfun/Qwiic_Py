@@ -50,7 +50,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -133,15 +134,16 @@ class QwiicMMC5983MA(object):
             self.internal_control_2 = 0x0
             self.internal_control_3 = 0x0
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -149,14 +151,8 @@ class QwiicMMC5983MA(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # Initialize offsets as 2^17 (half of full scale range)
         self.x_offset = 2**17
@@ -166,9 +162,6 @@ class QwiicMMC5983MA(object):
         # Initialize shadow registers
         self.memory_shadow = self.MemoryShadow()
 
-        # Calibrate offsets
-        self.calibrate_offsets()
-
     def is_connected(self):
         """!
         Determines if this device is connected
@@ -176,13 +169,11 @@ class QwiicMMC5983MA(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        if self._i2c.isDeviceConnected(self.address) == False:
+        if not self._i2c.is_device_connected(self.address):
             return False
         
         # Something ACK'd, check the product ID
-        return self._i2c.readByte(self.address, self.PROD_ID_REG) == self.PROD_ID
-
-    connected = property(is_connected)
+        return self._i2c.read_byte(self.address, self.PROD_ID_REG) == self.PROD_ID
 
     def begin(self):
         """!
@@ -197,37 +188,40 @@ class QwiicMMC5983MA(object):
         # Perform a reset. To revert all registers to a known state
         self.soft_reset()
 
+        # Calibrate offsets
+        self.calibrate_offsets()
+
         return True
 
     def is_bit_set(self, register_address, bit_mask):
         """!
         Checks if a bit is set in a register
 
-        @param int register_address: Register address
-        @param int bit_mask: Bit mask
+        @param register_address: **int** Register address
+        @param bit_mask: **int** Bit mask
 
         @return **bool** `True` if bit is set, otherwise `False`
         """
-        return bool(self._i2c.readByte(self.address, register_address) & bit_mask)
+        return bool(self._i2c.read_byte(self.address, register_address) & bit_mask)
 
     def set_register_bit(self, register_address, bit_mask):
         """!
         Sets a bit in a register
 
-        @param int register_address: Register address
-        @param int bit_mask: Bit mask
+        @param register_address: **int** Register address
+        @param bit_mask: **int** Bit mask
         """
-        reg_value = self._i2c.readByte(self.address, register_address)
-        self._i2c.writeByte(self.address, register_address, reg_value | bit_mask)
+        reg_value = self._i2c.read_byte(self.address, register_address)
+        self._i2c.write_byte(self.address, register_address, reg_value | bit_mask)
 
     def set_shadow_bit(self, register_address, bit_mask, do_write = True):
         """!
         Sets a bit in the shadow register and optionally writes the value to the
         device
 
-        @param int register_address: Register address
-        @param int bit_mask: Bit mask
-        @param bool, optional do_write: Whether to write the value to the device, defaults to True
+        @param register_address: **int** Register address
+        @param bit_mask: **int** Bit mask
+        @param do_write: **bool, optional** Whether to write the value to the device, defaults to True
 
         @return **bool** `True` if successful, otherwise `False`
         """
@@ -246,7 +240,7 @@ class QwiicMMC5983MA(object):
         if shadow_register is not None:
             shadow_register |= bit_mask
             if do_write:
-                self._i2c.writeByte(self.address, register_address, shadow_register)
+                self._i2c.write_byte(self.address, register_address, shadow_register)
             return True
 
         return False
@@ -256,9 +250,9 @@ class QwiicMMC5983MA(object):
         Clears a bit in the shadow register and optionally writes the value to
         the device
 
-        @param int register_address: Register address
-        @param int bit_mask: Bit mask
-        @param bool, optional do_write: Whether to write the value to the device, defaults to True
+        @param register_address: **int** Register address
+        @param bit_mask: **int** Bit mask
+        @param do_write: **bool, optional** Whether to write the value to the device, defaults to True
 
         @return **bool** `True` if successful, otherwise `False`
         """
@@ -277,7 +271,7 @@ class QwiicMMC5983MA(object):
         if shadow_register is not None:
             shadow_register &= ~bit_mask
             if do_write:
-                self._i2c.writeByte(self.address, register_address, shadow_register)
+                self._i2c.write_byte(self.address, register_address, shadow_register)
             return True
 
         return False
@@ -286,8 +280,8 @@ class QwiicMMC5983MA(object):
         """!
         Checks if a bit is set in the shadow register
 
-        @param int register_address: Register address
-        @param int bit_mask: Bit mask
+        @param register_address: **int** Register address
+        @param bit_mask: **int** Bit mask
 
         @return **bool** `True` if bit is set, otherwise `False`
         """
@@ -323,14 +317,14 @@ class QwiicMMC5983MA(object):
         time_out = 5
         while (not self.is_bit_set(self.STATUS_REG, self.MEAS_T_DONE)) and (time_out > 0):
             # Wait a little so we won't flood MMC with requests
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
             time_out -= 1
 
         self.clear_shadow_bit(self.INT_CTRL_0_REG, self.TM_T, False) # Clear the bit - in shadow memory only
 
         # Get raw temperature value from the IC
         # even if a timeout occurred - old data vs no data
-        result = self._i2c.readByte(self.address, self.T_OUT_REG)
+        result = self._i2c.read_byte(self.address, self.T_OUT_REG)
 
         # Convert it using the equation provided in the datasheet
         temperature = -75.0 + (float(result) * (200.0 / 255.0))
@@ -353,7 +347,7 @@ class QwiicMMC5983MA(object):
         self.clear_shadow_bit(self.INT_CTRL_1_REG, self.SW_RST, False) # Clear the bit - in shadow memory only
 
         # The reset time is 10 msec. but we'll wait 15 msec. just in case.
-        time.sleep(0.015)
+        self._i2c.delay_ms(15)
 
         return success
 
@@ -427,7 +421,7 @@ class QwiicMMC5983MA(object):
         self.clear_shadow_bit(self.INT_CTRL_0_REG, self.SET_OPERATION)
 
         # Wait for the set operation to complete (500ns)
-        time.sleep(0.001)
+        self._i2c.delay_ms(1)
 
         return success
 
@@ -447,7 +441,7 @@ class QwiicMMC5983MA(object):
         self.clear_shadow_bit(self.INT_CTRL_0_REG, self.RESET_OPERATION)
 
         # Wait for the reset operation to complete (500ns)
-        time.sleep(0.001)
+        self._i2c.delay_ms(1)
 
         return success
 
@@ -537,7 +531,7 @@ class QwiicMMC5983MA(object):
         """!
         Sets the filter bandwidth
 
-        @param int bandwidth: Bandwidth in Hz, can be 100, 200, 400, or 800
+        @param bandwidth: **int** Bandwidth in Hz, can be 100, 200, 400, or 800
 
         @return **bool** `True` if successful, otherwise `False`
         """
@@ -610,7 +604,7 @@ class QwiicMMC5983MA(object):
         """!
         Sets the continuous mode frequency
 
-        @param int frequency: Frequency in Hz, can be 1, 10, 20, 50, 100, 200, or
+        @param frequency: **int** Frequency in Hz, can be 1, 10, 20, 50, 100, 200, or
         1000. Pass 0 to disable continuous mode.
 
         @return **bool** `True` if successful, otherwise `False`
@@ -718,7 +712,7 @@ class QwiicMMC5983MA(object):
         Sets the number of samples between each SET operation when periodic SET
         operations are enabled
 
-        @param int number_of_samples: Number of samples, can be 1, 25, 75, 100, 250,
+        @param number_of_samples: **int** Number of samples, can be 1, 25, 75, 100, 250,
         500, 1000, or 2000
 
         @return **bool** `True` if successful, otherwise `False`
@@ -869,7 +863,7 @@ class QwiicMMC5983MA(object):
         """!
         Clears the measurement done interrupt
 
-        @param int, optional meas_mask: Measurement mask, defaults to MEAS_T_DONE | MEAS_M_DONE
+        @param meas_mask: **int, optional** Measurement mask, defaults to MEAS_T_DONE | MEAS_M_DONE
         """
         # Ensure only the Meas_T_Done and Meas_M_Done interrupts can be cleared
         meas_mask &= (self.MEAS_T_DONE | self.MEAS_M_DONE)
@@ -902,7 +896,7 @@ class QwiicMMC5983MA(object):
         time_out += 1  # Add 1 just in case (for 800Hz)
         while (not self.is_bit_set(self.STATUS_REG, self.MEAS_M_DONE)) and (time_out > 0):
             # Wait a little so we won't flood MMC with requests
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
             time_out -= 1
 
         self.clear_shadow_bit(self.INT_CTRL_0_REG, self.TM_M, False)  # Clear the bit - in shadow memory only
@@ -912,8 +906,8 @@ class QwiicMMC5983MA(object):
         buffer_2_bit = 0
 
         # Read the field even if a timeout occurred - old data vs no data
-        buffer = self._i2c.readBlock(self.address, self.X_OUT_0_REG, 2)
-        buffer_2_bit = self._i2c.readByte(self.address, self.XYZ_OUT_2_REG)
+        buffer = self._i2c.read_block(self.address, self.X_OUT_0_REG, 2)
+        buffer_2_bit = self._i2c.read_byte(self.address, self.XYZ_OUT_2_REG)
 
         result = buffer[0]  # out[17:10]
         result = (result << 8) | buffer[1]  # out[9:2]
@@ -945,7 +939,7 @@ class QwiicMMC5983MA(object):
         time_out += 1  # Add 1 just in case (for 800Hz)
         while (not self.is_bit_set(self.STATUS_REG, self.MEAS_M_DONE)) and (time_out > 0):
             # Wait a little so we won't flood MMC with requests
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
             time_out -= 1
 
         self.clear_shadow_bit(self.INT_CTRL_0_REG, self.TM_M, False)  # Clear the bit - in shadow memory only
@@ -955,8 +949,8 @@ class QwiicMMC5983MA(object):
         buffer_2_bit = 0
 
         # Read the field even if a timeout occurred - old data vs no data
-        buffer = self._i2c.readBlock(self.address, self.Y_OUT_0_REG, 2)
-        buffer_2_bit = self._i2c.readByte(self.address, self.XYZ_OUT_2_REG)
+        buffer = self._i2c.read_block(self.address, self.Y_OUT_0_REG, 2)
+        buffer_2_bit = self._i2c.read_byte(self.address, self.XYZ_OUT_2_REG)
 
         result = buffer[0]  # out[17:10]
         result = (result << 8) | buffer[1]  # out[9:2]
@@ -988,7 +982,7 @@ class QwiicMMC5983MA(object):
         time_out += 1  # Add 1 just in case (for 800Hz)
         while (not self.is_bit_set(self.STATUS_REG, self.MEAS_M_DONE)) and (time_out > 0):
             # Wait a little so we won't flood MMC with requests
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
             time_out -= 1
 
         self.clear_shadow_bit(self.INT_CTRL_0_REG, self.TM_M, False)  # Clear the bit - in shadow memory only
@@ -997,7 +991,7 @@ class QwiicMMC5983MA(object):
         buffer = [0, 0, 0]
 
         # Read the field even if a timeout occurred - old data vs no data
-        buffer = self._i2c.readBlock(self.address, self.Z_OUT_0_REG, 3)
+        buffer = self._i2c.read_block(self.address, self.Z_OUT_0_REG, 3)
 
         result = buffer[0]  # out[17:10]
         result = (result << 8) | buffer[1]  # out[9:2]
@@ -1031,7 +1025,7 @@ class QwiicMMC5983MA(object):
         time_out += 1  # Add 1 just in case (for 800Hz)
         while (not self.is_bit_set(self.STATUS_REG, self.MEAS_M_DONE)) and (time_out > 0):
             # Wait a little so we won't flood MMC with requests
-            time.sleep(0.001)
+            self._i2c.delay_ms(1)
             time_out -= 1
 
         self.clear_shadow_bit(self.INT_CTRL_0_REG, self.TM_M, False)  # Clear the bit - in shadow memory only
@@ -1052,7 +1046,7 @@ class QwiicMMC5983MA(object):
         """
         register_values = [0] * 7
 
-        register_values = self._i2c.readBlock(self.address, self.X_OUT_0_REG, 7)
+        register_values = self._i2c.read_block(self.address, self.X_OUT_0_REG, 7)
 
         x = register_values[0]  # Xout[17:10]
         x = (x << 8) | register_values[1]  # Xout[9:2]
@@ -1098,23 +1092,23 @@ class QwiicMMC5983MA(object):
         """!
         Gets the x-axis measurement in gauss
 
-        @param int, optional offset: Offset to apply to the measurement, defaults to None,
+        @param offset: **int, optional** Offset to apply to the measurement, defaults to None,
         which will instead use stored offset
-        @param float, optional gain: Gain to apply to the measurement, defaults to 8 (full scale
+        @param gain: **float, optional** Gain to apply to the measurement, defaults to 8 (full scale
         range of the MMC5983MA)
 
         @return **float** x-axis measurement in gauss
         """
         # Check if an offset was provided
-        if(offset == None):
+        if offset is None:
             # No offset, use the stored offset
             offset = self.x_offset
         
         # Get the raw measurement, apply the offset, then scale it to get gauss
         # Raw value is 18 bit, so divide by 2^17 = 131072 (half of full range)
         measurement_raw = self.get_measurement_x()
-        mesaurement_zeroed = measurement_raw - offset
-        measurement_gauss = mesaurement_zeroed * gain / 131072
+        measurement_zeroed = measurement_raw - offset
+        measurement_gauss = measurement_zeroed * gain / 131072
 
         return measurement_gauss
     
@@ -1122,23 +1116,23 @@ class QwiicMMC5983MA(object):
         """!
         Gets the y-axis measurement in gauss
 
-        @param int, optional offset: Offset to apply to the measurement, defaults to None,
+        @param offset: **int, optional** Offset to apply to the measurement, defaults to None,
         which will instead use stored offset
-        @param float, optional gain: Gain to apply to the measurement, defaults to 8 (full scale
+        @param gain: **float, optional** Gain to apply to the measurement, defaults to 8 (full scale
         range of the MMC5983MA)
 
         @return **float** y-axis measurement in gauss
         """
         # Check if an offset was provided
-        if(offset == None):
+        if offset is None:
             # No offset, use the stored offset
             offset = self.y_offset
         
         # Get the raw measurement, apply the offset, then scale it to get gauss
         # Raw value is 18 bit, so divide by 2^17 = 131072 (half of full range)
         measurement_raw = self.get_measurement_y()
-        mesaurement_zeroed = measurement_raw - offset
-        measurement_gauss = mesaurement_zeroed * gain / 131072
+        measurement_zeroed = measurement_raw - offset
+        measurement_gauss = measurement_zeroed * gain / 131072
 
         return measurement_gauss
     
@@ -1146,23 +1140,23 @@ class QwiicMMC5983MA(object):
         """!
         Gets the z-axis measurement in gauss
 
-        @param int, optional offset: Offset to apply to the measurement, defaults to None,
+        @param offset: **int, optional** Offset to apply to the measurement, defaults to None,
         which will instead use stored offset
-        @param float, optional gain: Gain to apply to the measurement, defaults to 8 (full scale
+        @param gain: **float, optional** Gain to apply to the measurement, defaults to 8 (full scale
         range of the MMC5983MA)
 
         @return **float** z-axis measurement in gauss
         """
         # Check if an offset was provided
-        if(offset == None):
+        if offset is None:
             # No offset, use the stored offset
             offset = self.z_offset
         
         # Get the raw measurement, apply the offset, then scale it to get gauss
         # Raw value is 18 bit, so divide by 2^17 = 131072 (half of full range)
         measurement_raw = self.get_measurement_z()
-        mesaurement_zeroed = measurement_raw - offset
-        measurement_gauss = mesaurement_zeroed * gain / 131072
+        measurement_zeroed = measurement_raw - offset
+        measurement_gauss = measurement_zeroed * gain / 131072
 
         return measurement_gauss
 
@@ -1170,15 +1164,15 @@ class QwiicMMC5983MA(object):
         """!
         Gets the x, y, and z-axis measurements in gauss
 
-        @param tuple(int, int, int), optional offsets: Offsets to apply to the measurements, defaults to None,
+        @param offsets: **tuple(int, int, int), optional** Offsets to apply to the measurements, defaults to None,
         which will instead use stored offsets
-        @param list(float), optional gains: Gains to apply to the measurements, defaults to 8 (full
+        @param gains: **list(float), optional** Gains to apply to the measurements, defaults to 8 (full
         scale range of the MMC5983MA)
 
         @return **tuple(float, float, float)** x, y, and z-axis measurements in gauss
         """
         # Check if offsets were provided
-        if(offsets == None):
+        if offsets is None:
             # No offsets, use the stored offsets
             offsets = [self.x_offset, self.y_offset, self.z_offset]
         

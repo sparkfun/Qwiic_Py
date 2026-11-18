@@ -45,7 +45,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
-import time
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -72,10 +73,10 @@ class QwiicADS1015(object):
     # TODO: potentially we could delete some of the below constants to save space if we don't think we'll use them in 
 
     # Pointer Register
-    kPointerConvert = 0x00
-    kPointerConfig = 0x01
-    kPointerLowThresh = 0x02
-    kPointerHiThresh = 0x03
+    POINTER_CONVERT = 0x00
+    POINTER_CONFIG = 0x01
+    POINTER_LOW_THRESH = 0x02
+    POINTER_HI_THRESH = 0x03
 
     # Config Register
 
@@ -83,60 +84,61 @@ class QwiicADS1015(object):
     # This bit determines the operational status of the device. OS can only be written
     # when in power-down state and has no effect when a conversion is ongoing.
 
-    kConfigOsNo = 0x0000
-    kConfigOsSingle = 0x8000  # 1 : Start a single conversion (when in power-down state)
-    kConfigOsNotReady = 0x0000  # 0 : Device is currently performing a conversion
-    kConfigOsReady = 0x8000  # 1 : Device is not currently performing a conversion
+    CONFIG_OS_NO = 0x0000
+    CONFIG_OS_SINGLE = 0x8000  # 1 : Start a single conversion (when in power-down state)
+    CONFIG_OS_NOT_READY = 0x0000  # 0 : Device is currently performing a conversion
+    CONFIG_OS_READY = 0x8000  # 1 : Device is not currently performing a conversion
 
-    kConfigModeCont = 0x0000
-    kConfigModeSingle = 0x0100
+    CONFIG_MODE_CONT = 0x0000
+    CONFIG_MODE_SINGLE = 0x0100
 
-    kConfigMuxSingle0 = 0x4000
-    kConfigMuxSingle1 = 0x5000
-    kConfigMuxSingle2 = 0x6000
-    kConfigMuxSingle3 = 0x7000
-    kConfigMuxDiffP0N1 = 0x0000
-    kConfigMuxDiffP0N3 = 0x1000
-    kConfigMuxDiffP1N3 = 0x2000
-    kConfigMuxDiffP2N3 = 0x3000
+    CONFIG_MUX_SINGLE_0 = 0x4000
+    CONFIG_MUX_SINGLE_1 = 0x5000
+    CONFIG_MUX_SINGLE_2 = 0x6000
+    CONFIG_MUX_SINGLE_3 = 0x7000
+    CONFIG_MUX_DIFF_P0N1 = 0x0000
+    CONFIG_MUX_DIFF_P0N3 = 0x1000
+    CONFIG_MUX_DIFF_P1N3 = 0x2000
+    CONFIG_MUX_DIFF_P2N3 = 0x3000
 
-    kConfigRateMask = 0x00E0
-    kConfigRate128Hz = 0x0000
-    kConfigRate250Hz = 0x0020
-    kConfigRate490Hz = 0x0040
-    kConfigRate920Hz = 0x0060
-    kConfigRate1600Hz = 0x0080
-    kConfigRate2400Hz = 0x00A0
-    kConfigRate3300Hz = 0x00C0
+    CONFIG_RATE_MASK = 0x00E0
+    CONFIG_RATE_128HZ = 0x0000
+    CONFIG_RATE_250HZ = 0x0020
+    CONFIG_RATE_490HZ = 0x0040
+    CONFIG_RATE_920HZ = 0x0060
+    CONFIG_RATE_1600HZ = 0x0080
+    CONFIG_RATE_2400HZ = 0x00A0
+    CONFIG_RATE_3300HZ = 0x00C0
 
-    kConfigPgaMask = 0x0E00
-    kConfigPgaTwoThirds = 0x0000  # +/- 6.144v
-    kConfigPga1 = 0x0200  # +/- 4.096v
-    kConfigPga2 = 0x0400  # +/- 2.048v
-    kConfigPga4 = 0x0600  # +/- 1.024v
-    kConfigPga8 = 0x0800  # +/- 0.512v
-    kConfigPga16 = 0x0A00  # +/- 0.256v
+    CONFIG_PGA_MASK = 0x0E00
+    CONFIG_PGA_TWO_THIRDS = 0x0000  # +/- 6.144v
+    CONFIG_PGA_1 = 0x0200  # +/- 4.096v
+    CONFIG_PGA_2 = 0x0400  # +/- 2.048v
+    CONFIG_PGA_4 = 0x0600  # +/- 1.024v
+    CONFIG_PGA_8 = 0x0800  # +/- 0.512v
+    CONFIG_PGA_16 = 0x0A00  # +/- 0.256v
 
-    kConfigCmodeTrad = 0x0000  # Traditional comparator with hysteresis (default)
-    kConfigCmodeWindow = 0x0010  # Window comparator
-    kConfigCpolActvLow = 0x0000  # ALERT/RDY pin is low when active (default)
-    kConfigCpolActvHi = 0x0008  # ALERT/RDY pin is high when active
-    kConfigClatNonLat = 0x0000  # Non-latching comparator (default)
-    kConfigClatLatch = 0x0004  # Latching comparator
-    kConfigCque1Conv = 0x0000  # Assert ALERT/RDY after one conversion
-    kConfigCque2Conv = 0x0001  # Assert ALERT/RDY after two conversions
-    kConfigCque4Conv = 0x0002  # Assert ALERT/RDY after four conversions
-    kConfigCqueNone = 0x0003  # Disable the comparator and put ALERT/RDY in high state (default)
+    CONFIG_CMODE_TRAD = 0x0000  # Traditional comparator with hysteresis (default)
+    CONFIG_CMODE_WINDOW = 0x0010  # Window comparator
+    CONFIG_CPOL_ACTV_LOW = 0x0000  # ALERT/RDY pin is low when active (default)
+    CONFIG_CPOL_ACTV_HI = 0x0008  # ALERT/RDY pin is high when active
+    CONFIG_CLAT_NON_LAT = 0x0000  # Non-latching comparator (default)
+    CONFIG_CLAT_LATCH = 0x0004  # Latching comparator
+    CONFIG_CQUE_1_CONV = 0x0000  # Assert ALERT/RDY after one conversion
+    CONFIG_CQUE_2_CONV = 0x0001  # Assert ALERT/RDY after two conversions
+    CONFIG_CQUE_4_CONV = 0x0002  # Assert ALERT/RDY after four conversions
+    CONFIG_CQUE_NONE = 0x0003  # Disable the comparator and put ALERT/RDY in high state (default)
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -144,19 +146,13 @@ class QwiicADS1015(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-        self._sampleRate = self.kConfigRate1600Hz
-        self._gain = self.kConfigPga2
+        self._sampleRate = self.CONFIG_RATE_1600HZ
+        self._gain = self.CONFIG_PGA_2
         self._useConversionReady = False # Default to disabled, allowing continous mode to be used
-        self._mode = self.kConfigModeCont # Default to continuous mode
+        self._mode = self.CONFIG_MODE_CONT # Default to continuous mode
         self._multiplierToVolts = 1.0
 
         # Array is structured as calibrationValues[finger][lo/hi]
@@ -171,9 +167,7 @@ class QwiicADS1015(object):
         # Check if connected by seeing if an ACK is received
         # TODO: If the device has a product ID register, that should be
         # checked in addition to the ACK
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -192,33 +186,33 @@ class QwiicADS1015(object):
         """!
         Returns the decimal value of sensor channel single-ended input
 
-        @param int channel: The channel to read
+        @param channel: **int** The channel to read
 
         @return **int** The decimal value of the sensor channel
         """
         if channel > 3:
             return 0
 
-        config = self.kConfigOsSingle | self.kConfigCqueNone | self._sampleRate
+        config = self.CONFIG_OS_SINGLE | self.CONFIG_CQUE_NONE | self._sampleRate
 
         config |= self._gain
 
         if self._useConversionReady:
-            config |= self.kConfigModeSingle
+            config |= self.CONFIG_MODE_SINGLE
         else:
             config |= self._mode
 
         if channel == 0:
-            config |= self.kConfigMuxSingle0
+            config |= self.CONFIG_MUX_SINGLE_0
         elif channel == 1:
-            config |= self.kConfigMuxSingle1
+            config |= self.CONFIG_MUX_SINGLE_1
         elif channel == 2:
-            config |= self.kConfigMuxSingle2
+            config |= self.CONFIG_MUX_SINGLE_2
         elif channel == 3:
-            config |= self.kConfigMuxSingle3
+            config |= self.CONFIG_MUX_SINGLE_3
 
         bytes_to_write = [config >> 8, config & 0xFF]
-        self._i2c.writeBlock(self.address, self.kPointerConfig, bytes_to_write)
+        self._i2c.write_block(self.address, self.POINTER_CONFIG, bytes_to_write)
 
         if self._useConversionReady:
             while not self.available():
@@ -226,7 +220,7 @@ class QwiicADS1015(object):
             else:
                 self.conversion_delay()
 
-        result_bytes = self._i2c.read_block(self.address, self.kPointerConvert, 2)
+        result_bytes = self._i2c.read_block(self.address, self.POINTER_CONVERT, 2)
         result = (result_bytes[0] << 8) | result_bytes[1]
 
         return result >> 4
@@ -235,15 +229,15 @@ class QwiicADS1015(object):
         """!
         Returns the signed value of sensor channel single-ended input
 
-        @param int channel: The channel to read
+        @param channel: **int** The channel to read
 
         @return **int** The signed value of the sensor channel
         """
         value = self.get_single_ended(channel)
 
         # Check for sign bit in the 12-bit result and turn into a negative number if needed
-        if result > 0x07FF:
-            result -= 1 << 12
+        if result > 0x07FF:  # noqa: F821
+            result -= 1 << 12  # noqa: F821
 
         return value
     
@@ -251,45 +245,45 @@ class QwiicADS1015(object):
         """!
         Returns the millivolt value of sensor channel single-ended input
 
-        @param int channel: The channel to read
+        @param channel: **int** The channel to read
 
         @return **float** The millivolt value of the sensor channel
         """
         return self.get_single_ended(channel) * self.get_multiplier()
     
-    def get_differential(self, config_mux_diff=kConfigMuxDiffP0N1):
+    def get_differential(self, config_mux_diff=CONFIG_MUX_DIFF_P0N1):
         """!
         Returns the signed decimal value of sensor differential input
         Note, there are 4 possible differential pin setups:
-        kConfigMuxDiffP0N1
-        kConfigMuxDiffP0N3
-        kConfigMuxDiffP1N3
-        kConfigMuxDiffP2N3
+        CONFIG_MUX_DIFF_P0N1
+        CONFIG_MUX_DIFF_P0N3
+        CONFIG_MUX_DIFF_P1N3
+        CONFIG_MUX_DIFF_P2N3
 
-        @param int config_mux_dif: The differential pin set up from the list above
+        @param config_mux_diff: **int** The differential pin set up from the list above
 
         @return **int** The signed value of the sensor differential input channel
         """
         if config_mux_diff not in [
-            self.kConfigMuxDiffP0N1,
-            self.kConfigMuxDiffP0N3,
-            self.kConfigMuxDiffP1N3,
-            self.kConfigMuxDiffP2N3,
+            self.CONFIG_MUX_DIFF_P0N1,
+            self.CONFIG_MUX_DIFF_P0N3,
+            self.CONFIG_MUX_DIFF_P1N3,
+            self.CONFIG_MUX_DIFF_P2N3,
         ]:
             return 0  # received invalid argument
 
-        config = self.kConfigOsSingle | self.kConfigCqueNone | self._sampleRate
+        config = self.CONFIG_OS_SINGLE | self.CONFIG_CQUE_NONE | self._sampleRate
         config |= self._gain
 
         if self._useConversionReady:
-            config |= self.kConfigModeSingle
+            config |= self.CONFIG_MODE_SINGLE
         else:
             config |= self._mode
         
         config |= config_mux_diff
 
         bytes_to_write = [config >> 8, config & 0xFF]
-        self._i2c.writeBlock(self.address, self.kPointerConfig, bytes_to_write)
+        self._i2c.write_block(self.address, self.POINTER_CONFIG, bytes_to_write)
 
         if self._useConversionReady:
             while not self.available():
@@ -297,7 +291,7 @@ class QwiicADS1015(object):
         else:
             self.conversion_delay()
 
-        result_bytes = self._i2c.read_block(self.address, self.kPointerConvert, 2)
+        result_bytes = self._i2c.read_block(self.address, self.POINTER_CONVERT, 2)
         result = ( (result_bytes[0] << 8) | result_bytes[1]) >> 4
 
         # Check for sign bit in the 12-bit result and turn into a negative number if needed
@@ -306,16 +300,16 @@ class QwiicADS1015(object):
         
         return result
 
-    def get_differential_millivolts(self, config_mux_diff=kConfigMuxDiffP0N1):
+    def get_differential_millivolts(self, config_mux_diff=CONFIG_MUX_DIFF_P0N1):
         """!
         Returns the millivolt value of sensor differential input
         Note, there are 4 possible differential pin setups:
-        kConfigMuxDiffP0N1
-        kConfigMuxDiffP0N3
-        kConfigMuxDiffP1N3
-        kConfigMuxDiffP2N3
+        CONFIG_MUX_DIFF_P0N1
+        CONFIG_MUX_DIFF_P0N3
+        CONFIG_MUX_DIFF_P1N3
+        CONFIG_MUX_DIFF_P2N3
 
-        @param int config_mux_dif: The differential pin set up from the list above
+        @param config_mux_diff: **int** The differential pin set up from the list above
 
         @return **float** The millivolt value of the sensor differential input channel
         """
@@ -326,11 +320,11 @@ class QwiicADS1015(object):
         """!
         Maps a value from one range to another
 
-        @param float val: The value to map
-        @param float in_min: The minimum value of the input range
-        @param float in_max: The maximum value of the input range
-        @param float out_min: The minimum value of the output range
-        @param float out_max: The maximum value of the output range
+        @param val: **float** The value to map
+        @param in_min: **float** The minimum value of the input range
+        @param in_max: **float** The maximum value of the input range
+        @param out_min: **float** The minimum value of the output range
+        @param out_max: **float** The maximum value of the output range
 
         @return **float** The mapped value
         """
@@ -340,7 +334,7 @@ class QwiicADS1015(object):
         """!
         Returns a value between 0 and 1 based on how bent the finger is. This function will not work with an uncalibrated sensor
 
-        @param int channel: The channel to read
+        @param channel: **int** The channel to read
 
         @return **float** The scaled value of the sensor
         """
@@ -367,26 +361,26 @@ class QwiicADS1015(object):
             elif (value < self._calibrationValues[finger][0] or self._calibrationValues[finger][0] == 0):
                 self._calibrationValues[finger][0] = value
     
-    def get_calibration(self, channel, hiLo):
+    def get_calibration(self, channel, hi_lo):
         """!
-        Returns the calibration value for the specified channel and hiLo
+        Returns the calibration value for the specified channel and hi_lo
 
-        @param int channel: The channel to read
-        @param int hiLo: The hiLo to read
+        @param channel: **int** The channel to read
+        @param hi_lo: **int** The hi_lo to read
 
         @return **int** The calibration value
         """
-        return self._calibrationValues[channel][hiLo]
+        return self._calibrationValues[channel][hi_lo]
     
-    def set_calibration(self, channel, hiLo, value):
+    def set_calibration(self, channel, hi_lo, value):
         """!
-        Sets the calibration value for the specified channel and hiLo
+        Sets the calibration value for the specified channel and hi_lo
 
-        @param int channel: The channel to read
-        @param int hiLo: The hiLo to read
-        @param int value: The value to set
+        @param channel: **int** The channel to read
+        @param hi_lo: **int** The hi_lo to read
+        @param value: **int** The value to set
         """
-        self._calibrationValues[channel][hiLo] = value
+        self._calibrationValues[channel][hi_lo] = value
     
     def reset_calibration(self):
         """!
@@ -398,14 +392,14 @@ class QwiicADS1015(object):
         """!
         Sets the mode of the device. Continuous mode 0 is favored
 
-        @param int mode: The mode to set
+        @param mode: **int** The mode to set
         """
-        mode &= self.kConfigModeSingle
+        mode &= self.CONFIG_MODE_SINGLE
         self._mode = mode
 
     def get_mode(self):
         """!
-        Returns the mode of the device. get_mode will return 0 for continuous and ADS1015_CONFIG_MODE_SINGLE for single shot
+        Returns the mode of the device. get_mode will return 0 for continuous and CONFIG_MODE_SINGLE for single shot
 
         @return **int** The mode of the device
         """
@@ -415,16 +409,16 @@ class QwiicADS1015(object):
         """!
         Sets the gain of the device. 
         Valid values are: 
-            kConfigPgaTwoThirds,
-            kConfigPga1,
-            kConfigPga2,
-            kConfigPga4,
-            kConfigPga8,
-            kConfigPga16
+            CONFIG_PGA_TWO_THIRDS,
+            CONFIG_PGA_1,
+            CONFIG_PGA_2,
+            CONFIG_PGA_4,
+            CONFIG_PGA_8,
+            CONFIG_PGA_16
 
-        @param int gain: The gain to set
+        @param gain: **int** The gain to set
         """
-        gain &= self.kConfigPgaMask
+        gain &= self.CONFIG_PGA_MASK
         self._gain = gain
         self.update_multiplier_to_volts() # each new gain setting changes how we convert to volts
     
@@ -448,17 +442,17 @@ class QwiicADS1015(object):
         """!
         Updates the multiplier to convert to volts
         """
-        if self._gain == self.kConfigPgaTwoThirds:
+        if self._gain == self.CONFIG_PGA_TWO_THIRDS:
             self._multiplierToVolts = 3.0
-        elif self._gain == self.kConfigPga1:
+        elif self._gain == self.CONFIG_PGA_1:
             self._multiplierToVolts = 2.0
-        elif self._gain == self.kConfigPga2:
+        elif self._gain == self.CONFIG_PGA_2:
             self._multiplierToVolts = 1.0
-        elif self._gain == self.kConfigPga4:
+        elif self._gain == self.CONFIG_PGA_4:
             self._multiplierToVolts = 0.5
-        elif self._gain == self.kConfigPga8:
+        elif self._gain == self.CONFIG_PGA_8:
             self._multiplierToVolts = 0.25
-        elif self._gain == self.kConfigPga16:
+        elif self._gain == self.CONFIG_PGA_16:
             self._multiplierToVolts = 0.125
         else:
             self._multiplierToVolts = 1.0
@@ -475,9 +469,9 @@ class QwiicADS1015(object):
         """!
         Sets the sample rate of the device
 
-        @param int rate: The sample rate to set
+        @param rate: **int** The sample rate to set
         """
-        rate &= self.kConfigRateMask
+        rate &= self.CONFIG_RATE_MASK
         self._sampleRate = rate
     
     def get_sample_rate(self):
@@ -502,10 +496,10 @@ class QwiicADS1015(object):
 
         @return **bool** True if the OS flag is set, otherwise False
         """
-        value_bytes = self._i2c.read_block(self.address, self.kPointerConfig, 2)
+        value_bytes = self._i2c.read_block(self.address, self.POINTER_CONFIG, 2)
         value = (value_bytes[0] << 8) | value_bytes[1]
 
-        return (value & self.kConfigOsReady > 0)
+        return (value & self.CONFIG_OS_READY > 0)
     
     def set_comparator_single_ended(self, channel, threshold):
         """!
@@ -519,43 +513,43 @@ class QwiicADS1015(object):
         located here:
         https://github.com/adafruit/Adafruit_ADS1X15
 
-        @param int channel: The channel to read
-        @param int threshold: The threshold value to compare
+        @param channel: **int** The channel to read
+        @param threshold: **int** The threshold value to compare
         """
         if channel > 3:
             return 0
 
         config = (
-            self.kConfigModeCont |
+            self.CONFIG_MODE_CONT |
             self._sampleRate |
-            self.kConfigCque1Conv |   # Comparator enabled and asserts on 1 match
-            self.kConfigClatLatch |   # Latching mode
-            self.kConfigCpolActvLow | # Alert/Rdy active low (default val)
-            self.kConfigCmodeTrad    # Traditional comparator (default val)
+            self.CONFIG_CQUE_1_CONV |   # Comparator enabled and asserts on 1 match
+            self.CONFIG_CLAT_LATCH |   # Latching mode
+            self.CONFIG_CPOL_ACTV_LOW | # Alert/Rdy active low (default val)
+            self.CONFIG_CMODE_TRAD    # Traditional comparator (default val)
         )
 
         config |= self._gain
 
         if channel == 0:
-            config |= self.kConfigMuxSingle0
+            config |= self.CONFIG_MUX_SINGLE_0
         elif channel == 1:
-            config |= self.kConfigMuxSingle1
+            config |= self.CONFIG_MUX_SINGLE_1
         elif channel == 2:
-            config |= self.kConfigMuxSingle2
+            config |= self.CONFIG_MUX_SINGLE_2
         elif channel == 3:
-            config |= self.kConfigMuxSingle3
+            config |= self.CONFIG_MUX_SINGLE_3
 
         # Set the high threshold register
         # Shift 12-bit results left 4 bits for the ADS1015
         threshold = threshold << 4
 
         bytes_to_write = [threshold >> 8, threshold & 0xFF]
-        self._i2c.writeBlock(self.address, self.kPointerConfig, bytes_to_write)
+        self._i2c.write_block(self.address, self.POINTER_CONFIG, bytes_to_write)
 
 
         # Write config register to the ADC
         bytes_to_write  = [config >> 8, config & 0xFF]
-        self._i2c.writeBlock(self.address, self.kPointerConfig, bytes_to_write)
+        self._i2c.write_block(self.address, self.POINTER_CONFIG, bytes_to_write)
     
     def get_last_conversion_results(self):
         """!
@@ -573,7 +567,7 @@ class QwiicADS1015(object):
         # Read the conversion results
         # Shift 12-bit results right 4 bits for the ADS1015,
         # making sure we keep the sign bit intact
-        result_bytes = self._i2c.read_block(self.address, self.kPointerConfig, 2)
+        result_bytes = self._i2c.read_block(self.address, self.POINTER_CONFIG, 2)
         result = (result_bytes[0] << 8) | result_bytes[1]
         result = result >> 4
 
@@ -588,20 +582,20 @@ class QwiicADS1015(object):
         Delay for experimentally-determined delay times based on sample rate.
         These were determined experimentally by using Example7
         """
-        if self._sampleRate >= self.kConfigRate3300Hz:
-            time.sleep(0.000400) # > 303 us + 10% + 25 us power-up
-        elif self._sampleRate >= self.kConfigRate2400Hz:
-            time.sleep(0.000500) # > (417us + 10% + 25us power-up)
-        elif self._sampleRate >= self.kConfigRate1600Hz:
-            time.sleep(0.001000) # > (625us + 10% + 25us power-up)
-        elif self._sampleRate >= self.kConfigRate920Hz:
-            time.sleep(0.002000)
-        elif self._sampleRate >= self.kConfigRate490Hz:
-            time.sleep(0.004000)
-        elif self._sampleRate >= self.kConfigRate250Hz:
-            time.sleep(0.008000)
+        if self._sampleRate >= self.CONFIG_RATE_3300HZ:
+            self._i2c.delay_us(400) # > 303 us + 10% + 25 us power-up
+        elif self._sampleRate >= self.CONFIG_RATE_2400HZ:
+            self._i2c.delay_us(500) # > (417us + 10% + 25us power-up)
+        elif self._sampleRate >= self.CONFIG_RATE_1600HZ:
+            self._i2c.delay_ms(1) # > (625us + 10% + 25us power-up)
+        elif self._sampleRate >= self.CONFIG_RATE_920HZ:
+            self._i2c.delay_ms(2)
+        elif self._sampleRate >= self.CONFIG_RATE_490HZ:
+            self._i2c.delay_ms(4)
+        elif self._sampleRate >= self.CONFIG_RATE_250HZ:
+            self._i2c.delay_ms(8)
         else:
-            time.sleep(0.016000) # 128Hz
+            self._i2c.delay_ms(16) # 128Hz
     
     def use_conversion_ready(self, enable):
         """!
@@ -611,6 +605,6 @@ class QwiicADS1015(object):
         The Config Register OS bit is read to determine when the conversion is complete - instead of using conversionDelay.
         Single-shot mode is always selected. _mode is ignored.
 
-        @param bool enable: True to enable, False to disable
+        @param enable: **bool** True to enable, False to disable
         """
         self._useConversionReady = enable

@@ -43,9 +43,7 @@
 #=======================================================================
 # Example 2
 
-from __future__ import print_function
 import qwiic_eeprom
-import time
 import sys
 
 def run_example():
@@ -53,7 +51,7 @@ def run_example():
     print("\nSparkFun Qwiic EEPROM, Example 2\n")
     my_eeprom = qwiic_eeprom.QwiicEEPROM()
 
-    if my_eeprom.begin() != True:
+    if not my_eeprom.begin():
         print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
@@ -80,5 +78,5 @@ if __name__ == '__main__':
     try:
         run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
+        print("\nEnding Example 2")
         sys.exit(0)

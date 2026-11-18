@@ -38,7 +38,6 @@
 # Example 11
 
 import qwiic_led_stick
-import time
 import sys
 
 def run_example():
@@ -60,9 +59,9 @@ def run_example():
     print("\nLED Stick 2 ready!")
 
     # Set all of LED Stick 1 to white
-    my_stick1.set_all_LED_color(10, 10, 10)
+    my_stick1.set_all_led_color(10, 10, 10)
     # Set all of LED Stick 2 to red
-    my_stick2.set_all_LED_color(255, 0, 0)
+    my_stick2.set_all_led_color(255, 0, 0)
 
 if __name__ == '__main__':
     try:

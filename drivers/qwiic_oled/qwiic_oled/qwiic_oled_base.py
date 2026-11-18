@@ -53,9 +53,7 @@ This package can be used in conjunction with the overall [SparkFun qwiic Python 
 New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 """
 
-import sys
 import math
-# import time
 
 import qwiic_i2c
 
@@ -124,14 +122,15 @@ VERTICALRIGHTHORIZONTALSCROLL   = 0x29
 VERTICALLEFTHORIZONTALSCROLL    = 0x2A
 
 
-class QwiicOledBase(object):
+class QwiicOLEDBase(object):
     """!
-        QwiicOledBase
+        QwiicOLEDBase
 
         @param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        @param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        @param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
+        @param pixel_width: Width of the display in pixels
+        @param pixel_height: Height of the display in pixels
 
         @return **Object** The SSD1306 OLED device object.
         """
@@ -151,31 +150,26 @@ class QwiicOledBase(object):
     ALL                 = 1
 
 
-    def __init__(self, address=None, pixel_width = _LCDWIDTH, pixel_height = _LCDHEIGHT, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None, pixel_width = _LCDWIDTH, pixel_height = _LCDHEIGHT):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address is not None else self.available_addresses[0]
 
         # Screen size:
-        self.LCDHEIGHT = pixel_height
-        self.LCDWIDTH  = pixel_width
+        self.lcd_height = pixel_height
+        self.lcd_width  = pixel_width
 
-        # Load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # define the screen buffer - since this is a two color display, only bits are used
         # So the height is 8  bits / byte or LCDHEIGHT/8
-        self._screenbuffer = bytearray(self.LCDWIDTH * int(math.ceil(self.LCDHEIGHT/8.)))
+        self._screenbuffer = bytearray(self.lcd_width * int(math.ceil(self.lcd_height/8.)))
 
         # Set initial contents
-        self._screenbuffer = [0x00]*int(self.LCDWIDTH*self.LCDHEIGHT/8) #Screen Area in bytes (Total Pixels/8)
+        self._screenbuffer = [0x00]*int(self.lcd_width*self.lcd_height/8) #Screen Area in bytes (Total Pixels/8)
         
         # Display SparkFun Logo
         oled_logos.add_logo(self._screenbuffer)
@@ -185,33 +179,31 @@ class QwiicOledBase(object):
         # time.sleep(2)
         # self.clear(self.PAGE)
         
-        self.cursorX = 0
-        self.cursorY = 0
+        self.cursor_x = 0
+        self.cursor_y = 0
 
-        self.foreColor = self.WHITE
-        self.drawMode  = self.NORM
+        self.fore_color = self.WHITE
+        self.draw_mode  = self.NORM
 
-        # self.fontWidth = 0
-        # self.fontHeight = 0
-        # self.fontStartChar = 0
-        # self.fontTotalChar = 0
-        self.fontType = 0
-        # self.fontData = None
+        # self.font_width = 0
+        # self.font_height = 0
+        # self.font_start_char = 0
+        # self.font_total_char = 0
+        self.font_type = 0
+        # self.font_data = None
         self._font = None
 
-        self.nFonts = oled_fonts.count()
+        self.n_fonts = oled_fonts.count()
 
 
     #--------------------------------------------------------------------------
     def is_connected(self):
         """!
-            Determine if a SSD1306 OLED device is conntected to the system..
+            Determine if a SSD1306 OLED device is connected to the system.
 
             @return **bool** True if the device is connected, otherwise False.
             """
-        return qwiic_i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return qwiic_i2c.is_device_connected(self.address)
 
     #--------------------------------------------------------------------------
     def begin(self):
@@ -223,78 +215,80 @@ class QwiicOledBase(object):
 
         self.set_font_type(0)
         self.set_color(self.WHITE)
-        self.set_draw_modee(self.NORM)
+        self.set_draw_mode(self.NORM)
         self.set_cursor(0,0)
 
         #  Display Init sequence
-        self._i2c.writeByte(self.address, I2C_COMMAND, DISPLAYOFF)          #  0xAE
+        self._i2c.write_byte(self.address, I2C_COMMAND, DISPLAYOFF)          #  0xAE
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETDISPLAYCLOCKDIV)  #  0xD5
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x80)                    #  the suggested ratio 0x80
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETDISPLAYCLOCKDIV)  #  0xD5
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x80)                    #  the suggested ratio 0x80
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETMULTIPLEX)            #  0xA8
-        self._i2c.writeByte(self.address, I2C_COMMAND, self.LCDHEIGHT - 1)
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETMULTIPLEX)            #  0xA8
+        self._i2c.write_byte(self.address, I2C_COMMAND, self.lcd_height - 1)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETDISPLAYOFFSET)        #  0xD3
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x0)                 #  no offset
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETDISPLAYOFFSET)        #  0xD3
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x0)                 #  no offset
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETSTARTLINE | 0x0)  #  line #0
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETSTARTLINE | 0x0)  #  line #0
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, CHARGEPUMP)          #  enable charge pump
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x14)
+        self._i2c.write_byte(self.address, I2C_COMMAND, CHARGEPUMP)          #  enable charge pump
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x14)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, NORMALDISPLAY)           #  0xA6
-        self._i2c.writeByte(self.address, I2C_COMMAND, DISPLAYALLONRESUME)  #  0xA4
+        self._i2c.write_byte(self.address, I2C_COMMAND, NORMALDISPLAY)           #  0xA6
+        self._i2c.write_byte(self.address, I2C_COMMAND, DISPLAYALLONRESUME)  #  0xA4
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SEGREMAP | 0x1)
-        self._i2c.writeByte(self.address, I2C_COMMAND, COMSCANDEC)
+        self._i2c.write_byte(self.address, I2C_COMMAND, SEGREMAP | 0x1)
+        self._i2c.write_byte(self.address, I2C_COMMAND, COMSCANDEC)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETCOMPINS)          #  0xDA
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETCOMPINS)          #  0xDA
         if len(self._screenbuffer) == 512:
-            self._i2c.writeByte(self.address, I2C_COMMAND, 0x02)                # rect (128x32 OLED modules)
+            self._i2c.write_byte(self.address, I2C_COMMAND, 0x02)                # rect (128x32 OLED modules)
         else:
-            self._i2c.writeByte(self.address, I2C_COMMAND, 0x12)                # square and large (64x48 or 128x64 OLED modules)
+            self._i2c.write_byte(self.address, I2C_COMMAND, 0x12)                # square and large (64x48 or 128x64 OLED modules)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETCONTRAST)         #  0x81
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x8F)
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETCONTRAST)         #  0x81
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x8F)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETPRECHARGE)            #  0xd9
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x22)
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETPRECHARGE)            #  0xd9
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x22)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETVCOMDESELECT)         #  0xDB
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x30)
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETVCOMDESELECT)         #  0xDB
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x30)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, DISPLAYON)               # --turn on oled panel
+        self._i2c.write_byte(self.address, I2C_COMMAND, DISPLAYON)               # --turn on oled panel
         self.clear(self.ALL)                        #  Erase hardware memory inside the OLED controller to aself random data in memory.
+
+        return True
 
     #----------------------------------------------------
     # brief Set SSD1306 page address.
     #     Send page address command and address to the SSD1306 OLED controller.
 
-    def set_page_address(self, pageAddress):
+    def set_page_address(self, page_address):
         """!
             Set SSD1306 page address.
 
-            @param pageAddress: The page address command and address
+            @param page_address: The page address command and address
 
             @return  No return value
 
         
             """
 
-        # self._i2c.writeByte(self.address, I2C_COMMAND, 0xb0|pageAddress)
+        # self._i2c.write_byte(self.address, I2C_COMMAND, 0xb0|page_address)
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x22)
-        self._i2c.writeByte(self.address, I2C_COMMAND, (pageAddress& (self.LCDHEIGHT - 1)))
-        self._i2c.writeByte(self.address, I2C_COMMAND, self.LCDHEIGHT - 1)
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x22)
+        self._i2c.write_byte(self.address, I2C_COMMAND, (page_address& (self.lcd_height - 1)))
+        self._i2c.write_byte(self.address, I2C_COMMAND, self.lcd_height - 1)
 
     #----------------------------------------------------
     # Send column address command and address to the SSD1306 OLED controller.
-    def set_column_address(self, colAddress):
+    def set_column_address(self, col_address):
         """!
             Set SSD1306 column address.
 
-            @param colAddress: The column address command and address
+            @param col_address: The column address command and address
 
             @return  No return value
 
@@ -302,12 +296,12 @@ class QwiicOledBase(object):
             """
         
         if len(self._screenbuffer) == 384:
-            self._i2c.writeByte(self.address, I2C_COMMAND, (0x10|(colAddress>>4))+0x02)
-            self._i2c.writeByte(self.address, I2C_COMMAND, (0x0f&colAddress))
+            self._i2c.write_byte(self.address, I2C_COMMAND, (0x10|(col_address>>4))+0x02)
+            self._i2c.write_byte(self.address, I2C_COMMAND, (0x0f&col_address))
         else:
-            self._i2c.writeByte(self.address, I2C_COMMAND, 0x21)
-            self._i2c.writeByte(self.address, I2C_COMMAND, (colAddress& (self.LCDWIDTH - 1)))
-            self._i2c.writeByte(self.address, I2C_COMMAND, self.LCDWIDTH -1)
+            self._i2c.write_byte(self.address, I2C_COMMAND, 0x21)
+            self._i2c.write_byte(self.address, I2C_COMMAND, (col_address& (self.lcd_width - 1)))
+            self._i2c.write_byte(self.address, I2C_COMMAND, self.lcd_width -1)
 
     #----------------------------------------------------
     #  To clear GDRAM inside the LCD controller, pass in the variable mode = ALL and to clear screen page buffer pass in the variable mode = PAGE.
@@ -331,7 +325,7 @@ class QwiicOledBase(object):
                 self.set_column_address(0)
                 #pylint: disable=unused-variable
                 for j in range(0x80):
-                    self._i2c.writeByte(self.address, I2C_DATA, value)
+                    self._i2c.write_byte(self.address, I2C_DATA, value)
                 #pylint: enable=unused-variable
         else:
             self._screenbuffer[:] = [value]*len(self._screenbuffer)
@@ -350,9 +344,9 @@ class QwiicOledBase(object):
         
             """
         if inv:
-            self._i2c.writeByte(self.address, I2C_COMMAND, INVERTDISPLAY)
+            self._i2c.write_byte(self.address, I2C_COMMAND, INVERTDISPLAY)
         else:
-            self._i2c.writeByte(self.address, I2C_COMMAND, NORMALDISPLAY)
+            self._i2c.write_byte(self.address, I2C_COMMAND, NORMALDISPLAY)
 
     #--------------------------------------------------------------------------
     # OLED contract value from 0 to 255. Note: Contrast level is not very obvious.
@@ -367,8 +361,8 @@ class QwiicOledBase(object):
 
         
             """
-        self._i2c.writeByte(self.address, I2C_COMMAND, SETCONTRAST)     #  0x81
-        self._i2c.writeByte(self.address, I2C_COMMAND, contrast)
+        self._i2c.write_byte(self.address, I2C_COMMAND, SETCONTRAST)     #  0x81
+        self._i2c.write_byte(self.address, I2C_COMMAND, contrast)
 
     #--------------------------------------------------------------------------
     # Bulk move the screen buffer to the SSD1306 controller's memory so that images/graphics drawn on the screen buffer will be displayed on the OLED.
@@ -405,7 +399,7 @@ class QwiicOledBase(object):
                 iEnd = iStart  + min(lenLine - iStart, lenBlock) # what's left - not > 32 in len
 
                 # Send the block - take into account the current line/row offset
-                self._i2c.writeBlock(self.address, I2C_DATA, self._screenbuffer[lineStart+iStart:lineStart+iEnd])
+                self._i2c.write_block(self.address, I2C_DATA, self._screenbuffer[lineStart+iStart:lineStart+iEnd])
 
     #     Leftover from port -> Arduino's print overridden so that we can use uView.print().
     #--------------------------------------------------------------------------
@@ -420,15 +414,15 @@ class QwiicOledBase(object):
         
             """
         if c == '\n':
-            # self.cursorY += self.fontHeight
-            self.cursorY += self._font.height
-            self.cursorX = 0
+            # self.cursor_y += self.font_height
+            self.cursor_y += self._font.height
+            self.cursor_x = 0
         elif c != '\r':
-            self.draw_char(self.cursorX, self.cursorY, c)
-            self.cursorX += self._font.width+1
-            if self.cursorX > (self.LCDWIDTH - self._font.width):
-                self.cursorY += self._font.height
-                self.cursorX = 0
+            self.draw_char(self.cursor_x, self.cursor_y, c)
+            self.cursor_x += self._font.width+1
+            if self.cursor_x > (self.lcd_width - self._font.width):
+                self.cursor_y += self._font.height
+                self.cursor_x = 0
 
         return 1
 
@@ -470,8 +464,8 @@ class QwiicOledBase(object):
 
         
             """
-        self.cursorX = x
-        self.cursorY = y
+        self.cursor_x = x
+        self.cursor_y = y
 
     #--------------------------------------------------------------------------
     # Draw color pixel in the screen buffer's x,y position with NORM or XOR draw mode.
@@ -493,17 +487,17 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
-        if  x < 0 or  x >= self.LCDWIDTH or y < 0 or y >= self.LCDHEIGHT:
+        if  x < 0 or  x >= self.lcd_width or y < 0 or y >= self.lcd_height:
             return
 
         x = int(x)
         y = int(y)
-        index = x + (y//8)*self.LCDWIDTH
+        index = x + (y//8)*self.lcd_width
 
         if mode == self.XOR:
             if color == self.WHITE:
@@ -535,10 +529,10 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
         steep = abs(y1 - y0) > abs(x1 - x0)
         if steep:
@@ -591,10 +585,10 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
         self.line(x, y, x+width, y, color, mode)
 
@@ -619,10 +613,10 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
         self.line(x, y, x, y+height, color, mode)
 
@@ -647,10 +641,10 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
         self.line_h(x, y, width, color, mode)
         self.line_h(x, y+height-1, width, color, mode)
@@ -686,10 +680,10 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
         # // TODO - need to optimise the memory map draw so that this function will not call pixel one by one
         for i in range(x, x+width):
@@ -714,10 +708,10 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
         # in the future- find a way to check for no overlapping of pixels so that XOR draw mode will work perfectly
         f = 1 - radius
@@ -762,9 +756,8 @@ class QwiicOledBase(object):
 
         
             """
-        return self.LCDHEIGHT
+        return self.lcd_height
 
-    height = property(get_lcd_height)
 
     # The width of the LCD return as byte.
     def get_lcd_width(self):
@@ -776,9 +769,8 @@ class QwiicOledBase(object):
 
         
             """
-        return self.LCDWIDTH
+        return self.lcd_width
 
-    width = property(get_lcd_width)
 
     # The cucrrent font's width return as byte.
 
@@ -793,7 +785,6 @@ class QwiicOledBase(object):
             """
         return self._font.width
 
-    font_width = property(get_font_width)
 
     # The current font's height return as byte.
 
@@ -808,7 +799,6 @@ class QwiicOledBase(object):
             """
         return self._font.height
 
-    font_height = property(get_font_height)
     # Return the starting ASCII character of the currnet font, not all fonts start with ASCII character 0. Custom fonts can start from any ASCII character.
 
     def get_font_start_char(self):
@@ -848,7 +838,7 @@ class QwiicOledBase(object):
 
         
             """
-        return self.nFonts
+        return self.n_fonts
 
     # Return the font type number of the current font.
     def get_font_type(self):
@@ -860,7 +850,7 @@ class QwiicOledBase(object):
 
         
             """
-        return self.fontType
+        return self.font_type
 
     # Set the current font type number, ie changing to different fonts base on the type provided.
 
@@ -868,24 +858,23 @@ class QwiicOledBase(object):
         """!
             Set the current font type number, ie changing to different fonts base on the type provided.
 
-            @param type: The type to set the font to.
+            @param font_type: The type to set the font to.
 
-            @return  No return value
+            @return **bool** True if the font was loaded, otherwise False
 
         
             """
 
-        if font_type >= self.nFonts or font_type < 0:
+        if font_type >= self.n_fonts or font_type < 0:
             return False
 
-        self.fontType = font_type
+        self.font_type = font_type
         self._font = oled_fonts.get_font(font_type)
         if self._font is None:
             return False
 
         return True
 
-    font_type = property(get_font_type, set_font_type)
     # Set the current draw's color. Only WHITE and BLACK available.
 
     def set_color(self, color):
@@ -898,11 +887,11 @@ class QwiicOledBase(object):
 
         
             """
-        self.foreColor = color
+        self.fore_color = color
 
     # Set current draw mode with NORM or XOR.
 
-    def set_draw_modee(self, mode):
+    def set_draw_mode(self, mode):
         """!
             Set current draw mode with NORM or XOR.
 
@@ -912,7 +901,7 @@ class QwiicOledBase(object):
 
         
             """
-        self.drawMode = mode
+        self.draw_mode = mode
 
     # Draw character c using color and draw mode at x,y.
     # pylint: disable=too-many-locals
@@ -932,10 +921,10 @@ class QwiicOledBase(object):
             """
 
         if color is None:
-            color = self.foreColor
+            color = self.fore_color
 
         if mode is None:
-            mode = self.drawMode
+            mode = self.draw_mode
 
         if self._font is None:
             return
@@ -983,17 +972,19 @@ class QwiicOledBase(object):
         
             """
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, DEACTIVATESCROLL)
+        self._i2c.write_byte(self.address, I2C_COMMAND, DEACTIVATESCROLL)
 
 
     # Set row start to row stop on the OLED to scroll.
-    def scroll (self, start, stop, scrollCommand = RIGHTHORIZONTALSCROLL, vertOffset = 0):
+    def scroll (self, start, stop, scroll_command = RIGHTHORIZONTALSCROLL, vert_offset = 0):
         """!
             Set row start to row stop on the OLED to scroll.
             Refer to http://learn.microview.io/intro/general-overview-of-microview.html for explanation of the rows.
 
             @param start: The staring position on the display
             @param stop: The stopping position on the display
+            @param scroll_command: The scroll command, for example RIGHTHORIZONTALSCROLL
+            @param vert_offset: Vertical rows per step for the vertical scroll commands (0 means 1)
 
             @return  No return value
         
@@ -1001,24 +992,24 @@ class QwiicOledBase(object):
         if stop < start:        # stop must be larger or equal to start
             return
 
-        if scrollCommand in [VERTICALRIGHTHORIZONTALSCROLL, VERTICALLEFTHORIZONTALSCROLL]:
-            self._i2c.writeByte(self.address, I2C_COMMAND, SETVERTICALSCROLLAREA)
-            self._i2c.writeByte(self.address, I2C_COMMAND, 0x00)
-            self._i2c.writeByte(self.address, I2C_COMMAND, self.LCDHEIGHT)
-            if vertOffset == 0:
-                vertOffset = 1
+        if scroll_command in [VERTICALRIGHTHORIZONTALSCROLL, VERTICALLEFTHORIZONTALSCROLL]:
+            self._i2c.write_byte(self.address, I2C_COMMAND, SETVERTICALSCROLLAREA)
+            self._i2c.write_byte(self.address, I2C_COMMAND, 0x00)
+            self._i2c.write_byte(self.address, I2C_COMMAND, self.lcd_height)
+            if vert_offset == 0:
+                vert_offset = 1
         
         self.scroll_stop()       # need to disable scrolling before starting to avoid memory corrupt
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, scrollCommand)
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x00)
-        self._i2c.writeByte(self.address, I2C_COMMAND, start)
-        self._i2c.writeByte(self.address, I2C_COMMAND, 0x7)     # scroll speed frames , TODO
-        self._i2c.writeByte(self.address, I2C_COMMAND, stop)
-        self._i2c.writeByte(self.address, I2C_COMMAND, vertOffset)
-        if vertOffset == 0: # Horizontal scroll
-            self._i2c.writeByte(self.address, I2C_COMMAND, 0xFF)
-        self._i2c.writeByte(self.address, I2C_COMMAND, ACTIVATESCROLL)
+        self._i2c.write_byte(self.address, I2C_COMMAND, scroll_command)
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x00)
+        self._i2c.write_byte(self.address, I2C_COMMAND, start)
+        self._i2c.write_byte(self.address, I2C_COMMAND, 0x7)     # scroll speed frames , TODO
+        self._i2c.write_byte(self.address, I2C_COMMAND, stop)
+        self._i2c.write_byte(self.address, I2C_COMMAND, vert_offset)
+        if vert_offset == 0: # Horizontal scroll
+            self._i2c.write_byte(self.address, I2C_COMMAND, 0xFF)
+        self._i2c.write_byte(self.address, I2C_COMMAND, ACTIVATESCROLL)
     
     # Refer to http://learn.microview.io/intro/general-overview-of-microview.html for explanation of the rows.
 
@@ -1050,7 +1041,7 @@ class QwiicOledBase(object):
             """
         self.scroll(start, stop, LEFT_HORIZONTALSCROLL)
 
-    def scroll_vert_left(self,start,stop, vertOffset = 1):
+    def scroll_vert_left(self,start,stop, vert_offset = 1):
         """!
             Set row start to row stop on the OLED to scroll vertical right (Diagonally).
             Refer to http://learn.microview.io/intro/general-overview-of-microview.html for explanation of the rows.
@@ -1063,9 +1054,9 @@ class QwiicOledBase(object):
 
         
             """
-        self.scroll(start, stop, VERTICALLEFTHORIZONTALSCROLL, vertOffset)
+        self.scroll(start, stop, VERTICALLEFTHORIZONTALSCROLL, vert_offset)
     
-    def scroll_vert_right(self, start, stop, vertOffset = 1):
+    def scroll_vert_right(self, start, stop, vert_offset = 1):
         """!
             Set row start to row stop on the OLED to scroll vertical right (Diagonally).
             Refer to http://learn.microview.io/intro/general-overview-of-microview.html for explanation of the rows.
@@ -1078,7 +1069,7 @@ class QwiicOledBase(object):
 
         
             """
-        self.scroll(start, stop, VERTICALRIGHTHORIZONTALSCROLL, vertOffset)
+        self.scroll(start, stop, VERTICALRIGHTHORIZONTALSCROLL, vert_offset)
 
     # Flip the graphics on the OLED vertically.
     def flip_vertical(self, flip):
@@ -1090,7 +1081,7 @@ class QwiicOledBase(object):
         
             """
 
-        self._i2c.writeByte(self.address, I2C_COMMAND, COMSCANINC if flip else COMSCANDEC)
+        self._i2c.write_byte(self.address, I2C_COMMAND, COMSCANINC if flip else COMSCANDEC)
 
     # Flip the graphics on the OLED horizontally.
     def flip_horizontal(self, flip):
@@ -1101,7 +1092,7 @@ class QwiicOledBase(object):
 
         
             """
-        self._i2c.writeByte(self.address, I2C_COMMAND, SEGREMAP | ( 0x0 if flip else 0x1))
+        self._i2c.write_byte(self.address, I2C_COMMAND, SEGREMAP | ( 0x0 if flip else 0x1))
         self.clear(self.ALL)
         self.display()
 
@@ -1118,20 +1109,19 @@ class QwiicOledBase(object):
     # Draw Bitmap image on screen. The array for the bitmap can be stored in the Arduino file, so user don't have to mess with the library files.
     # To use, create uint8_t array that is 64x48 pixels (384 bytes). Then call .draw_bitmap and pass it the array.
 
-    def draw_bitmap(self, bitArray):
+    def draw_bitmap(self, bit_array):
         """!
             Draw Bitmap image on screen.
             To use, create int array that is 64x48 pixels (384 bytes). Then call .draw_bitmap and pass it the array.
 
-            @param bitArray: The bitmap to draw
+            @param bit_array: The bitmap to draw
 
             @return  No return value
 
         
             """
 
-        if len(bitArray) != len(self._screenbuffer):
-            print("draw_bitmap - Invalid Input size.", file=sys.stderr)
-            return
+        if len(bit_array) != len(self._screenbuffer):
+            raise ValueError("draw_bitmap: the bitmap must be %d bytes" % len(self._screenbuffer))
 
-        self._screenbuffer[:] = bitArray
+        self._screenbuffer[:] = bit_array

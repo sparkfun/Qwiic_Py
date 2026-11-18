@@ -36,21 +36,21 @@
 
 import qwiic_bmp581
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
-	print("\nQwiic Template Example 5 - Oversampling\n")
+def run_example():
+	print("\nQwiic BMP581 Example 5 - Oversampling\n")
 
 	# Create instance of device
 	myBMP581 = qwiic_bmp581.QwiicBMP581()
 
 	# Check if it's connected
-	if myBMP581.is_connected() == False:
+	if not myBMP581.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	if myBMP581.begin() == False:
+	if not myBMP581.begin():
 		print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
 		return
 	
@@ -60,27 +60,27 @@ def runExample():
     # multiple measurements are performed to increase resolution and decrease
     # noise. By default, no oversampling is used.
 	config = qwiic_bmp581.OsrOdrPressConfig()
-	config.osrT = config.kOversampling8x
-	config.osrP = config.kOversampling128x
+	config.osrT = config.OVERSAMPLING_8X
+	config.osrP = config.OVERSAMPLING_128X
 
 	myBMP581.set_osr_multipliers(config)
 
 	# Larger oversampling requires longer measurement times, so ODR may need
     # to be decreased. The datasheet contains a table with max ODR values for
     # given OSR settings (Table 7). You can set the ODR with this function.
-	myBMP581.set_odr_frequency(myBMP581.kOdr10Hz)
+	myBMP581.set_odr_frequency(myBMP581.ODR_10HZ)
 	myBMP581.get_osr_odr_eff()
 
 	# You can also verify whether your OSR and ODR are valid with this function
-	osrEff = myBMP581.get_osr_odr_eff()
+	osr_eff = myBMP581.get_osr_odr_eff()
 
 	# The returned object from this function contains a flag indicating validty
-	if not osrEff.odrIsValid:
+	if not osr_eff.odrIsValid:
 		# Desired OSR and ODR are invalid, so the sensor uses different
         # effective OSR. We can print those out like so
 		print("OSR and ODR are invalid!")
-		print("Effective Temperature OSR: ", osrEff.osrTEff)
-		print("Effective Pressure OSR: ", osrEff.osrPEff)
+		print("Effective Temperature OSR: ", osr_eff.osrTEff)
+		print("Effective Pressure OSR: ", osr_eff.osrPEff)
 
 	while True:
 		data = myBMP581.get_sensor_data()
@@ -88,11 +88,11 @@ def runExample():
 		print("Pressure (Pa): ", data.pressure)
 
 		# Only print every second
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

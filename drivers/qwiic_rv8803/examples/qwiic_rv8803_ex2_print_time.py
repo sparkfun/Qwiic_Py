@@ -35,9 +35,9 @@
 
 import qwiic_rv8803
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic RV8803 Example 2 - Print Time\n")
 
 	# Create instance of device
@@ -57,11 +57,11 @@ def runExample():
 		print ("Current Time: ", end="")
 		print (myRTC.string_date_usa(), end="")
 		print (" ", myRTC.string_time())
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

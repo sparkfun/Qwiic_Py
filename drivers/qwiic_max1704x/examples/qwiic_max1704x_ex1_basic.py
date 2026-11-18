@@ -37,9 +37,9 @@
 
 import qwiic_max1704x
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic MAX1704X Example 1 - Simple\n")
 
 	# Create instance of device
@@ -47,12 +47,12 @@ def runExample():
 
 	# Comment out above line and comment out below line if not using MAX17043. 
 	# You can pass any of the following device types: 
-	#	kDeviceTypeMAX17043,
-	# 	kDeviceTypeMAX17044, 
-	# 	kDeviceTypeMAX17048, 
-	# 	kDeviceTypeMAX17049
+	#	DEVICE_TYPE_MAX17043,
+	# 	DEVICE_TYPE_MAX17044, 
+	# 	DEVICE_TYPE_MAX17048, 
+	# 	DEVICE_TYPE_MAX17049
 	#
-	# myLipo = qwiic_max1704x.QwiicMAX1704X(qwiic_max1704x.QwiicMAX1704X.kDeviceTypeMAX17048)
+	# myLipo = qwiic_max1704x.QwiicMAX1704X(qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
 
 	# Check if it's connected
 	if myLipo.is_connected() == False:
@@ -85,11 +85,11 @@ def runExample():
 			print("Battery SoC is above threshold.")
 
 		# Delay so as to not spam prints
-		time.sleep(0.500)
+		qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

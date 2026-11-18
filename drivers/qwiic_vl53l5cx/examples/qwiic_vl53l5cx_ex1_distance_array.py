@@ -36,9 +36,9 @@
 import qwiic_vl53l5cx 
 import sys
 from math import sqrt
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic VL53LCX Example 1 - DistanceArray\n")
 
 	# Create instance of device
@@ -71,11 +71,11 @@ def runExample():
 				print("\n")
 			print("\n")
 		
-		time.sleep(0.005)
+		qwiic_i2c.delay_ms(5)
 	
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

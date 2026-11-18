@@ -36,7 +36,7 @@
 import qwiic_nau7802
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic NAU7802 Example 2 - Complete Scale\n")
 
 	# Create instance of device
@@ -99,7 +99,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

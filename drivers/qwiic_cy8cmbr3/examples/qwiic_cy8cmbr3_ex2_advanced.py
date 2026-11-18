@@ -36,9 +36,9 @@
 
 import qwiic_cy8cmbr3
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic Template Example 2 - Advanced\n")
 
 	# Create instance of device
@@ -54,15 +54,15 @@ def runExample():
 	mySoilSensor.begin()
 
 	# Sensitivity values (counts per pF)
-    # kCsSensitivity500CountsPerPf = 0  # 50 counts/0.1pF
-    # kCsSensitivity250CountsPerPf = 1  # 50 counts/0.2pF
-    # kCsSensitivity167CountsPerPf = 2  # 50 counts/0.3pF
-    # kCsSensitivity125CountsPerPf = 3  # 50 counts/0.4pF
-	mySoilSensor.set_sensitivity_cs0(mySoilSensor.kCsSensitivity500CountsPerPf)
+    # CS_SENSITIVITY_500_COUNTS_PER_PF = 0  # 50 counts/0.1pF
+    # CS_SENSITIVITY_250_COUNTS_PER_PF = 1  # 50 counts/0.2pF
+    # CS_SENSITIVITY_167_COUNTS_PER_PF = 2  # 50 counts/0.3pF
+    # CS_SENSITIVITY_125_COUNTS_PER_PF = 3  # 50 counts/0.4pF
+	mySoilSensor.set_sensitivity_cs0(mySoilSensor.CS_SENSITIVITY_500_COUNTS_PER_PF)
 
 	# Refresh Intervals
 	# See qwiic_cy8cmbr3.py for all options
-	mySoilSensor.set_refresh_interval(mySoilSensor.kRefreshInterval100ms)
+	mySoilSensor.set_refresh_interval(mySoilSensor.REFRESH_INTERVAL_100MS)
 
 	mySoilSensor.save_config()
 
@@ -93,13 +93,13 @@ def runExample():
 		
 		print("\n--------------------------------\n")
 
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

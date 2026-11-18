@@ -35,16 +35,16 @@
 
 import qwiic_lsm6dso
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
 	print("\nQwiic LSM6DSO Example 1 - Basic Readings\n")
 
 	# Create instance of device
 	my_imu = qwiic_lsm6dso.QwiicLSM6DSO()
 
 	# Check if it's connected
-	if my_imu.is_connected() == False:
+	if not my_imu.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
@@ -58,23 +58,23 @@ def runExample():
 		# Uncomment the section you want to use below.
 
 		# You can read each axis individually
-		# accX = my_imu.read_float_accel_x()
-		# accY = my_imu.read_float_accel_y()
-		# accZ = my_imu.read_float_accel_z()
-		# gyrX = my_imu.read_float_gyro_x()
-		# gyrY = my_imu.read_float_gyro_y()
-		# gyrZ = my_imu.read_float_gyro_z()
+		# acc_x = my_imu.read_float_accel_x()
+		# acc_y = my_imu.read_float_accel_y()
+		# acc_z = my_imu.read_float_accel_z()
+		# gyr_x = my_imu.read_float_gyro_x()
+		# gyr_y = my_imu.read_float_gyro_y()
+		# gyr_z = my_imu.read_float_gyro_z()
 
 		# Or you can read all 3 axes of each sensor in one call for faster reads
-		# accX, accY, accZ = my_imu.read_float_accel_all()
-		# gyrX, gyrY, gyrZ = my_imu.read_float_gyro_all()
+		# acc_x, acc_y, acc_z = my_imu.read_float_accel_all()
+		# gyr_x, gyr_y, gyr_z = my_imu.read_float_gyro_all()
 
 		# Or you can read all 6 axes in a single call for the fastest read speed
-		accX, accY, accZ, gyrX, gyrY, gyrZ = my_imu.read_float_accel_gyro_all()
+		acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z = my_imu.read_float_accel_gyro_all()
 		
 		# Now print the results!
-		print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (accX, accY, accZ))
-		print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyrX, gyrY, gyrZ))
+		print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (acc_x, acc_y, acc_z))
+		print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyr_x, gyr_y, gyr_z))
 
 		# You can also read the temperature of the IMU
 		temperature = my_imu.read_temp_c()
@@ -84,11 +84,11 @@ def runExample():
 		print()
 
 		# Wait a second and repeat
-		time.sleep(1)
+		qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

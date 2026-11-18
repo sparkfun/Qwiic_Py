@@ -37,22 +37,25 @@
 # SOFTWARE.
 #==================================================================================
 	
-import sys
-import os
+#
+# Fonts live in the "fonts" folder next to this module, one file per font,
+# named <fontnumber>_<fontname>.bin. Only when font data is requested is the
+# data loaded for that font.
+#
+# The os module isn't part of the portable subset (and isn't available on every
+# platform), so the font folder is found from __file__ with plain string
+# operations and the font files are listed in _FONT_NAMES below.
 
 import math
 
-# Define storage for fonts
+# Font names, by font number. Font n is in the file "<n>_<name>.bin".
+_FONT_NAMES = ["font5x7", "font8x16", "7segment", "fontlargenumber", "fontlargeletter31x48"]
 
-# map - map font index to font name
-_fontIndexMap=[]
-
-# font cache - maps name to font data
+# font cache - the most recently used font
 _fontCacheIndex = -1
-_fontCache=None
+_fontCache = None
 
-_isInited = False
-
+_fontDir = None
 
 
 #-----------------------------------------
@@ -60,7 +63,7 @@ _isInited = False
 
 class OLEDFont():
 
-	def __init__(self, fontFile):
+	def __init__(self, font_file):
 		self.width = 0
 		self.height = 0
 		self.start_char = 0
@@ -71,61 +74,45 @@ class OLEDFont():
 		# Good for memory state (fragementation), but slightly slower.
 		self._fontData = []
 
-		self._loadFontFile(fontFile)
+		self._load_font_file(font_file)
 
-	def _loadFontFile(self, fontFile):
+	def _load_font_file(self, font_file):
 
-		fp = None
+		# OSError if the file is missing: check that the fonts were installed
+		fp = open(font_file, 'rb')
 
 		try:
-			fp = open(fontFile, 'rb')
+			# read the font header
+			fHeader = fp.read(6)
+			fHeader = bytearray(fHeader) ## for int conversion
+			self.width 		= fHeader[0]
+			self.height 	= fHeader[1]
+			self.start_char = fHeader[2]
+			self.total_char = fHeader[3]
+			self.map_width 	= fHeader[4]*100 + fHeader[5] #two bytes values into integer 16
 
-		except Exception as exError:
-			print("Error opening font file: %s" % fontFile)
+			# build the list to store the fonts - list uses less mem than a dict. 
+			self._fontData = [0]* (self.height//8 * self.total_char)	
+			# Break font into rows - not as effeicent, but great for memory.
+			# note: the fonts span rows - and each row is 8 bits. So i font height > 8,
+			#       the font spans multiple rows.
+			#
+			# Double note: If the font is a single row - we add a byte to the row buffer
+			#			   Seems no margin was encoded on this font, and this bust be added
 
-			raise exError
+			rowsPerChar = int(math.ceil(self.height/8.))
 
-		# read the font header
-		fHeader = fp.read(6)
-		fHeader = bytearray(fHeader) ## for int conversion
-		self.width 		= fHeader[0]
-		self.height 	= fHeader[1]
-		self.start_char = fHeader[2]
-		self.total_char = fHeader[3]
-		self.map_width 	= fHeader[4]*100 + fHeader[5] #two bytes values into integer 16
+			# do we add a pad byte?
+			nPad = (rowsPerChar == 1)*1
 
-		# build the list to store the fonts - list uses less mem than a dict. 
-		self._fontData = [0]* (self.height//8 * self.total_char)	
-		# Break font into rows - not as effeicent, but great for memory.
-		# note: the fonts span rows - and each row is 8 bits. So i font height > 8,
-		#       the font spans multiple rows.
-		#
-		# Double note: If the font is a single row - we add a byte to the row buffer
-		#			   Seems no margin was encoded on this font, and this bust be added
+			# buffer padding bytes
+			bBuffer = bytearray(nPad)
 
-		rowsPerChar = int(math.ceil(self.height/8.))
-
-		# do we add a pad byte?
-		nPad = (rowsPerChar == 1)*1
-
-		# buffer padding bytes
-		bBuffer = bytearray(nPad)
-
-		# read in font
-		for iChar in range(self.total_char * rowsPerChar):
-
-			try:
-
+			# read in font
+			for iChar in range(self.total_char * rowsPerChar):
 				self._fontData[iChar] = bytearray(fp.read(self.width))  + bBuffer
-
-			except Exception as exError:
-				print("Error reading font data. Character: %d, File:%s" % (iChar, _loadFontFile))
-
-				fp.close()
-				# cascade this up
-				raise exError
-
-		fp.close()
+		finally:
+			fp.close()
 
 
 	# method to override [] access for this object. 
@@ -144,115 +131,73 @@ class OLEDFont():
 
 def _check_if_exists(filename):
 	"""!
-	Checks if a file or directory exists. Works on MicroPython and CircuitPython
-	which do not have os.path functions (as well as Linux which does).
+	Checks if a file exists, without the os module.
 	"""
 	try:
-		os.stat(filename)
-		return True
-	except:
+		f = open(filename, 'rb')
+	except OSError:
 		return False
-		
+	f.close()
+	return True
+
 # handy util
-def _getFontDir():
+def _get_font_dir():
+
+	global _fontDir
+
+	if _fontDir is not None:
+		return _fontDir
+
+	first_font = "0_" + _FONT_NAMES[0] + ".bin"
 
 	# First check if font directory exists where it is installed when using a frozen SparkFun MicroPython package
 	# It should exist in "_frozen_data" if the package is frozen
-	if _check_if_exists("_frozen_data" + os.sep + "fonts"):
-		return "_frozen_data" + os.sep + "fonts"
+	if _check_if_exists("_frozen_data/fonts/" + first_font):
+		_fontDir = "_frozen_data/fonts"
+		return _fontDir
 
-	return __file__.rsplit(os.sep, 1)[0] +  os.sep + "fonts"
+	# Otherwise the fonts are next to this module. "/" works as the separator
+	# on every platform, Windows included.
+	try:
+		here = __file__.replace("\\", "/")
+	except NameError:
+		here = ""
 
-#-----------------------------------------
-# General Structure
-#
-# Fonts are stored in the fonts subfolder of this package. Uses filenames
-# to deliniate the fonts.
-#
-# Name Structure
-#      <fontnumber>_<fontname>.bin
-#
-# This system lists the filenames and builds the index map
-#
-# Only when font data is requested is the data loaded for that font.
-# 
-# 
-def _initFontSystem():
+	if "/" in here:
+		_fontDir = here.rsplit("/", 1)[0] + "/fonts"
+	else:
+		_fontDir = "fonts"
 
-	global _isInited, _fontIndexMap
-
-	if _isInited:
-		return
-
-	_isInited = True
-
-	fDir = _getFontDir()
-
-	try: 
-		tmpFiles = os.listdir(fDir)
-	except:
-		print("OLED fonts do not exists - check your installation")
-		return
-
-
-	fontFiles = []
-
-	for tFile in tmpFiles:
-		if tFile.find('.bin') == -1:
-			continue
-
-		fontFiles.append(tFile)
-
-	# get our font names 
-
-	if len(fontFiles) == 0:
-		print("OLED - no fonts found")
-		return
-
-
-	# build our font index
-
-	_fontIndexMap = [''] * len(fontFiles)
-
-	for fBase in fontFiles:
-
-		iSep = fBase.find('_')
-		if iSep == -1:
-			print("Invalid Font File: %s " % fBase)
-			continue
-		nFont = int(fBase[0:iSep])
-
-		# stash the name, strip off the number and the suffix
-		_fontIndexMap[nFont] = fBase[iSep+1:-4]
+	return _fontDir
 
 def count():
-
-	if not _isInited:
-		_initFontSystem()
-
-	return len(_fontIndexMap)
+	"""!
+	@return **int** The number of fonts
+	"""
+	return len(_FONT_NAMES)
 
 def font_names():
+	"""!
+	@return **list of str** The font names, by font number
+	"""
+	return _FONT_NAMES
 
-	if not _isInited:
-		_initFontSystem()
+def get_font(font_number):
+	"""!
+	Load a font (or return it from the cache).
 
-	return _fontIndexMap
-
-def get_font(iFont):
+	@param font_number: The font number
+	@return **OLEDFont** The font
+	@exception OSError: The font file is missing (check that the package was installed with its fonts)
+	"""
 
 	global _fontCache, _fontCacheIndex
 
-	if not _isInited:
-		_initFontSystem()
+	if font_number != _fontCacheIndex:
 
-	if iFont != _fontCacheIndex:
-
-		fFont = _getFontDir() + os.sep + str(iFont) + '_' + _fontIndexMap[iFont] + '.bin'
+		fFont = _get_font_dir() + "/" + str(font_number) + '_' + _FONT_NAMES[font_number] + '.bin'
 
 		_fontCache = OLEDFont(fFont)
-		_fontCacheIndex = iFont
+		_fontCacheIndex = font_number
 
 	return _fontCache
-
-

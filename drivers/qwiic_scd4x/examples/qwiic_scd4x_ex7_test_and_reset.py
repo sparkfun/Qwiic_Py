@@ -36,21 +36,20 @@
 
 import qwiic_scd4x
 import sys
-import time
 
-def runExample():
+def run_example():
 	print("\nQwiic SCD4x Example 7 - Self Test and Factory Reset\n")
 
 	# Create instance of device
 	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
 	# Check if it's connected
-	if mySCD4x.is_connected() == False:
+	if not mySCD4x.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	if mySCD4x.begin() == False:
+	if not mySCD4x.begin():
 		print("Error while initializing device", file=sys.stderr)
 		return
 	
@@ -60,14 +59,14 @@ def runExample():
 
 	# Now we can run the self test:
 	print("Starting the self-test. This will take 10 seconds to complete...")
-	if mySCD4x.perform_self_test() == True:
+	if mySCD4x.perform_self_test():
 		print("Self-test passed!")
 	else:
 		print("Self-test failed!", file=sys.stderr)
 		return
 	
 	# We can do a factory reset if we want to completely reset the sensor
-	if mySCD4x.perform_factory_reset() == True:
+	if mySCD4x.perform_factory_reset():
 		print("Factory reset completed!")
 	else:
 		print("Factory reset failed!", file=sys.stderr)
@@ -75,7 +74,7 @@ def runExample():
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

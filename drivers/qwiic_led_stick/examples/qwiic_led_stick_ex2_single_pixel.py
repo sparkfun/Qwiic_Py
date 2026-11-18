@@ -38,7 +38,7 @@
 # Example 2
 
 import qwiic_led_stick
-import time
+import qwiic_i2c
 import sys
 
 def run_example():
@@ -55,15 +55,15 @@ def run_example():
     while True:
 
         # Turn all LEDs off
-        my_stick.LED_off()
+        my_stick.led_off()
         # Turn on LED #4, red
-        my_stick.set_single_LED_color(4, 255, 0, 0)
-        time.sleep(1)
+        my_stick.set_single_led_color(4, 255, 0, 0)
+        qwiic_i2c.delay_ms(1000)
         # Turn all LEDs off
-        my_stick.LED_off()
+        my_stick.led_off()
         # Turn on LED #6, red
-        my_stick.set_single_LED_color(6, 255, 0, 0)
-        time.sleep(1)
+        my_stick.set_single_led_color(6, 255, 0, 0)
+        qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
     try:

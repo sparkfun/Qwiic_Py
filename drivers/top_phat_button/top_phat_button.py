@@ -45,9 +45,9 @@
 """
 top_phat_button
 ===============
-Python module for the[SparkFun Qwiic Joystick](https://www.sparkfun.com/products/15168)
+Python module for the buttons on the [SparkFun Top pHAT for Raspberry Pi](https://www.sparkfun.com/products/16301)
 
-This python package is a port of the existing [SparkFun Qwiic Joystick Arduino Library](https://github.com/sparkfun/SparkFun_Qwiic_Joystick_Arduino_Library)
+The firmware for the Top pHAT's button controller is in the [SparkFun Top pHAT repository](https://github.com/sparkfun/Top_pHat)
 
 This package can be used in conjunction with the overall [SparkFun qwiic Python Package](https://github.com/sparkfun/Qwiic_Py)
 
@@ -56,9 +56,9 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 """
 #-----------------------------------------------------------------------------
 
-from __future__ import print_function
-
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class instance.
@@ -73,7 +73,7 @@ _DEFAULT_NAME = "SparkFun Top pHAT Button"
 # device.
 _AVAILABLE_I2C_ADDRESS = [0x71]
 
-# Register codes for the Joystick
+# Register codes for the Top pHAT buttons
 BUTTON_ID               = 0x00
 BUTTON_VERSION1         = 0x01
 BUTTON_VERSION2         = 0x02
@@ -81,7 +81,7 @@ BUTTON_PRESSED          = 0x03
 BUTTON_CLICKED          = 0x04
 BUTTON_INTERRUPT        = 0x05
 BUTTON_DEBOUNCE         = 0x06
-BUTTON_CHANGE_ADDREESS  = 0x1F
+BUTTON_CHANGE_ADDRESS   = 0x1F
 
 # Define the bit positions of the buttons and interrupt flag
 A                     = 0
@@ -101,15 +101,14 @@ PRESSED_INTERRUPT_ENABLE        = 1
 # device is encapsulated by this class. The device class should be the only value exported
 # from this module.
 
-class ToppHATButton(object):
+class TopPHATButton(object):
     """
-    ToppHATButton
+    TopPHATButton
 
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
-        :return: The ToppHATButton device object.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
+        :return: The TopPHATButton device object.
         :rtype: Object
     """
     # Constructor
@@ -135,21 +134,16 @@ class ToppHATButton(object):
     clicked_event_available = 0
     
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = address if address is not None else self.available_addresses[0]
 
         
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ----------------------------------
     # is_connected()
@@ -158,15 +152,13 @@ class ToppHATButton(object):
 
     def is_connected(self):
         """
-            Determine if the Top pHAT Buttons are connected to the system..
+            Determine if the Top pHAT Buttons are connected to the system.
 
             :return: True if the device is connected, otherwise False.
             :rtype: bool
 
         """
-        return qwiic_i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return qwiic_i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -204,7 +196,7 @@ class ToppHATButton(object):
             :return: button status
             :rtype: integer
         """
-        temp = self._i2c.readByte(self.address, BUTTON_PRESSED)
+        temp = self._i2c.read_byte(self.address, BUTTON_PRESSED)
         self.a_pressed = (temp & (1 << A)) >> A 
         self.b_pressed = (temp & (1 << B)) >> B 
         self.up_pressed = (temp & (1 << UP)) >> UP 
@@ -215,8 +207,6 @@ class ToppHATButton(object):
         self.pressed_event_available = (temp & (1 << EVENT_AVAILABLE)) >>EVENT_AVAILABLE
         
         return temp
-
-    button_pressed = property(get_button_pressed)
     
     #----------------------------------------------------------------
     # get_button_clicked()
@@ -234,7 +224,7 @@ class ToppHATButton(object):
             :return: Clicked status of all buttons in a byte
             :rtype: integer
         """
-        temp = self._i2c.readByte(self.address, BUTTON_CLICKED)
+        temp = self._i2c.read_byte(self.address, BUTTON_CLICKED)
         self.a_clicked = temp & (1 << A)
         self.b_clicked = (temp & (1 << B)) >> B 
         self.up_clicked = (temp & (1 << UP)) >> UP 
@@ -244,8 +234,6 @@ class ToppHATButton(object):
         self.center_clicked = (temp & (1 << CENTER)) >> CENTER
         self.clicked_event_available = (temp & (1 << EVENT_AVAILABLE)) >> EVENT_AVAILABLE
         return temp
-
-    button_clicked = property(get_button_clicked)
     
     #----------------------------------------------------------------
     # get_version()
@@ -259,12 +247,10 @@ class ToppHATButton(object):
             :return: The firmware version
             :rtype: string
         """
-        vMajor = self._i2c.readByte(self.address, BUTTON_VERSION1)
-        vMinor = self._i2c.readByte(self.address, BUTTON_VERSION2)
+        v_major = self._i2c.read_byte(self.address, BUTTON_VERSION1)
+        v_minor = self._i2c.read_byte(self.address, BUTTON_VERSION2)
 
-        return "v %d.%d" % (vMajor, vMinor)
-
-    version = property(get_version)
+        return "v %d.%d" % (v_major, v_minor)
     
     #----------------------------------------------------------------
     # get__pressed_interrupt()
@@ -278,7 +264,7 @@ class ToppHATButton(object):
             :return: The pressed interrupt enable bit
             :rtype: bool
         """
-        interrupt = self._i2c.readByte(self.address, BUTTON_INTERRUPT)
+        interrupt = self._i2c.read_byte(self.address, BUTTON_INTERRUPT)
         interrupt = (interrupt & (1 << PRESSED_INTERRUPT_ENABLE)) >> PRESSED_INTERRUPT_ENABLE
                    
         return interrupt
@@ -296,13 +282,12 @@ class ToppHATButton(object):
             :return: The status of the I2C transaction
             :rtype: bool
         """
-        interrupt = self._i2c.readByte(self.address, BUTTON_INTERRUPT)
+        interrupt = self._i2c.read_byte(self.address, BUTTON_INTERRUPT)
         interrupt &= ~(1 << PRESSED_INTERRUPT_ENABLE) #Clear enable bit
         interrupt |= (bit_setting << PRESSED_INTERRUPT_ENABLE)
-                   
-        return self._i2c.writeWord(self.address, BUTTON_INTERRUPT, interrupt)
 
-    pressed_interrupt_enable = property(get_pressed_interrupt, set_pressed_interrupt)    
+        return self._i2c.write_word(self.address, BUTTON_INTERRUPT, interrupt)
+
     #----------------------------------------------------------------
     # get__clicked_interrupt()
     #
@@ -315,7 +300,7 @@ class ToppHATButton(object):
             :return: The clicked interrupt enable bit
             :rtype: bool
         """
-        interrupt = self._i2c.readByte(self.address, BUTTON_INTERRUPT)
+        interrupt = self._i2c.read_byte(self.address, BUTTON_INTERRUPT)
         interrupt = (interrupt & (1 << CLICKED_INTERRUPT_ENABLE)) >> CLICKED_INTERRUPT_ENABLE
                    
         return interrupt
@@ -333,10 +318,8 @@ class ToppHATButton(object):
             :return: The status of the I2C transaction
             :rtype: bool
         """
-        interrupt = self._i2c.readByte(self.address, BUTTON_INTERRUPT)
+        interrupt = self._i2c.read_byte(self.address, BUTTON_INTERRUPT)
         interrupt &= ~(1 << CLICKED_INTERRUPT_ENABLE) #Clear enable bit
         interrupt |= (bit_setting << CLICKED_INTERRUPT_ENABLE)
-                   
-        return self._i2c.writeWord(self.address, BUTTON_INTERRUPT, interrupt)
 
-    clicked_interrupt_enable = property(get_clicked_interrupt, set_clicked_interrupt)
+        return self._i2c.write_word(self.address, BUTTON_INTERRUPT, interrupt)

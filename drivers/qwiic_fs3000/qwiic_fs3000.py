@@ -45,6 +45,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -64,18 +66,19 @@ class QwiicFS3000(object):
     device_name         = _DEFAULT_NAME
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
-    kAirflowRange7Mps = 0 # FS3000-1005 has a range of 0-7.23 meters per second
-    kAirflowRange15Mps = 1 # FS3000-1015 has a range of 0-15 meters per second
+    AIRFLOW_RANGE_7_MPS = 0 # FS3000-1005 has a range of 0-7.23 meters per second
+    AIRFLOW_RANGE_15_MPS = 1 # FS3000-1015 has a range of 0-15 meters per second
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -83,16 +86,10 @@ class QwiicFS3000(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
-        self._range = self.kAirflowRange7Mps # defaults to FS3000-1005 range
+        self._range = self.AIRFLOW_RANGE_7_MPS # defaults to FS3000-1005 range
         self._mps_data_point = [0, 1.07, 2.01, 3.00, 3.97, 4.96, 5.98, 6.99, 7.23] # defaults to FS3000-1005 datapoints
         self._raw_data_point = [409, 915, 1522, 2066, 2523, 2908, 3256, 3572, 3686] # defaults to FS3000-1005 datapoints
 
@@ -103,9 +100,7 @@ class QwiicFS3000(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        return self._i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -123,25 +118,25 @@ class QwiicFS3000(object):
 
         Valid input arguments are:
         AIRFLOW_RANGE_7_MPS
-        AIRPLOW_RANGE_15_MPS
+        AIRFLOW_RANGE_15_MPS
 
         Note, this also sets the datapoints (from the graphs in the datasheet pages 6 and 7).
         These datapoints are used to convert from raw values to m/sec - and then mph.
 
-        @param int range: The range of the sensor
+        @param range: **int** The range of the sensor
 
         @return **bool** Returns `True` if successful, otherwise `False`
         """
 
-        if range == self.kAirflowRange7Mps:
+        if range == self.AIRFLOW_RANGE_7_MPS:
             self._mps_data_point = [0, 1.07, 2.01, 3.00, 3.97, 4.96, 5.98, 6.99, 7.23] # FS3000-1005 datapoints
             self._raw_data_point = [409, 915, 1522, 2066, 2523, 2908, 3256, 3572, 3686] # FS3000-1005 datapoints
-        elif range == self.kAirflowRange15Mps:
+        elif range == self.AIRFLOW_RANGE_15_MPS:
             self._mps_data_point = [0, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00, 11.00, 13.00, 15.00] # FS3000-1015 datapoints
             self._raw_data_point = [409, 1203, 1597, 1908, 2187, 2400, 2629, 2801, 3006, 3178, 3309, 3563, 3686] # FS3000-1015 datapoints
         else:
             return False
-        
+
         return True
         
     def checksum(self, data_in):
@@ -156,7 +151,7 @@ class QwiicFS3000(object):
         [3]generic checksum data
         [4]generic checksum data
 
-        @param list data_in: The data to check
+        @param data_in: **list** The data to check
 
         @return **bool** Returns `True` if successful, otherwise `False`
         """
@@ -178,7 +173,7 @@ class QwiicFS3000(object):
         @return **int** The raw value from the sensor (or -1 on error)
         """
 
-        buff = self._i2c.read_block(self.address, None, 5) # Pass None for the command, this is a read not from a specific register. Will only work with newer versions of Qwiic_I2c_Py
+        buff = self._i2c.read_block(self.address, None, 5) # None: a plain read, not from a register
 
         if not self.checksum(buff):
             return -1
@@ -249,9 +244,9 @@ class QwiicFS3000(object):
         mps_window_size = self._mps_data_point[data_position + 1] - self._mps_data_point[data_position]
 
         # add percentage of window_mps to mps
-        airflowMps = self._mps_data_point[data_position] + (percentage_of_window * mps_window_size)
+        airflow_mps = self._mps_data_point[data_position] + (percentage_of_window * mps_window_size)
 
-        return airflowMps
+        return airflow_mps
     
     def read_miles_per_hour(self):
         """!
@@ -260,12 +255,12 @@ class QwiicFS3000(object):
         @return **float** The air velocity value in miles per hour (or -1 on error)
         """
 
-        airflowMps = self.read_meters_per_second()
+        airflow_mps = self.read_meters_per_second()
 
-        if airflowMps == -1:
+        if airflow_mps == -1:
             return -1
 
         # convert m/s to mph
-        airflowMph = airflowMps * 2.2369362912
+        airflow_mph = airflow_mps * 2.2369362912
 
-        return airflowMph
+        return airflow_mph

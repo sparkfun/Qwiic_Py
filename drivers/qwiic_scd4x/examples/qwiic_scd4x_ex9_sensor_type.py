@@ -36,40 +36,39 @@
 
 import qwiic_scd4x
 import sys
-import time
 
-def runExample():
+def run_example():
 	print("\nQwiic SCD4x Example 9 - Sensor Type\n")
 
 	# Create instance of device
 	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
 	# Check if it's connected
-	if mySCD4x.is_connected() == False:
+	if not mySCD4x.is_connected():
 		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device (NOTE: we do not start periodic measurements and we poll and set device type)
-	if mySCD4x.begin(measBegin=False, pollAndSetDeviceType=True) == False:
+	if not mySCD4x.begin(meas_begin=False, poll_and_set_device_type=True):
 		print("Error while initializing device", file=sys.stderr)
 		return
 	
-	# Get the type of our sensor (NOTE: this is actually already done in the begin() function above since we set pollAndSetDeviceType=True)
+	# Get the type of our sensor (NOTE: this is actually already done in the begin() function above since we set poll_and_set_device_type=True)
 	# But it is useful to see how to call the below functions explicitly if you want to check sensor type after begin()
 	
 	mySCD4x.get_feature_set_version() # issues command to get feature set and stores the sensor type
 	sensor_type = mySCD4x.get_sensor_type() # returns the sensor type
 
-	if sensor_type == mySCD4x.kTypeSCD40:
+	if sensor_type == mySCD4x.TYPE_SCD40:
 		print("Sensor type is SCD40")
-	elif sensor_type == mySCD4x.kTypeSCD41:
+	elif sensor_type == mySCD4x.TYPE_SCD41:
 		print("Sensor type is SCD41")
 	else:
 		print("Unknown sensor type")
 
 if __name__ == '__main__':
 	try:
-		runExample()
+		run_example()
 	except (KeyboardInterrupt, SystemExit) as exErr:
 		print("\nEnding Example")
 		sys.exit(0)

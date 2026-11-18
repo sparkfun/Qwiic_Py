@@ -42,7 +42,7 @@
 # Example 9
 
 import qwiic_led_stick
-import time
+import qwiic_i2c
 import sys
 
 def run_example():
@@ -57,15 +57,15 @@ def run_example():
     print("\nLED Stick ready!")
     
     # First, turn all LEDs off
-    my_stick.LED_off()
+    my_stick.led_off()
     # Give stick time to turn all LEDs off
-    time.sleep(0.5)
+    qwiic_i2c.delay_ms(500)
     
     # Change LED length to 5
     # This will allow you to write to a maximum of 5 LEDs
     my_stick.change_length(5)
     # Set all LEDs to dim white, notice only 5 are lit.
-    my_stick.set_all_LED_color(10, 10, 10)
+    my_stick.set_all_led_color(10, 10, 10)
 
 if __name__ == '__main__':
     try:

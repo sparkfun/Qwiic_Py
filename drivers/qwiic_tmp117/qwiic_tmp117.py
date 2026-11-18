@@ -34,7 +34,7 @@
 #===============================================================================
 
 """!
-qwiic_template
+qwiic_tmp117
 ============
 Python module for the [SparkFun Qwiic TMP117 High Precision Temperature Sensor](https://www.sparkfun.com/products/15805)
 This is a port of the existing [Arduino Library](https://github.com/sparkfun/SparkFun_TMP117_Arduino_Library)
@@ -45,6 +45,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # The Qwiic_I2C_Py platform driver is designed to work on almost any Python
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -66,91 +68,92 @@ class QwiicTMP117(object):
     available_addresses = _AVAILABLE_I2C_ADDRESS
 
     # Register Addresses:
-    kRegTempResult = 0x00
-    kRegConfiguration = 0x01
-    kRegTHighLimit = 0x02
-    kRegTLowLimit = 0x03
-    kRegEepromUl = 0x04
-    kRegEeprom1 = 0x05
-    kRegEeprom2 = 0x06
-    kRegTempOffset = 0x07
-    kRegEeprom3 = 0x08
-    kRegDeviceId = 0x0F
+    REG_TEMP_RESULT = 0x00
+    REG_CONFIGURATION = 0x01
+    REG_T_HIGH_LIMIT = 0x02
+    REG_T_LOW_LIMIT = 0x03
+    REG_EEPROM_UL = 0x04
+    REG_EEPROM_1 = 0x05
+    REG_EEPROM_2 = 0x06
+    REG_TEMP_OFFSET = 0x07
+    REG_EEPROM_3 = 0x08
+    REG_DEVICE_ID = 0x0F
 
     # Configuration Register Masks and Shifts:
-    kConfigSoftResetShift = 1
-    kConfigSoftResetMask  = 0b1 << kConfigSoftResetShift
+    CONFIG_SOFT_RESET_SHIFT = 1
+    CONFIG_SOFT_RESET_MASK  = 0b1 << CONFIG_SOFT_RESET_SHIFT
 
-    kConfigDrAlertShift = 2
-    kConfigDrAlertMask = 0b1 << kConfigDrAlertShift
+    CONFIG_DR_ALERT_SHIFT = 2
+    CONFIG_DR_ALERT_MASK = 0b1 << CONFIG_DR_ALERT_SHIFT
 
-    kConfigPolShift = 3
-    kConfigPolMask = 0b1 << kConfigPolShift
+    CONFIG_POL_SHIFT = 3
+    CONFIG_POL_MASK = 0b1 << CONFIG_POL_SHIFT
 
-    kConfigTNaShift = 4
-    kConfigTNaMask = 0b1 << kConfigTNaShift
+    CONFIG_T_NA_SHIFT = 4
+    CONFIG_T_NA_MASK = 0b1 << CONFIG_T_NA_SHIFT
     
-    kConfigAvgShift = 5
-    kConfigAvgMask = 0b11 << kConfigAvgShift
+    CONFIG_AVG_SHIFT = 5
+    CONFIG_AVG_MASK = 0b11 << CONFIG_AVG_SHIFT
 
-    kConfigConvShift = 7
-    kConfigConvMask = 0b111 << kConfigConvShift
+    CONFIG_CONV_SHIFT = 7
+    CONFIG_CONV_MASK = 0b111 << CONFIG_CONV_SHIFT
 
-    kConfigModShift = 10
-    kConfigModMask = 0b11 << kConfigModShift
+    CONFIG_MOD_SHIFT = 10
+    CONFIG_MOD_MASK = 0b11 << CONFIG_MOD_SHIFT
 
-    kConfigEepromBusyShift = 12
-    kConfigEepromBusyMask = 0b1 << kConfigEepromBusyShift
+    CONFIG_EEPROM_BUSY_SHIFT = 12
+    CONFIG_EEPROM_BUSY_MASK = 0b1 << CONFIG_EEPROM_BUSY_SHIFT
 
-    kConfigDataReadyShift = 13
-    kConfigDataReadyMask = 0b1 << kConfigDataReadyShift
+    CONFIG_DATA_READY_SHIFT = 13
+    CONFIG_DATA_READY_MASK = 0b1 << CONFIG_DATA_READY_SHIFT
 
-    kConfigLowAlertShift = 14
-    kConfigLowAlertMask = 0b1 << kConfigLowAlertShift
+    CONFIG_LOW_ALERT_SHIFT = 14
+    CONFIG_LOW_ALERT_MASK = 0b1 << CONFIG_LOW_ALERT_SHIFT
 
-    kConfigHighAlertShift = 15
-    kConfigHighAlertMask = 0b1 << kConfigHighAlertShift
+    CONFIG_HIGH_ALERT_SHIFT = 15
+    CONFIG_HIGH_ALERT_MASK = 0b1 << CONFIG_HIGH_ALERT_SHIFT
     
     # Device ID Register Masks and Shifts:
-    kConfigDeviceIdShift = 0
-    kConfigDeviceIdMask = 0xFFF
+    CONFIG_DEVICE_ID_SHIFT = 0
+    CONFIG_DEVICE_ID_MASK = 0xFFF
 
-    kConfigRevShift = 12
-    kConfigRevMask = 0xF << kConfigRevShift
+    CONFIG_REV_SHIFT = 12
+    CONFIG_REV_MASK = 0xF << CONFIG_REV_SHIFT
 
     # Conversion Modes
-    kContinuousConversionMode = 0b00  # Continuous Conversion Mode
-    kOneShotMode = 0b11  # One Shot Conversion Mode
-    kShutdownMode = 0b01  # Shutdown Conversion Mode
+    CONTINUOUS_CONVERSION_MODE = 0b00  # Continuous Conversion Mode
+    ONE_SHOT_MODE = 0b11  # One Shot Conversion Mode
+    SHUTDOWN_MODE = 0b01  # Shutdown Conversion Mode
 
     # Therm/alert Modes
-    kThermMode = 1
-    kAlertMode = 0
+    THERM_MODE = 1
+    ALERT_MODE = 0
 
     # Conversion Averaging Modes
-    kConvAvgNone = 0b00  # No Averaging
-    kConvAvg8 = 0b01  # 8 Averaged Conversions
-    kConvAvg32 = 0b10  # 32 Averaged Conversions
-    kConvAvg64 = 0b11  # 64 Averaged Conversions
+    CONV_AVG_NONE = 0b00  # No Averaging
+    CONV_AVG_8 = 0b01  # 8 Averaged Conversions
+    CONV_AVG_32 = 0b10  # 32 Averaged Conversions
+    CONV_AVG_64 = 0b11  # 64 Averaged Conversions
 
     # Constants to index into the Return Value of get_high_low_alert()
-    kLowAlertIdx = 0
-    kHighAlertIdx = 1
+    LOW_ALERT_IDX = 0
+    HIGH_ALERT_IDX = 1
 
     # Misc Constants:
-    kDeviceIdValue = 0x0117  # Value found in the device ID register on reset (page 24 Table 3 of datasheet)
-    kTmp117Resolution = 0.0078125  # Resolution of the device, found on (page 1 of datasheet)
+    DEVICE_ID_VALUE = 0x0117  # Value found in the device ID register on reset (page 24 Table 3 of datasheet)
+    TMP117_RESOLUTION = 0.0078125  # Resolution of the device, found on (page 1 of datasheet)
 
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -158,14 +161,8 @@ class QwiicTMP117(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     def is_connected(self):
         """!
@@ -175,15 +172,13 @@ class QwiicTMP117(object):
         """
         # Check if connected by seeing if an ACK is received
 
-        if not self._i2c.isDeviceConnected(self.address):
+        if not self._i2c.is_device_connected(self.address):
             return False
 
         # Check the device has a product ID register
-        deviceId = self.read_register(self.kRegDeviceId)
+        device_id = self.read_register(self.REG_DEVICE_ID)
 
-        return deviceId == self.kDeviceIdValue
-
-    connected = property(is_connected)
+        return device_id == self.DEVICE_ID_VALUE
 
     def begin(self):
         """!
@@ -210,13 +205,13 @@ class QwiicTMP117(object):
 
         @return **float** The temperature in degrees celsius
         """
-        rawTemp = self.read_register(self.kRegTempResult)
+        raw_temp = self.read_register(self.REG_TEMP_RESULT)
         
         # Convert to signed 16-bit value
-        if rawTemp > 32767:
-            rawTemp -= 65536
+        if raw_temp > 32767:
+            raw_temp -= 65536
 
-        return rawTemp * self.kTmp117Resolution
+        return raw_temp * self.TMP117_RESOLUTION
     
     def read_temp_f(self):
         """!
@@ -233,24 +228,24 @@ class QwiicTMP117(object):
 
         @return **float** The temperature offset value
         """
-        offset = self.read_register(self.kRegTempOffset)
+        offset = self.read_register(self.REG_TEMP_OFFSET)
         
         # Convert to signed 16-bit value
         if offset > 32767:
             offset -= 65536
-        return offset * self.kTmp117Resolution
+        return offset * self.TMP117_RESOLUTION
 
     def set_temperature_offset(self, offset):
         """!
         This function sets the temperature offset value on the device
 
-        @param float offset: The offset value to set
+        @param offset: **float** The offset value to set
         """
         # Convert to 16-bit value
-        offset = int(offset / self.kTmp117Resolution)
+        offset = int(offset / self.TMP117_RESOLUTION)
         
         # Write the offset to the device
-        self.write_register(self.kRegTempOffset, offset)
+        self.write_register(self.REG_TEMP_OFFSET, offset)
 
     def get_low_limit(self):
         """!
@@ -258,24 +253,24 @@ class QwiicTMP117(object):
 
         @return **float** The low limit temperature in degrees celsius
         """
-        lowLimit = self.read_register(self.kRegTLowLimit)
+        low_limit = self.read_register(self.REG_T_LOW_LIMIT)
         
         # Convert to signed 16-bit value
-        if lowLimit > 32767:
-            lowLimit -= 65536
+        if low_limit > 32767:
+            low_limit -= 65536
 
-        return lowLimit * self.kTmp117Resolution
+        return low_limit * self.TMP117_RESOLUTION
     
-    def set_low_limit(self, lowLimit):
+    def set_low_limit(self, low_limit):
         """!
         This function allows the user to set the low limit register to whatever
         specified value, as long as in the range for the temperature sensor. This
         function can be used as a threshold for Therm mode and or Alert mode.
 
-        @param float lowLimit: The low limit temperature in degrees celsius
+        @param low_limit: **float** The low limit temperature in degrees celsius
         """
-        scaledLimit = int(lowLimit / self.kTmp117Resolution)
-        self.write_register(self.kRegTLowLimit, scaledLimit)
+        scaled_limit = int(low_limit / self.TMP117_RESOLUTION)
+        self.write_register(self.REG_T_LOW_LIMIT, scaled_limit)
 
     def get_high_limit(self):
         """!
@@ -283,24 +278,24 @@ class QwiicTMP117(object):
 
         @return **float** The high limit temperature in degrees celsius
         """
-        highLimit = self.read_register(self.kRegTHighLimit)
+        high_limit = self.read_register(self.REG_T_HIGH_LIMIT)
         
         # Convert to signed 16-bit value
-        if highLimit > 32767:
-            highLimit -= 65536
+        if high_limit > 32767:
+            high_limit -= 65536
 
-        return highLimit * self.kTmp117Resolution
+        return high_limit * self.TMP117_RESOLUTION
     
-    def set_high_limit(self, highLimit):
+    def set_high_limit(self, high_limit):
         """!
         This function allows the user to set the high limit register to whatever
 	    specified value, as long as in the range for the temperature sensor. This
 	    function can be used as a threshold for Therm mode and or Alert mode
 
-        @param float highLimit: The high limit temperature in degrees celsius
+        @param high_limit: **float** The high limit temperature in degrees celsius
         """
-        scaledLimit = int(highLimit / self.kTmp117Resolution)
-        self.write_register(self.kRegTHighLimit, scaledLimit)
+        scaled_limit = int(high_limit / self.TMP117_RESOLUTION)
+        self.write_register(self.REG_T_HIGH_LIMIT, scaled_limit)
 
     def get_configuration_register(self):
         """!
@@ -310,7 +305,7 @@ class QwiicTMP117(object):
 
         @return **int** The configuration register value
         """
-        return self.read_register(self.kRegConfiguration)
+        return self.read_register(self.REG_CONFIGURATION)
     
     def get_high_low_alert(self):
         """!
@@ -319,12 +314,12 @@ class QwiicTMP117(object):
 
         @return **list of bool** The high and low alert flags in a list [low, high]
 
-        Index into the list with the kLowAlertIdx and kHighAlertIdx constants
+        Index into the list with the LOW_ALERT_IDX and HIGH_ALERT_IDX constants
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        highAlert = ( (configReg & self.kConfigHighAlertMask) == self.kConfigHighAlertMask )
-        lowAlert = ( (configReg & self.kConfigLowAlertMask) == self.kConfigLowAlertMask )
-        return [lowAlert, highAlert]
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        high_alert = ( (config_reg & self.CONFIG_HIGH_ALERT_MASK) == self.CONFIG_HIGH_ALERT_MASK )
+        low_alert = ( (config_reg & self.CONFIG_LOW_ALERT_MASK) == self.CONFIG_LOW_ALERT_MASK )
+        return [low_alert, high_alert]
     
     def get_high_alert(self):
         """!
@@ -334,8 +329,8 @@ class QwiicTMP117(object):
 
         @return **bool** `True` if the high alert flag is set, otherwise `False`
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        return ( (configReg & self.kConfigHighAlertMask) == self.kConfigHighAlertMask )
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        return ( (config_reg & self.CONFIG_HIGH_ALERT_MASK) == self.CONFIG_HIGH_ALERT_MASK )
 
     def get_low_alert(self):
         """!
@@ -345,33 +340,33 @@ class QwiicTMP117(object):
 
         @return **bool** `True` if the low alert flag is set, otherwise `False`
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        return ( (configReg & self.kConfigLowAlertMask) == self.kConfigLowAlertMask )
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        return ( (config_reg & self.CONFIG_LOW_ALERT_MASK) == self.CONFIG_LOW_ALERT_MASK )
     
-    def set_alert_function_mode(self, setAlertMode):
+    def set_alert_function_mode(self, set_alert_mode):
         """!
         This function sets the alert function mode to either "alert" or
         "therm" mode
 
-        @param bool setAlertMode: The alert mode to set
+        @param set_alert_mode: **bool** The alert mode to set
 
-        Allowable setAlertMode values are:
-            kThermMode
-            kAlertMode
+        Allowable set_alert_mode values are:
+            THERM_MODE
+            ALERT_MODE
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if setAlertMode not in [self.kThermMode, self.kAlertMode]:
+        if set_alert_mode not in [self.THERM_MODE, self.ALERT_MODE]:
             return False
 
-        configReg = self.read_register(self.kRegConfiguration)
+        config_reg = self.read_register(self.REG_CONFIGURATION)
 
-        if setAlertMode == self.kThermMode:
-            configReg |= self.kConfigTNaMask
+        if set_alert_mode == self.THERM_MODE:
+            config_reg |= self.CONFIG_T_NA_MASK
         else:
-            configReg &= ~self.kConfigTNaMask
+            config_reg &= ~self.CONFIG_T_NA_MASK
 
-        self.write_register(self.kRegConfiguration, configReg)
+        self.write_register(self.REG_CONFIGURATION, config_reg)
 
         return True
 
@@ -383,20 +378,20 @@ class QwiicTMP117(object):
         @return **int** The alert mode
 
         Allowable return values are:
-            kThermMode
-            kAlertMode
+            THERM_MODE
+            ALERT_MODE
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        return (configReg & self.kConfigTNaMask) >> self.kConfigTNaShift
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        return (config_reg & self.CONFIG_T_NA_MASK) >> self.CONFIG_T_NA_SHIFT
     
     def soft_reset(self):
         """!
         This function performs a software reset, loading all the default
 	    values into the configuration register
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        configReg |= self.kConfigSoftResetMask
-        self.write_register(self.kRegConfiguration, configReg)
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        config_reg |= self.CONFIG_SOFT_RESET_MASK
+        self.write_register(self.REG_CONFIGURATION, config_reg)
 
     # TODO: could combine all of the below functions into one function that takes a mode parameter, 
     # but since Arduino library has them separate, kept them separate for now
@@ -405,11 +400,11 @@ class QwiicTMP117(object):
         This function sets the conversion mode of the sensor to be 
         continuous. The TMP117 defaults to Continuous Conversion Mode on reset.
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        configReg &= ~self.kConfigModMask
-        configReg |= (self.kContinuousConversionMode << self.kConfigModShift)
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        config_reg &= ~self.CONFIG_MOD_MASK
+        config_reg |= (self.CONTINUOUS_CONVERSION_MODE << self.CONFIG_MOD_SHIFT)
 
-        self.write_register(self.kRegConfiguration, configReg)
+        self.write_register(self.REG_CONFIGURATION, config_reg)
     
     def set_shutdown_mode(self):
         """!
@@ -417,11 +412,11 @@ class QwiicTMP117(object):
 	    in shutdown mode. The TMP117 defaults to Continuous Conversion Mode 
 	    on reset.
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        configReg &= ~self.kConfigModMask
-        configReg |= (self.kShutdownMode << self.kConfigModShift)
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        config_reg &= ~self.CONFIG_MOD_MASK
+        config_reg |= (self.SHUTDOWN_MODE << self.CONFIG_MOD_SHIFT)
 
-        self.write_register(self.kRegConfiguration, configReg)
+        self.write_register(self.REG_CONFIGURATION, config_reg)
 
     def set_one_shot_mode(self):
         """!
@@ -429,11 +424,11 @@ class QwiicTMP117(object):
         in one shot mode. The TMP117 defaults to Continuous Conversion Mode
         on reset.
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        configReg &= ~self.kConfigModMask
-        configReg |= (self.kOneShotMode << self.kConfigModShift)
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        config_reg &= ~self.CONFIG_MOD_MASK
+        config_reg |= (self.ONE_SHOT_MODE << self.CONFIG_MOD_SHIFT)
 
-        self.write_register(self.kRegConfiguration, configReg)
+        self.write_register(self.REG_CONFIGURATION, config_reg)
 
     def get_conversion_mode(self):
         """!
@@ -442,36 +437,36 @@ class QwiicTMP117(object):
         @return **int** The conversion mode
 
         Allowable return values are:
-            kContinuousConversionMode
-            kOneShotMode
-            kShutdownMode
+            CONTINUOUS_CONVERSION_MODE
+            ONE_SHOT_MODE
+            SHUTDOWN_MODE
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        return (configReg & self.kConfigModMask) >> self.kConfigModShift
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        return (config_reg & self.CONFIG_MOD_MASK) >> self.CONFIG_MOD_SHIFT
     
-    def set_conversion_average_mode(self, convMode):
+    def set_conversion_average_mode(self, conv_mode):
         """!
         This function sets the conversion averaging mode of the device
 	    when in Continuous Conversion Mode.
 
-        @param int convMode: The conversion averaging mode to set
+        @param conv_mode: **int** The conversion averaging mode to set
 
-        Allowable convMode values are:
-            kConvAvgNone
-            kConvAvg8
-            kConvAvg32
-            kConvAvg64
+        Allowable conv_mode values are:
+            CONV_AVG_NONE
+            CONV_AVG_8
+            CONV_AVG_32
+            CONV_AVG_64
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        if convMode not in [self.kConvAvgNone, self.kConvAvg8, self.kConvAvg32, self.kConvAvg64]:
+        if conv_mode not in [self.CONV_AVG_NONE, self.CONV_AVG_8, self.CONV_AVG_32, self.CONV_AVG_64]:
             return False
 
-        configReg = self.read_register(self.kRegConfiguration)
-        configReg &= ~self.kConfigAvgMask
-        configReg |= (convMode << self.kConfigAvgShift)
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        config_reg &= ~self.CONFIG_AVG_MASK
+        config_reg |= (conv_mode << self.CONFIG_AVG_SHIFT)
 
-        self.write_register(self.kRegConfiguration, configReg)
+        self.write_register(self.REG_CONFIGURATION, config_reg)
 
         return True
 
@@ -482,13 +477,13 @@ class QwiicTMP117(object):
         @return **int** The conversion averaging mode
 
         Allowable return values are:
-            kConvAvgNone
-            kConvAvg8
-            kConvAvg32
-            kConvAvg64
+            CONV_AVG_NONE
+            CONV_AVG_8
+            CONV_AVG_32
+            CONV_AVG_64
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        return (configReg & self.kConfigAvgMask) >> self.kConfigAvgShift
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        return (config_reg & self.CONFIG_AVG_MASK) >> self.CONFIG_AVG_SHIFT
 
     def set_conversion_cycle_bit(self, conv):
         """!
@@ -509,7 +504,7 @@ class QwiicTMP117(object):
          6             8s      8s      8s       8s     
          7             16s     16s     16s      16s
 
-        @param int conv: The conversion cycle time bit to set
+        @param conv: **int** The conversion cycle time bit to set
 
         Allowable conv values are 0-7
 
@@ -518,11 +513,11 @@ class QwiicTMP117(object):
         if conv < 0 or conv > 7:
             return False
 
-        configReg = self.read_register(self.kRegConfiguration)
-        configReg &= ~self.kConfigConvMask
-        configReg |= (conv << self.kConfigConvShift)
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        config_reg &= ~self.CONFIG_CONV_MASK
+        config_reg |= (conv << self.CONFIG_CONV_SHIFT)
 
-        self.write_register(self.kRegConfiguration, configReg)
+        self.write_register(self.REG_CONFIGURATION, config_reg)
     
     def get_conversion_cycle_bit(self):
         """!
@@ -535,8 +530,8 @@ class QwiicTMP117(object):
 
         Allowable return values are 0-7
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        return (configReg & self.kConfigConvMask) >> self.kConfigConvShift
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        return (config_reg & self.CONFIG_CONV_MASK) >> self.CONFIG_CONV_SHIFT
 
     def data_ready(self):
         """!
@@ -545,14 +540,14 @@ class QwiicTMP117(object):
 
         @return **bool** `True` if the data is ready, otherwise `False`
         """
-        configReg = self.read_register(self.kRegConfiguration)
-        return ( (configReg & self.kConfigDataReadyMask) == self.kConfigDataReadyMask )
+        config_reg = self.read_register(self.REG_CONFIGURATION)
+        return ( (config_reg & self.CONFIG_DATA_READY_MASK) == self.CONFIG_DATA_READY_MASK )
 
     def read_register(self, register):
         """!
         Reads a register from the device
 
-        @param int register: The register to read
+        @param register: **int** The register to read
 
         @return **int** The 16-bit value read from the register
 
@@ -565,8 +560,8 @@ class QwiicTMP117(object):
         """!
         Writes a value to a register on the device
 
-        @param int register: The register to write to
-        @param int value: The 16-bit value to write to the register
+        @param register: **int** The register to write to
+        @param value: **int** The 16-bit value to write to the register
 
         Used because the device expects bytes as big-endian
         """

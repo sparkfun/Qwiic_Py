@@ -39,12 +39,12 @@
 # Example 4
 
 import qwiic_led_stick
-import time
+import qwiic_i2c
 import sys
 
 def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 3")
+    print("\nSparkFun Qwiic LED Stick Example 4")
     my_stick = qwiic_led_stick.QwiicLEDStick()
 
     if my_stick.begin() == False:
@@ -59,17 +59,17 @@ def run_example():
     blue_list = [0, 0, 0, 0, 170, 255, 255, 255, 170, 255]
 
     # Turn on the LED Stick according to the 3 arrays
-    my_stick.set_all_LED_unique_color(red_list, green_list, blue_list, 10)
+    my_stick.set_all_led_unique_color(red_list, green_list, blue_list, 10)
 
     while True:
 
         # This will step through each available brightness setting
         # Brightness values can be from 0 - 31
         for i in range(0, 32):
-            my_stick.set_all_LED_brightness(i)
+            my_stick.set_all_led_brightness(i)
 
             print("\nBrightness level: " + str(i))
-            time.sleep(1)
+            qwiic_i2c.delay_ms(1000)
 
 if __name__ == '__main__':
     try:

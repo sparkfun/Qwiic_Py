@@ -51,6 +51,8 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 
+__version__ = "3.0.0"
+
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
 # instance. This allows higher level logic to rapidly create a index of Qwiic
@@ -155,47 +157,48 @@ class QwiicLSM6DSO(object):
     SW_RESET_DEVICE = 0x01
 
     # Accelerometer full scale range values
-    FS_XL_2g = 0x00
-    FS_XL_16g = 0x01
-    FS_XL_4g = 0x02
-    FS_XL_8g = 0x03
+    FS_XL_2G = 0x00
+    FS_XL_16G = 0x01
+    FS_XL_4G = 0x02
+    FS_XL_8G = 0x03
     FS_XL_MASK = 0xF3
     FS_XL_POS = 2
 
     # Gyroscope full scale range values
-    FS_G_125dps   	= 0x01
-    FS_G_250dps 	= 0x00
-    FS_G_500dps 	= 0x02
-    FS_G_1000dps 	= 0x04
-    FS_G_2000dps 	= 0x06
+    FS_G_125DPS   	= 0x01
+    FS_G_250DPS 	= 0x00
+    FS_G_500DPS 	= 0x02
+    FS_G_1000DPS 	= 0x04
+    FS_G_2000DPS 	= 0x06
     FS_G_MASK       = 0xF1
     FS_G_POS        = 1
 
     # Accelerometer and gyroscope output data rate values
     ODR_DISABLE   = 0x00 
-    ODR_12_5Hz    = 0x01 # Low Power only
-    ODR_26Hz      = 0x02 # Low Power only
-    ODR_52Hz      = 0x03 # Low Power only 
-    ODR_104Hz     = 0x04 # Normal Mode
-    ODR_208Hz     = 0x05 # Normal Mode
-    ODR_416Hz     = 0x06 # High performance
-    ODR_833Hz     = 0x07 # High Performance 
-    ODR_1660Hz    = 0x08 # High Performance
-    ODR_3330Hz    = 0x09 # High Performance
-    ODR_6660Hz    = 0x0A # High Performance
-    ODR_1_6Hz     = 0x0B # Low Power only, and only accelerometer
+    ODR_12_5HZ    = 0x01 # Low Power only
+    ODR_26HZ      = 0x02 # Low Power only
+    ODR_52HZ      = 0x03 # Low Power only 
+    ODR_104HZ     = 0x04 # Normal Mode
+    ODR_208HZ     = 0x05 # Normal Mode
+    ODR_416HZ     = 0x06 # High performance
+    ODR_833HZ     = 0x07 # High Performance 
+    ODR_1660HZ    = 0x08 # High Performance
+    ODR_3330HZ    = 0x09 # High Performance
+    ODR_6660HZ    = 0x0A # High Performance
+    ODR_1_6HZ     = 0x0B # Low Power only, and only accelerometer
     ODR_MASK      = 0x0F
     ODR_POS       = 4
 
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
         """!
         Constructor
 
-        @param int, optional address: The I2C address to use for the device
+        @param address: **int, optional** The I2C address to use for the device
             If not provided, the default address is used
-        @param I2CDriver, optional i2c_driver: An existing i2c driver object
-            If not provided, a driver object is created
+        @param i2c_bus: **I2CBus, optional** A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         """
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
         if address in self.available_addresses:
@@ -203,14 +206,8 @@ class QwiicLSM6DSO(object):
         else:
             self.address = self.available_addresses[0]
 
-        # Load the I2C driver if one isn't provided
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
         # Initialize member variables by resetting them to their default values
         self.reset_member_variables()
@@ -222,14 +219,12 @@ class QwiicLSM6DSO(object):
         @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
-        if not self._i2c.isDeviceConnected(self.address):
+        if not self._i2c.is_device_connected(self.address):
             return False
         
         # Check the Who Am I register to see if it's correct
-        reg_val = self._i2c.readByte(self.address, self.WHO_AM_I_REG)
+        reg_val = self._i2c.read_byte(self.address, self.WHO_AM_I_REG)
         return reg_val == self.WHO_AM_I_VALUE
-
-    connected = property(is_connected)
 
     def begin(self):
         """!
@@ -250,8 +245,8 @@ class QwiicLSM6DSO(object):
         # Both the accelerometer and gyroscope are disabled by default, which is
         # controlled by the ODR value. Because the ranges both default to their
         # minimum values, we'll default the ODR to the minimum value as well.
-        self.set_accel_data_rate(self.ODR_12_5Hz)
-        self.set_gyro_data_rate(self.ODR_12_5Hz)
+        self.set_accel_data_rate(self.ODR_12_5HZ)
+        self.set_gyro_data_rate(self.ODR_12_5HZ)
 
         # Done!
         return True
@@ -269,7 +264,7 @@ class QwiicLSM6DSO(object):
         """!
         Resets the device to its default settings
         """
-        self._i2c.writeByte(self.address, self.CTRL3_C, self.SW_RESET_DEVICE)
+        self._i2c.write_byte(self.address, self.CTRL3_C, self.SW_RESET_DEVICE)
 
         # Also reset member variables to reflect change of device settings
         self.reset_member_variables()
@@ -279,12 +274,12 @@ class QwiicLSM6DSO(object):
         Sets whether data registers should only update after both the MSB and
         LSB registers have been read
 
-        @param bool enable: `True` to enable, `False` to disable
+        @param enable: **bool** `True` to enable, `False` to disable
         """
-        reg_val = self._i2c.readByte(self.address, self.CTRL3_C)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL3_C)
         reg_val &= 0xBF
         reg_val |= enable << 6
-        self._i2c.writeByte(self.address, self.CTRL3_C, reg_val)
+        self._i2c.write_byte(self.address, self.CTRL3_C, reg_val)
         
     def get_status_reg(self):
         """!
@@ -293,39 +288,39 @@ class QwiicLSM6DSO(object):
 
         @return **int** The status register value
         """
-        return self._i2c.readByte(self.address, self.STATUS_REG)
+        return self._i2c.read_byte(self.address, self.STATUS_REG)
         
     def set_accel_range(self, range):
         """!
         Sets the accelerometer full scale range. Can be 2g, 4g, 8g, or 16g
 
-        @param int range: The full scale range to set
+        @param range: **int** The full scale range to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Ensure provided range is valid
-        if range < self.FS_XL_2g or range > self.FS_XL_8g:
+        if range < self.FS_XL_2G or range > self.FS_XL_8G:
             return False
 
         # Get full scale value, can't have 16g with XL_FS_MODE == 1
         full_scale = self.get_accel_full_scale()
-        if full_scale == 1 and range == self.FS_XL_16g:
+        if full_scale == 1 and range == self.FS_XL_16G:
             return False
 
         # Get current register value, set new range, write new register value
-        reg_val = self._i2c.readByte(self.address, self.CTRL1_XL)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL1_XL)
         reg_val &= self.FS_XL_MASK
         reg_val |= range << self.FS_XL_POS
-        self._i2c.writeByte(self.address, self.CTRL1_XL, reg_val)
+        self._i2c.write_byte(self.address, self.CTRL1_XL, reg_val)
 
         # Compute raw to G conversion value
-        if range == self.FS_XL_2g:
+        if range == self.FS_XL_2G:
             self.accel_raw_to_g = 0.000061
-        elif range == self.FS_XL_4g:
+        elif range == self.FS_XL_4G:
             self.accel_raw_to_g = 0.000122
-        elif range == self.FS_XL_8g:
+        elif range == self.FS_XL_8G:
             self.accel_raw_to_g = 0.000244
-        elif range == self.FS_XL_16g:
+        elif range == self.FS_XL_16G:
             self.accel_raw_to_g = 0.000488
 
         # Done!
@@ -338,7 +333,7 @@ class QwiicLSM6DSO(object):
         @return **int** The range register's raw value
         """
         # Get current register value and extract range
-        reg_val = self._i2c.readByte(self.address, self.CTRL1_XL)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL1_XL)
         return (reg_val & (0xFF ^ self.FS_XL_MASK)) >> self.FS_XL_POS
 
     def get_accel_range_g(self):
@@ -352,15 +347,15 @@ class QwiicLSM6DSO(object):
 
         # If XL_FS_MODE == 1 and range is 0x01 (16g), the range is actually 2g
         full_scale = self.get_accel_full_scale()
-        if full_scale == 1 and range == self.FS_XL_16g:
-            range = self.FS_XL_2g
+        if full_scale == 1 and range == self.FS_XL_16G:
+            range = self.FS_XL_2G
 
         # Determine G value based on raw range
-        if range == self.FS_XL_2g:
+        if range == self.FS_XL_2G:
             return 2
-        elif range == self.FS_XL_4g:
+        elif range == self.FS_XL_4G:
             return 4
-        elif range == self.FS_XL_8g:
+        elif range == self.FS_XL_8G:
             return 8
         return 16
 
@@ -369,24 +364,24 @@ class QwiicLSM6DSO(object):
         Sets the accelerometer output data rate. Can be 1.6Hz, 12.5Hz, 26Hz,
         52Hz, 104Hz, 208Hz, 416Hz, 833Hz, 1660Hz, 3330Hz, 6660Hz, or DISABLE
 
-        @param int rate: The output data rate to set
+        @param rate: **int** The output data rate to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Ensure provided rate is valid
-        if rate < self.ODR_DISABLE or rate > self.ODR_1_6Hz:
+        if rate < self.ODR_DISABLE or rate > self.ODR_1_6HZ:
             return False
 
         # Get high performance value, can't have 1.6Hz with HP mode enabled
         high_perf = self.get_accel_high_perf()
-        if high_perf == 1 and rate == self.ODR_1_6Hz:
+        if high_perf == 1 and rate == self.ODR_1_6HZ:
             return False
 
         # Get current register value, set new rate, write new register value
-        reg_val = self._i2c.readByte(self.address, self.CTRL1_XL)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL1_XL)
         reg_val &= self.ODR_MASK
         reg_val |= rate << self.ODR_POS
-        self._i2c.writeByte(self.address, self.CTRL1_XL, reg_val)
+        self._i2c.write_byte(self.address, self.CTRL1_XL, reg_val)
 
         # Done!
         return True
@@ -398,7 +393,7 @@ class QwiicLSM6DSO(object):
         @return **int** The accelerometer output data rate register's raw value
         """
         # Get current register value and extract range
-        reg_val = self._i2c.readByte(self.address, self.CTRL1_XL)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL1_XL)
         return (reg_val & (0xFF ^ self.ODR_MASK)) >> self.ODR_POS
 
     def get_accel_data_rate_odr(self):
@@ -412,31 +407,31 @@ class QwiicLSM6DSO(object):
 
         # If HP mode is enabled and rate is 0x0B (1.6Hz), the rate is 12.5Hz
         high_perf = self.get_accel_high_perf()
-        if high_perf == 1 and rate == self.ODR_1_6Hz:
-            rate = self.ODR_12_5Hz
+        if high_perf == 1 and rate == self.ODR_1_6HZ:
+            rate = self.ODR_12_5HZ
 
         # Determine ODR value based on raw rate
         if rate == self.ODR_DISABLE:
             return 0
-        elif rate == self.ODR_1_6Hz:
+        elif rate == self.ODR_1_6HZ:
             return 1.6
-        elif rate == self.ODR_12_5Hz:
+        elif rate == self.ODR_12_5HZ:
             return 12.5
-        elif rate == self.ODR_26Hz:
+        elif rate == self.ODR_26HZ:
             return 26
-        elif rate == self.ODR_52Hz:
+        elif rate == self.ODR_52HZ:
             return 52
-        elif rate == self.ODR_104Hz:
+        elif rate == self.ODR_104HZ:
             return 104
-        elif rate == self.ODR_208Hz:
+        elif rate == self.ODR_208HZ:
             return 208
-        elif rate == self.ODR_416Hz:
+        elif rate == self.ODR_416HZ:
             return 416
-        elif rate == self.ODR_833Hz:
+        elif rate == self.ODR_833HZ:
             return 833
-        elif rate == self.ODR_1660Hz:
+        elif rate == self.ODR_1660HZ:
             return 1660
-        elif rate == self.ODR_3330Hz:
+        elif rate == self.ODR_3330HZ:
             return 3330
         return 6660
 
@@ -444,12 +439,12 @@ class QwiicLSM6DSO(object):
         """!
         Sets the accelerometer full scale mode
 
-        @param bool enable: `True` to enable, `False` to disable
+        @param enable: **bool** `True` to enable, `False` to disable
         """
-        reg_val = self._i2c.readByte(self.address, self.CTRL8_XL)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL8_XL)
         reg_val &= 0xFD
         reg_val |= enable << 1
-        self._i2c.writeByte(self.address, self.CTRL8_XL, reg_val)
+        self._i2c.write_byte(self.address, self.CTRL8_XL, reg_val)
 
     def get_accel_full_scale(self):
         """!
@@ -457,19 +452,19 @@ class QwiicLSM6DSO(object):
 
         @return **int** The accelerometer full scale mode
         """
-        reg_val = self._i2c.readByte(self.address, self.CTRL8_XL)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL8_XL)
         return (reg_val & 0x02) >> 1
 
     def set_accel_high_perf(self, enable):
         """!
         Sets the accelerometer high performance mode
 
-        @param bool enable: `True` to enable, `False` to disable
+        @param enable: **bool** `True` to enable, `False` to disable
         """
-        reg_val = self._i2c.readByte(self.address, self.CTRL6_C)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL6_C)
         reg_val &= 0xEF
         reg_val |= enable << 4
-        self._i2c.writeByte(self.address, self.CTRL6_C, reg_val)
+        self._i2c.write_byte(self.address, self.CTRL6_C, reg_val)
 
     def get_accel_high_perf(self):
         """!
@@ -477,7 +472,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The accelerometer high performance mode
         """
-        reg_val = self._i2c.readByte(self.address, self.CTRL6_C)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL6_C)
         return (reg_val & 0x10) >> 4
 
     def set_gyro_range(self, range):
@@ -485,30 +480,30 @@ class QwiicLSM6DSO(object):
         Sets the gyroscope full scale range. Can be 125dps, 250dps, 500dps,
         1000dps, or 2000dps
 
-        @param int range: The full scale range to set
+        @param range: **int** The full scale range to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Ensure provided range is valid
-        if range < self.FS_G_250dps or range > self.FS_G_2000dps:
+        if range < self.FS_G_250DPS or range > self.FS_G_2000DPS:
             return False
 
         # Get current register value, set new range, write new register value
-        reg_val = self._i2c.readByte(self.address, self.CTRL2_G)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL2_G)
         reg_val &= self.FS_G_MASK
         reg_val |= range << self.FS_G_POS
-        self._i2c.writeByte(self.address, self.CTRL2_G, reg_val)
+        self._i2c.write_byte(self.address, self.CTRL2_G, reg_val)
 
         # Compute raw to DPS conversion value
-        if range == self.FS_G_125dps:
+        if range == self.FS_G_125DPS:
             self.gyro_raw_to_dps = .004375
-        elif range == self.FS_G_250dps:
+        elif range == self.FS_G_250DPS:
             self.gyro_raw_to_dps = .00875
-        elif range == self.FS_G_500dps:
+        elif range == self.FS_G_500DPS:
             self.gyro_raw_to_dps = .0175
-        elif range == self.FS_G_1000dps:
+        elif range == self.FS_G_1000DPS:
             self.gyro_raw_to_dps = .035
-        elif range == self.FS_G_2000dps:
+        elif range == self.FS_G_2000DPS:
             self.gyro_raw_to_dps = .070
 
         # Done!
@@ -521,7 +516,7 @@ class QwiicLSM6DSO(object):
         @return **int** The range register's raw value
         """
         # Get current register value and extract range
-        reg_val = self._i2c.readByte(self.address, self.CTRL2_G)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL2_G)
         return (reg_val & (0xFF ^ self.FS_G_MASK)) >> self.FS_G_POS
 
     def get_gyro_range_dps(self):
@@ -534,13 +529,13 @@ class QwiicLSM6DSO(object):
         range = self.get_gyro_range_raw()
 
         # Determine dps value based on raw range
-        if range == self.FS_G_125dps:
+        if range == self.FS_G_125DPS:
             return 125
-        elif range == self.FS_G_250dps:
+        elif range == self.FS_G_250DPS:
             return 250
-        elif range == self.FS_G_500dps:
+        elif range == self.FS_G_500DPS:
             return 500
-        elif range == self.FS_G_1000dps:
+        elif range == self.FS_G_1000DPS:
             return 1000
         return 2000
 
@@ -549,19 +544,19 @@ class QwiicLSM6DSO(object):
         Sets the gyroscope output data rate. Can be 12.5Hz, 26Hz, 52Hz, 104Hz,
         208Hz, 416Hz, 833Hz, 1660Hz, 3330Hz, or 6660Hz
 
-        @param float rate: The output data rate to set
+        @param rate: **float** The output data rate to set
 
         @return **bool** `True` if successful, otherwise `False`
         """
         # Ensure provided rate is valid
-        if rate < self.ODR_DISABLE or rate > self.ODR_6660Hz:
+        if rate < self.ODR_DISABLE or rate > self.ODR_6660HZ:
             return False
 
         # Get current register value, set new rate, write new register value
-        reg_val = self._i2c.readByte(self.address, self.CTRL2_G)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL2_G)
         reg_val &= self.ODR_MASK
         reg_val |= rate << self.ODR_POS
-        self._i2c.writeByte(self.address, self.CTRL2_G, reg_val)
+        self._i2c.write_byte(self.address, self.CTRL2_G, reg_val)
 
         # Done!
         return True
@@ -573,7 +568,7 @@ class QwiicLSM6DSO(object):
         @return **int** The gyroscope output data rate register's raw value
         """
         # Get current register value and extract range
-        reg_val = self._i2c.readByte(self.address, self.CTRL2_G)
+        reg_val = self._i2c.read_byte(self.address, self.CTRL2_G)
         return (reg_val & (0xFF ^ self.ODR_MASK)) >> self.ODR_POS
 
     def get_gyro_data_rate_odr(self):
@@ -588,23 +583,23 @@ class QwiicLSM6DSO(object):
         # Determine ODR value based on raw rate
         if rate == self.ODR_DISABLE:
             return 0
-        elif rate == self.ODR_12_5Hz:
+        elif rate == self.ODR_12_5HZ:
             return 12.5
-        elif rate == self.ODR_26Hz:
+        elif rate == self.ODR_26HZ:
             return 26
-        elif rate == self.ODR_52Hz:
+        elif rate == self.ODR_52HZ:
             return 52
-        elif rate == self.ODR_104Hz:
+        elif rate == self.ODR_104HZ:
             return 104
-        elif rate == self.ODR_208Hz:
+        elif rate == self.ODR_208HZ:
             return 208
-        elif rate == self.ODR_416Hz:
+        elif rate == self.ODR_416HZ:
             return 416
-        elif rate == self.ODR_833Hz:
+        elif rate == self.ODR_833HZ:
             return 833
-        elif rate == self.ODR_1660Hz:
+        elif rate == self.ODR_1660HZ:
             return 1660
-        elif rate == self.ODR_3330Hz:
+        elif rate == self.ODR_3330HZ:
             return 3330
         return 6660
 
@@ -614,7 +609,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The raw accelerometer X axis value
         """
-        return self._i2c.readWord(self.address, self.OUTX_L_A)
+        return self._i2c.read_word(self.address, self.OUTX_L_A)
 
     def read_float_accel_x(self):
         """!
@@ -630,7 +625,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The raw accelerometer Y axis value
         """
-        return self._i2c.readWord(self.address, self.OUTY_L_A)
+        return self._i2c.read_word(self.address, self.OUTY_L_A)
 
     def read_float_accel_y(self):
         """!
@@ -646,7 +641,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The raw accelerometer Z axis value
         """
-        return self._i2c.readWord(self.address, self.OUTZ_L_A)
+        return self._i2c.read_word(self.address, self.OUTZ_L_A)
 
     def read_float_accel_z(self):
         """!
@@ -662,7 +657,7 @@ class QwiicLSM6DSO(object):
 
         @return **list** The raw accelerometer X, Y, and Z axis values
         """
-        return self._i2c.readBlock(self.address, self.OUTX_L_A, 6)
+        return self._i2c.read_block(self.address, self.OUTX_L_A, 6)
 
     def read_float_accel_all(self):
         """!
@@ -671,16 +666,16 @@ class QwiicLSM6DSO(object):
         @return **tuple** The accelerometer X, Y, and Z axis values in G
         """
         raw = self.read_raw_accel_all()
-        outputX = self.calc_accel(raw[0] | (raw[1] << 8))
-        outputY = self.calc_accel(raw[2] | (raw[3] << 8))
-        outputZ = self.calc_accel(raw[4] | (raw[5] << 8))
-        return outputX, outputY, outputZ
+        output_x = self.calc_accel(raw[0] | (raw[1] << 8))
+        output_y = self.calc_accel(raw[2] | (raw[3] << 8))
+        output_z = self.calc_accel(raw[4] | (raw[5] << 8))
+        return output_x, output_y, output_z
 
     def calc_accel(self, input):
         """!
         Calculates the acceleration in G based on the raw input value
 
-        @param int input: The raw input value
+        @param input: **int** The raw input value
 
         @return **float** The acceleration in G
         """
@@ -695,7 +690,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The raw gyroscope X axis value
         """
-        return self._i2c.readWord(self.address, self.OUTX_L_G)
+        return self._i2c.read_word(self.address, self.OUTX_L_G)
 
     def read_float_gyro_x(self):
         """!
@@ -711,7 +706,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The raw gyroscope Y axis value
         """
-        return self._i2c.readWord(self.address, self.OUTY_L_G)
+        return self._i2c.read_word(self.address, self.OUTY_L_G)
 
     def read_float_gyro_y(self):
         """!
@@ -727,7 +722,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The raw gyroscope Z axis value
         """
-        return self._i2c.readWord(self.address, self.OUTZ_L_G)
+        return self._i2c.read_word(self.address, self.OUTZ_L_G)
 
     def read_float_gyro_z(self):
         """!
@@ -743,7 +738,7 @@ class QwiicLSM6DSO(object):
 
         @return **list** The raw gyroscope X, Y, and Z axis values
         """
-        return self._i2c.readBlock(self.address, self.OUTX_L_G, 6)
+        return self._i2c.read_block(self.address, self.OUTX_L_G, 6)
 
     def read_float_gyro_all(self):
         """!
@@ -752,17 +747,17 @@ class QwiicLSM6DSO(object):
         @return **tuple** The gyroscope X, Y, and Z axis values in degrees per second
         """
         raw = self.read_raw_gyro_all()
-        outputX = self.calc_gyro(raw[0] | (raw[1] << 8))
-        outputY = self.calc_gyro(raw[2] | (raw[3] << 8))
-        outputZ = self.calc_gyro(raw[4] | (raw[5] << 8))
-        return outputX, outputY, outputZ
+        output_x = self.calc_gyro(raw[0] | (raw[1] << 8))
+        output_y = self.calc_gyro(raw[2] | (raw[3] << 8))
+        output_z = self.calc_gyro(raw[4] | (raw[5] << 8))
+        return output_x, output_y, output_z
 
     def calc_gyro(self, input):
         """!
         Calculates the angular velocity in degrees per second based on the raw
         input value
 
-        @param int input: The raw input value
+        @param input: **int** The raw input value
 
         @return **float** The angular velocity in degrees per second
         """
@@ -777,7 +772,7 @@ class QwiicLSM6DSO(object):
 
         @return **list** The raw accelerometer and gyroscope X, Y, and Z axis values
         """
-        return self._i2c.readBlock(self.address, self.OUTX_L_G, 12)
+        return self._i2c.read_block(self.address, self.OUTX_L_G, 12)
 
     def read_float_accel_gyro_all(self):
         """!
@@ -788,13 +783,13 @@ class QwiicLSM6DSO(object):
             and degrees per second
         """
         raw = self.read_raw_accel_gyro_all()
-        gyrX = self.calc_gyro(raw[0] | (raw[1] << 8))
-        gyrY = self.calc_gyro(raw[2] | (raw[3] << 8))
-        gyrZ = self.calc_gyro(raw[4] | (raw[5] << 8))
-        accX = self.calc_accel(raw[6] | (raw[7] << 8))
-        accY = self.calc_accel(raw[8] | (raw[9] << 8))
-        accZ = self.calc_accel(raw[10] | (raw[11] << 8))
-        return accX, accY, accZ, gyrX, gyrY, gyrZ
+        gyr_x = self.calc_gyro(raw[0] | (raw[1] << 8))
+        gyr_y = self.calc_gyro(raw[2] | (raw[3] << 8))
+        gyr_z = self.calc_gyro(raw[4] | (raw[5] << 8))
+        acc_x = self.calc_accel(raw[6] | (raw[7] << 8))
+        acc_y = self.calc_accel(raw[8] | (raw[9] << 8))
+        acc_z = self.calc_accel(raw[10] | (raw[11] << 8))
+        return acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z
 
     def read_raw_temp(self):
         """!
@@ -802,7 +797,7 @@ class QwiicLSM6DSO(object):
 
         @return **int** The raw temperature value
         """
-        return self._i2c.readWord(self.address, self.OUT_TEMP_L)
+        return self._i2c.read_word(self.address, self.OUT_TEMP_L)
 
     def read_temp_c(self):
         """!

@@ -39,9 +39,8 @@
 #=======================================================================
 # Example 5
 
-from __future__ import print_function
 import qwiic_eeprom
-import time
+import qwiic_i2c
 import sys
 import random
 
@@ -50,7 +49,7 @@ def run_example():
     print("\nSparkFun Qwiic EEPROM, Example 5\n")
     my_eeprom = qwiic_eeprom.QwiicEEPROM()
 
-    if my_eeprom.begin() != True:
+    if not my_eeprom.begin():
         print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
@@ -68,10 +67,10 @@ def run_example():
     # Erase test
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     print("\nErasing EEPROM, please be patient!")
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     my_eeprom.erase()
-    end_time = time.time()
-    print("\nTime to erase all EEPROM: " + str(end_time  - start_time) + "s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to erase all EEPROM: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
     # Byte sequential test
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -81,21 +80,21 @@ def run_example():
     my_value2 = 23
     random_location = random.randrange(0, my_eeprom.length())
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     my_eeprom.write_byte(random_location, my_value1)   # (location, data)
-    end_time = time.time()
+    end_time = qwiic_i2c.ticks_ms()
     my_eeprom.write_byte(random_location + 1, my_value2)
-    print("\nTime to record byte: " + str(end_time - start_time) + " s")
+    print("\nTime to record byte: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     my_eeprom.write_byte(random_location, my_value1)    # (location, data)
-    end_time = time.time()
-    print("\nTime to write identical byte to same location (should be ~0s): " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to write identical byte to same location (should be ~0 ms): " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     response1 = my_eeprom.read_byte(random_location)
-    end_time = time.time()
-    print("\nTime to read byte: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to read byte: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
     response2 = my_eeprom.read_byte(random_location + 1)
     print("\nLocation " + str(random_location) + " should be " + str(my_value1) + ": " + str(response1))
@@ -115,16 +114,16 @@ def run_example():
     my_value4 = 400123
     random_location = random.randrange(0, my_eeprom.length())
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     my_eeprom.write_int(random_location, my_value3)
-    end_time = time.time()
-    print("\nTime to record int32: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to record int32: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
     my_eeprom.write_int(random_location + 4, my_value4)
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     response3 = my_eeprom.read_int(random_location)
-    end_time = time.time()
-    print("\nTime to read 32 bits: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to read 32 bits: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
     response4 = my_eeprom.read_int(random_location + 4)
     print("\nLocation " + str(random_location) + " should be " + str(my_value3) + ": " + str(response3))
@@ -144,10 +143,10 @@ def run_example():
     my_eeprom.write_int(random_location, my_value5)
     my_eeprom.write_int(random_location + 4, my_value6)
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     response5 = my_eeprom.read_int(random_location)
-    end_time = time.time()
-    print("\nTime to read 32 bits: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to read 32 bits: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
     response6 = my_eeprom.read_int(random_location + 4)
     print("\nLocation " + str(random_location) + " should be " + str(my_value5) + ": " + str(response5))
@@ -167,10 +166,10 @@ def run_example():
     my_eeprom.write_float(random_location, my_value7)
     my_eeprom.write_float(random_location + 4, my_value8)
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     response7 = my_eeprom.read_float(random_location)
-    end_time = time.time()
-    print("\nTime to read float: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to read float: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
     
     response8 = my_eeprom.read_float(random_location + 4)
     
@@ -195,15 +194,15 @@ def run_example():
     my_value9 = [0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]
     random_location = random.randrange(0, my_eeprom.length())
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     my_eeprom.write(random_location, my_value9)
-    end_time = time.time()
-    print("\nTime to record 64 bits: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to record 64 bits: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     response9 = my_eeprom.read(random_location, len(my_value9))
-    end_time = time.time()
-    print("\nTime to read 64 bits: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to read 64 bits: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
     print("\nLocation " + str(random_location) + " should be " + str(my_value9) + ": " + str(response9))
  
@@ -221,15 +220,15 @@ def run_example():
     est_time = len(my_chars) / my_eeprom.get_page_size() * my_eeprom.get_page_write_time()
     print("\nCalculated time to record array of " + str(len(my_chars)) + " characters: ~" + str(est_time) + " ms")
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     my_eeprom.write_string(random_location, my_chars)
-    end_time = time.time()
-    print("\nTime to record string: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to record string: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
-    start_time = time.time()
+    start_time = qwiic_i2c.ticks_ms()
     read_chars = my_eeprom.read_string(random_location, len(my_chars))
-    end_time = time.time()
-    print("\nTime to read string: " + str(end_time - start_time) + " s")
+    end_time = qwiic_i2c.ticks_ms()
+    print("\nTime to read string: " + str(qwiic_i2c.ticks_diff(end_time, start_time)) + " ms")
 
     print("\nLocation " + str(random_location) + " string should read:\n" + my_chars)
     print("\n" + read_chars)
@@ -248,5 +247,5 @@ if __name__ == '__main__':
     try:
         run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
+        print("\nEnding Example 5")
         sys.exit(0)

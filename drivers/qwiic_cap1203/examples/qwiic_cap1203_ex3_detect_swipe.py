@@ -36,30 +36,30 @@
 import qwiic_cap1203
 import sys
 
-def runExample():
+def run_example():
 	print("\nQwiic CAP1203 Example 3 - Detect Swipe\n")
 
 	# Create instance of device
-	myDevice = qwiic_cap1203.QwiicCAP1203()
+	my_device = qwiic_cap1203.QwiicCAP1203()
 
 	# Check if it's connected
-	if myDevice.is_connected() == False:
+	if my_device.is_connected() == False:
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
 	# Initialize the device
-	myDevice.begin()
+	my_device.begin()
 
 	while True:
-		if myDevice.is_right_swipe_pulled():
+		if my_device.is_right_swipe_pulled():
 			print("Right Swipe")
-		if myDevice.is_left_swipe_pulled():
+		if my_device.is_left_swipe_pulled():
 			print("Left Swipe")
 
 if __name__ == '__main__':
 	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
+		run_example()
+	except (KeyboardInterrupt, SystemExit):
 		print("\nEnding Example")
 		sys.exit(0)

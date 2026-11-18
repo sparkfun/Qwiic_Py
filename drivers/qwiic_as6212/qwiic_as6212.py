@@ -55,16 +55,16 @@ qwiic_as6212
 ============
 Python module for the [SparkFun Digital Temperature Sensor Breakout - AS6212 (Qwiic)](https://www.sparkfun.com/products/18521)
 
-This python package is a port of the existing [SparkFun Qwiic AS6212 Sensor Arduino Library](https://github.com/sparkfun/SparkFun_TMP102_Arduino_Library/tree/master/examples)
+This python package is a port of the existing [SparkFun AS6212 Qwiic Arduino Library](https://github.com/sparkfun/SparkFun_AS6212_Qwiic_Arduino_Library)
 
 This package can be used in conjunction with the overall [SparkFun qwiic Python Package](https://github.com/sparkfun/Qwiic_Py)
 
 New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 """
-from __future__ import print_function, division
-
 import qwiic_i2c
+
+__version__ = "3.0.0"
 
 #======================================================================
 # Basic setup of I2C commands and available I2C Addresses
@@ -118,14 +118,13 @@ _AVAILABLE_I2C_ADDRESS = [0x48, 0x44, 0x45, 0x46, 0x47, 0x49, 0x4A, 0x4B]
 # NOTE: The first address in this list is considered the default I2C address for the
 # device.
 
-class QwiicAs6212Sensor(object):
+class QwiicAS6212(object):
     """
-    QwiicAs6212Sensor
+    QwiicAS6212
 
         :param address: The I2C address to use for the device.
                         If not provided, the default address is used.
-        :param i2c_driver: An existing i2c driver object. If not provided
-                        a driver object is created.
+        :param i2c_bus: A qwiic_i2c bus or a native bus object. If not provided, the default bus is used.
         :return: The AS6212 Sensor device object.
         :rtype: Object
     """
@@ -144,21 +143,15 @@ class QwiicAs6212Sensor(object):
     AS6212_ALERT_ACTIVE_LOW = 0
 
     # Constructor
-    def __init__(self, address=None, i2c_driver=None):
+    def __init__(self, address=None, i2c_bus=None):
 
+        # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
+        address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Did the user specify an I2C address?
         self.address = self.available_addresses[0] if address is None else address
 
-        # load the I2C driver if one isn't provided
-
-        if i2c_driver is None:
-            self._i2c = qwiic_i2c.getI2CDriver()
-            if self._i2c is None:
-                print("Unable to load I2C driver for this platform.")
-                return
-        else:
-            self._i2c = i2c_driver
-
+        # Use the given I2C bus, or the platform's default bus
+        self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
     # ----------------------------------
     # is_connected()
@@ -167,13 +160,11 @@ class QwiicAs6212Sensor(object):
 
     def is_connected(self):
         """
-            Determine if a Soil MoistureSensor device is conntected to the system..
+            Determine if an AS6212 device is connected to the system.
             :return: True if the device is connected, otherwise False.
             :rtype: bool
         """        
-        return qwiic_i2c.isDeviceConnected(self.address)
-
-    connected = property(is_connected)
+        return qwiic_i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -181,14 +172,14 @@ class QwiicAs6212Sensor(object):
     # Initialize the system/validate the board.
     def begin(self):
         """
-            Initialize the operation of the Soil Moisture Sensor module
+            Initialize the operation of the AS6212 module
             :return: Returns true of the initialization was successful, otherwise False.
             :rtype: bool
         """
         # Set variables
-        self.tempC = 0
-        self.tempF = 0
-        
+        self.temp_c = 0
+        self.temp_f = 0
+
         # Basically return True if we are connected...
         return self.is_connected()
 
@@ -209,7 +200,7 @@ class QwiicAs6212Sensor(object):
         Combines them into a single 16 bit value
         Returns single value
         """
-        data = self._i2c.readBlock(self.address, register_to_read, 2)
+        data = self._i2c.read_block(self.address, register_to_read, 2)
 
         #Combine bytes to create a single signed int
         return ( (data[0] << 8 ) | data[1] )
@@ -218,37 +209,39 @@ class QwiicAs6212Sensor(object):
         data_bytes = [0,0]
         data_bytes[1] |= (data & 0xFF)
         data_bytes[0] |= data >> 8
-        self._i2c.writeBlock(self.address, reg, data_bytes)
+        self._i2c.write_block(self.address, reg, data_bytes)
 
     def read_config(self):
         return self.read_2_byte_register(CONFIG_REG)
 
-    def write_config(self, targetState):
-        self.write_register(CONFIG_REG, targetState)
+    def write_config(self, target_state):
+        self.write_register(CONFIG_REG, target_state)
         
     def read_temp_c(self):
         """
         Reads the results from the sensor
-        :rtype: integer
+        :return: The temperature in degrees Celsius
+        :rtype: float
         """
-        digitalTempC = self.read_2_byte_register(TVAL_REG)
-                
-        if (digitalTempC < 32768):
-                finalTempC = digitalTempC * 0.0078125
-        if (digitalTempC >= 32768):
-                finalTempC = ((digitalTempC - 1) * 0.0078125) * -1
+        digital_temp_c = self.read_2_byte_register(TVAL_REG)
 
-        self.tempC = finalTempC
-        return self.tempC
+        if (digital_temp_c < 32768):
+                final_temp_c = digital_temp_c * 0.0078125
+        if (digital_temp_c >= 32768):
+                final_temp_c = ((digital_temp_c - 1) * 0.0078125) * -1
+
+        self.temp_c = final_temp_c
+        return self.temp_c
         
     def read_temp_f(self):
         """
         Reads the results from the sensor
-        :rtype: integer
+        :return: The temperature in degrees Fahrenheit
+        :rtype: float
         """
 
-        self.tempF = self.read_temp_c() * 9.0 / 5.0 + 32.0
-        return self.tempF
+        self.temp_f = self.read_temp_c() * 9.0 / 5.0 + 32.0
+        return self.temp_f
 
     def set_alert_polarity(self, polarity):
         """
@@ -256,9 +249,9 @@ class QwiicAs6212Sensor(object):
         AS6212_ALERT_ACTIVE_HIGH (1)
         AS6212_ALERT_ACTIVE_LOW (0)
         """
-        configReg = self.read_config()
-        configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_ALERT_POL, polarity)        
-        self.write_config(configReg)
+        config_reg = self.read_config()
+        config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_ALERT_POL, polarity)        
+        self.write_config(config_reg)
         
     def get_alert_polarity(self):
         """
@@ -266,8 +259,8 @@ class QwiicAs6212Sensor(object):
         AS6212_ALERT_ACTIVE_HIGH (1)
         AS6212_ALERT_ACTIVE_LOW (0)
         """
-        configReg = self.read_config()
-        return self.bit_read(configReg, AS6212_CONFIG_BIT_ALERT_POL)            
+        config_reg = self.read_config()
+        return self.bit_read(config_reg, AS6212_CONFIG_BIT_ALERT_POL)            
 
     def set_interrupt_mode(self, mode):
         """
@@ -277,9 +270,9 @@ class QwiicAs6212Sensor(object):
         AS6212_MODE_COMPARATOR (0)
         AS6212_MODE_INTERRUPT (1)
         """
-        configReg = self.read_config()
-        configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_INTERRUPT_MODE, mode)        
-        self.write_config(configReg)
+        config_reg = self.read_config()
+        config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_INTERRUPT_MODE, mode)        
+        self.write_config(config_reg)
 
     def get_interrupt_mode(self):
         """
@@ -287,15 +280,15 @@ class QwiicAs6212Sensor(object):
         AS6212_MODE_COMPARATOR (0)
         AS6212_MODE_INTERRUPT (1)
         """
-        configReg = self.read_config()
-        return self.bit_read(configReg, AS6212_CONFIG_BIT_INTERRUPT_MODE)
+        config_reg = self.read_config()
+        return self.bit_read(config_reg, AS6212_CONFIG_BIT_INTERRUPT_MODE)
 
     def get_alert_status(self):
         """
         Get the status of the alert bit (0 or 1)
         """
-        configReg = self.read_config()
-        return self.bit_read(configReg, AS6212_CONFIG_BIT_ALERT)              
+        config_reg = self.read_config()
+        return self.bit_read(config_reg, AS6212_CONFIG_BIT_ALERT)              
 
     def set_consecutive_faults(self, faults):
         """
@@ -306,15 +299,15 @@ class QwiicAs6212Sensor(object):
 	    4 - 4 faults
         """
         if (faults > 4) or (faults < 1):
-            return NaN
+            return NaN  # noqa: F821
         faults = faults - 1 # consecutive faults value is stored in just 2 bits in the config reg,
         # so we must convert from "human readable" ints 1-4 to stored values (0-3).
-        configReg = self.read_config()
-        configBit_11 = self.bit_read(faults, 0)
-        configBit_12 = self.bit_read(faults, 1)
-        configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_0, configBit_11)
-        configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_1, configBit_12)
-        self.write_config(configReg)
+        config_reg = self.read_config()
+        config_bit_11 = self.bit_read(faults, 0)
+        config_bit_12 = self.bit_read(faults, 1)
+        config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_0, config_bit_11)
+        config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_1, config_bit_12)
+        self.write_config(config_reg)
 
     def get_consecutive_faults(self):
         """
@@ -322,9 +315,9 @@ class QwiicAs6212Sensor(object):
                 valid settings are 1,2,3 or 4 but this correspond to other bit values
                 in the configuration register bits 11 and 12
         """
-        configReg = self.read_config()
-        consecutive_faults_bit_0 = self.bit_read(configReg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_0)
-        consecutive_faults_bit_1 = self.bit_read(configReg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_1)
+        config_reg = self.read_config()
+        consecutive_faults_bit_0 = self.bit_read(config_reg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_0)
+        consecutive_faults_bit_1 = self.bit_read(config_reg, AS6212_CONFIG_BIT_CONSECUTIVE_FAULTS_1)
         faults = 0
         faults = self.bit_write(faults, 0, consecutive_faults_bit_0)
         faults = self.bit_write(faults, 1, consecutive_faults_bit_1)
@@ -344,32 +337,32 @@ class QwiicAs6212Sensor(object):
         """
         #discard out of range values
         if cycletime > 3 or cycletime < 0:
-            return nan
-        configReg = self.read_config()
-        configBit_6 = self.bit_read(cycletime, 0)
-        configBit_7 = self.bit_read(cycletime, 1)
-        configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_CONVERSION_RATE_0, configBit_6)
-        configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_CONVERSION_RATE_1, configBit_7)
-        self.write_config(configReg)
+            return nan  # noqa: F821
+        config_reg = self.read_config()
+        config_bit_6 = self.bit_read(cycletime, 0)
+        config_bit_7 = self.bit_read(cycletime, 1)
+        config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_CONVERSION_RATE_0, config_bit_6)
+        config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_CONVERSION_RATE_1, config_bit_7)
+        self.write_config(config_reg)
         
     def get_conversion_cycletime(self):
         """
                 Gets the conversion cycle time (aka conversion rate) in teh config reg
                 Returns the cycle time in milliseconds: (125/250/1000/4000)
         """
-        configReg = self.read_config()
-        conversion_rate_bit_0 = self.bit_read(configReg, AS6212_CONFIG_BIT_CONVERSION_RATE_0)
-        conversion_rate_bit_1 = self.bit_read(configReg, AS6212_CONFIG_BIT_CONVERSION_RATE_1)
+        config_reg = self.read_config()
+        conversion_rate_bit_0 = self.bit_read(config_reg, AS6212_CONFIG_BIT_CONVERSION_RATE_0)
+        conversion_rate_bit_1 = self.bit_read(config_reg, AS6212_CONFIG_BIT_CONVERSION_RATE_1)
         cycletime_val = 0
         cycletime_val = self.bit_write(cycletime_val, 0, conversion_rate_bit_0)
         cyceltime_val = self.bit_write(cycletime_val, 1, conversion_rate_bit_1)
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_125MS:
+        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_125MS:  # noqa: F821
             return 125
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_250MS:
+        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_250MS:  # noqa: F821
             return 250
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_1000MS:
+        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_1000MS:  # noqa: F821
             return 1000
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_4000MS:
+        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_4000MS:  # noqa: F821
             return 4000
       
     def set_sleep_mode(self, mode):
@@ -380,28 +373,28 @@ class QwiicAs6212Sensor(object):
                 0 = SLEEP MODE OFF
                 1 = SLEEP MODE ON
         """
-        configReg = self.read_config()
-        configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_SLEEP_MODE, mode)
+        config_reg = self.read_config()
+        config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_SLEEP_MODE, mode)
         if mode == 1: # as recommended in datasheet section 6.2.4
-            configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_SINGLE_SHOT, 1)
-        self.write_config(configReg)
+            config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_SINGLE_SHOT, 1)
+        self.write_config(config_reg)
 
     def get_sleep_mode(self):
         """
         gets the status of the sleep mode bit from the config register
         """
-        configReg = self.read_config()
-        return self.bit_read(configReg, AS6212_CONFIG_BIT_SLEEP_MODE)
+        config_reg = self.read_config()
+        return self.bit_read(config_reg, AS6212_CONFIG_BIT_SLEEP_MODE)
 
     def trigger_single_shot_conversion(self):
         """
                 Sets the SS mode bit in the config register
                 Note, you must be in sleep mode for this to work
         """
-        configReg = self.read_config()
-        if self.bit_read(configReg, AS6212_CONFIG_BIT_SLEEP_MODE) == 1:
-            configReg = self.bit_write(configReg, AS6212_CONFIG_BIT_SINGLE_SHOT, 1)
-            self.write_config(configReg)
+        config_reg = self.read_config()
+        if self.bit_read(config_reg, AS6212_CONFIG_BIT_SLEEP_MODE) == 1:
+            config_reg = self.bit_write(config_reg, AS6212_CONFIG_BIT_SINGLE_SHOT, 1)
+            self.write_config(config_reg)
 
     def get_single_shot_status(self):
         """
@@ -409,8 +402,8 @@ class QwiicAs6212Sensor(object):
         0 = No conversion ongoing / conversion finished
         1 = Start single shot conversion / conversion ongoing
         """
-        configReg = self.read_config()
-        return self.bit_read(configReg, AS6212_CONFIG_BIT_SINGLE_SHOT)
+        config_reg = self.read_config()
+        return self.bit_read(config_reg, AS6212_CONFIG_BIT_SINGLE_SHOT)
 
     def set_low_temp_c(self, temperature):
         """
@@ -460,12 +453,12 @@ class QwiicAs6212Sensor(object):
         """
         digital_temp = self.read_2_byte_register(TLOW_REG)
         if (digital_temp < 32768):
-                finalTempC = float(digital_temp) * 0.0078125
+                final_temp_c = float(digital_temp) * 0.0078125
         if (digital_temp >= 32768):
                 digital_temp = ~digital_temp
                 digital_temp &= 0xFFFF
-                finalTempC = (( digital_temp + 1 ) * 0.0078125) * -1
-        return finalTempC       
+                final_temp_c = (( digital_temp + 1 ) * 0.0078125) * -1
+        return final_temp_c       
          
     def read_high_temp_c(self):
         """
@@ -473,12 +466,12 @@ class QwiicAs6212Sensor(object):
         """
         digital_temp = self.read_2_byte_register(THIGH_REG)
         if (digital_temp < 32768):
-                finalTempC = digital_temp * 0.0078125
+                final_temp_c = digital_temp * 0.0078125
         if (digital_temp >= 32768):
                 digital_temp = ~digital_temp
                 digital_temp &= 0xFFFF
-                finalTempC = (( digital_temp + 1 ) * 0.0078125) * -1
-        return finalTempC  
+                final_temp_c = (( digital_temp + 1 ) * 0.0078125) * -1
+        return final_temp_c  
 
     def read_low_temp_f(self):
         """
@@ -508,22 +501,21 @@ class QwiicAs6212Sensor(object):
         if (bitvalue == 0):
             return self.bit_clear(value, bit)
     
-    def print_config_binary(self):
-        configReg = self.read_config()
-        print("\nConfig: ")
-        configBin = ""
-        for i in range(15, -1, -1):
-            configBin += str(self.bit_read(configReg, i))
-            if i == 8:
-                configBin += " "
-        print(configBin)
+    def get_config_binary(self):
+        """
+        Returns the configuration register as a binary string, MSB first,
+        with a space between the two bytes (for example "01000000 10100000")
+        """
+        return self.format_binary(self.read_config())
 
-    def print_binary(self, data):
-        configReg = self.read_config()
-        print("\ndata: ")
-        dataBin = ""
+    def format_binary(self, data):
+        """
+        Returns a 16-bit value as a binary string, MSB first,
+        with a space between the two bytes
+        """
+        data_bin = ""
         for i in range(15, -1, -1):
-            dataBin += str(self.bit_read(data, i))
+            data_bin += str(self.bit_read(data, i))
             if i == 8:
-                dataBin += " "
-        print(dataBin)        
+                data_bin += " "
+        return data_bin        

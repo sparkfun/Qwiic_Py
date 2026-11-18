@@ -44,27 +44,27 @@
 
 import qwiic_otos
 import sys
-import time
+import qwiic_i2c
 
-def runExample():
+def run_example():
     print("\nQwiic OTOS Example 3 - Calibration\n")
 
     # Create instance of device
-    myOtos = qwiic_otos.QwiicOTOS()
+    my_otos = qwiic_otos.QwiicOTOS()
 
     # Check if it's connected
-    if myOtos.is_connected() == False:
+    if not my_otos.is_connected():
         print("The device isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
 
     # Initialize the device
-    myOtos.begin()
+    my_otos.begin()
 
     print("Ensure the OTOS is flat and stationary during calibration!")
     for i in range(5, 0, -1):
         print("Calibrating in %d seconds..." % i)
-        time.sleep(1)
+        qwiic_i2c.delay_ms(1000)
 
     print("Calibrating IMU...")
 
@@ -74,24 +74,24 @@ def runExample():
     # when it powers up, but it is recommended to perform a more thorough
     # calibration at the start of all your programs. Note that the sensor must
     # be completely stationary and flat during calibration! When calling
-    # calibrateImu(), you can specify the number of samples to take and whether
+    # calibrate_imu(), you can specify the number of samples to take and whether
     # to wait until the calibration is complete. If no parameters are provided,
     # it will take 255 samples and wait until done; each sample takes about
     # 2.4ms, so about 612ms total
-    myOtos.calibrateImu()
+    my_otos.calibrate_imu()
 
     # Alternatively, you can specify the number of samples and whether to wait
     # until it's done. If you don't want to wait, you can asynchronously check
     # how many samples remain with the code below. Once zero samples remain,
     # the calibration is done!
-    # myOtos.calibrateImu(255, False)
+    # my_otos.calibrate_imu(255, False)
     # done = False
-    # while(done == False):
+    # while not done:
     #     # Check how many samples remain
-    #     samplesRemaining = myOtos.getImuCalibrationProgress()
+    #     samples_remaining = my_otos.get_imu_calibration_progress()
 
     #     # If 0 samples remain, the calibration is done
-    #     if(samplesRemaining == 0):
+    #     if samples_remaining == 0:
     #         done = True
 
     # Here we can set the linear and angular scalars, which can compensate for
@@ -110,32 +110,32 @@ def runExample():
     # multiple speeds to get an average, then set the linear scalar to the
     # inverse of the error. For example, if you move the robot 100 inches and
     # the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
-    myOtos.setLinearScalar(1.0)
-    myOtos.setAngularScalar(1.0)
+    my_otos.set_linear_scalar(1.0)
+    my_otos.set_angular_scalar(1.0)
 
     # Reset the tracking algorithm - this resets the position to the origin,
     # but can also be used to recover from some rare tracking errors
-    myOtos.resetTracking()
+    my_otos.reset_tracking()
 
     # Main loop
     while True:
         # Get the latest position, which includes the x and y coordinates, plus
         # the heading angle
-        myPosition = myOtos.getPosition()
+        my_position = my_otos.get_position()
 
         # Print measurement
         print()
         print("Position:")
-        print("X (Inches): {}".format(myPosition.x))
-        print("Y (Inches): {}".format(myPosition.y))
-        print("Heading (Degrees): {}".format(myPosition.h))
+        print("X (Inches): {}".format(my_position.x))
+        print("Y (Inches): {}".format(my_position.y))
+        print("Heading (Degrees): {}".format(my_position.h))
 
         # Wait a bit so we don't spam the serial port
-        time.sleep(0.5)
+        qwiic_i2c.delay_ms(500)
 
 if __name__ == '__main__':
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example")
         sys.exit(0)

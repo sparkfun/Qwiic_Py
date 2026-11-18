@@ -39,80 +39,80 @@
 # Example 3 - Quad
 
 import qwiic_relay
-import time
+import qwiic_i2c
 import sys
 
 # Be sure to initialize your relay with the proper address.
-myRelays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_RELAY_DEFUALT_ADDR)
-# myRelays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_RELAY_JUMPER_CLOSE_ADDR)
-# myRelays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_SOLID_STATE_RELAY_DEFUALT_ADDR)
-# myRelays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_SOLID_STATE_RELAY_JUMPER_CLOSE_ADDR)
+my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_RELAY_DEFAULT_ADDR)
+# my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_RELAY_JUMPER_CLOSE_ADDR)
+# my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_SOLID_STATE_RELAY_DEFAULT_ADDR)
+# my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_SOLID_STATE_RELAY_JUMPER_CLOSE_ADDR)
 
-def runExample():
+def run_example():
 
     print("\nSparkFun Qwiic Relay Example 3 - Quad\n")
 
-    if myRelays.begin() == False:
+    if not my_relays.begin():
         print("The Qwiic Relay isn't connected to the system. Please check your connection", \
             file=sys.stderr)
         return
     
     # Turn on relays one and three
-    myRelays.set_relay_on(1)
-    myRelays.set_relay_on(3)
+    my_relays.set_relay_on(1)
+    my_relays.set_relay_on(3)
     
     # Print the status of all relays
-    print("Relay 1 state: " + str(myRelays.get_relay_state(1)))
-    print("Relay 2 state: " + str(myRelays.get_relay_state(2)))
-    print("Relay 3 state: " + str(myRelays.get_relay_state(3)))
-    print("Relay 4 state: " + str(myRelays.get_relay_state(4)))
+    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+    print("Relay 3 state: " + str(my_relays.get_relay_state(3)))
+    print("Relay 4 state: " + str(my_relays.get_relay_state(4)))
     print()
 
     # Wait a moment
-    time.sleep(1)
+    qwiic_i2c.delay_ms(1000)
     
     # Turn off 1 and 3, turn on 2 and 4
-    myRelays.set_relay_off(1)
-    myRelays.set_relay_on(2)
-    myRelays.set_relay_off(3)
-    myRelays.set_relay_on(4)
+    my_relays.set_relay_off(1)
+    my_relays.set_relay_on(2)
+    my_relays.set_relay_off(3)
+    my_relays.set_relay_on(4)
     
     # Print the status of all relays
-    print("Relay 1 state: " + str(myRelays.get_relay_state(1)))
-    print("Relay 2 state: " + str(myRelays.get_relay_state(2)))
-    print("Relay 3 state: " + str(myRelays.get_relay_state(3)))
-    print("Relay 4 state: " + str(myRelays.get_relay_state(4)))
+    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+    print("Relay 3 state: " + str(my_relays.get_relay_state(3)))
+    print("Relay 4 state: " + str(my_relays.get_relay_state(4)))
     print()
 
     # Wait a moment
-    time.sleep(1)
+    qwiic_i2c.delay_ms(1000)
     
     # Turn all relays on
-    myRelays.set_all_relays_on()
+    my_relays.set_all_relays_on()
     
     # Print the status of all relays
-    print("Relay 1 state: " + str(myRelays.get_relay_state(1)))
-    print("Relay 2 state: " + str(myRelays.get_relay_state(2)))
-    print("Relay 3 state: " + str(myRelays.get_relay_state(3)))
-    print("Relay 4 state: " + str(myRelays.get_relay_state(4)))
+    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+    print("Relay 3 state: " + str(my_relays.get_relay_state(3)))
+    print("Relay 4 state: " + str(my_relays.get_relay_state(4)))
     print()
 
     # Wait a moment
-    time.sleep(1)
+    qwiic_i2c.delay_ms(1000)
 
     # Turn all relays off
-    myRelays.set_all_relays_off()
+    my_relays.set_all_relays_off()
     
     # Print the status of all relays
-    print("Relay 1 state: " + str(myRelays.get_relay_state(1)))
-    print("Relay 2 state: " + str(myRelays.get_relay_state(2)))
-    print("Relay 3 state: " + str(myRelays.get_relay_state(3)))
-    print("Relay 4 state: " + str(myRelays.get_relay_state(4)))
+    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+    print("Relay 3 state: " + str(my_relays.get_relay_state(3)))
+    print("Relay 4 state: " + str(my_relays.get_relay_state(4)))
     print()
     
 if __name__ == '__main__':
     try:
-        runExample()
+        run_example()
     except (KeyboardInterrupt, SystemExit) as exErr:
         print("\nEnding Example 3")
         sys.exit(0)
