@@ -97,6 +97,11 @@ def run_example():
     my_buttons.set_pressed_interrupt(True)
     my_buttons.set_clicked_interrupt(True) #Enable both hardware interrupts
 
+    # Read the buttons once now. If an interrupt was already pending (for example
+    # from an earlier run), INT is already low and no falling edge would ever
+    # arrive. Reading the buttons clears it, so the next press is detected.
+    interrupt_callback(INTERRUPT_PIN)
+
     while True:
         
         qwiic_i2c.delay_ms(100)

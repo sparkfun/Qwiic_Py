@@ -242,14 +242,15 @@ class QwiicMCP4725(object):
         # byte 3 (EEPROM Reg): X   | PD1 | PD0 | X  | D11 | D10 | D9  | D8
         # byte 4 (EEPROM Reg): D7  | D6  | D5  | D4 | D3  | D2  | D1  | D0
 
-        read_bytes = self._i2c.read_block(self.address, 0, 5)
+        # A read is just the address byte, with no register (datasheet pg. 26)
+        read_bytes = self._i2c.read_block(self.address, None, 5)
 
         data = {
             'rdy_flag': (read_bytes[0] & 0x80) >> 7,
             'por_flag': (read_bytes[0] & 0x40) >> 6,
             'dac_power_down_mode': (read_bytes[0] & 0x06) >> 1,
             'dac_value': (read_bytes[1] << 4) | ((read_bytes[2] & 0xF0) >> 4),
-            'eeprom_power_down_mode': (read_bytes[3] & 0x60) >> 1,
+            'eeprom_power_down_mode': (read_bytes[3] & 0x60) >> 5,
             'eeprom_value': ((read_bytes[3] & 0x0F) << 8) | read_bytes[4]
         }
 

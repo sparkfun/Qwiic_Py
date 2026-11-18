@@ -153,6 +153,9 @@ class QwiicAS6212(object):
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
+        self.temp_c = 0
+        self.temp_f = 0
+
     # ----------------------------------
     # is_connected()
     #
@@ -164,7 +167,7 @@ class QwiicAS6212(object):
             :return: True if the device is connected, otherwise False.
             :rtype: bool
         """        
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -225,10 +228,11 @@ class QwiicAS6212(object):
         """
         digital_temp_c = self.read_2_byte_register(TVAL_REG)
 
+        # The register is a 16-bit two's complement value
         if (digital_temp_c < 32768):
                 final_temp_c = digital_temp_c * 0.0078125
         if (digital_temp_c >= 32768):
-                final_temp_c = ((digital_temp_c - 1) * 0.0078125) * -1
+                final_temp_c = (digital_temp_c - 65536) * 0.0078125
 
         self.temp_c = final_temp_c
         return self.temp_c
@@ -299,7 +303,7 @@ class QwiicAS6212(object):
 	    4 - 4 faults
         """
         if (faults > 4) or (faults < 1):
-            return NaN  # noqa: F821
+            raise ValueError("faults must be 1, 2, 3 or 4")
         faults = faults - 1 # consecutive faults value is stored in just 2 bits in the config reg,
         # so we must convert from "human readable" ints 1-4 to stored values (0-3).
         config_reg = self.read_config()
@@ -337,7 +341,7 @@ class QwiicAS6212(object):
         """
         #discard out of range values
         if cycletime > 3 or cycletime < 0:
-            return nan  # noqa: F821
+            raise ValueError("cycletime must be one of the AS6212_CONVERSION_CYCLE_TIME_* values")
         config_reg = self.read_config()
         config_bit_6 = self.bit_read(cycletime, 0)
         config_bit_7 = self.bit_read(cycletime, 1)
@@ -355,14 +359,14 @@ class QwiicAS6212(object):
         conversion_rate_bit_1 = self.bit_read(config_reg, AS6212_CONFIG_BIT_CONVERSION_RATE_1)
         cycletime_val = 0
         cycletime_val = self.bit_write(cycletime_val, 0, conversion_rate_bit_0)
-        cyceltime_val = self.bit_write(cycletime_val, 1, conversion_rate_bit_1)
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_125MS:  # noqa: F821
+        cycletime_val = self.bit_write(cycletime_val, 1, conversion_rate_bit_1)
+        if cycletime_val == self.AS6212_CONVERSION_CYCLE_TIME_125MS:
             return 125
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_250MS:  # noqa: F821
+        if cycletime_val == self.AS6212_CONVERSION_CYCLE_TIME_250MS:
             return 250
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_1000MS:  # noqa: F821
+        if cycletime_val == self.AS6212_CONVERSION_CYCLE_TIME_1000MS:
             return 1000
-        if cycletime_val == AS6212_CONVERSION_CYCLE_TIME_4000MS:  # noqa: F821
+        if cycletime_val == self.AS6212_CONVERSION_CYCLE_TIME_4000MS:
             return 4000
       
     def set_sleep_mode(self, mode):

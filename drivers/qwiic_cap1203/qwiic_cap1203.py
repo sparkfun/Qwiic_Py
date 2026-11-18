@@ -206,7 +206,7 @@ class QwiicCAP1203(object):
 
         @return **int** Main Control Register value
         """
-        self._i2c.read_byte(self.address, self.MAIN_CONTROL)
+        return self._i2c.read_byte(self.address, self.MAIN_CONTROL)
 
     def check_status(self):
         """!
@@ -215,7 +215,7 @@ class QwiicCAP1203(object):
 
         @return **int** General Status Register value
         """
-        self._i2c.read_byte(self.address, self.GENERAL_STATUS)
+        return self._i2c.read_byte(self.address, self.GENERAL_STATUS)
 
     def clear_interrupt(self):
         """!

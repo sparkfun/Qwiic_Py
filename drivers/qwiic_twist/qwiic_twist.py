@@ -99,6 +99,12 @@ _statusEncoderMovedBit = 0
 _enableInterruptButtonBit = 1
 _enableInterruptEncoderBit = 0
 
+def _signed16(value):
+    """!
+    Convert a 16-bit register value to a signed integer (int16_t on the Twist)
+    """
+    return value - 0x10000 if value & 0x8000 else value
+
 # define the class that encapsulates the device being created. All information associated with this
 # device is encapsulated by this class. The device class should be the only value exported
 # from this module.
@@ -139,7 +145,7 @@ class QwiicTwist(object):
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -178,9 +184,10 @@ class QwiicTwist(object):
         """!
         Returns the number of indents the user has twisted the knob
 
-        @return **word as integer** number of indents
+        @return **integer** number of indents, signed (negative after twisting
+            counter-clockwise past 0 with no limit set)
         """
-        return self._i2c.read_word(self.address, TWIST_COUNT)
+        return _signed16(self._i2c.read_word(self.address, TWIST_COUNT))
 
     #----------------------------------------------------------------
     # set_count()
@@ -238,9 +245,9 @@ class QwiicTwist(object):
 
         @param clear_value: Set to True to clear the current value. Default is False
 
-        @return **integer** the difference
+        @return **integer** the difference, signed (negative for counter-clockwise)
         """
-        difference = self._i2c.read_word(self.address, TWIST_DIFFERENCE)
+        difference = _signed16(self._i2c.read_word(self.address, TWIST_DIFFERENCE))
 
         if clear_value:
             self._i2c.write_word(self.address, TWIST_DIFFERENCE, 0)
@@ -319,7 +326,7 @@ class QwiicTwist(object):
 
         # Clear the current value if requested
         if clear_value:
-            self._i2c.write_word(TWIST_LAST_ENCODER_EVENT, 0)
+            self._i2c.write_word(self.address, TWIST_LAST_ENCODER_EVENT, 0)
 
         return time_elapsed
 
@@ -341,7 +348,7 @@ class QwiicTwist(object):
 
         # Clear the current value if requested
         if clear_value:
-            self._i2c.write_word(TWIST_LAST_BUTTON_EVENT, 0)
+            self._i2c.write_word(self.address, TWIST_LAST_BUTTON_EVENT, 0)
 
         return time_elapsed
 
@@ -480,7 +487,12 @@ class QwiicTwist(object):
 
         @return No return value
         """
-        self._i2c.write_block(self.address, TWIST_CONNECT_RED, [int(red), int(green), int(blue)])
+        # The connect registers are 16 bits each (little-endian), starting at TWIST_CONNECT_RED
+        data = []
+        for amount in (int(red), int(green), int(blue)):
+            data.append(amount & 0xFF)
+            data.append((amount >> 8) & 0xFF)
+        self._i2c.write_block(self.address, TWIST_CONNECT_RED, data)
 
     #----------------------------------------------------------------
     # set_connect_red()
@@ -508,7 +520,7 @@ class QwiicTwist(object):
 
         @return Red component of the color
         """
-        return self._i2c.read_word(self.address, TWIST_CONNECT_RED)
+        return _signed16(self._i2c.read_word(self.address, TWIST_CONNECT_RED))
 
 
     #----------------------------------------------------------------
@@ -537,7 +549,7 @@ class QwiicTwist(object):
 
         @return green component of the color
         """
-        return self._i2c.read_word(self.address, TWIST_CONNECT_GREEN)
+        return _signed16(self._i2c.read_word(self.address, TWIST_CONNECT_GREEN))
 
 
     #----------------------------------------------------------------
@@ -566,7 +578,7 @@ class QwiicTwist(object):
 
         @return Blue component of the color
         """
-        return self._i2c.read_word(self.address, TWIST_CONNECT_BLUE)
+        return _signed16(self._i2c.read_word(self.address, TWIST_CONNECT_BLUE))
 
 
     #----------------------------------------------------------------

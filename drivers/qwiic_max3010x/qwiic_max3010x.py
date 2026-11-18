@@ -296,7 +296,7 @@ class HeartRate(object):
         self.negative_edge = 0
         self.ir_avg_reg = 0
 
-        self.cbuff = list(range(32))
+        self.cbuff = [0] * 32
         self.offset = 0
 
         self.fir_coeffs = [172, 321, 579, 927, 1360, 1858, 2390, 2916, 3391, 3768, 4012, 4096]
@@ -356,7 +356,8 @@ class HeartRate(object):
             self.ir_ac_signal_max = 0
 
             #if ((self.ir_ac_max - self.ir_ac_min) > 100 & (self.ir_ac_max - self.ir_ac_min) < 1000)
-            if ((self.ir_ac_max - self.ir_ac_min) > 20 & (self.ir_ac_max - self.ir_ac_min) < 1000):
+            # (C's & binds looser than its comparisons, so this was (x > 20) & (x < 1000) in the Arduino code)
+            if ((self.ir_ac_max - self.ir_ac_min) > 20) and ((self.ir_ac_max - self.ir_ac_min) < 1000):
                 #Heart beat!!!
                 beat_detected = True
 
@@ -375,8 +376,6 @@ class HeartRate(object):
             self.ir_ac_signal_min = self.ir_ac_signal_current
       
         return beat_detected
-
-hr = HeartRate()
 
 
 class QwiicMAX3010x(object):
@@ -402,9 +401,6 @@ class QwiicMAX3010x(object):
     STORAGE_SIZE = 4
 
     # Circular buffer of readings from the sensor
-    red = [0,0,0,0] # place holders to make this list 4 spaces long (to mimic previous struct arrays in arduino library)
-    ir = [0,0,0,0]
-    green = [0,0,0,0]
     head = 0
     tail = 0
 
@@ -426,6 +422,17 @@ class QwiicMAX3010x(object):
 
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
+
+        # Circular buffer of readings from the sensor, one list per instance
+        self.red = [0,0,0,0] # place holders to make this list 4 spaces long (to mimic previous struct arrays in arduino library)
+        self.ir = [0,0,0,0]
+        self.green = [0,0,0,0]
+
+        # Set by read_revision_id()
+        self.revision_id = 0
+
+        # Beat detection state for check_for_beat()
+        self._heart_rate = HeartRate()
 
     # ----------------------------------
     # is_connected()
@@ -1440,6 +1447,7 @@ class QwiicMAX3010x(object):
         @return **integer** Revision ID
         """
         self.revision_id = self._i2c.read_byte(self.address, MAX30105_REVISIONID)
+        return self.revision_id
 
     # 
     # get_revision_id()
@@ -1524,4 +1532,4 @@ class QwiicMAX3010x(object):
 
         @return **boolean** True if a beat is detected, otherwise False
         """
-        return hr.check_for_beat(sample)
+        return self._heart_rate.check_for_beat(sample)

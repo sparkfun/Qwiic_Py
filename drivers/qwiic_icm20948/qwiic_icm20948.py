@@ -321,6 +321,20 @@ class QwiicICM20948(object):
 		# Use the given I2C bus, or the platform's default bus
 		self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
+		# Raw readings, updated by get_agmt()
+		self.ax_raw = 0
+		self.ay_raw = 0
+		self.az_raw = 0
+		self.gx_raw = 0
+		self.gy_raw = 0
+		self.gz_raw = 0
+		self.tmp_raw = 0
+		self.mx_raw = 0
+		self.my_raw = 0
+		self.mz_raw = 0
+		self.mag_stat1 = 0
+		self.mag_stat2 = 0
+
 	# ----------------------------------
 	# is_connected()
 	#
@@ -348,7 +362,8 @@ class QwiicICM20948(object):
 			return False
 		bank = ((bank << 4) & 0x30) # bits 5:4 of REG_BANK_SEL
 		#return ICM_20948_execute_w(pdev, REG_BANK_SEL, &bank, 1)
-		return self._i2c.write_byte(self.address, self.REG_BANK_SEL, bank)
+		self._i2c.write_byte(self.address, self.REG_BANK_SEL, bank)
+		return True
 
 	# ----------------------------------
 	# sw_reset()
@@ -369,7 +384,8 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(0)
-		return self._i2c.write_byte(self.address, self.AGB0_REG_PWR_MGMT_1, register)		
+		self._i2c.write_byte(self.address, self.AGB0_REG_PWR_MGMT_1, register)
+		return True		
 
 	# ----------------------------------
 	# sleep()
@@ -393,7 +409,8 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(0)
-		return self._i2c.write_byte(self.address, self.AGB0_REG_PWR_MGMT_1, register)			
+		self._i2c.write_byte(self.address, self.AGB0_REG_PWR_MGMT_1, register)
+		return True			
 
 	# ----------------------------------
 	# low_power()
@@ -417,7 +434,8 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(0)
-		return self._i2c.write_byte(self.address, self.AGB0_REG_PWR_MGMT_1, register)	
+		self._i2c.write_byte(self.address, self.AGB0_REG_PWR_MGMT_1, register)
+		return True	
 
 	# ----------------------------------
 	# set_sample_mode()
@@ -460,7 +478,8 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(0)
-		return self._i2c.write_byte(self.address, self.AGB0_REG_LP_CONFIG, register)		
+		self._i2c.write_byte(self.address, self.AGB0_REG_LP_CONFIG, register)
+		return True		
 
 	# ----------------------------------
 	# set_full_scale_range_accel()
@@ -470,7 +489,7 @@ class QwiicICM20948(object):
 		"""!
 		Sets the full scale range for the accel in the ICM20948 module
 
-		@return **bool** Returns true if the full scale range setting write was successful, otherwise False.
+		@return **bool** Returns true if the full scale range was written and reads back correctly, otherwise False.
 		"""
 		# Read the Accel Config Register, store in local variable "register"
 		self.set_bank(2)
@@ -482,7 +501,10 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(2)
-		return self._i2c.write_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1, register)	
+		self._i2c.write_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1, register)
+
+		# Check the data was written correctly
+		return self._i2c.read_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1) == (register & 0xFF)	
 
 	# ----------------------------------
 	# set_full_scale_range_gyro()
@@ -492,7 +514,7 @@ class QwiicICM20948(object):
 		"""!
 		Sets the full scale range for the gyro in the ICM20948 module
 
-		@return **bool** Returns true if the full scale range setting write was successful, otherwise False.
+		@return **bool** Returns true if the full scale range was written and reads back correctly, otherwise False.
 		"""
 		# Read the Gyro Config Register, store in local variable "register"
 		self.set_bank(2)
@@ -504,7 +526,10 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(2)
-		return self._i2c.write_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1, register)			
+		self._i2c.write_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1, register)
+
+		# Check the data was written correctly
+		return self._i2c.read_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1) == (register & 0xFF)			
 
 	# ----------------------------------
 	# set_dlpf_cfg_accel()
@@ -514,7 +539,7 @@ class QwiicICM20948(object):
 		"""!
 		Sets the digital low pass filter for the accel in the ICM20948 module
 
-		@return **bool** Returns true if the dlp setting write was successful, otherwise False.
+		@return **bool** Returns true if the dlp setting was written and reads back correctly, otherwise False.
 		"""
 		# Read the Accel Config Register, store in local variable "register"
 		self.set_bank(2)
@@ -526,7 +551,10 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(2)
-		return self._i2c.write_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1, register)	
+		self._i2c.write_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1, register)
+
+		# Check the data was written correctly
+		return self._i2c.read_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1) == (register & 0xFF)	
 
 	# ----------------------------------
 	# set_dlpf_cfg_gyro()
@@ -536,7 +564,7 @@ class QwiicICM20948(object):
 		"""!
 		Sets the digital low pass filter for the gyro in the ICM20948 module
 
-		@return **bool** Returns true if the dlp setting write was successful, otherwise False.
+		@return **bool** Returns true if the dlp setting was written and reads back correctly, otherwise False.
 		"""
 		# Read the gyro Config Register, store in local variable "register"
 		self.set_bank(2)
@@ -548,7 +576,10 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(2)
-		return self._i2c.write_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1, register)
+		self._i2c.write_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1, register)
+
+		# Check the data was written correctly
+		return self._i2c.read_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1) == (register & 0xFF)
 
 	# ----------------------------------
 	# enable_dlpf_accel()
@@ -558,7 +589,7 @@ class QwiicICM20948(object):
 		"""!
 		Enables or disables the accelerometer DLPF of the ICM90248 module
 
-		@return **bool** Returns true if the DLPF mode setting write was successful, otherwise False.
+		@return **bool** Returns true if the DLPF mode setting was written and reads back correctly, otherwise False.
 		"""
 
 		# Read the AGB2_REG_ACCEL_CONFIG_1, store in local variable "register"
@@ -573,7 +604,10 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(2)
-		return self._i2c.write_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1, register)	
+		self._i2c.write_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1, register)
+
+		# Check the data was written correctly
+		return self._i2c.read_byte(self.address, self.AGB2_REG_ACCEL_CONFIG_1) == (register & 0xFF)	
 
 	# ----------------------------------
 	# enable_dlpf_gyro()
@@ -583,7 +617,7 @@ class QwiicICM20948(object):
 		"""!
 		Enables or disables the Gyro DLPF of the ICM90248 module
 
-		@return **bool** Returns true if the DLPF mode setting write was successful, otherwise False.
+		@return **bool** Returns true if the DLPF mode setting was written and reads back correctly, otherwise False.
 		"""
 
 		# Read the AGB2_REG_GYRO_CONFIG_1, store in local variable "register"
@@ -598,7 +632,10 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(2)
-		return self._i2c.write_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1, register)			
+		self._i2c.write_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1, register)
+
+		# Check the data was written correctly
+		return self._i2c.read_byte(self.address, self.AGB2_REG_GYRO_CONFIG_1) == (register & 0xFF)			
 
 	# ----------------------------------
 	# data_ready()
@@ -677,6 +714,8 @@ class QwiicICM20948(object):
 		self.gy_raw = self.to_signed_int(self.gy_raw)
 		self.gz_raw = self.to_signed_int(self.gz_raw)
 
+		self.tmp_raw = self.to_signed_int(self.tmp_raw)
+
 		self.mx_raw = self.to_signed_int(self.mx_raw)
 		self.my_raw = self.to_signed_int(self.my_raw)
 		self.mz_raw = self.to_signed_int(self.mz_raw)
@@ -711,7 +750,8 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(0)
-		return self._i2c.write_byte(self.address, self.AGB0_REG_INT_PIN_CONFIG, register)	
+		self._i2c.write_byte(self.address, self.AGB0_REG_INT_PIN_CONFIG, register)
+		return True	
 
 	# ----------------------------------
 	# i2c_master_enable()
@@ -752,7 +792,8 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(0)
-		return self._i2c.write_byte(self.address, self.AGB0_REG_USER_CTRL, register)
+		self._i2c.write_byte(self.address, self.AGB0_REG_USER_CTRL, register)
+		return True
 
 	# Transact directly with an I2C device, one byte at a time
 	# Used to configure a device before it is setup into a normal 0-3 slave slot
@@ -869,7 +910,8 @@ class QwiicICM20948(object):
 
 		# Write register
 		self.set_bank(0)
-		return self._i2c.write_byte(self.address, self.AGB0_REG_USER_CTRL, register)	
+		self._i2c.write_byte(self.address, self.AGB0_REG_USER_CTRL, register)
+		return True	
 
 	# ----------------------------------
 	# i2c_master_configure_slave()
@@ -924,7 +966,8 @@ class QwiicICM20948(object):
 		ctrl_reg_slv_x |= (swap << 6)
 		ctrl_reg_slv_x |= (data_only << 5)
 		ctrl_reg_slv_x |= (grp << 4)
-		return self._i2c.write_byte(self.address, slv_ctrl_reg, ctrl_reg_slv_x)
+		self._i2c.write_byte(self.address, slv_ctrl_reg, ctrl_reg_slv_x)
+		return True
 
 	# ----------------------------------
 	# startup_magnetometer()
@@ -970,6 +1013,10 @@ class QwiicICM20948(object):
 
 		@return **bool** Returns true of the initializtion was successful, otherwise False.
 		"""
+		# No device at this address
+		if not self.is_connected():
+			return False
+
 		# are we who we need to be?
 		self.set_bank(0)
 		chip_id = self._i2c.read_byte(self.address, self.AGB0_REG_WHO_AM_I)
@@ -1001,6 +1048,4 @@ class QwiicICM20948(object):
 		self.enable_dlpf_accel(False)
 		self.enable_dlpf_gyro(False)
 
-		self.startup_magnetometer()
-
-		return True
+		return self.startup_magnetometer()

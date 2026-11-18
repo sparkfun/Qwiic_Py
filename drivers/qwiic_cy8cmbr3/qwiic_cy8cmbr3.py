@@ -68,6 +68,11 @@ class QwiicCY8CMBR3(object):
     # Set default name and I2C address(es)
     device_name         = _DEFAULT_NAME
     available_addresses = _AVAILABLE_I2C_ADDRESS
+
+    # How long to wait for the device before giving up. The slowest command
+    # (saving the configuration) takes up to about 220 ms.
+    _CTRL_CMD_TIMEOUT_MS = 2000
+    _SENSOR_ID_TIMEOUT_MS = 1000
     DEFAULT_ADDRESS = _AVAILABLE_I2C_ADDRESS[0]
 
     # Register Map
@@ -632,14 +637,18 @@ class QwiicCY8CMBR3(object):
 
         @param sensor_id: The Sensor ID value to set
 
-        @return Returns `True` if successful, otherwise `False`
+        @return Returns `True` if successful, otherwise `False` (including when the
+            device doesn't confirm the new sensor ID within 1 second)
         """
         # Write the Sensor ID value to the SENSOR_ID register
         self._write_byte_with_retry(self.REG_SENSOR_ID, sensor_id)
 
         # Wait until the debug sensor ID matches the set sensor ID
+        start = self._i2c.ticks_ms()
         while (self.get_debug_sensor_id() != sensor_id):
-            pass  # Optionally, add a timeout here to avoid infinite loops
+            if self._i2c.ticks_diff(self._i2c.ticks_ms(), start) > self._SENSOR_ID_TIMEOUT_MS:
+                return False
+            self._i2c.delay_ms(1)
 
         return True
     
@@ -796,8 +805,11 @@ class QwiicCY8CMBR3(object):
             return True
 
         # Wait for the command to complete
+        start = self._i2c.ticks_ms()
         while not self.is_ctrl_command_complete():
-            pass  # Optionally, add a timeout here to avoid infinite loops
+            if self._i2c.ticks_diff(self._i2c.ticks_ms(), start) > self._CTRL_CMD_TIMEOUT_MS:
+                return False
+            self._i2c.delay_ms(1)
 
         # Read the CTRL_CMD_ERR register to check for errors
         ctrlCmdErr = self._read_byte_with_retry(self.REG_CTRL_CMD_ERR)
@@ -861,14 +873,13 @@ class QwiicCY8CMBR3(object):
         self.address = new_address
 
         # wait for the command to complete on the new address
-        completionRetries = 10
-        while completionRetries > 0:
+        for _ in range(10):
             if self.is_ctrl_command_complete():
-                break
-            completionRetries -= 1
+                return True
             self._i2c.delay_ms(100)  # Small delay before retrying
 
-        return True  # Return true to indicate success
+        # The device never answered at its new address
+        return False
     
     def reset(self, wait_for_completion=True):
         """!

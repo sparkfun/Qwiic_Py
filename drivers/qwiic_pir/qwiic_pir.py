@@ -62,7 +62,7 @@ _DEFAULT_NAME = "Qwiic PIR"
 # device.
 _QWIIC_PIR_DEFAULT_ADDRESS = 0x12
 _FULL_ADDRESS_LIST = list(range(0x08, 0x77+1))  # Full address list (excluding reserved addresses)
-_FULL_ADDRESS_LIST.remove(_QWIIC_PIR_DEFAULT_ADDRESS >> 1)  # Remove default address from list
+_FULL_ADDRESS_LIST.remove(_QWIIC_PIR_DEFAULT_ADDRESS)  # Remove default address from list
 _AVAILABLE_I2C_ADDRESS = [_QWIIC_PIR_DEFAULT_ADDRESS]  # Initialize with default address
 _AVAILABLE_I2C_ADDRESS.extend(_FULL_ADDRESS_LIST)   # Add full range of I2C addresses
 
@@ -127,7 +127,10 @@ class QwiicPIR(object):
         # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
         address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
         # Use address if provided, otherwise pick the default
-        self.address = address if address is not None else self.available_addresses[0]
+        if address in self.available_addresses:
+            self.address = address
+        else:
+            self.address = self.available_addresses[0]
 
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
@@ -143,7 +146,7 @@ class QwiicPIR(object):
             :return: True if the device is connected, otherwise False.
             :rtype: bool
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
     
     # ------------------------------------------------
     # begin()
@@ -203,6 +206,7 @@ class QwiicPIR(object):
 
         # Talk to the device at its new address from now on
         self.address = new_address
+        return True
     
     # ---------------------------------------------------
     # get_i2c_address()
@@ -386,7 +390,7 @@ class QwiicPIR(object):
         self._i2c.write_byte(self.address, self.EVENT_STATUS, pir_status)
         # Update variables
         self.object_remove = 0
-        self.objected_detect = 0
+        self.object_detect = 0
         self.event_available = 0
     
     # -------------------------------------------------------

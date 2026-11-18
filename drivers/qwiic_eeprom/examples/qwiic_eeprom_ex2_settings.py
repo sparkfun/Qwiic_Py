@@ -59,7 +59,7 @@ def run_example():
     print("\nEEPROM ready!")
 
     # Set settings for this EEPROM
-    my_eeprom.set_memory_size(512000/8) # In bytes. 512kbit = 64kbyte
+    my_eeprom.set_memory_size(512 * 1024 // 8) # In bytes. 512kbit = 64kbyte
     my_eeprom.set_page_size(128)    # in bytes. Has 128 byte page size.
     my_eeprom.disable_poll_for_write_complete()  # Supports I2C polling of write completion
     my_eeprom.set_page_write_time(3)    # 3 ms max write time

@@ -48,7 +48,7 @@ def run_example():
 	print("\nSparkFun Qwiic TMP102 Sensor Example 1\n")
 	myTmpSensor = qwiic_tmp102.QwiicTMP102()
 
-	if myTmpSensor.is_connected == False:
+	if not myTmpSensor.is_connected():
 		print("The Qwiic TMP102 Sensor device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return

@@ -223,7 +223,7 @@ class QwiicCCS811(object):
             :rtype: bool
 
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # is_rpi_i2c_baudrate_ok()
@@ -265,6 +265,10 @@ class QwiicCCS811(object):
             :rtype: bool
 
         """
+
+        # No device at this address
+        if not self.is_connected():
+            return False
 
         # wait for sensor to come up...
         self._i2c.delay_ms(100)
@@ -590,14 +594,18 @@ class QwiicCCS811(object):
 
         self.ntc_counts = (data[2] << 8) | data[3]
 
+        if self.vref_counts == 0:
+            # Can't scale by a zero reference count
+            return self.SENSOR_GENERIC_ERROR
+
         self._resistance = self.ntc_counts * self.ref_resistance / float(self.vref_counts)
 
 
         # Code from Milan Malesevic and Zoran Stupic, 2011,
         # Modified by Max Mayfield,
-        if self._resistance == 0:
+        if self._resistance < 1:
             # we had an error of some sorts. Log 0 is not a happy value
-            return 1
+            return self.SENSOR_GENERIC_ERROR
 
         self._temperature = math.log(int(self._resistance))
         self._temperature = 1 / (0.001129148 + (0.000234125 * self._temperature) + \

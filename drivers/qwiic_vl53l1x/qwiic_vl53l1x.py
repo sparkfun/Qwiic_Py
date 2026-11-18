@@ -459,6 +459,8 @@ class QwiicVL53L1X(object):
 		# Use the given I2C bus, or the platform's default bus
 		self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
+		self.status = VL53L1_ERROR_NONE
+
 
 	def is_connected(self):
 		"""!
@@ -503,7 +505,7 @@ class QwiicVL53L1X(object):
 					-1- Failure
 		
 		"""
-		if (self.get_sensor_id() == 0xEEAC):
+		if (self.get_sensor_id() == 0xEACC):
 			return 0
 		return -1
 
@@ -610,24 +612,26 @@ class QwiicVL53L1X(object):
 		This function loads the 135 bytes default values to initialize the sensor.
 		begin() calls this after checking the sensor is connected and booted.
 
-		@return **Integer** 0 on success or error code
+		@return **Integer** 0 (VL53L1_ERROR_NONE) on success, or
+			VL53L1_ERROR_TIME_OUT (-7) if the first measurement never became ready
 		
 		"""
 		self.status = 0
 		Addr = 0x00
 		tmp = 0
-		timeout = 0
-
 		for Addr in range(0x2D, 0x87 + 1):
 			self.status = self.__i2c_write(self.address, Addr, VL51L1X_DEFAULT_CONFIGURATION[Addr - 0x2D], 1)
 		
 		self.status = self.start_ranging()
+		# The first measurement takes about 100 ms; allow up to 1 s whatever the bus speed
+		start = self._i2c.ticks_ms()
 		while(tmp == 0):
 				tmp = self.check_for_data_ready()
-				timeout = timeout + 1
-				if (timeout > 50):
-					self.status = VL53L1_ERROR_TIME_OUT
-					return self.status
+				if tmp == 0:
+					if self._i2c.ticks_diff(self._i2c.ticks_ms(), start) > 1000:
+						self.status = VL53L1_ERROR_TIME_OUT
+						return self.status
+					self._i2c.delay_ms(1)
 		
 		tmp = 0
 		self.status = self.clear_interrupt()
@@ -836,6 +840,8 @@ class QwiicVL53L1X(object):
 			self.status = self.__i2c_write(self.address, RANGE_CONFIG__VALID_PHASE_HIGH, 0xB8, 1)
 			self.status = self.__i2c_write(self.address, SD_CONFIG__WOI_SD0, 0x0F0D, 2)
 			self.status = self.__i2c_write(self.address, SD_CONFIG__INITIAL_PHASE_SD0, 0x0E0E, 2)
+		else:
+			raise ValueError("Invalid distance mode: use 1 (short) or 2 (long)")
 
 		self.status = self.set_timing_budget_in_ms(TB)
 		return self.status
@@ -851,6 +857,7 @@ class QwiicVL53L1X(object):
 		"""
 		self.status = 0
 
+		DM = 0
 		TempDM = self.__i2c_read(self.address,PHASECAL_CONFIG__TIMEOUT_MACROP, 1)
 		if (TempDM == 0x14):
 			DM=1
@@ -913,7 +920,7 @@ class QwiicVL53L1X(object):
 
 	def get_sensor_id(self):
 		"""!
-		This function returns the sensor id, sensor Id must be 0xEEAC
+		This function returns the sensor id, sensor Id must be 0xEACC
 
 		@return **Integer** Sensor ID
 		"""
@@ -1067,7 +1074,10 @@ class QwiicVL53L1X(object):
 		"""
 		self.status = 0
 		Temp = self.__i2c_read(self.address,ALGO__PART_TO_PART_RANGE_OFFSET_MM, 2)
-		Temp = Temp << 3
+		# Signed 11.2 format in the low 13 bits: shift up to a signed 16-bit value, then back down
+		Temp = (Temp << 3) & 0xFFFF
+		if Temp >= 0x8000:
+			Temp -= 0x10000
 		Temp = Temp >> 5
 		offset = Temp
 
@@ -1089,7 +1099,7 @@ class QwiicVL53L1X(object):
 		self.status = self.__i2c_write(self.address, ALGO__CROSSTALK_COMPENSATION_Y_PLANE_GRADIENT_KCPS,
 				0x0000, 2)
 		self.status = self.__i2c_write(self.address, ALGO__CROSSTALK_COMPENSATION_PLANE_OFFSET_KCPS,
-				(xtalk_value << 9)/1000, 2) # << 9 (7.9 format) and /1000 to convert cps to kpcs
+				(xtalk_value << 9)//1000, 2) # << 9 (7.9 format) and /1000 to convert cps to kpcs
 		
 		return self.status
 
@@ -1365,8 +1375,8 @@ class QwiicVL53L1X(object):
 			AverageDistance = AverageDistance + distance
 		
 		self.status = self.stop_ranging()
-		AverageDistance = AverageDistance / 50
-		offset = target_dist_in_mm - AverageDistance
+		AverageDistance = AverageDistance // 50
+		offset = int(target_dist_in_mm - AverageDistance)
 		self.status = self.__i2c_write(self.address, ALGO__PART_TO_PART_RANGE_OFFSET_MM, offset*4, 2)
 
 		return self.status #,offset???
@@ -1410,7 +1420,7 @@ class QwiicVL53L1X(object):
 		AverageSpadNb = AverageSpadNb / 50
 		AverageSignalRate = AverageSignalRate / 50
 		# Calculate Xtalk value
-		xtalk = (512*(AverageSignalRate*(1-(AverageDistance/target_dist_in_mm)))/AverageSpadNb)
+		xtalk = int(512*(AverageSignalRate*(1-(AverageDistance/target_dist_in_mm)))/AverageSpadNb)
 		self.status = self.__i2c_write(self.address, 0x0016, xtalk, 2)
 		
 		return self.status #,xtalk???
@@ -1427,8 +1437,7 @@ class QwiicVL53L1X(object):
 		"""
 		self.status = VL53L1_ERROR_NONE
 
-		# ptick_count_ms = timeGetTime()
-		ptick_count_ms = 0
+		ptick_count_ms = self._i2c.ticks_ms()
 
 		return ptick_count_ms
 
@@ -1505,7 +1514,7 @@ class QwiicVL53L1X(object):
 		@param nbytes: number of bytes in data (*to be set*)
 							(needs to be specified as python passes in integer value, but device expects a specific nuber of bytes for that value)
 
-		@return **Boolean** status- (*self*) Indicator for I2C transaction success???
+		@return **Integer** status- (*self*) 0 (VL53L1_ERROR_NONE); I2C errors raise OSError
 		"""
 		
 		registerMSB = register >> 8
@@ -1524,9 +1533,10 @@ class QwiicVL53L1X(object):
 		elif nbytes == 1:
 			buffer.append( data )
 		else:
-			return
+			raise ValueError("nbytes must be 1, 2 or 4")
 
-		self.status = self._i2c.write_block(address, registerMSB, buffer)
+		self._i2c.write_block(address, registerMSB, buffer)
+		self.status = VL53L1_ERROR_NONE
 
 		return self.status
 	
@@ -1548,7 +1558,7 @@ class QwiicVL53L1X(object):
 		registerLSB = register & 0xFF
 
 		if nbytes not in [1, 2, 4]:
-			return
+			raise ValueError("nbytes must be 1, 2 or 4")
 
 		# Setup for read/write transactions on smbus 2
 		# write = self.i2c_custom.write(address, [registerMSB, registerLSB])	# Write part of transaction

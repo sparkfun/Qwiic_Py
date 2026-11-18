@@ -444,7 +444,7 @@ class PiServoHAT(object):
 		period = 1 / self.frequency			# seconds
 		resolution = period / 4096			# seconds
 
-		# 180 Degree Servo Timing:
+		# 180 Degree Servo Timing (default 1 ms to 2 ms pulse times):
 		# 	0 	Degrees	=	1.0	ms
 		#	90	Degrees	=	1.5	ms
 		#	180	Degrees	=	2.0	ms
@@ -459,10 +459,12 @@ class PiServoHAT(object):
 			raise ValueError("swing must be 90 or 180")
 			
 		
-		# Servo Timing
-		m = 1 / swing											# ms/degree
-		difference = (initial_off - initial_on) * resolution	# steps/second
-		position = ((difference * 1000) - 1) / m				# degrees
+		# Servo Timing: the inverse of move_servo_position(), so it also
+		# holds for pulse times set with min_pt/max_pt or set_pulse_time()
+		# (2.x assumed 1 ms to 2 ms; the result is the same for those).
+		time_dif = self.maximum_pulse_width - self.minimum_pulse_width	# ms
+		difference = (initial_off - initial_on) * resolution	# seconds
+		position = ((difference * 1000) - self.minimum_pulse_width) * swing / time_dif	# degrees
 
 		return position
 			

@@ -43,7 +43,7 @@ def run_example():
 	print("\nQwiic MAX1704X Example 4 - MAX17048 Kitchen Sink\n")
 
 	# Create instance of device
-	myLipo = qwiic_max1704x.QwiicMAX1704X(qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
+	myLipo = qwiic_max1704x.QwiicMAX1704X(device_type=qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
 
 	# Check if it's connected
 	if myLipo.is_connected() == False:

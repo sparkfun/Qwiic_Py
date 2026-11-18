@@ -65,7 +65,7 @@ _DEFAULT_NAME = "Qwiic Button"
 # device.
 _QWIIC_BUTTON_DEFAULT_ADDRESS = 0x6F
 _FULL_ADDRESS_LIST = list(range(0x08, 0x77+1))  # Full address list (excluding reserved addresses)
-_FULL_ADDRESS_LIST.remove(_QWIIC_BUTTON_DEFAULT_ADDRESS >> 1)   # Remove default address from list
+_FULL_ADDRESS_LIST.remove(_QWIIC_BUTTON_DEFAULT_ADDRESS)   # Remove default address from list
 _AVAILABLE_I2C_ADDRESS = [_QWIIC_BUTTON_DEFAULT_ADDRESS]    # Initialize with default address
 _AVAILABLE_I2C_ADDRESS.extend(_FULL_ADDRESS_LIST) # Add full range of I2C addresses
 
@@ -211,6 +211,7 @@ class QwiicButton(object):
         self._i2c.write_byte(self.address, self.I2C_ADDRESS, new_address)
 
         self.address = new_address
+        return True
     
     # ---------------------------------------------------
     # get_i2c_address()
@@ -375,7 +376,7 @@ class QwiicButton(object):
         interrupt_config = self._i2c.read_byte(self.address, self.INTERRUPT_CONFIG)
         self.clicked_enable = 0
         # Clear the clicked_enable bit
-        interrupt_config = interrupt_config & (self.clicked_enable)
+        interrupt_config = interrupt_config & ~1
         # Write the new interrupt configure byte
         self._i2c.write_byte(self.address, self.INTERRUPT_CONFIG, interrupt_config)
     

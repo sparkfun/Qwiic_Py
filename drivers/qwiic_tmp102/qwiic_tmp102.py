@@ -63,6 +63,8 @@ class QwiicTMP102(object):
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
+        self.temp_c = 0
+        self.temp_f = 0
 
     # ----------------------------------
     # is_connected()
@@ -75,7 +77,7 @@ class QwiicTMP102(object):
 
         @return **bool** True if the device is connected, otherwise False.
         """        
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -121,7 +123,7 @@ class QwiicTMP102(object):
         if(data[1]&0x01):	# 13 bit mode
                 base_read = ((data[0]) << 5) | (data[1] >> 3)
                 if(base_read > 0xFFF):
-                        base_read |= 0xE000
+                        base_read -= 0x2000  # 13-bit two's complement
         else:
                 #Combine bytes to create a signed int 
                 base_read = ((data[0]) << 4) | (data[1] >> 4)
@@ -129,7 +131,7 @@ class QwiicTMP102(object):
         	#Temperature data can be + or -, if it should be negative,
                 #convert 12 bit to 16 bit and use the 2s compliment.
                 if(base_read > 0x7FF):
-                        base_read |= 0xF000
+                        base_read -= 0x1000  # 12-bit two's complement
 
         self.temp_c = base_read * 0.0625
         return self.temp_c
@@ -260,10 +262,10 @@ class QwiicTMP102(object):
         
         # Align data for the temperature registers (see pg. 19 of datasheet)
         if(extended_mode):	#13-bit mode
-                register_byte[0] = int(temperature)>>5
+                register_byte[0] = (int(temperature)>>5) & 0xFF  # negative values in two's complement
                 register_byte[1] = (int(temperature) & 0x1F)<<3 # lower 5 bits 
         else:
-                register_byte[0] = int(temperature)>>4
+                register_byte[0] = (int(temperature)>>4) & 0xFF  # negative values in two's complement
                 register_byte[1] = (int(temperature) & 0xF)<<4 # lower 4 bits
               
         self._i2c.write_block(self.address, T_LOW_REGISTER, register_byte)
@@ -291,10 +293,10 @@ class QwiicTMP102(object):
         
         # Align data for the temperature registers (see pg. 19 of datasheet)
         if(extended_mode):	#13-bit mode
-                register_byte[0] = int(temperature)>>5 
+                register_byte[0] = (int(temperature)>>5) & 0xFF  # negative values in two's complement
                 register_byte[1] = (int(temperature) & 0x1F)<<3 # lower 5 bits 
         else:
-                register_byte[0] = int(temperature)>>4
+                register_byte[0] = (int(temperature)>>4) & 0xFF  # negative values in two's complement
                 register_byte[1] = (int(temperature) & 0xF)<<4 # lower 4 bits
                 
         self._i2c.write_block(self.address, T_HIGH_REGISTER, register_byte)
@@ -337,11 +339,11 @@ class QwiicTMP102(object):
         if (extended_mode):
                 digital_temp = ((low_temp_byte[0]) << 5) | (low_temp_byte[1] >> 3)
                 if(digital_temp > 0xFFF):
-                        digital_temp |= 0xE000
+                        digital_temp -= 0x2000  # 13-bit two's complement
         else:
                 digital_temp = ((low_temp_byte[0]) << 4) | (low_temp_byte[1] >> 4)
                 if(digital_temp > 0x7FF):
-                        digital_temp |= 0xF000
+                        digital_temp -= 0x1000  # 12-bit two's complement
                         
         return digital_temp*0.0625    
         
@@ -366,11 +368,11 @@ class QwiicTMP102(object):
         if (extended_mode):
                 digital_temp = ((high_temp_byte[0]) << 5) | (high_temp_byte[1] >> 3)
                 if(digital_temp > 0xFFF):
-                        digital_temp |= 0xE000
+                        digital_temp -= 0x2000  # 13-bit two's complement
         else:
                 digital_temp = ((high_temp_byte[0]) << 4) | (high_temp_byte[1] >> 4)
                 if(digital_temp > 0x7FF):
-                        digital_temp |= 0xF000
+                        digital_temp -= 0x1000  # 12-bit two's complement
                         
         return digital_temp*0.0625
 

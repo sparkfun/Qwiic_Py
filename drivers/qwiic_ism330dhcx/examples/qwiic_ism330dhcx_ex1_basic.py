@@ -44,7 +44,7 @@ def run_example():
 	my_ism = qwiic_ism330dhcx.QwiicISM330DHCX()
 
 	# Check if it's connected
-	if my_ism.is_connected() == False:
+	if not my_ism.is_connected():
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return

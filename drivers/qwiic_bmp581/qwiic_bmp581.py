@@ -158,10 +158,10 @@ class OorPressConfiguration(object):
 # BMP5 fifo configurations.
 class FifoConfig(object):
     # Possible fifo frame selections
-    FIFO_NOT_ENABLED = 1
-    FIFO_TEMPERATURE_DATA = 2
-    FIFO_PRESSURE_DATA = 3
-    FIFO_PRESS_TEMP_DATA = 4
+    FIFO_NOT_ENABLED = 0
+    FIFO_TEMPERATURE_DATA = 1
+    FIFO_PRESSURE_DATA = 2
+    FIFO_PRESS_TEMP_DATA = 3
     
     # Possible fifo decimation(downsampling) selection
     FIFO_NO_DOWNSAMPLING = 0
@@ -567,13 +567,14 @@ class QwiicBMP581(object):
 
         @return **OsrOdrPressConfig** The current oversampling and output data rate configuration
         """
-        osr_config = self._i2c.read_byte(self.address, self.REG_OSR_CONFIG)
+        # OSR_CONFIG and ODR_CONFIG are read together; the ODR is in the second
+        osr_config, odr_config = self._i2c.read_block(self.address, self.REG_OSR_CONFIG, 2)
 
         config = OsrOdrPressConfig()
         config.osrT = (osr_config & self.TEMP_OS_MASK) >> self.TEMP_OS_SHIFT
         config.osrP = (osr_config & self.PRESS_OS_MASK) >> self.PRESS_OS_SHIFT
         config.pressEn = (osr_config & self.PRESS_EN_MASK) >> self.PRESS_EN_SHIFT
-        config.odr = (osr_config & self.ODR_MASK) >> self.ODR_SHIFT
+        config.odr = (odr_config & self.ODR_MASK) >> self.ODR_SHIFT
 
         return config
     
@@ -746,8 +747,9 @@ class QwiicBMP581(object):
         # Get the OOR Configurations
         reg_data = list(self._i2c.read_block(self.address, self.REG_OOR_THR_P_LSB, 4))
 
-        reg_data[0] = (reg_data[0] & ~self.OOR_THR_P_LSB_MASK) | (config.oorThrP << self.OOR_THR_P_LSB_SHIFT)
-        reg_data[1] = (reg_data[1] & ~self.OOR_THR_P_MSB_MASK) | ( (config.oorThrP >> 8) << self.OOR_THR_P_MSB_SHIFT)
+        # Bits 0-7 and 8-15 of the 17-bit threshold (bit 16 goes in reg_data[3] below)
+        reg_data[0] = (config.oorThrP & self.OOR_THR_P_LSB_MASK) >> self.OOR_THR_P_LSB_SHIFT
+        reg_data[1] = (config.oorThrP & self.OOR_THR_P_MSB_MASK) >> 8
         reg_data[2] = config.oorRangeP
         thres_x_msb = (config.oorThrP & self.OOR_THR_P_XMSB_MASK) >> self.OOR_THR_P_XMSB_SHIFT
         reg_data[3] = (reg_data[3] & ~self.OOR_THR_P_XMSB_REG_MASK) | thres_x_msb
@@ -780,7 +782,7 @@ class QwiicBMP581(object):
             - `DISABLE`
         """
         
-        reg_data = self._i2c.read_block(self.address, self.REG_INT_CONFIG, 1)
+        reg_data = self._i2c.read_byte(self.address, self.REG_INT_CONFIG)
 
         # Any change between latched/pulsed mode has to be applied while interrupt is disabled
         # Step 1 : Turn off all INT sources (INT_SOURCE -> 0x00)
@@ -832,25 +834,28 @@ class QwiicBMP581(object):
         
         self._set_fifo_iir_config(fifo.setFifoIirT, fifo.setFifoIirP)
 
-        # Get the FIFO Configurations
-        reg_data = list(self._i2c.read_byte(self.address, self.REG_FIFO_CONFIG))
+        # Get the FIFO Configurations (a one-item list, so _set_fifo_threshold can update it)
+        reg_data = [self._i2c.read_byte(self.address, self.REG_FIFO_CONFIG)]
 
-        reg_data &= ~self.FIFO_MODE_MASK
-        reg_data |= fifo.mode << self.FIFO_MODE_SHIFT
+        reg_data[0] &= ~self.FIFO_MODE_MASK
+        reg_data[0] |= fifo.mode << self.FIFO_MODE_SHIFT
 
-        self._set_fifo_threshold(reg_data, fifo)
+        if self._set_fifo_threshold(reg_data, fifo) != self.NO_ERROR:
+            return self.ERROR
 
         # Set the fifo configurations
-        self._i2c.write_byte(self.address, self.REG_FIFO_CONFIG, reg_data)
+        self._i2c.write_byte(self.address, self.REG_FIFO_CONFIG, reg_data[0])
 
         reg_data = self._i2c.read_byte(self.address, self.REG_FIFO_SEL)
 
         reg_data &= ~self.FIFO_FRAME_SEL_MASK
         reg_data |= fifo.frameSel << self.FIFO_FRAME_SEL_SHIFT
         reg_data &= ~self.FIFO_DEC_SEL_MASK
-        reg_data |= fifo.decimation << self.FIFO_DEC_SEL_SHIFT
+        reg_data |= fifo.decSel << self.FIFO_DEC_SEL_SHIFT
 
         self._i2c.write_byte(self.address, self.REG_FIFO_SEL, reg_data)
+
+        return self.NO_ERROR
 
     def get_fifo_len(self, fifo):
         """!
@@ -892,9 +897,13 @@ class QwiicBMP581(object):
         """
 
         idx = 0
+        data_index = 0
 
-        for i in range(0, fifo.length):
-            res = self._unpack_sensor_data(sensor_data[idx], i, fifo)
+        # _unpack_sensor_data() returns the byte index of the next frame.
+        # Stop at the last whole frame: a read can end part way through one.
+        frame_size = 6 if fifo.frameSel == fifo.FIFO_PRESS_TEMP_DATA else 3
+        while data_index + frame_size <= fifo.length:
+            res, data_index = self._unpack_sensor_data(sensor_data[idx], data_index, fifo)
             if not res:
                 break
             idx += 1
@@ -1066,7 +1075,7 @@ class QwiicBMP581(object):
         reg_data[1] &= ~self.SET_IIR_PRESS_MASK
         reg_data[1] |= config.setIirP << self.SET_IIR_PRESS_SHIFT
 
-        self._i2c.write_block(self.address, self.REG_DSP_IIR, reg_data)
+        self._i2c.write_block(self.address, self.REG_DSP_CONFIG, reg_data)
 
     def _set_oor_iir_count_limit(self, set_oor_iir_p, set_count_limit):
         """!
@@ -1152,7 +1161,7 @@ class QwiicBMP581(object):
         @param data_index: **int** The data index
         @param fifo: **FifoConfiguration** The fifo configuration
 
-        @return  True on success, False on failure/frame empty
+        @return  (True on success or False on failure/frame empty, index of the next frame)
         
         """
         res = True 
@@ -1167,7 +1176,7 @@ class QwiicBMP581(object):
                 data_index = fifo.length
                 res = False
 
-        if fifo.frameSel == fifo.FIFO_PRESSURE_DATA:
+        elif fifo.frameSel == fifo.FIFO_PRESSURE_DATA:
             if not ((fifo.data[data_index] == self.FIFO_EMPTY) and (fifo.data[data_index + 1] == self.FIFO_EMPTY) and (fifo.data[data_index + 2] == self.FIFO_EMPTY)):
                 raw_data_p = (fifo.data[data_index + 2] << 16) | (fifo.data[data_index + 1] << 8) | fifo.data[data_index]
                 
@@ -1178,7 +1187,7 @@ class QwiicBMP581(object):
                 data_index = fifo.length
                 res = False
 
-        if fifo.frameSel == fifo.FIFO_PRESS_TEMP_DATA:
+        elif fifo.frameSel == fifo.FIFO_PRESS_TEMP_DATA:
             if not ((fifo.data[data_index] == self.FIFO_EMPTY) and (fifo.data[data_index + 1] == self.FIFO_EMPTY) and (fifo.data[data_index + 2] == self.FIFO_EMPTY) \
                 and (fifo.data[data_index + 3] == self.FIFO_EMPTY) and (fifo.data[data_index + 4] == self.FIFO_EMPTY) and (fifo.data[data_index + 5] == self.FIFO_EMPTY)):
                 raw_data_t = (fifo.data[data_index + 2] << 16) | (fifo.data[data_index + 1] << 8) | fifo.data[data_index]
@@ -1194,8 +1203,10 @@ class QwiicBMP581(object):
         else:
             sensor_data.pressure = 0.0
             sensor_data.temperature = 0.0
+            # No frame type selected: nothing to unpack
+            res = False
         
-        return res
+        return res, data_index
 
     def _get_nvm_status(self):
         """!

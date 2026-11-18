@@ -137,6 +137,7 @@ class QwiicFS3000(object):
         else:
             return False
 
+        self._range = range
         return True
         
     def checksum(self, data_in):

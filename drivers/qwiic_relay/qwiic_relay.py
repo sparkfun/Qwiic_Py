@@ -137,11 +137,9 @@ class QwiicRelay(object):
 
         # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
         address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
-        # Did the user specify an I2C address?
-        if address in self.available_addresses:
-            self.address = address
-        else:
-            self.address = self.available_addresses[0]
+        # Did the user specify an I2C address? Any address is accepted, so a
+        # board moved with change_address() can be opened again.
+        self.address = address if address is not None else self.available_addresses[0]
 
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
@@ -208,16 +206,21 @@ class QwiicRelay(object):
         @param new_address: The new address to change to (0x07 to 0x78)
         @param single_relay: True for the single relay, False for the
                         dual and quad relays
+
+        @return **bool** True if the address was changed, False if
+                        new_address is out of range
         """
         if (new_address < 0x07) or (new_address > 0x78):
-            return
+            return False
         
         if single_relay:
-            return self._i2c.write_byte(self.address, SINGLE_CHANGE_ADDRESS, new_address)
+            self._i2c.write_byte(self.address, SINGLE_CHANGE_ADDRESS, new_address)
         else:
-            return self._i2c.write_byte(self.address, QUAD_CHANGE_ADDRESS, new_address)
+            self._i2c.write_byte(self.address, QUAD_CHANGE_ADDRESS, new_address)
 
+        # Talk to the board at its new address from now on
         self.address = new_address
+        return True
     
     def set_relay_off(self, relay_num=None):
         """!

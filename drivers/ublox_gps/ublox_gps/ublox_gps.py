@@ -58,7 +58,7 @@ try:
 except ImportError:
     spidev = None
 
-from . import spi_wrapper
+from .spi_wrapper import SPIWrapper
 from . import sparkfun_predefines as sp
 from . import core
 
@@ -80,10 +80,9 @@ class UbloxGPS(object):
 
     def __init__(self, hard_port = None):
         if hard_port is None:
-            self.hard_port = serial.Serial("/dev/serial0/", 38400, timeout=1)
+            self.hard_port = serial.Serial("/dev/serial0", 38400, timeout=1)
         elif spidev is not None and isinstance(hard_port, spidev.SpiDev):
-            sfe_spi = spi_wrapper(hard_port)
-            self.hard_port = sfe_spi
+            self.hard_port = SPIWrapper(hard_port)
         else:
             self.hard_port = hard_port
 
@@ -136,6 +135,7 @@ class UbloxGPS(object):
             'accE' : 0.1,
             'accD' : 0.1,
             'accLength' : 0.1,
+            'accRoll' : (10**-5),
             'accPitch' : (10**-5),
             'accHeading' : (10**-5),
 
@@ -188,7 +188,7 @@ class UbloxGPS(object):
         :return: ublox message
         :rtype: namedtuple
         """
-        if wait_time < 0 or wait_time is None:
+        if wait_time is None or wait_time < 0:
             wait_time = 0
 
         orig_tm = time.monotonic()
@@ -225,6 +225,8 @@ class UbloxGPS(object):
 
                     if not(cls_name is None or msg_name is None or payload is None):
                         self.set_packet(cls_name, msg_name, payload)
+
+                    c2 = b'' # start looking for the next message
 
                 if (self.stopping):
                     break

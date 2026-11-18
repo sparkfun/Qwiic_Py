@@ -431,7 +431,7 @@ class QwiicRV8803(object):
 
         @return **str** The month as a string
         """
-        month = self._time[self.IDX_MONTH]
+        month = self.bcd_to_dec(self._time[self.IDX_MONTH])
         if month == 1:
             return "January"
         elif month == 2:
@@ -515,7 +515,7 @@ class QwiicRV8803(object):
         self._time[self.IDX_SECONDS] = self.dec_to_bcd(seconds)
         self._time[self.IDX_MINUTES] = self.dec_to_bcd(minutes)
         self._time[self.IDX_HOURS] = self.dec_to_bcd(hours)
-        self._time[self.IDX_WEEKDAY] = self.dec_to_bcd(weekday)
+        self._time[self.IDX_WEEKDAY] = weekday # One bit per day, not BCD
         self._time[self.IDX_DATE] = self.dec_to_bcd(date)
         self._time[self.IDX_MONTH] = self.dec_to_bcd(month)
         self._time[self.IDX_YEAR] = self.dec_to_bcd(year - 2000)
@@ -563,7 +563,7 @@ class QwiicRV8803(object):
         self._time[self.IDX_MINUTES] = self.dec_to_bcd((seconds // 60) % 60)
         self._time[self.IDX_HOURS] = self.dec_to_bcd(seconds // 3600)
         self._time[self.IDX_DATE] = self.dec_to_bcd(date)
-        self._time[self.IDX_WEEKDAY] = self.dec_to_bcd(1 << ((days + 3) % 7)) # 1970-01-01 was a Thursday; weekday 0 is Monday, as in time.localtime()
+        self._time[self.IDX_WEEKDAY] = 1 << ((days + 4) % 7) # 1970-01-01 was a Thursday; bit 0 is Sunday
         self._time[self.IDX_MONTH] = self.dec_to_bcd(month)
         self._time[self.IDX_YEAR] = self.dec_to_bcd(year - 2000)
 
@@ -655,7 +655,7 @@ class QwiicRV8803(object):
         if value not in [self.SUNDAY, self.MONDAY, self.TUESDAY, self.WEDNESDAY, self.THURSDAY, self.FRIDAY, self.SATURDAY]:
             return False
 
-        self._time[self.IDX_WEEKDAY] = self.dec_to_bcd(value)
+        self._time[self.IDX_WEEKDAY] = value # One bit per day, not BCD
         self.set_time_list(self._time)
         return True
     
@@ -781,7 +781,7 @@ class QwiicRV8803(object):
 
         @return **int** The weekday
         """
-        return self.bcd_to_dec(self._time[self.IDX_WEEKDAY])
+        return self._time[self.IDX_WEEKDAY] # One bit per day, not BCD
 
         # TODO: The arduino lib converts the weekday read to 0-6, this isn't really necessary if user always compares against the day constants
         #       but if we want that functionality, we can add it with this:
@@ -1182,7 +1182,7 @@ class QwiicRV8803(object):
 
         @return **int** The alarm minutes
         """
-        return self.bcd_to_dec(self._i2c.read_byte(self.address, self.REG_MINUTES_ALARM))
+        return self.bcd_to_dec(self._i2c.read_byte(self.address, self.REG_MINUTES_ALARM) & 0x7F)
 
     def get_alarm_hours(self):
         """!
@@ -1190,15 +1190,15 @@ class QwiicRV8803(object):
 
         @return **int** The alarm hours
         """
-        return self.bcd_to_dec(self._i2c.read_byte(self.address, self.REG_HOURS_ALARM))
+        return self.bcd_to_dec(self._i2c.read_byte(self.address, self.REG_HOURS_ALARM) & 0x7F)
 
     def get_alarm_weekday(self):
         """!
         Gets the alarm weekday
 
-        @return **int** The alarm weekday
+        @return **int** The alarm weekday mask (one bit per day, as set_alarm_weekday() takes)
         """
-        return self.bcd_to_dec(self._i2c.read_byte(self.address, self.REG_WEEKDAYS_DATE_ALARM))
+        return self._i2c.read_byte(self.address, self.REG_WEEKDAYS_DATE_ALARM) & 0x7F
 
     def get_alarm_date(self):
         """!
@@ -1206,7 +1206,7 @@ class QwiicRV8803(object):
 
         @return **int** The alarm date
         """
-        return self.bcd_to_dec(self._i2c.read_byte(self.address, self.REG_WEEKDAYS_DATE_ALARM))
+        return self.bcd_to_dec(self._i2c.read_byte(self.address, self.REG_WEEKDAYS_DATE_ALARM) & 0x7F)
 
 
     # Helper Functions

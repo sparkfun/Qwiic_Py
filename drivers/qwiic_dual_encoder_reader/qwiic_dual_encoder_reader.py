@@ -134,7 +134,7 @@ class QwiicDualEncoderReader(object):
             :rtype: bool
 
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -222,7 +222,8 @@ class QwiicDualEncoderReader(object):
 
         """
 
-        return self._i2c.write_word(self.address, QDER_COUNT1, amount)
+        # The count is a signed 16-bit value
+        return self._i2c.write_word(self.address, QDER_COUNT1, amount & 0xFFFF)
 
     #----------------------------------------------------------------
     # set_count2()
@@ -237,7 +238,8 @@ class QwiicDualEncoderReader(object):
 
         """
 
-        return self._i2c.write_word(self.address, QDER_COUNT2, amount)
+        # The count is a signed 16-bit value
+        return self._i2c.write_word(self.address, QDER_COUNT2, amount & 0xFFFF)
 
     #----------------------------------------------------------------
     # get_limit()
@@ -285,6 +287,9 @@ class QwiicDualEncoderReader(object):
 
         """
         difference = self._i2c.read_word(self.address, QDER_DIFFERENCE1)
+        # The difference is a signed 16-bit value
+        if difference > 32767:
+            difference -= 65536
 
         if clear_value:
             self._i2c.write_word(self.address, QDER_DIFFERENCE1, 0)
@@ -331,7 +336,7 @@ class QwiicDualEncoderReader(object):
 
         # Clear the current value if requested
         if clear_value:
-            self._i2c.write_word(QDER_LAST_ENCODER_EVENT, 0)
+            self._i2c.write_word(self.address, QDER_LAST_ENCODER_EVENT, 0)
 
         return time_elapsed
 

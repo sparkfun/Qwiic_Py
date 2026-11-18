@@ -426,8 +426,14 @@ class QwiicOTOS(object):
         # Convert to integer, multiples of 0.1%
         raw_scalar = round((scalar - 1.0) * 1000)
 
+        # The register is a signed 8-bit value, so send negative values as
+        # their two's complement byte (eg. 0.9 -> -100 -> 0x9C)
+        raw_scalar &= 0xFF
+
         # Write the scalar to the device
         self._i2c.write_byte(self.address, self.REG_SCALAR_LINEAR, raw_scalar)
+
+        return True
 
     def get_angular_scalar(self):
         """!
@@ -461,8 +467,14 @@ class QwiicOTOS(object):
         # Convert to integer, multiples of 0.1%
         raw_scalar = round((scalar - 1.0) * 1000)
 
+        # The register is a signed 8-bit value, so send negative values as
+        # their two's complement byte (eg. 0.9 -> -100 -> 0x9C)
+        raw_scalar &= 0xFF
+
         # Write the scalar to the device
         self._i2c.write_byte(self.address, self.REG_SCALAR_ANGULAR, raw_scalar)
+
+        return True
 
     def reset_tracking(self):
         """!

@@ -388,7 +388,7 @@ class QwiicPCA9685(object):
 					False-	Can't find device
 		"""
 
-		return qwiic_i2c.is_device_connected(self.address)
+		return self._i2c.is_device_connected(self.address)
 
 
 	#----------------------------------------------
@@ -930,8 +930,8 @@ class QwiicPCA9685(object):
 		# Defaults to channel 0 if unspecified.
 		self.channel = channel if channel is not None else self.available_pwm_channels[0]
 
-		channel_on_l = LED0_ON_L + 4 * channel
-		channel_off_l = LED0_OFF_L + 4 * channel
+		channel_on_l = LED0_ON_L + 4 * self.channel
+		channel_off_l = LED0_OFF_L + 4 * self.channel
 
 		# Enable word read/writes if not enabled
 		if self.get_auto_increment_bit() != 1:
@@ -943,6 +943,8 @@ class QwiicPCA9685(object):
 			register = channel_off_l
 		elif on_off == 1:
 			register = channel_on_l
+		else:
+			return False
 
 		value = self._i2c.read_word(self.address, register)
 
@@ -982,14 +984,14 @@ class QwiicPCA9685(object):
 		# Defaults to channel 0 if unspecified.
 		self.channel = channel if channel is not None else self.available_pwm_channels[0]
 
-		channel_on_l = LED0_ON_L + 4 * channel
-		channel_off_l = LED0_OFF_L + 4 * channel
+		channel_on_l = LED0_ON_L + 4 * self.channel
+		channel_off_l = LED0_OFF_L + 4 * self.channel
 
 		# Enable word read/writes if not enabled
 		if self.get_auto_increment_bit() != 1:
 			self.set_auto_increment_bit(1)
 
-		if value < 0 or 4095 < value:
+		if value is None or value < 0 or 4095 < value:
 			return False
 
 		if on_off is None:
@@ -998,6 +1000,8 @@ class QwiicPCA9685(object):
 			register = channel_off_l
 		elif on_off == 1:
 			register = channel_on_l
+		else:
+			return False
 
 		self._i2c.write_word(self.address, register, value)
 		return True
@@ -1159,8 +1163,12 @@ class QwiicPCA9685(object):
 				else:
 					osc_clock = 25 * 10**6 # 25 MHz (Default)
 
-		# Calculate prescale value
-		pwm_pre_scale = round(float(osc_clock/(4096*frequency))) - 1
+			# Calculate prescale value
+			pwm_pre_scale = round(float(osc_clock/(4096*frequency))) - 1
+
+			# The register holds 3 to 255; an external clock can fall outside
+			if pwm_pre_scale < 3 or 255 < pwm_pre_scale:
+				return False
 		
 		# Writes 1 to SLEEP bit in MODE1 register.
 		self.set_sleep_bit(1)

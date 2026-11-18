@@ -158,7 +158,7 @@ class TopPHATButton(object):
             :rtype: bool
 
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()
@@ -247,8 +247,9 @@ class TopPHATButton(object):
             :return: The firmware version
             :rtype: string
         """
-        v_major = self._i2c.read_byte(self.address, BUTTON_VERSION1)
-        v_minor = self._i2c.read_byte(self.address, BUTTON_VERSION2)
+        # BUTTON_VERSION1 holds the minor version and BUTTON_VERSION2 the major
+        v_minor = self._i2c.read_byte(self.address, BUTTON_VERSION1)
+        v_major = self._i2c.read_byte(self.address, BUTTON_VERSION2)
 
         return "v %d.%d" % (v_major, v_minor)
     
@@ -286,7 +287,8 @@ class TopPHATButton(object):
         interrupt &= ~(1 << PRESSED_INTERRUPT_ENABLE) #Clear enable bit
         interrupt |= (bit_setting << PRESSED_INTERRUPT_ENABLE)
 
-        return self._i2c.write_word(self.address, BUTTON_INTERRUPT, interrupt)
+        # The interrupt register is one byte; the debounce time follows it
+        return self._i2c.write_byte(self.address, BUTTON_INTERRUPT, interrupt)
 
     #----------------------------------------------------------------
     # get__clicked_interrupt()
@@ -322,4 +324,5 @@ class TopPHATButton(object):
         interrupt &= ~(1 << CLICKED_INTERRUPT_ENABLE) #Clear enable bit
         interrupt |= (bit_setting << CLICKED_INTERRUPT_ENABLE)
 
-        return self._i2c.write_word(self.address, BUTTON_INTERRUPT, interrupt)
+        # The interrupt register is one byte; the debounce time follows it
+        return self._i2c.write_byte(self.address, BUTTON_INTERRUPT, interrupt)

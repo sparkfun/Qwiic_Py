@@ -1008,7 +1008,7 @@ class QwiicMAX1704X(object):
         if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        self.write16(self.address, self.REG_HIBRT, self.MODE_EN_HIB)
+        self.write16(self.address, self.REG_HIBRT, self.MAX17048_HIBRT_EN_HIB)
 
         return True
     
@@ -1022,7 +1022,7 @@ class QwiicMAX1704X(object):
         if self._device <= self.DEVICE_TYPE_MAX17044:
             return False
         
-        self.write16(self.address, self.REG_HIBRT, self.MODE_DIS_HIB)
+        self.write16(self.address, self.REG_HIBRT, self.MAX17048_HIBRT_DIS_HIB)
         return True
     
     def write16(self, address, register, data):

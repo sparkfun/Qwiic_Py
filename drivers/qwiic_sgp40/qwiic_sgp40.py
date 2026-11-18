@@ -569,7 +569,7 @@ class QwiicSGP40(object):
     SGP40_MEASURE_TEST_PASS = [0xD4, 0x00]
     SGP40_MEASURE_TEST_FAIL = [0x4B, 0x00]
   
-    DURATION_WAIT_MEASURE_TEST = 0.25
+    DURATION_WAIT_MEASURE_TEST = 0.32
     DURATION_READ_RAW_VOC = 0.03
   
     # Constructor
@@ -646,7 +646,8 @@ class QwiicSGP40(object):
         
         self._i2c.write_byte(self.address, temp0, temp1)
         self._i2c.delay_ms(self.DURATION_WAIT_MEASURE_TEST * 1000)
-        result = self._i2c.read_block(self.address, 0, 3)
+        # The result is read directly, with no register or command first
+        result = self._i2c.read_block(self.address, None, 3)
         
         if result[0] == self.SGP40_MEASURE_TEST_PASS[0] and result[1] == self.SGP40_MEASURE_TEST_PASS[1]:
             return 0
@@ -732,7 +733,8 @@ class QwiicSGP40(object):
         self._i2c.delay_ms(self.DURATION_READ_RAW_VOC * 1000)
         
         # Data is read back in 3 bytes: data (MSB) / data (LSB) / Cecksum
-        result = self._i2c.read_block(self.address, 0, 3)
+        # The result is read directly, with no register or command first
+        result = self._i2c.read_block(self.address, None, 3)
         
         if self.__check_crc(result) == 0:
             return result[0]<<8 | result[1]

@@ -155,8 +155,8 @@ class QwiicADS1015(object):
         self._mode = self.CONFIG_MODE_CONT # Default to continuous mode
         self._multiplierToVolts = 1.0
 
-        # Array is structured as calibrationValues[finger][lo/hi]
-        self._calibrationValues = [[0,0],[0,0]]
+        # Array is structured as calibrationValues[channel][lo/hi], one per channel
+        self._calibrationValues = [[0,0],[0,0],[0,0],[0,0]]
 
     def is_connected(self):
         """!
@@ -217,8 +217,8 @@ class QwiicADS1015(object):
         if self._useConversionReady:
             while not self.available():
                 pass
-            else:
-                self.conversion_delay()
+        else:
+            self.conversion_delay()
 
         result_bytes = self._i2c.read_block(self.address, self.POINTER_CONVERT, 2)
         result = (result_bytes[0] << 8) | result_bytes[1]
@@ -236,8 +236,8 @@ class QwiicADS1015(object):
         value = self.get_single_ended(channel)
 
         # Check for sign bit in the 12-bit result and turn into a negative number if needed
-        if result > 0x07FF:  # noqa: F821
-            result -= 1 << 12  # noqa: F821
+        if value > 0x07FF:
+            value -= 1 << 12
 
         return value
     
@@ -249,7 +249,7 @@ class QwiicADS1015(object):
 
         @return **float** The millivolt value of the sensor channel
         """
-        return self.get_single_ended(channel) * self.get_multiplier()
+        return self.get_single_ended_signed(channel) * self.get_multiplier()
     
     def get_differential(self, config_mux_diff=CONFIG_MUX_DIFF_P0N1):
         """!
@@ -352,9 +352,9 @@ class QwiicADS1015(object):
 
     def calibrate(self):
         """!
-        Perform calibration on the sensor. This function will set the calibration values for each finger
+        Perform calibration on the sensor. This function will set the calibration values for each channel
         """
-        for finger in range(2):
+        for finger in range(4):
             value = self.get_single_ended(finger)
             if (value > self._calibrationValues[finger][1] or self._calibrationValues[finger][1] == 0) and value < 1085:
                 self._calibrationValues[finger][1] = value
@@ -386,7 +386,7 @@ class QwiicADS1015(object):
         """!
         Resets the calibration values to 0
         """
-        self._calibrationValues = [[0,0],[0,0]]
+        self._calibrationValues = [[0,0],[0,0],[0,0],[0,0]]
     
     def set_mode(self, mode):
         """!
@@ -544,7 +544,7 @@ class QwiicADS1015(object):
         threshold = threshold << 4
 
         bytes_to_write = [threshold >> 8, threshold & 0xFF]
-        self._i2c.write_block(self.address, self.POINTER_CONFIG, bytes_to_write)
+        self._i2c.write_block(self.address, self.POINTER_HI_THRESH, bytes_to_write)
 
 
         # Write config register to the ADC
@@ -567,7 +567,7 @@ class QwiicADS1015(object):
         # Read the conversion results
         # Shift 12-bit results right 4 bits for the ADS1015,
         # making sure we keep the sign bit intact
-        result_bytes = self._i2c.read_block(self.address, self.POINTER_CONFIG, 2)
+        result_bytes = self._i2c.read_block(self.address, self.POINTER_CONVERT, 2)
         result = (result_bytes[0] << 8) | result_bytes[1]
         result = result >> 4
 

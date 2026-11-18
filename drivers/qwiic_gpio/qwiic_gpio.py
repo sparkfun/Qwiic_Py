@@ -132,7 +132,7 @@ class QwiicGPIO(object):
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin()

@@ -204,6 +204,10 @@ class QwiicBME280(object):
 
         @return **bool** Returns true of the initializtion was successful, otherwise False.
         """
+        # No device at this address
+        if not self.is_connected():
+            return False
+
         # are we who we need to be?
         chip_id = self._i2c.read_byte(self.address, self.BME280_CHIP_ID_REG)
         if chip_id not in _validChipIDs:

@@ -57,7 +57,7 @@ _DEFAULT_NAME = "Qwiic LED Stick"
 
 _QWIIC_LED_STICK_DEFAULT_ADDRESS = 0x23
 _FULL_ADDRESS_LIST = list(range(0x08, 0x77+1)) # Full address list (excluding reserved addresses)
-_FULL_ADDRESS_LIST.remove(_QWIIC_LED_STICK_DEFAULT_ADDRESS >> 1) # Remove default address from list
+_FULL_ADDRESS_LIST.remove(_QWIIC_LED_STICK_DEFAULT_ADDRESS) # Remove default address from list
 _AVAILABLE_I2C_ADDRESS = [_QWIIC_LED_STICK_DEFAULT_ADDRESS] # Initialize with default address
 _AVAILABLE_I2C_ADDRESS.extend(_FULL_ADDRESS_LIST) # Add full range of I2C addresses
 
@@ -107,7 +107,7 @@ class QwiicLEDStick(object):
 
         @return **bool** True if the device is connected, false otherwise.
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ------------------------------------------------------------------------------
     # begin()
@@ -315,16 +315,22 @@ class QwiicLEDStick(object):
 
         @param new_address: the new address to be set to. Must be valid.
 
-        @return **Void** Nothing
+        @return **bool** True if the command was sent, False if new_address is not valid
         """
         # First, check if the specified address is valid
         if new_address < 0x08 or new_address > 0x77:
             return False
         
         self._i2c.write_byte(self.address, self.COMMAND_CHANGE_ADDRESS, new_address)
-        
+
+        # The stick stores the address and restarts its I2C interface. Talking
+        # to it before that's done can lock it up until it's power-cycled.
+        self._i2c.delay_ms(500)
+
         # Update address variable
         self.address = new_address
+
+        return True
     
     # --------------------------------------------------------------------------
     # change_length(new_length)

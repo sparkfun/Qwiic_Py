@@ -151,7 +151,7 @@ class QwiicTitanGPS(object):
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
 
@@ -174,22 +174,23 @@ class QwiicTitanGPS(object):
 
         while buffer_tracker != 0:
 
+            # The XA1110 has no registers: read its output stream directly
             if buffer_tracker > self.MAX_I2C_BUFFER:
-                raw_data.extend(self._i2c.read_block(self.address, 0x00,
+                raw_data.extend(self._i2c.read_block(self.address, None,
                                                      self.MAX_I2C_BUFFER))
                 buffer_tracker = buffer_tracker - self.MAX_I2C_BUFFER
                 if raw_data[0] == 0x0A:
                     break
 
-            elif buffer_tracker < self.MAX_I2C_BUFFER:
-                raw_data.extend(self._i2c.read_block(self.address, 0x00,
+            else:
+                raw_data.extend(self._i2c.read_block(self.address, None,
                                                      buffer_tracker))
                 buffer_tracker = 0
                 if raw_data[0] == 0x0A:
                     break
 
-            for raw_bytes in raw_data:
-                raw_sentences = raw_sentences + chr(raw_bytes)
+        for raw_bytes in raw_data:
+            raw_sentences = raw_sentences + chr(raw_bytes)
 
         return raw_sentences
 
@@ -420,8 +421,8 @@ class MicropyGPS(object):
 
         try:
             self.log_handle = open(target_file, mode_code)
-        except AttributeError:
-            # Invalid file name
+        except (AttributeError, OSError, TypeError):
+            # Invalid file name, or no file system on this platform
             return False
 
         self.log_en = True
@@ -445,7 +446,7 @@ class MicropyGPS(object):
         """
         try:
             self.log_handle.write(log_string)
-        except TypeError:
+        except (TypeError, OSError):
             return False
         return True
 

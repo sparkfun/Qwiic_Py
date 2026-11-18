@@ -457,7 +457,7 @@ class QwiicISM330DHCX(object):
     MD1_CFG_SHIFT_INT1_SHUB = 0
     MD1_CFG_MASK_INT1_SHUB = 0b1 << MD1_CFG_SHIFT_INT1_SHUB
 
-    REG_EMB_FUN_INT2 = 0x0E
+    REG_EMB_FUNC_INT2 = 0x0E
     EMB_FUNC_INT2_SHIFT_FSM_LC = 7
     EMB_FUNC_INT2_MASK_FSM_LC = 0b1 << EMB_FUNC_INT2_SHIFT_FSM_LC
     EMB_FUNC_INT2_SHIFT_SIG_MOT = 5
@@ -656,8 +656,7 @@ class QwiicISM330DHCX(object):
             return False
         
         # Confirm device ID is correct
-        if self.get_id() != self.DEV_ID:
-            return False
+        return self.get_id() == self.DEV_ID
 
     def begin(self):
         """!
@@ -1428,8 +1427,8 @@ class QwiicISM330DHCX(object):
 
         reg_val = self._i2c.read_byte(self.address, self.REG_FIFO_CTRL3)
 
-        reg_val &= ~self.FIFO_CTRL3_MASK_BDR_G
-        reg_val |= (val << self.FIFO_CTRL3_SHIFT_BDR_G)
+        reg_val &= ~self.FIFO_CTRL3_MASK_BDR_GY
+        reg_val |= (val << self.FIFO_CTRL3_SHIFT_BDR_GY)
         
         self._i2c.write_byte(self.address, self.REG_FIFO_CTRL3, reg_val)
     
@@ -1790,15 +1789,15 @@ class QwiicISM330DHCX(object):
         @param val: **int** The data ready mode.
 
         Possible values:
-            - DATA_READY_PULSED
-            - DATA_READY_LATCHED
+            - DRDY_LATCHED
+            - DRDY_PULSED
         """
-        if val < self.DATA_READY_PULSED or val > self.DATA_READY_LATCHED:
+        if val not in (self.DRDY_LATCHED, self.DRDY_PULSED):
             return
 
         reg_val = self._i2c.read_byte(self.address, self.REG_CNTR_BDR1)
 
-        reg_val &= ~self.CNTR_BDR1_SHIFT_DATAREADY_PULSED
+        reg_val &= ~self.CNTR_BDR1_MASK_DATAREADY_PULSED
         reg_val |= (val << self.CNTR_BDR1_SHIFT_DATAREADY_PULSED)
 
         self._i2c.write_byte(self.address, self.REG_CNTR_BDR1, reg_val)
@@ -1848,15 +1847,15 @@ class QwiicISM330DHCX(object):
             slv_subadd_reg = self.REG_SLV0_SUBADD
             slv_config_reg = self.REG_SLV0_CONFIG
         elif sensor == 1:
-            slv_add_reg = self.REG_SLV1_ADDR
+            slv_add_reg = self.REG_SLV1_ADD
             slv_subadd_reg = self.REG_SLV1_SUBADD
             slv_config_reg = self.REG_SLV1_CONFIG
         elif sensor == 2:
-            slv_add_reg = self.REG_SLV2_ADDR
+            slv_add_reg = self.REG_SLV2_ADD
             slv_subadd_reg = self.REG_SLV2_SUBADD
             slv_config_reg = self.REG_SLV2_CONFIG
         elif sensor == 3:
-            slv_add_reg = self.REG_SLV3_ADDR
+            slv_add_reg = self.REG_SLV3_ADD
             slv_subadd_reg = self.REG_SLV3_SUBADD
             slv_config_reg = self.REG_SLV3_CONFIG
         
@@ -1961,7 +1960,7 @@ class QwiicISM330DHCX(object):
 
         self._mem_bank_set(self.SENSOR_HUB_BANK)
 
-        data = list(self._i2c.read_bytes(self.address, self.REG_SENSOR_HUB1, len))
+        data = list(self._i2c.read_block(self.address, self.REG_SENSOR_HUB1, len))
 
         self._mem_bank_set(self.USER_BANK)
 
@@ -2058,7 +2057,7 @@ class QwiicISM330DHCX(object):
         self._mem_bank_set(self.SENSOR_HUB_BANK)
 
         master_config = self._i2c.read_byte(self.address, self.REG_MASTER_CONFIG)
-        master_config &= ~self.MASTER_CONFIG_SHIFT_PASS_THROUGH_MODE
+        master_config &= ~self.MASTER_CONFIG_MASK_PASS_THROUGH_MODE
         master_config |= (enable << self.MASTER_CONFIG_SHIFT_PASS_THROUGH_MODE)
         self._i2c.write_byte(self.address, self.REG_MASTER_CONFIG, master_config)
 

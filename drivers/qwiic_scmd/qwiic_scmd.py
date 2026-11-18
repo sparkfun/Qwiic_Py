@@ -65,7 +65,8 @@ _DEFAULT_NAME = "Qwiic Serial Control Motor Driver"
 # Some devices have multiple availabel addresses - this is a list of these addresses.
 # NOTE: The first address in this list is considered the default I2C address for the
 # device.
-_AVAILABLE_I2C_ADDRESS = [0x5D, 0x58, 0x59, 0x5A, 0x5C]
+# The board's config jumpers select 0x58 to 0x61 (0x5D is the default).
+_AVAILABLE_I2C_ADDRESS = [0x5D, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5E, 0x5F, 0x60, 0x61]
 
 # pylint: disable=too-few-public-methods
 # Simple replication of the diagnostic class.
@@ -274,7 +275,7 @@ class QwiicSCMD(object):
 
             @return **bool** True if the device is connected, otherwise False.
             """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     def begin(self):
         """!
@@ -282,6 +283,10 @@ class QwiicSCMD(object):
 
             @return **bool** Returns true if the device ID reads as ID_WORD (0xA9), otherwise False.
             """
+        # No device at this address
+        if not self.is_connected():
+            return False
+
         # dummy read
         self._i2c.read_byte(self.address, self.SCMD_ID)
 
@@ -372,6 +377,16 @@ class QwiicSCMD(object):
         if motor_num < 34:
             drive_value = (level * direction) + (level * (direction - 1)) # set to 1/2 drive if direction = 1 or -1/2 drive if direction = 0 (level * direction)
             drive_value += 128
+            # The drive register is one byte: 1 is full speed one way, 128
+            # stop, 255 full speed the other way. The Arduino library halves
+            # the level with level >> 1, so it only ever sends 1 to 255. The
+            # rounding above can go one step further each way: direction 1
+            # with level 255 gives 128 + 128 = 256, which the bus sent as
+            # 0x00, and direction 0 with level 255 gives 0. The motor driver
+            # doesn't drive the motor at 0, so both left the motor stopped
+            # instead of at full speed. Clamp to 1-255; every other value is
+            # unchanged.
+            drive_value = max(1, min(255, drive_value))
             self._i2c.write_byte(self.address, self.SCMD_MA_DRIVE + motor_num, drive_value)
 
 
@@ -474,7 +489,7 @@ class QwiicSCMD(object):
                 # out of range
                 return
             # convert driver_num to one-hot mask
-            data = self._i2c.read_byte(reg_temp) & (~(1 << driver_num ) & 0xFF)
+            data = self._i2c.read_byte(self.address, reg_temp) & (~(1 << driver_num ) & 0xFF)
             self._i2c.write_byte(self.address, reg_temp, data | ((bridged & 0x01) << driver_num))
 
     # ****************************************************************************#

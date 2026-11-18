@@ -69,11 +69,11 @@ def load_user_settings(my_mem, settings):
 
         print("\nDefault settings applied")
     else:
-        settings.baud_rate == my_mem.read_int(LOCATION_SETTINGS)
-        settings.log_date == bool(my_mem.read_byte(LOCATION_SETTINGS + 4))
-        settings.enable_imu == bool(my_mem.read_byte(LOCATION_SETTINGS + 5))
+        settings.baud_rate = my_mem.read_int(LOCATION_SETTINGS)
+        settings.log_date = bool(my_mem.read_byte(LOCATION_SETTINGS + 4))
+        settings.enable_imu = bool(my_mem.read_byte(LOCATION_SETTINGS + 5))
         # Round to 2-decimal point precision
-        settings.cal_value == round(my_mem.read_float(LOCATION_SETTINGS + 6), 2)
+        settings.cal_value = round(my_mem.read_float(LOCATION_SETTINGS + 6), 2)
 
 # Record the current settings into EEPROM
 def record_user_settings(my_mem, settings):

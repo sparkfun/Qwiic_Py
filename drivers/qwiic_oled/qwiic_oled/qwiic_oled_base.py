@@ -203,7 +203,7 @@ class QwiicOLEDBase(object):
 
             @return **bool** True if the device is connected, otherwise False.
             """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     #--------------------------------------------------------------------------
     def begin(self):
@@ -212,6 +212,10 @@ class QwiicOLEDBase(object):
 
             @return **bool** Returns true of the initializtion was successful, otherwise False.
             """
+
+        # No device at this address
+        if not self.is_connected():
+            return False
 
         self.set_font_type(0)
         self.set_color(self.WHITE)
@@ -248,7 +252,10 @@ class QwiicOLEDBase(object):
             self._i2c.write_byte(self.address, I2C_COMMAND, 0x12)                # square and large (64x48 or 128x64 OLED modules)
 
         self._i2c.write_byte(self.address, I2C_COMMAND, SETCONTRAST)         #  0x81
-        self._i2c.write_byte(self.address, I2C_COMMAND, 0x8F)
+        if len(self._screenbuffer) == 1024:
+            self._i2c.write_byte(self.address, I2C_COMMAND, 0xCF)                # large (128x64 OLED modules)
+        else:
+            self._i2c.write_byte(self.address, I2C_COMMAND, 0x8F)                # square and rect (64x48 or 128x32 OLED modules)
 
         self._i2c.write_byte(self.address, I2C_COMMAND, SETPRECHARGE)            #  0xd9
         self._i2c.write_byte(self.address, I2C_COMMAND, 0x22)
@@ -413,11 +420,15 @@ class QwiicOLEDBase(object):
 
         
             """
-        if c == '\n':
+        # print() passes character codes; accept a one-character string too
+        if isinstance(c, str):
+            c = ord(c)
+
+        if c == 10: # '\n'
             # self.cursor_y += self.font_height
             self.cursor_y += self._font.height
             self.cursor_x = 0
-        elif c != '\r':
+        elif c != 13: # '\r'
             self.draw_char(self.cursor_x, self.cursor_y, c)
             self.cursor_x += self._font.width+1
             if self.cursor_x > (self.lcd_width - self._font.width):

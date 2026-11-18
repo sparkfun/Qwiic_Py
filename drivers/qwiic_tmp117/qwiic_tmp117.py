@@ -518,6 +518,8 @@ class QwiicTMP117(object):
         config_reg |= (conv << self.CONFIG_CONV_SHIFT)
 
         self.write_register(self.REG_CONFIGURATION, config_reg)
+
+        return True
     
     def get_conversion_cycle_bit(self):
         """!

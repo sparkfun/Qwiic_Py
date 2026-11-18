@@ -91,6 +91,13 @@ DISPLAY_ADDRESS1 = 0x72 # This is the default address of the OpenLCD
 MAX_ROWS = 4
 MAX_COLUMNS = 20
 
+# Minimum time between two I2C transmissions to the display, in milliseconds.
+# The SerLCD's ATmega328P sometimes fails to ACK a transmission that follows the
+# previous one too closely (see sparkfun/qwiic_serlcd_py issues #9 and #11). The
+# SparkFun SerLCD Arduino library waits at least 10 ms after every transmission,
+# so this driver keeps at least that gap too.
+_MIN_COMMAND_GAP_MS = 10
+
 # OpenLCD command characters
 SPECIAL_COMMAND = 254  # Magic number for sending a special command
 SETTING_COMMAND = 0x7C # 124, |, the pipe character: The command to change settings: baud, lines, width, backlight, splash, etc
@@ -175,6 +182,9 @@ class QwiicSerLCD(object):
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
+        # ticks_ms() of the last transmission, for the minimum gap between commands
+        self._last_command_ms = None
+
     def is_connected(self):
         """!
         @brief Determine if a device is connected to the system.
@@ -182,7 +192,30 @@ class QwiicSerLCD(object):
         @return **bool** True if the device is connected, otherwise False.
         """
         # Another possible comment could be @retval bool True: Device is connected. above
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
+
+    # Every transmission goes through these three methods, so consecutive
+    # commands are always at least _MIN_COMMAND_GAP_MS apart.
+    def _wait_for_display(self):
+        if self._last_command_ms is not None:
+            elapsed = self._i2c.ticks_diff(self._i2c.ticks_ms(), self._last_command_ms)
+            if elapsed < _MIN_COMMAND_GAP_MS:
+                self._i2c.delay_ms(_MIN_COMMAND_GAP_MS - elapsed)
+
+    def _write_command(self, value):
+        self._wait_for_display()
+        self._i2c.write_byte(self.address, None, value)
+        self._last_command_ms = self._i2c.ticks_ms()
+
+    def _write_byte(self, register, value):
+        self._wait_for_display()
+        self._i2c.write_byte(self.address, register, value)
+        self._last_command_ms = self._i2c.ticks_ms()
+
+    def _write_block(self, register, data):
+        self._wait_for_display()
+        self._i2c.write_block(self.address, register, data)
+        self._last_command_ms = self._i2c.ticks_ms()
 
     def begin(self):
         """!
@@ -208,13 +241,10 @@ class QwiicSerLCD(object):
             Print a string of characters to the LCD
 
             @param string string: The string you would like to print. Aka ASCII characters. example: "Hello"
-
-            @return **bool** Returns True if the I2C writes were successful, otherwise False.
         """
         for c in string:
-            self._i2c.write_byte(self.address, None, ord(c))
+            self._write_command(ord(c))
             self._i2c.delay_ms(10)
-        return True
 
     def clear_screen(self):
         """!
@@ -249,7 +279,7 @@ class QwiicSerLCD(object):
         command = LCD_SETDDRAMADDR | (col + row_offsets[row])
 
         # send the complete bytes (special command + command)
-        self._i2c.write_byte(self.address, SPECIAL_COMMAND, command)
+        self._write_byte(SPECIAL_COMMAND, command)
 
     def set_contrast(self, contrast):
         """!
@@ -269,7 +299,7 @@ class QwiicSerLCD(object):
         block = [CONTRAST_COMMAND, contrast]
 
         # send the complete bytes (address, settings command , contrast command, contrast value)
-        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._write_block(SETTING_COMMAND, block)
         self._i2c.delay_ms(10)
 
     def set_backlight(self, r, g, b):
@@ -309,8 +339,9 @@ class QwiicSerLCD(object):
         block[8] = SPECIAL_COMMAND
         block[9] = (LCD_DISPLAYCONTROL | self._display_control)
 
-        # send the complete bytes (address, settings command , contrast command, contrast value)
-        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        # send the complete bytes. block[0] (SPECIAL_COMMAND) is already the
+        # leading command byte, so it goes in the register position.
+        self._write_block(block[0], block[1:])
         self._i2c.delay_ms(50)
 
     def special_command(self, command, count = 1):
@@ -323,7 +354,7 @@ class QwiicSerLCD(object):
         """
         for i in range(0, count):
             # send the complete bytes (special command + command)
-            self._i2c.write_byte(self.address, SPECIAL_COMMAND, command)
+            self._write_byte(SPECIAL_COMMAND, command)
         self._i2c.delay_ms(50)
 
     def command(self, command):
@@ -333,7 +364,7 @@ class QwiicSerLCD(object):
 
             @param command: **int** Command to send (a single byte)
         """
-        self._i2c.write_byte(self.address, SETTING_COMMAND, command)
+        self._write_byte(SETTING_COMMAND, command)
         self._i2c.delay_ms(10)
 
     def move_cursor_left(self, count = 1):
@@ -400,29 +431,29 @@ class QwiicSerLCD(object):
         """!
             Turn autoscrolling on. This will right-justify text from the cursor.
         """
-        self._display_control |= LCD_ENTRYSHIFTINCREMENT
-        self.special_command(LCD_ENTRYMODESET | self._display_control)
+        self._display_mode |= LCD_ENTRYSHIFTINCREMENT
+        self.special_command(LCD_ENTRYMODESET | self._display_mode)
 
     def no_autoscroll(self):
         """!
             Turn autoscrolling off.
         """
-        self._display_control &= ~LCD_ENTRYSHIFTINCREMENT
-        self.special_command(LCD_ENTRYMODESET | self._display_control)
+        self._display_mode &= ~LCD_ENTRYSHIFTINCREMENT
+        self.special_command(LCD_ENTRYMODESET | self._display_mode)
 
     def left_to_right(self):
         """!
             Set the text to flow from left to right.
         """
-        self._display_control |= LCD_ENTRYLEFT
-        self.special_command(LCD_ENTRYMODESET | self._display_control)
+        self._display_mode |= LCD_ENTRYLEFT
+        self.special_command(LCD_ENTRYMODESET | self._display_mode)
 
     def right_to_left(self):
         """!
             Set the text to flow from right to left
         """
-        self._display_control &= ~LCD_ENTRYLEFT
-        self.special_command(LCD_ENTRYMODESET | self._display_control)
+        self._display_mode &= ~LCD_ENTRYLEFT
+        self.special_command(LCD_ENTRYMODESET | self._display_mode)
 
     def create_char(self, location, charmap):
         """!
@@ -444,7 +475,7 @@ class QwiicSerLCD(object):
             block[i] = charmap[i-1]
 
         # send the complete bytes (address, settings command , write char command (includes location), charmap)
-        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._write_block(SETTING_COMMAND, block)
         self._i2c.delay_ms(50)
 
     def write_char(self, location):
@@ -491,7 +522,7 @@ class QwiicSerLCD(object):
         block[3] = b
 
         # send the complete bytes (address, settings command , rgb command , red byte, green byte, blue byte)
-        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._write_block(SETTING_COMMAND, block)
         self._i2c.delay_ms(10)
 
     def enable_system_messages(self):
@@ -553,6 +584,6 @@ class QwiicSerLCD(object):
         block[1] = new_addr
 
         # send the complete bytes (address, settings command , address command , new_addr byte)
-        self._i2c.write_block(self.address, SETTING_COMMAND, block)
+        self._write_block(SETTING_COMMAND, block)
         self._i2c.delay_ms(50)
         self.address = new_addr # update our own address, so we can still talk to the display

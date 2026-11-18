@@ -128,7 +128,7 @@ class QwiicTCA9548A(object):
 
 			@return **bool** True if the device is connected, otherwise False.
 			"""
-		return qwiic_i2c.is_device_connected(self.address)
+		return self._i2c.is_device_connected(self.address)
 
 	def begin(self):
 		"""!
@@ -159,17 +159,18 @@ class QwiicTCA9548A(object):
 							list. The method will automatically convert
 							an individual integer into a list.
 							Range- 0 to 7
+
+		@exception ValueError An entry is not an integer from 0 to 7.
+							Nothing is changed.
 		"""
 		# If entry is an integer and not a list; turn it into a list of (1)
 		if type(enable) is not list: enable = [ enable ]
+		self._check_channels(enable)
 
 		command = self.get_enabled_channels()
 
 		# Iterate through list
 		for entry in enable:
-			# Skip entries that aren't channel numbers (0-7)
-			if type(entry) is not int or entry < 0 or 7 < entry:
-				continue
 			# Set bit to 1
 			command = command | (1<<entry)
 
@@ -185,21 +186,28 @@ class QwiicTCA9548A(object):
 							or list. The method will automatically
 							convert an individual integer into a list.
 							Range- 0 to 7
+
+		@exception ValueError An entry is not an integer from 0 to 7.
+							Nothing is changed.
 		"""
 		# If entry is an integer and not a list; turn it into a list of (1)
 		if type(disable) is not list: disable = [ disable ]
+		self._check_channels(disable)
 
 		command = self.get_enabled_channels()
 
 		# Iterate through list
 		for entry in disable:
-			# Skip entries that aren't channel numbers (0-7)
-			if type(entry) is not int or entry < 0 or 7 < entry:
-				continue
 			# Clear bit to 0
 			command = command & ~(1 << entry)
 
 		self._i2c.write_byte(self.address, None, command & 0xFF)
+
+	def _check_channels(self, channels):
+		# Every entry must be a channel number (2.x printed and skipped bad entries)
+		for entry in channels:
+			if type(entry) is not int or entry < 0 or 7 < entry:
+				raise ValueError("channel must be an integer from 0 to 7, not %r" % (entry,))
 
 	def enable_all(self):
 		"""!

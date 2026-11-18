@@ -113,8 +113,8 @@ class QwiicProximity(object):
     # Define commands/commandwords for the sensor
     VCNL4040_ALS_IT_MASK = (~((1 << 7) | (1 << 6))) & 0xff #uint8
     VCNL4040_ALS_IT_80MS = 0
-    VCNL4040_ALS_IT_160MS = (1 << 7)
-    VCNL4040_ALS_IT_320MS = (1 << 6)
+    VCNL4040_ALS_IT_160MS = (1 << 6)
+    VCNL4040_ALS_IT_320MS = (1 << 7)
     VCNL4040_ALS_IT_640MS = (1 << 7) | (1 << 6)
 
     VCNL4040_ALS_PERS_MASK = (~((1 << 3) | (1 << 2))) & 0xff
@@ -163,13 +163,13 @@ class QwiicProximity(object):
 
     VCNL4040_PS_SMART_PERS_MASK = (~(1 << 4)) & 0xff
     VCNL4040_PS_SMART_PERS_DISABLE = 0
-    VCNL4040_PS_SMART_PERS_ENABLE = (1 << 1)
+    VCNL4040_PS_SMART_PERS_ENABLE = (1 << 4)
 
     VCNL4040_PS_AF_MASK = (~(1 << 3)) & 0xff
     VCNL4040_PS_AF_DISABLE = 0
     VCNL4040_PS_AF_ENABLE = (1 << 3)
 
-    VCNL4040_PS_TRIG_MASK = (~(1 << 3)) & 0xff
+    VCNL4040_PS_TRIG_MASK = (~(1 << 2)) & 0xff
     VCNL4040_PS_TRIG_TRIGGER = (1 << 2)
 
     VCNL4040_WHITE_EN_MASK = (~(1 << 7)) & 0xff
@@ -215,7 +215,7 @@ class QwiicProximity(object):
             :rtype: bool
 
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     #----------------------------------------------
     # //Check comm with sensor and set it to default init settings
@@ -511,7 +511,7 @@ class QwiicProximity(object):
 
             :return: No return value
         """
-        self._bit_mask(VCNL4040_PS_MS, UPPER, self.VCNL4040_WHITE_EN_MASK, self.VCNL4040_WHITE_ENABLE)
+        self._bit_mask(VCNL4040_PS_MS, UPPER, self.VCNL4040_WHITE_EN_MASK, self.VCNL4040_WHITE_DISABLE)
 
     # Enable the proximity detection logic output mode
     # When this mode is selected, the INT pin is pulled low when an object is

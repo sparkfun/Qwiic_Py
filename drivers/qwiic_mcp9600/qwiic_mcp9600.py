@@ -195,10 +195,7 @@ class QwiicMCP9600(object):
         address, i2c_bus = qwiic_i2c.device_args(address, i2c_bus)
 
         # Use address if provided, otherwise pick the default
-        if address in self.available_addresses:
-            self.address = address
-        else:
-            self.address = self.available_addresses[0]
+        self.address = address if address is not None else self.available_addresses[0]
 
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
@@ -270,8 +267,8 @@ class QwiicMCP9600(object):
             try:
                 # Read the register
                 value = self._i2c.read_block(self.address, register, num_bytes)
-            except Exception:
-                # If there's an error, try again
+            except OSError:
+                # If there's an I2C error, try again
                 continue
             else:
                 # If no error, return the value
@@ -737,7 +734,7 @@ class QwiicMCP9600(object):
 
         return True
     
-    def get_shutdown_mode(self, mode):
+    def get_shutdown_mode(self):
         """!
         Returns the shutdown "operating" mode of the MCP9600. Configurable to Normal, Shutdown, and Burst.
 

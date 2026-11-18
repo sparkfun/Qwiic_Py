@@ -58,8 +58,7 @@ def run_example():
 	print("Initialized.")
 
 	while True:
-		mySoilSensor.read_moisture_level()
-		print(mySoilSensor.level)
+		print(mySoilSensor.read_moisture_level())
 		mySoilSensor.led_on()
 		qwiic_i2c.delay_ms(1000)
 		mySoilSensor.led_off()

@@ -107,7 +107,7 @@ class QwiicEEPROM(object):
         """
         if i2c_address is None:
             i2c_address = self.address
-        return qwiic_i2c.is_device_connected(i2c_address)
+        return self._i2c.is_device_connected(i2c_address)
     
     # ------------------------------------------------------------------
     # begin()

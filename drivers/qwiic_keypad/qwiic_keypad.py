@@ -72,6 +72,10 @@ _DEFAULT_NAME = "Qwiic Keypad - 12 Key"
 # device.
 _AVAILABLE_I2C_ADDRESS = [0x4B]
 
+# Number of times update_fifo() tries the write before giving up. The bus can
+# fail now and then on some platforms (for example the Raspberry Pi).
+_UPDATE_FIFO_ATTEMPTS = 3
+
 # Register codes for the keypad
 KEYPAD_ID       = 0x00
 KEYPAD_VERSION1 = 0x01
@@ -208,7 +212,18 @@ class QwiicKeypad(object):
         "commands" keypad to plug in the next button into the registerMap
         note, this actually sets the bit0 on the updateFIFO register
 
+        The write is retried a few times, since the bus can fail now and then
+        on some platforms.
+
         @return No return value
+        @exception OSError: The write failed on every attempt
         """
         # set bit0, commanding keypad to update fifo
-        self._i2c.write_byte(self.address, KEYPAD_UPDATE_FIFO, 0x01)
+        for attempt in range(_UPDATE_FIFO_ATTEMPTS):
+            try:
+                self._i2c.write_byte(self.address, KEYPAD_UPDATE_FIFO, 0x01)
+                return
+            except OSError:
+                if attempt == _UPDATE_FIFO_ATTEMPTS - 1:
+                    raise
+                self._i2c.delay_ms(1)

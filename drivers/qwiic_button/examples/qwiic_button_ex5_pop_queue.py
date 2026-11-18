@@ -65,7 +65,7 @@ def run_example():
         # If the character is p or P, then pop a value off of the pressed queue
         if val == "p" or val == "P":
             print("Popped Pressed Queue!")
-            print(str(my_button.pop_clicked_queue() / 1000.0))
+            print(str(my_button.pop_pressed_queue() / 1000.0))
 
         qwiic_i2c.delay_ms(100)    # Let's not hammer too hard on the I2C bus
 

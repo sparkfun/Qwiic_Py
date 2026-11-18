@@ -98,8 +98,6 @@ class QwiicRFID(object):
 
     RFID_TAG = None
     RFID_TIME = None
-    TAG_ARRAY = [None] * MAX_TAG_STORAGE
-    TIME_ARRAY = [None] * MAX_TAG_STORAGE
 
     # Constructor
     def __init__(self, address=None, i2c_bus=None):
@@ -114,6 +112,10 @@ class QwiicRFID(object):
 
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
+
+        # Tags and times read by get_all_tags(), one list per reader
+        self.TAG_ARRAY = [None] * self.MAX_TAG_STORAGE
+        self.TIME_ARRAY = [None] * self.MAX_TAG_STORAGE
 
     # ------------------------------------
     # is_connected()
@@ -261,7 +263,7 @@ class QwiicRFID(object):
 
         @param new_address: the new address to set the RFID reader to
         
-        @return **bool** False if the address is out of range
+        @return **bool** True if the address was changed, False if it is out of range
         """
         if new_address < 0x07 or new_address > 0x78:
             return False
@@ -269,6 +271,7 @@ class QwiicRFID(object):
         self._i2c.write_byte(self.address, self.ADDRESS_LOCATION, new_address)
         
         self.address = new_address
+        return True
 
     # ------------------------------------------------
     # _read_tag_time()

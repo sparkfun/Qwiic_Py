@@ -48,8 +48,8 @@ def run():
         while True:
             try:
                 # Get NMEA Protocol Version (key CFG-NMEA-PROTVER)
-                get_set = gps.ubx_get_set_del(0x20930001)
-                print(get_set)
+                get_val = gps.ubx_get_val(0x20930001)
+                print(get_val)
             except (ValueError, IOError) as err:
                 print(err)
 

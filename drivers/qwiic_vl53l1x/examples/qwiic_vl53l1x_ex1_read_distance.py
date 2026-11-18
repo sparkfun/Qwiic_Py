@@ -62,9 +62,10 @@ import qwiic_i2c
 def read_distance(tof):
 	"""Take one measurement and return the distance in mm."""
 	tof.start_ranging()						# Write configuration bytes to initiate measurement
-	qwiic_i2c.delay_ms(5)
+	while not tof.check_for_data_ready():	# Wait for the measurement to finish
+		qwiic_i2c.delay_ms(1)
 	distance = tof.get_distance()			# Get the result of the measurement from the sensor
-	qwiic_i2c.delay_ms(5)
+	tof.clear_interrupt()					# Arm the sensor for the next measurement
 	tof.stop_ranging()
 	return distance
 

@@ -56,7 +56,7 @@ def run_example():
     
     print("\nEEPROM ready!")
 
-    my_eeprom.set_memory_size(51200 / 8)    # Qwiic EEPROM is 24512C (512kbit)
+    my_eeprom.set_memory_size(512 * 1024 // 8)    # Qwiic EEPROM is 24512C (512kbit = 64kbyte)
     # my_eeprom.set_page_size(128)
     # my_eeprom.disable_poll_for_write_complete()
 

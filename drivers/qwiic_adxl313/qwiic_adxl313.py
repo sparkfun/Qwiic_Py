@@ -225,7 +225,7 @@ class QwiicADXL313(object):
 			:return: True if the device is connected, otherwise False.
 			:rtype: bool
 		"""
-		return qwiic_i2c.is_device_connected(self.address)
+		return self._i2c.is_device_connected(self.address)
 
 	# ----------------------------------
 	# begin()
@@ -238,8 +238,12 @@ class QwiicADXL313(object):
 			:return: Returns true of the initializtion was successful, otherwise False.
 			:rtype: bool
 		"""
+		# No device at this address
+		if not self.is_connected():
+			return False
+
 		# are we who we need to be?
-		chip_id = self._i2c.read_byte(self.address, self.AGB0_REG_WHO_AM_I)
+		chip_id = self._i2c.read_byte(self.address, self.ADXL313_PARTID)
 		if not chip_id in _VALID_CHIP_IDS:
 			return False
 

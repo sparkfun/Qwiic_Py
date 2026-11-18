@@ -695,7 +695,7 @@ class QwiicAS726x(object):
         """
         value = self.virtual_read_register(self.CONFIG)
         value &= ~self.CONFIG_DATA_READY_MASK
-        self._i2c.write_byte(self.address, self.CONFIG, value)
+        self.virtual_write_register(self.CONFIG, value)
 
     def virtual_read_register(self, virtual_addr):
         """!

@@ -54,7 +54,7 @@ class Field:
         self.name = name
 
         if (len_ is None or len_ < 0):
-            ValueError('The provided _len is not valid')
+            raise ValueError('The provided _len is not valid')
 
 
         self._len = len_

@@ -146,11 +146,8 @@ class QwiicUltrasonic(object):
         if address < self.MIN_ADDRESS or address > self.MAX_ADDRESS:
             return False
 
-        # The first bit of the address must be set to 1
-        address |= 0x80
-
-        # Write the new address to the device
-        self._i2c.write_byte(self.address, None, address)
+        # Write the new address to the device. The first bit must be set to 1
+        self._i2c.write_byte(self.address, None, address | 0x80)
 
         # Update the address of this object
         self.address = address

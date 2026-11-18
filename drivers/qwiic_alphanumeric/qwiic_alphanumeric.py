@@ -232,9 +232,6 @@ class QwiicAlphanumeric(object):
     colon_on_off = 0    # Tracks the on/off state of the colon segment
     blink_rate = ALPHA_BLINK_RATE_NOBLINK   # Tracks the current blinking status
 
-    display_ram = [0] * 16 * 4
-    display_content = [' '] * (4 * 4 + 1)
-
     def __init__(self, address=None, i2c_bus=None):
 
         # The bus may come first: QwiicDevice(bus) or QwiicDevice(bus, 0x76)
@@ -247,19 +244,27 @@ class QwiicAlphanumeric(object):
 
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
+
+        # The first display is the one at the constructor's address until begin() says otherwise
+        self._device_address_display_one = self.address
+
+        # Per-instance display buffers (so two objects never share them)
+        self.display_ram = [0] * 16 * 4
+        self.display_content = [' '] * (4 * 4 + 1)
     
     # ---------------------------------------------------------------------------------
     # begin(address_left, address_left_center, address_right_center, address_right)
     #
     # Initialize the system and validate the baord.
-    def begin(self, address_display_one = _QWIIC_ALPHANUMERIC_DEFAULT_ADDRESS, address_display_two = DEFAULT_NOTHING_ATTACHED, address_display_three = DEFAULT_NOTHING_ATTACHED, address_display_four = DEFAULT_NOTHING_ATTACHED):
+    def begin(self, address_display_one = None, address_display_two = DEFAULT_NOTHING_ATTACHED, address_display_three = DEFAULT_NOTHING_ATTACHED, address_display_four = DEFAULT_NOTHING_ATTACHED):
         """!
         Initialize the operation of the Qwiic Alphanumeric.
         Assign addresses to displays and determine the number of displays connected to the bus.
         Run is_connected().
         Initialize and clear displays.
 
-        @param address_display_one: I2C address of first display
+        @param address_display_one: I2C address of first display. Defaults to the
+            address given to the constructor.
         @param address_display_two: I2C address of the second display
         @param address_display_three: I2C address of the third display
         @param address_display_four: I2C address of the fourth display
@@ -267,6 +272,8 @@ class QwiicAlphanumeric(object):
         @return **bool** Returns true if a Qwiic Alphanumeric is connected to the system.
                 False otherwise.
         """
+        if address_display_one is None:
+            address_display_one = self.address
         self._device_address_display_one = address_display_one # Grab the address(es) of the alphanumeric(s)
         self._device_address_display_two = address_display_two
         self._device_address_display_three = address_display_three
@@ -420,7 +427,7 @@ class QwiicAlphanumeric(object):
         """
         data_to_write = self.ALPHA_CMD_SYSTEM_SETUP | 0 # Standby mode
 
-        return self.write_ram(self.look_up_display_address(display_number), data_to_write)
+        return self.write_ram_byte(self.look_up_display_address(display_number), data_to_write)
 
     # ---------------------------------------------------------------------------------
     # look_up_display_address(display_number)
@@ -554,7 +561,9 @@ class QwiicAlphanumeric(object):
         # Default to no blink
         else:
             blink_rate = self.ALPHA_BLINK_RATE_NOBLINK
-        
+
+        # Remembered so display_on() and display_off() keep blinking
+        self.blink_rate = blink_rate
         data_to_write = self.ALPHA_CMD_DISPLAY_SETUP | (blink_rate << 1) | self.display_on_off
         return self.write_ram_byte(self.look_up_display_address(display_number), data_to_write)
     
@@ -987,7 +996,7 @@ class QwiicAlphanumeric(object):
 
         for i in range(1, self.number_of_displays + 1):
             
-            if self.write_ram(self.look_up_display_address(i), 0, self.display_ram[(i-1)*16:(i*16)-1]) == False:
+            if self.write_ram(self.look_up_display_address(i), 0, self.display_ram[(i-1)*16:i*16]) == False:
                 status = False
         
         return status
@@ -1080,6 +1089,8 @@ class QwiicAlphanumeric(object):
 
         self._i2c.write_block(address, reg, buff)
 
+        return True
+
     # ---------------------------------------------------------------------------------
     # write_ram_byte(address, data_to_write)
     #
@@ -1094,3 +1105,5 @@ class QwiicAlphanumeric(object):
         @return **bool** true if the byte has been written successfully, false otherwise.
         """
         self._i2c.write_byte(address, None, data_to_write)
+
+        return True

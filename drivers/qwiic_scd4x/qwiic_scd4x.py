@@ -151,7 +151,7 @@ class QwiicSCD4x(object):
         @param skip_stop_periodic_measurement: **bool** Don't stop periodic measurements first
         @param poll_and_set_device_type: **bool** Read the feature set version to detect SCD40 or SCD41
 
-        @return **bool** Returns `True` if successful, otherwise `False`
+        @return **bool** Returns `True` if every check passed, otherwise `False`
         """
         # Confirm device is connected before doing anything
         if not self.is_connected():
@@ -177,7 +177,7 @@ class QwiicSCD4x(object):
         if meas_begin:
             self.start_periodic_measurement()
 
-        return True
+        return bool(success)
 
     def start_periodic_measurement(self):
         """!
@@ -321,6 +321,8 @@ class QwiicSCD4x(object):
 
         @param altitude: **int** The altitude to set
         @param delay_millis: **int** The delay in milliseconds to wait after setting the altitude
+
+        @return **bool** `True` if successful, otherwise `False`
         """
         if self._doing_periodic_measurement:
             return False
@@ -329,6 +331,8 @@ class QwiicSCD4x(object):
 
         if delay_millis > 0:
             self._i2c.delay_ms(delay_millis)
+
+        return True
 
     def get_sensor_altitude(self):
         """!
@@ -394,9 +398,10 @@ class QwiicSCD4x(object):
         if self.compute_crc8(read_bytes[0:2]) != read_bytes[2]:
             return False
         
-        correction = ((read_bytes[0] << 8) | read_bytes[1]) - 32768 # FRC correction [ppm CO2] = word[0] – 0x8000
-
-        return (correction != 0xFFFF)
+        # The sensor answers 0xFFFF when the recalibration failed. Otherwise
+        # FRC correction [ppm CO2] = word - 0x8000.
+        word = (read_bytes[0] << 8) | read_bytes[1]
+        return word != 0xFFFF
     
     def start_low_power_periodic_measurement(self):
         """!

@@ -44,8 +44,8 @@ import sys
 
 # Be sure to initialize your relay with the proper address.
 # Note - PWM is only supported for the solid state relays
-my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_RELAY_DEFAULT_ADDR)
-# my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_RELAY_JUMPER_CLOSE_ADDR)
+my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_SOLID_STATE_RELAY_DEFAULT_ADDR)
+# my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_SOLID_STATE_RELAY_JUMPER_CLOSE_ADDR)
 # my_relays = qwiic_relay.QwiicRelay(qwiic_relay.DUAL_SOLID_STATE_RELAY_DEFAULT_ADDR)
 # my_relays = qwiic_relay.QwiicRelay(qwiic_relay.DUAL_SOLID_STATE_RELAY_JUMPER_CLOSE_ADDR)
 

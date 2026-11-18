@@ -469,7 +469,10 @@ class QwiicVL53L5CX(object):
                 return status # TODO: cpp lib doesn't have this, but probably should so that we break out on timeout
             else:
                 if (size >= 4) and (self.temp_buffer[2] >= 0x7F):
+                    # The MCU reported an error: stop polling (as ST's newer ULD driver does).
+                    # Polling on without counting the timeout never ended.
                     status |= self.MCU_ERROR
+                    break
                 else:
                     timeout += 1
 
@@ -505,8 +508,10 @@ class QwiicVL53L5CX(object):
         if resolution == self.RESOLUTION_4X4:
             self.temp_buffer[0x10:0x10+8] = dds_4x4
             self.swap_buffer(self.temp_buffer, self.OFFSET_DATA_SIZE)
-            signal_grid = self.temp_buffer[0x3C:0x3C+64]
-            range_grid = self.temp_buffer[0x140:0x140+64]
+            # The cpp lib copies these into uint32_t signal_grid[64] and int16_t range_grid[64],
+            # so average 32-bit and 16-bit words, not bytes
+            self.byte_list_to_uint32_list(self.temp_buffer[0x3C:0x3C+256], signal_grid)
+            self.byte_list_to_int16_list(self.temp_buffer[0x140:0x140+128], range_grid)
 
             for j in range(4):
                 for i in range(4):
@@ -516,19 +521,20 @@ class QwiicVL53L5CX(object):
                         signal_grid[(2 * i) + (16 * j) + 8] +
                         signal_grid[(2 * i) + (16 * j) + 9]
                     ) // 4
-                    range_grid[i + (4 * j)] = (
+                    range_sum = (
                         range_grid[(2 * i) + (16 * j) + 0] +
                         range_grid[(2 * i) + (16 * j) + 1] +
                         range_grid[(2 * i) + (16 * j) + 8] +
                         range_grid[(2 * i) + (16 * j) + 9]
-                    ) // 4
-            
-            # TODO: The cpp lib was a bit odd here, it appeared to memset well past the end of the arrays. Not sure if that was intentional or necessary
-            # It's possible these were located at known memory locations in the cpp lib and we wanted to zero out the stuff directly after them as well
+                    )
+                    # int16 division in C truncates toward zero
+                    range_grid[i + (4 * j)] = range_sum // 4 if range_sum >= 0 else -((-range_sum) // 4)
+
+            # The cpp lib's memsets (96 and 192 bytes) clear words 16-63 of each grid
             range_grid[0x10:] = [0] * len(range_grid[0x10:])
             signal_grid[0x10:] = [0] * len(signal_grid[0x10:])
-            self.temp_buffer[0x3C:0x3C+64] = signal_grid
-            self.temp_buffer[0x140:0x140+64] = range_grid
+            self.temp_buffer[0x3C:0x3C+256] = self.uint32_list_to_byte_list(signal_grid)
+            self.temp_buffer[0x140:0x140+128] = self._int16_list_to_byte_list(range_grid)
             self.swap_buffer(self.temp_buffer, self.OFFSET_DATA_SIZE)
         
         for i in range (self.OFFSET_DATA_SIZE - 4):
@@ -568,7 +574,8 @@ class QwiicVL53L5CX(object):
             self.temp_buffer[0x20:0x20+8] = dss_4x4
             self.swap_buffer(self.temp_buffer, self.XTALK_DATA_SIZE)
 
-            signal_grid = self.temp_buffer[0x34:0x34+64]
+            # The cpp lib copies this into uint32_t signal_grid[64], so average 32-bit words, not bytes
+            self.byte_list_to_uint32_list(self.temp_buffer[0x34:0x34+256], signal_grid)
             for j in range(4):
                 for i in range(4):
                     signal_grid[i + (4 * j)] = (
@@ -578,10 +585,9 @@ class QwiicVL53L5CX(object):
                         signal_grid[(2 * i) + (16 * j) + 9]
                     ) // 4
             
-            # TODO: The cpp lib was a bit odd here, it appeared to memset well past the end of the arrays. Not sure if that was intentional or necessary
-            # It's possible these were located at known memory locations in the cpp lib and we wanted to zero out the stuff directly after them as well
+            # The cpp lib's memset (192 bytes) clears words 16-63 of the grid
             signal_grid[0x10:] = [0] * len(signal_grid[0x10:])
-            self.temp_buffer[0x34:0x34+64] = signal_grid
+            self.temp_buffer[0x34:0x34+256] = self.uint32_list_to_byte_list(signal_grid)
             self.swap_buffer(self.temp_buffer, self.XTALK_DATA_SIZE)
             self.temp_buffer[0x134:0x134+4] = profile_4x4
             self.temp_buffer[0x078:0x078+4] = [0] * 4
@@ -919,6 +925,21 @@ class QwiicVL53L5CX(object):
         return 0
 
         
+    def _int16_list_to_byte_list(self, int16_list):
+        """!
+            This function converts a list of int16 values to a list of bytes (little-endian).
+
+            @param int16_list: **list** The list of int16 values to convert.
+
+            @return  The list of bytes.
+            """
+        byte_list = []
+        for value in int16_list:
+            byte_list.append(value & 0xFF)
+            byte_list.append((value >> 8) & 0xFF)
+
+        return byte_list
+
     def set_ranging_mode(self, ranging_mode):
         """!
             This function is used to set the ranging mode. Two modes are
@@ -1025,7 +1046,7 @@ class QwiicVL53L5CX(object):
             bh_ptr_idx = (output[i] & self.BLOCK_HEADER_IDX_MASK) >> self.BLOCK_HEADER_IDX_SHIFT
 
             if (bh_ptr_type >= 0x01) and (bh_ptr_type < 0x0d):
-                if (bh_ptr_type >= 0x54d0) and (bh_ptr_idx < 0x54d0 + 960):
+                if (bh_ptr_idx >= 0x54d0) and (bh_ptr_idx < 0x54d0 + 960):
                     bh_ptr_size = resolution
                     output[i] &= ~self.BLOCK_HEADER_SIZE_MASK
                     output[i] |= (resolution << self.BLOCK_HEADER_SIZE_SHIFT)
@@ -1072,8 +1093,8 @@ class QwiicVL53L5CX(object):
 
         auto_stop_flag = self.rd_multi(self.address, 0x2FFC, 4)
         
-        # TODO: check endianess of the auto_stop_flag here
-        if auto_stop_flag != [0x00, 0x00, 0x04, 0xFF]:
+        # The cpp lib reads these 4 bytes into a little-endian uint32 and compares it with 0x4FF
+        if auto_stop_flag != [0xFF, 0x04, 0x00, 0x00]:
             self.wr_byte(self.address, 0x7fff, 0x00)
 
             # Provoke MCU stop
@@ -1350,7 +1371,7 @@ class QwiicVL53L5CX(object):
         
         status = self.STATUS_OK
 
-        if (target_order == self.TARGET_ORDER_CLOSEST) or (target_order == self.TARGET_ORDER_STRONGES):
+        if (target_order == self.TARGET_ORDER_CLOSEST) or (target_order == self.TARGET_ORDER_STRONGEST):
             status |= self.dci_replace_data(self.temp_buffer, self.DCI_TARGET_ORDER, 4, [target_order], 1, 0x0)
         else:
             status = self.STATUS_INVALID_PARAM
@@ -1385,14 +1406,13 @@ class QwiicVL53L5CX(object):
             @return **list** The values read from the register.
             """
 
-        bytes_to_write = [(reg >> 8) & 0xff, reg & 0xff]
-        self._i2c.write_byte(addr, bytes_to_write[0], bytes_to_write[1])
-
         num_read = 0
         data = [0] * num_bytes
         while num_read < num_bytes:
             try_read = min(chunk_size, num_bytes - num_read)
-            data[num_read:num_read + try_read] = list(self._i2c.read_block(addr, None, try_read))
+            # Write the 16-bit register address, then read with a repeated start
+            current_reg = reg + num_read
+            data[num_read:num_read + try_read] = list(self._i2c.read_block(addr, [(current_reg >> 8) & 0xff, current_reg & 0xff], try_read))
             num_read += try_read
 
         return data
@@ -1417,10 +1437,8 @@ class QwiicVL53L5CX(object):
 
             @return **int** The value read from the register.
             """
-        bytes_to_write = [(reg >> 8) & 0xff, reg & 0xff]
-        self._i2c.write_byte(addr, bytes_to_write[0], bytes_to_write[1])
-        # self._i2c.write_block(addr, bytes_to_write[0], bytes_to_write[1])
-        return self._i2c.read_byte(addr, None)
+        # Write the 16-bit register address, then read with a repeated start
+        return self._i2c.read_block(addr, [(reg >> 8) & 0xff, reg & 0xff], 1)[0]
     
     def get_buffer_from_open_file(self, f, start_byte = 0, end_byte = None):
         """!

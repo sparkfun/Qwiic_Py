@@ -86,6 +86,7 @@ def run_example():
                 break
             else:
                 print("Sensor", i, " not connected! Retrying...")
+                qwiic_i2c.delay_ms(500)
 
     while True:
         # Loop through each sensor and enable its MUX channel then read the distance

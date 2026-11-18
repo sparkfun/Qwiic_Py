@@ -189,9 +189,7 @@ class QwiicMMC5983MA(object):
         self.soft_reset()
 
         # Calibrate offsets
-        self.calibrate_offsets()
-
-        return True
+        return self.calibrate_offsets()
 
     def is_bit_set(self, register_address, bit_mask):
         """!
@@ -214,6 +212,40 @@ class QwiicMMC5983MA(object):
         reg_value = self._i2c.read_byte(self.address, register_address)
         self._i2c.write_byte(self.address, register_address, reg_value | bit_mask)
 
+    def _get_shadow(self, register_address):
+        """!
+        Gets the shadow copy of a write-only control register
+
+        @param register_address: **int** Register address
+
+        @return **int** The shadow value, or `None` if the register has no shadow
+        """
+        if register_address == self.INT_CTRL_0_REG:
+            return self.memory_shadow.internal_control_0
+        elif register_address == self.INT_CTRL_1_REG:
+            return self.memory_shadow.internal_control_1
+        elif register_address == self.INT_CTRL_2_REG:
+            return self.memory_shadow.internal_control_2
+        elif register_address == self.INT_CTRL_3_REG:
+            return self.memory_shadow.internal_control_3
+        return None
+
+    def _set_shadow(self, register_address, value):
+        """!
+        Stores the shadow copy of a write-only control register
+
+        @param register_address: **int** Register address
+        @param value: **int** New shadow value
+        """
+        if register_address == self.INT_CTRL_0_REG:
+            self.memory_shadow.internal_control_0 = value
+        elif register_address == self.INT_CTRL_1_REG:
+            self.memory_shadow.internal_control_1 = value
+        elif register_address == self.INT_CTRL_2_REG:
+            self.memory_shadow.internal_control_2 = value
+        elif register_address == self.INT_CTRL_3_REG:
+            self.memory_shadow.internal_control_3 = value
+
     def set_shadow_bit(self, register_address, bit_mask, do_write = True):
         """!
         Sets a bit in the shadow register and optionally writes the value to the
@@ -225,20 +257,12 @@ class QwiicMMC5983MA(object):
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        shadow_register = None
-
         # Which register are we referring to?
-        if register_address == self.INT_CTRL_0_REG:
-            shadow_register = self.memory_shadow.internal_control_0
-        elif register_address == self.INT_CTRL_1_REG:
-            shadow_register = self.memory_shadow.internal_control_1
-        elif register_address == self.INT_CTRL_2_REG:
-            shadow_register = self.memory_shadow.internal_control_2
-        elif register_address == self.INT_CTRL_3_REG:
-            shadow_register = self.memory_shadow.internal_control_3
+        shadow_register = self._get_shadow(register_address)
         
         if shadow_register is not None:
             shadow_register |= bit_mask
+            self._set_shadow(register_address, shadow_register)
             if do_write:
                 self._i2c.write_byte(self.address, register_address, shadow_register)
             return True
@@ -256,20 +280,12 @@ class QwiicMMC5983MA(object):
 
         @return **bool** `True` if successful, otherwise `False`
         """
-        shadow_register = None
-
         # Which register are we referring to?
-        if register_address == self.INT_CTRL_0_REG:
-            shadow_register = self.memory_shadow.internal_control_0
-        elif register_address == self.INT_CTRL_1_REG:
-            shadow_register = self.memory_shadow.internal_control_1
-        elif register_address == self.INT_CTRL_2_REG:
-            shadow_register = self.memory_shadow.internal_control_2
-        elif register_address == self.INT_CTRL_3_REG:
-            shadow_register = self.memory_shadow.internal_control_3
+        shadow_register = self._get_shadow(register_address)
 
         if shadow_register is not None:
-            shadow_register &= ~bit_mask
+            shadow_register &= ~bit_mask & 0xFF
+            self._set_shadow(register_address, shadow_register)
             if do_write:
                 self._i2c.write_byte(self.address, register_address, shadow_register)
             return True
@@ -344,7 +360,11 @@ class QwiicMMC5983MA(object):
         # always seems to read as 1...? I don't know why.
         success = self.set_shadow_bit(self.INT_CTRL_1_REG, self.SW_RST)
 
-        self.clear_shadow_bit(self.INT_CTRL_1_REG, self.SW_RST, False) # Clear the bit - in shadow memory only
+        # A soft reset clears all registers - in shadow memory only
+        self.clear_shadow_bit(self.INT_CTRL_0_REG, 0xFF, False)
+        self.clear_shadow_bit(self.INT_CTRL_1_REG, 0xFF, False)
+        self.clear_shadow_bit(self.INT_CTRL_2_REG, 0xFF, False)
+        self.clear_shadow_bit(self.INT_CTRL_3_REG, 0xFF, False)
 
         # The reset time is 10 msec. but we'll wait 15 msec. just in case.
         self._i2c.delay_ms(15)
@@ -418,7 +438,7 @@ class QwiicMMC5983MA(object):
         success = self.set_shadow_bit(self.INT_CTRL_0_REG, self.SET_OPERATION)
 
         # Clear the SET_OPERATION bit in the shadow memory
-        self.clear_shadow_bit(self.INT_CTRL_0_REG, self.SET_OPERATION)
+        self.clear_shadow_bit(self.INT_CTRL_0_REG, self.SET_OPERATION, False)
 
         # Wait for the set operation to complete (500ns)
         self._i2c.delay_ms(1)
@@ -438,7 +458,7 @@ class QwiicMMC5983MA(object):
         success = self.set_shadow_bit(self.INT_CTRL_0_REG, self.RESET_OPERATION)
 
         # Clear the RESET_OPERATION bit in the shadow memory
-        self.clear_shadow_bit(self.INT_CTRL_0_REG, self.RESET_OPERATION)
+        self.clear_shadow_bit(self.INT_CTRL_0_REG, self.RESET_OPERATION, False)
 
         # Wait for the reset operation to complete (500ns)
         self._i2c.delay_ms(1)
@@ -497,8 +517,8 @@ class QwiicMMC5983MA(object):
 
         @return **bool** `True` if enabled, otherwise `False`
         """
-        # Get the value of the X_INHIBIT bit from the shadow memory
-        return self.is_shadow_bit_set(self.INT_CTRL_1_REG, self.X_INHIBIT)
+        # The X_INHIBIT bit in the shadow memory is set when the channel is disabled
+        return not self.is_shadow_bit_set(self.INT_CTRL_1_REG, self.X_INHIBIT)
 
     def enable_yz_channels(self):
         """!
@@ -524,8 +544,8 @@ class QwiicMMC5983MA(object):
 
         @return **bool** `True` if enabled, otherwise `False`
         """
-        # Get the value of the YZ_INHIBIT bit from the shadow memory
-        return self.is_shadow_bit_set(self.INT_CTRL_1_REG, self.YZ_INHIBIT)
+        # The YZ_INHIBIT bit in the shadow memory is set when the channels are disabled
+        return not self.is_shadow_bit_set(self.INT_CTRL_1_REG, self.YZ_INHIBIT)
 
     def set_filter_bandwidth(self, bandwidth):
         """!
@@ -540,10 +560,10 @@ class QwiicMMC5983MA(object):
 
         if bandwidth == 800:
             success = self.set_shadow_bit(self.INT_CTRL_1_REG, self.BW1)
-            success &= self.clear_shadow_bit(self.INT_CTRL_1_REG, self.BW0)
+            success &= self.set_shadow_bit(self.INT_CTRL_1_REG, self.BW0)
         elif bandwidth == 400:
             success = self.set_shadow_bit(self.INT_CTRL_1_REG, self.BW1)
-            success &= self.set_shadow_bit(self.INT_CTRL_1_REG, self.BW0)
+            success &= self.clear_shadow_bit(self.INT_CTRL_1_REG, self.BW0)
         elif bandwidth == 200:
             success = self.clear_shadow_bit(self.INT_CTRL_1_REG, self.BW1)
             success &= self.set_shadow_bit(self.INT_CTRL_1_REG, self.BW0)
@@ -564,9 +584,9 @@ class QwiicMMC5983MA(object):
         bw1 = self.is_shadow_bit_set(self.INT_CTRL_1_REG, self.BW1)
 
         # Determine the corresponding bandwidth based on the bit values
-        if bw1 and not bw0:
+        if not bw1 and bw0:
             return 200
-        elif not bw1 and bw0:
+        elif bw1 and not bw0:
             return 400
         elif bw1 and bw0:
             return 800
@@ -659,17 +679,17 @@ class QwiicMMC5983MA(object):
         cm_freq_2 = self.is_shadow_bit_set(self.INT_CTRL_2_REG, self.CM_FREQ_2)
 
         # Determine the corresponding frequency based on the bit values
-        if cm_freq_2 and not cm_freq_1 and not cm_freq_0:
+        if not cm_freq_2 and not cm_freq_1 and cm_freq_0:
             return 1
         elif not cm_freq_2 and cm_freq_1 and not cm_freq_0:
             return 10
-        elif cm_freq_2 and cm_freq_1 and not cm_freq_0:
+        elif not cm_freq_2 and cm_freq_1 and cm_freq_0:
             return 20
-        elif not cm_freq_2 and not cm_freq_1 and cm_freq_0:
+        elif cm_freq_2 and not cm_freq_1 and not cm_freq_0:
             return 50
         elif cm_freq_2 and not cm_freq_1 and cm_freq_0:
             return 100
-        elif not cm_freq_2 and cm_freq_1 and cm_freq_0:
+        elif cm_freq_2 and cm_freq_1 and not cm_freq_0:
             return 200
         elif cm_freq_2 and cm_freq_1 and cm_freq_0:
             return 1000
@@ -1064,21 +1084,31 @@ class QwiicMMC5983MA(object):
         """!
         Calibrates the offsets for all axes. This will also degauss the sensor
         if it was previously exposed to a strong magnetic field.
+
+        @return **bool** `True` if successful, `False` if a measurement timed out
         """
         # Following the datasheet's instructions, page 18
         
         # Perform a set operation, then measure all axes
         self.perform_set_operation()
-        x1, y1, z1 = self.get_measurement_xyz()
+        set_values = self.get_measurement_xyz()
         
         # Then perform a rest operation and measure all axes again
         self.perform_reset_operation()
-        x2, y2, z2 = self.get_measurement_xyz()
+        reset_values = self.get_measurement_xyz()
+
+        # Keep the previous offsets if either measurement timed out
+        if not set_values or not reset_values:
+            return False
+        x1, y1, z1 = set_values
+        x2, y2, z2 = reset_values
         
         # Sum these values and divide by 2 to get new offsets
         self.x_offset = (x1 + x2) / 2
         self.y_offset = (y1 + y2) / 2
         self.z_offset = (z1 + z2) / 2
+
+        return True
 
     def get_offsets(self):
         """!
@@ -1169,7 +1199,8 @@ class QwiicMMC5983MA(object):
         @param gains: **list(float), optional** Gains to apply to the measurements, defaults to 8 (full
         scale range of the MMC5983MA)
 
-        @return **tuple(float, float, float)** x, y, and z-axis measurements in gauss
+        @return **tuple(float, float, float)** x, y, and z-axis measurements in gauss,
+            or False if the measurement timed out
         """
         # Check if offsets were provided
         if offsets is None:
@@ -1177,7 +1208,10 @@ class QwiicMMC5983MA(object):
             offsets = [self.x_offset, self.y_offset, self.z_offset]
         
         # Get the raw measurements
-        x_raw, y_raw, z_raw = self.get_measurement_xyz()
+        measurement = self.get_measurement_xyz()
+        if not measurement:
+            return False
+        x_raw, y_raw, z_raw = measurement
 
         # Apply the offsets
         x_zeroed = x_raw - offsets[0]

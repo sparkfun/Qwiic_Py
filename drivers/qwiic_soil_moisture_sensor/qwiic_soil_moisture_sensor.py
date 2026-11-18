@@ -70,6 +70,9 @@ class QwiicSoilMoistureSensor(object):
         # Use the given I2C bus, or the platform's default bus
         self._i2c = qwiic_i2c.get_i2c_bus(i2c_bus)
 
+        # Last moisture level read by read_moisture_level()
+        self.level = 0
+
     # ----------------------------------
     # is_connected()
     #
@@ -79,9 +82,17 @@ class QwiicSoilMoistureSensor(object):
         """!
         Determine if a Soil Moisture Sensor device is connected to the system.
 
+        The sensor doesn't acknowledge the empty write that
+        qwiic_i2c.is_device_connected() sends, so this reads the moisture
+        level instead.
+
         @return **bool** True if the device is connected, otherwise False.
-        """        
-        return self._i2c.is_device_connected(self.address)
+        """
+        try:
+            self._i2c.read_block(self.address, COMMAND_GET_VALUE, 2)
+            return True
+        except OSError:
+            return False
 
     # ----------------------------------
     # begin()
@@ -106,14 +117,16 @@ class QwiicSoilMoistureSensor(object):
     #
     # ****************************************************************************#
     # Updates the moisture level data
-    # Returns nothing
     def read_moisture_level(self):
         """!
-        Reads the results from the sensor and stores internally
+        Reads the results from the sensor and stores them in self.level
+
+        @return **int** The moisture level
         """
         
         data = self._i2c.read_block(self.address, COMMAND_GET_VALUE, 2)
         self.level = data[1] << 8 | data[0]
+        return self.level
         
     #----------------------------------------------------
     # Checks to see if error bit is set
@@ -165,7 +178,7 @@ class QwiicSoilMoistureSensor(object):
 
         @param new_address: the new address to set the Soil Moisture Sensor reader to
         
-        @return **bool** False if the address is out of range
+        @return **bool** True if the address was changed, False if the address is out of range
         """
         if new_address < 0x08 or new_address > 0x3F:
             return False
@@ -173,3 +186,4 @@ class QwiicSoilMoistureSensor(object):
         self._i2c.write_byte(self.address, COMMAND_CHANGE_ADDRESS, new_address)
         
         self.address = new_address
+        return True

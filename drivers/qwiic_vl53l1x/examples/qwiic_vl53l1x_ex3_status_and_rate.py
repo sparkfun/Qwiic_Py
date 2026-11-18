@@ -71,9 +71,10 @@ def mean(numbers):
 def read_distance(tof):
 	"""Take one measurement and return the distance in mm."""
 	tof.start_ranging()						# Write configuration bytes to initiate measurement
-	qwiic_i2c.delay_ms(5)
+	while not tof.check_for_data_ready():	# Wait for the measurement to finish
+		qwiic_i2c.delay_ms(1)
 	distance = tof.get_distance()			# Get the result of the measurement from the sensor
-	qwiic_i2c.delay_ms(5)
+	tof.clear_interrupt()					# Arm the sensor for the next measurement
 	tof.stop_ranging()
 	return distance
 
@@ -106,9 +107,9 @@ def run_example():
 
 		signalrate = tof.get_signal_rate()
 		rangestatus = tof.get_range_status()
-		elapsed_ms = qwiic_i2c.ticks_diff(end, start)
+		elapsed_ms = max(qwiic_i2c.ticks_diff(end, start), 1)
 
-		print("Distance(mm): %s avgDistance(mm): %.2f Signal Rate: %s Range Status: %s Hz: %.5f" % (distance[len(distance)-1], avgdistance, signalrate, rangestatus, elapsed_ms / 1000.0))
+		print("Distance(mm): %s avgDistance(mm): %.2f Signal Rate: %s Range Status: %s Hz: %.5f" % (distance[len(distance)-1], avgdistance, signalrate, rangestatus, 1000.0 / elapsed_ms))
 
 
 if __name__ == '__main__':

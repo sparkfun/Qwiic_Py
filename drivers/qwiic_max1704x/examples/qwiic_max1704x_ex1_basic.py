@@ -52,7 +52,7 @@ def run_example():
 	# 	DEVICE_TYPE_MAX17048, 
 	# 	DEVICE_TYPE_MAX17049
 	#
-	# myLipo = qwiic_max1704x.QwiicMAX1704X(qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
+	# myLipo = qwiic_max1704x.QwiicMAX1704X(device_type=qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
 
 	# Check if it's connected
 	if myLipo.is_connected() == False:

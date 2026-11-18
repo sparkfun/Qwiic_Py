@@ -115,13 +115,13 @@ def run_example():
 		qwiic_i2c.delay_ms(200)
 		timeOutCounter += 1
 
-	# this means the user is actively inputing
-	if timeOutCounter == TIMEOUT  and userIsActive == True: 
-		print("\n\nTimed out... try again.")
-		timeOutCounter = 0
-		userEntryIndex = 0
-		clear_entry(user_entry)
-		userIsActive = False # so we don't continuously timeout while inactive.
+		# this means the user is actively inputing
+		if timeOutCounter == TIMEOUT  and userIsActive == True: 
+			print("\n\nTimed out... try again.")
+			timeOutCounter = 0
+			userEntryIndex = 0
+			clear_entry(user_entry)
+			userIsActive = False # so we don't continuously timeout while inactive.
 
 #  check user entry against keyCode array.
 #  if they all match up, then respond with true.

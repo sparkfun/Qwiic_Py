@@ -260,7 +260,7 @@ class QwiicKX13XCore(object):
 
         @return **bool** True if the device is connected, otherwise False.
         """
-        return qwiic_i2c.is_device_connected(self.address)
+        return self._i2c.is_device_connected(self.address)
 
     # ----------------------------------
     # begin_core()
@@ -391,7 +391,7 @@ class QwiicKX13XCore(object):
         self.enable_accel(False)
 
         reg_val = self._i2c.read_byte(self.address, self.KX13X_ODCNTL)
-        reg_val &= 0x40
+        reg_val &= 0xF0
         reg_val |= rate
         self._i2c.write_byte(self.address, self.KX13X_ODCNTL , reg_val)
         self.enable_accel(accel_state)
@@ -405,8 +405,8 @@ class QwiicKX13XCore(object):
         """
 
         reg_val = self._i2c.read_byte(self.address, self.KX13X_ODCNTL)
-        reg_val &= 0x40
-        return (0.78 * (2 * reg_val))
+        reg_val &= 0x0F
+        return (0.78 * (2 ** reg_val))
 
     def set_interrupt_pin(self, enable, polarity = 0, pulse_width = 0,
                           latch_control = False):
@@ -441,6 +441,7 @@ class QwiicKX13XCore(object):
         reg_val &= 0x07
         reg_val |= combined_arguments
         self._i2c.write_byte(self.address, self.KX13X_INC1 , reg_val)
+        self.enable_accel(accel_state)
 
     def route_hardware_interrupt(self, rdr, pin = 1):
         """!
@@ -545,7 +546,7 @@ class QwiicKX13XCore(object):
         resolution = resolution >> 6
 
         if threshold > 86 and resolution == 1: # At 16bit resolution - max samples: 86
-            threshold == 86
+            threshold = 86
 
         self._i2c.write_byte(self.address, self.KX13X_BUF_CNTL1, threshold)
 

@@ -235,23 +235,29 @@ class QwiicENS160(object):
         Retrieves the 24 bit application version of the device
 
         @return **int** Application version
+        @exception OSError: The device didn't answer within 1 second
         """
 
         old_mode = self.get_operating_mode()
         self.set_operating_mode(self.OP_MODE_IDLE)
-        self._i2c.write_byte(self.address, self.REG_COMMAND, self.COMMAND_CLEAR_GPR)
-        self._i2c.write_byte(self.address, self.REG_COMMAND, self.COMMAND_GET_APP_VER)
+        try:
+            self._i2c.write_byte(self.address, self.REG_COMMAND, self.COMMAND_CLEAR_GPR)
+            self._i2c.write_byte(self.address, self.REG_COMMAND, self.COMMAND_GET_APP_VER)
 
-        while not self.check_gpr_status():
-            pass
+            start = self._i2c.ticks_ms()
+            while not self.check_gpr_status():
+                if self._i2c.ticks_diff(self._i2c.ticks_ms(), start) > 1000:
+                    raise OSError("ENS160 didn't answer the GET_APPVER command")
+                self._i2c.delay_ms(1)
 
-        version_bytes = self._i2c.read_block(self.address, self.REG_GPR_READ_4, 3)
+            version_bytes = self._i2c.read_block(self.address, self.REG_GPR_READ_4, 3)
+        finally:
+            # Put the sensor back in the mode it was in, even after a timeout
+            self.set_operating_mode(old_mode)
 
         version = version_bytes[0]
         version |= version_bytes[1] << 8
         version |= version_bytes[2] << 16
-
-        self.set_operating_mode(old_mode)
 
         return version
     

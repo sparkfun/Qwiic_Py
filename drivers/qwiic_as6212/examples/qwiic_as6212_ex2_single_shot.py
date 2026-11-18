@@ -85,7 +85,7 @@ def run_example():
 	print("\nSparkFun Qwiic AS6212 Sensor Example 2 - Single Shot Readings\n")
 	myTempSensor = qwiic_as6212.QwiicAS6212()
 
-	if myTempSensor.is_connected == False:
+	if not myTempSensor.is_connected():
 		print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
