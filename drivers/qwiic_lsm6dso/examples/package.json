@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_lsm6dso_examples/qwiic_lsm6dso_ex1_basic_readings.py", "qwiic_lsm6dso_ex1_basic_readings.py"],
+        ["qwiic_lsm6dso_examples/qwiic_lsm6dso_ex2_settings.py", "qwiic_lsm6dso_ex2_settings.py"]
+    ],
+    "version": "3.0.0"
+}

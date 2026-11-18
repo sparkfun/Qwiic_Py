@@ -2,132 +2,141 @@ Qwiic_Py
 ========
 
 <p align="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
-   <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
+   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>
+   <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>
 </p>
 <p align="center">
 	<a href="https://pypi.org/project/sparkfun-qwiic/" alt="Package">
-		<img src="https://img.shields.io/pypi/pyversions/sparkfun_qwiic.svg" /></a>
+		<img src="https://img.shields.io/pypi/pyversions/sparkfun-qwiic.svg" /></a>
 	<a href="https://github.com/sparkfun/Qwiic_Py/issues" alt="Issues">
 		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_Py.svg" /></a>
-	<a href="https://qwiic-py.readthedocs.io/en/latest/index.html" alt="Documentation">
+	<a href="https://qwiic-py.readthedocs.io/en/latest/" alt="Documentation">
 		<img src="https://readthedocs.org/projects/qwiic-py/badge/?version=latest&style=flat" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_Py/blob/master/LICENSE" alt="License">
+	<a href="https://github.com/sparkfun/Qwiic_Py/blob/main/LICENSE" alt="License">
 		<img src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-	<a href="https://twitter.com/intent/follow?screen_name=sparkfun">
-        	<img src="https://img.shields.io/twitter/follow/sparkfun.svg?style=social&logo=twitter"
-           	 alt="follow on Twitter"></a>
-	
 </p>
 
-<img src="https://cdn.sparkfun.com//assets/parts/1/3/8/7/9/Qwiic_pHAT_Pi-3-B-Plus.jpg"  align="right" width=340> 
+Every SparkFun [Qwiic](https://www.sparkfun.com/qwiic) Python driver, in one repository. The drivers run on CPython (Linux single board computers), MicroPython and CircuitPython. Each one is a separate package, so you install only the drivers you need.
 
-The SparkFun qwiic python package aggregates all python qwiic drivers/modules to provide a single entity for qwiic within a python environment. The qwiic package delivers the high-level functionality needed to dynamically discover connected qwiic devices and construct their associated driver object.
-
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ## Contents
 
 * [Supported Platforms](#supported-platforms)
-* [Structure](#structure)
-* [Dependent Modules](#dependent-modules)
-* [MicroPython and CircuitPython](#micropython-and-circuitpython)
-* [Checkout Commands](#checkout-commands)
 * [Installation](#installation)
+* [Choosing the Bus](#choosing-the-bus)
+* [Finding Connected Devices](#finding-connected-devices)
+* [Repository Structure](#repository-structure)
 * [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
+* [Contributing](#contributing)
 
-Supported Platforms
---------------------
-The qwiic Python package current supports the following platforms:
-* [Raspberry Pi](https://www.sparkfun.com/search/results?term=raspberry+pi)
-* [NVidia Jetson Nano](https://www.sparkfun.com/products/15297)
-* [Google Coral Development Board](https://www.sparkfun.com/products/15318)
+## Supported Platforms
 
+| Python | Platform | Boards tested |
+| --- | --- | --- |
+| CPython 3.8+ | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
-Structure
--------------
-Each qwiic board has an independent driver library that implements the required logic for the specific board. This driver implementation is structured as a python package that supports standard python package management operations and tools. Additionally, each driver is deployed in a distinct GitHub repository which provides a central area for package management and development.
+A few drivers for serial or SPI devices are CPython-only; the [driver list](docs/drivers.md) shows each driver's platforms.
 
-To provide dynamic discovery and instantiation capabilities, the qwiic package imports all the underlying qwiic driver packages at runtime. As such the qwiic driver packages must be installed prior to using this package. These packages can be installed manually, or the overall package will install them automatically when using a PyPi based package manger (aka pip).
+## Installation
 
-Dependent Modules
-------------------
-To make development and evaluation easer, the modules this package is dependent on are included in this repository as git submodules. This allows rapid checkout and access to the entire qwiic python ecosystem if needed. 
+Every driver installs on its own and pulls in [qwiic_i2c](https://github.com/sparkfun/Qwiic_Py/tree/main/qwiic_i2c), the shared I2C layer. The commands below use the BME280 as an example; each driver's README has its own.
 
-This structure has the following layout:
-```
-Qwiic_Py/
-   |
-   +--- qwiic_i2c/                                   --> Link to the qwiic_i2c submodule repository
-   |      |--- __index__.py
-   |      `--- ... The cross platform I2C bus access driver 
-   |
-   +--- qwiic/
-   |      |--- __index__.py
-   |      +--- ... Package Implementation
-   |      `--- drivers/
-   |            |--- qwiic_bme280	             --> The qwiic_bme280 submodule
-   |            |--- qwiic_micro_oled		     --> The qwiic_micro_oled submodule
-   |            `--- ... links to qwiic driver submodule repositories
-   |
-   +--- README.md
-   +--- setup.py
-   `--- ...etc
+### CPython (pip)
 
-```
-
-Micropython and CircuitPython
-------------------
-The drivers in the [drivers directory](https://github.com/sparkfun/Qwiic_Py/tree/master/qwiic/drivers) are supported on Linux, MicroPython and CircuitPython. The drivers in the [drivers_linux_only directory](https://github.com/sparkfun/Qwiic_Py/tree/master/qwiic/drivers_linux_only) are currently only supported for Linux. To learn more about MicroPython and CircuitPython, and for install instructions for your specific driver, see the README file of each supported driver.
-
-Dependencies
--------------
-The qwiic package depends on the qwiic I2C driver: 
-[Qwiic_I2C_Py](https://github.com/sparkfun/Qwiic_I2C_Py)
-
-This package is also dependent on the driver packages contained in the [drivers directory](https://github.com/sparkfun/Qwiic_Py/tree/master/qwiic/drivers).
-
-Documentation
---------------
-The SparkFun qwiic package documentation is hosted at [ReadTheDocs](https://qwiic-py.readthedocs.io/en/latest/index.html)
-
-
-Checkout Commands
-------------------
-To clone this repository, a standard git clone command will create a local copy of this repository:
-```sh
-git clone https://github.com/sparkfun/Qwiic_Py
-```
-
-This will create a local version of this repository, but the submodule directories (drivers/*, and qwiic_i2c/ ) will be empty. To clone the git repository and include the submodule contents, use the following command:
-```sh
-git clone --recurse-submodules https://github.com/sparkfun/Qwiic_Py.git 
-```
-
-Installation
--------------
-### PyPi Installation
-This repository is hosted on PyPi as the [sparkfun-qwiic](https://pypi.org/project/sparkfun-qwiic/) package. 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system and will install all the drivers in this package. **To install for MicroPython or CircuitPython, see the instructions in each driver's README.** 
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
 python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-bme280     # one driver
+~/sparkfun_venv/bin/pip install sparkfun-qwiic            # every driver, plus the qwiic module
 ```
 
-You can pass any path instead of ~/sparkfun_venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
+### MicroPython (mip)
 
-Next, install the qwiic package with:
 ```sh
-~/sparkfun_venv/bin/pip3 install sparkfun-qwiic
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic` by running e.g.:
-```sh
-~/sparkfun_venv/bin/python3 example_script.py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_bme280
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_bme280/examples
 ```
 
-This process will install all drivers and modules the qwiic package requires for operation. If you are only working with one driver, it is recommended to download that driver directly (see instructions in each driver's README) rather than from this large meta-package.
+Add `@qwiic_bme280-<version>` to install a specific release.
+
+### CircuitPython (circup)
+
+```sh
+circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_bme280
+circup example qwiic_bme280/qwiic_bme280_ex1_basic_readings
+```
+
+## Choosing the Bus
+
+Every driver uses the board's default Qwiic bus unless you give it one. The bus can be the first argument, or `i2c_bus=`, and can be the platform's own bus object:
+
+```python
+sensor = qwiic_bme280.QwiicBME280()                            # default bus
+sensor = qwiic_bme280.QwiicBME280(machine.I2C(1))              # MicroPython
+sensor = qwiic_bme280.QwiicBME280(busio.I2C(board.SCL, board.SDA))  # CircuitPython
+sensor = qwiic_bme280.QwiicBME280(smbus2.SMBus(7))             # Linux, /dev/i2c-7
+sensor = qwiic_bme280.QwiicBME280(bus, 0x76)                   # a bus and an address
+```
+
+To change the default bus for every driver created after that, use `qwiic_i2c.set_default_i2c_bus()`. This is useful for a SoftI2C port, or on a board where the automatic choice is wrong:
+
+```python
+qwiic_i2c.set_default_i2c_bus(machine.SoftI2C(scl=machine.Pin(5), sda=machine.Pin(4)))
+sensor = qwiic_bme280.QwiicBME280()                            # uses the SoftI2C bus
+```
+
+## Finding Connected Devices
+
+The `qwiic` module (installed with `sparkfun-qwiic`) finds connected devices and creates their driver objects:
+
+```python
+import qwiic
+
+print(qwiic.list_devices())                  # [(0x77, 'Qwiic BME280', 'QwiicBME280'), ...]
+sensor = qwiic.create_device("QwiicBME280")
+```
+
+See [qwiic/README.md](https://github.com/sparkfun/Qwiic_Py/blob/main/qwiic/README.md) for the full API.
+
+## Repository Structure
+
+```text
+Qwiic_Py/
+├── qwiic_i2c/                the I2C layer every driver uses
+├── drivers/
+│   └── qwiic_<chip>/         one directory per device driver: module, examples, README, pyproject.toml
+├── qwiic/                    the sparkfun-qwiic meta-package and its generated driver registry
+├── tools/                    generators, checks, bundle and docs builders used by CI
+├── tests/                    tests that need no hardware
+└── docs/                     the Read the Docs site and the shared Doxygen config
+```
+
+Each driver is released on its own, with a tag named `<driver>-<version>` (for example `qwiic_bme280-3.0.0`) that CI publishes to PyPI. The CircuitPython bundle is a GitHub Release named by date.
+
+## Documentation
+
+* [qwiic-py.readthedocs.io](https://qwiic-py.readthedocs.io/en/latest/): this overview and the [list of drivers](docs/drivers.md)
+* [docs.sparkfun.com/Qwiic_Py](https://docs.sparkfun.com/Qwiic_Py/): each driver's API reference
+* Each driver's README and `examples/README.md`
+
+## Migrating from 2.x
+
+Version 3 moved every driver into this repository and gave them one consistent API:
+
+* One name per method, following PEP 8. The camelCase duplicates are gone (`readByte` is now `read_byte`), and classes use the part number in capitals (`QwiicBME280`).
+* No properties: `sensor.connected` is now `sensor.is_connected()`, `sensor.pressure` is `sensor.read_pressure()`, and so on.
+* Drivers no longer print or use the `time` module, and run on MicroPython builds without `property()` or packages.
+* mip installs move from `github:sparkfun/<repo>` to `github:sparkfun/Qwiic_Py/drivers/<driver>`. PyPI names don't change.
+
+[MIGRATION.md](https://github.com/sparkfun/Qwiic_Py/blob/main/MIGRATION.md) lists every renamed class and method, driver by driver. Version 2 stays on the [2.x tags](https://github.com/sparkfun/Qwiic_Py/tree/20260227) and PyPI for Python 3.6 and 3.7 users.
+
+## Contributing
+
+Bug reports, fixes and new drivers are welcome. [CONTRIBUTING.md](https://github.com/sparkfun/Qwiic_Py/blob/main/CONTRIBUTING.md) describes the driver conventions, the tools and how to release.
 
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">

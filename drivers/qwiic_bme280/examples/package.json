@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_bme280_examples/qwiic_bme280_ex1_basic_readings.py", "qwiic_bme280_ex1_basic_readings.py"],
+        ["qwiic_bme280_examples/qwiic_bme280_ex4_settings.py", "qwiic_bme280_ex4_settings.py"],
+        ["qwiic_bme280_examples/qwiic_bme280_ex5_read_all_registers.py", "qwiic_bme280_ex5_read_all_registers.py"]
+    ],
+    "version": "3.0.0"
+}

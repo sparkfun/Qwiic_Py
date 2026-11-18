@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.mpy
+build/
+dist/
+*.egg-info/
+.venv/
+bundles/
+docs/_build/
+docs/html/
+site/
+forwarding/

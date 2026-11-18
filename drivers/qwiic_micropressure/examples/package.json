@@ -1,0 +1,6 @@
+{
+    "urls": [
+        ["qwiic_micropressure_examples/qwiic_micropressure_ex1_basic.py", "qwiic_micropressure_ex1_basic.py"]
+    ],
+    "version": "3.0.0"
+}

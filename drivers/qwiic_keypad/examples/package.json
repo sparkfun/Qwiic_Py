@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_keypad_examples/qwiic_keypad_ex1_basic_readings.py", "qwiic_keypad_ex1_basic_readings.py"],
+        ["qwiic_keypad_examples/qwiic_keypad_ex2_button_press_time.py", "qwiic_keypad_ex2_button_press_time.py"],
+        ["qwiic_keypad_examples/qwiic_keypad_ex3_keycode.py", "qwiic_keypad_ex3_keycode.py"]
+    ],
+    "version": "3.0.0"
+}

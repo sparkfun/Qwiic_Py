@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_as7343_examples/qwiic_as7343_ex1_basic_readings.py", "qwiic_as7343_ex1_basic_readings.py"],
+        ["qwiic_as7343_examples/qwiic_as7343_ex2_all_channels.py", "qwiic_as7343_ex2_all_channels.py"],
+        ["qwiic_as7343_examples/qwiic_as7343_ex3_gain.py", "qwiic_as7343_ex3_gain.py"],
+        ["qwiic_as7343_examples/qwiic_as7343_ex5_flicker_detection.py", "qwiic_as7343_ex5_flicker_detection.py"],
+        ["qwiic_as7343_examples/qwiic_as7343_ex6_sleep.py", "qwiic_as7343_ex6_sleep.py"],
+        ["qwiic_as7343_examples/qwiic_as7343_ex7_web_bar_graphs.py", "qwiic_as7343_ex7_web_bar_graphs.py"]
+    ],
+    "version": "3.0.0"
+}

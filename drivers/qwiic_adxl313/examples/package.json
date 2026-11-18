@@ -1,0 +1,12 @@
+{
+    "urls": [
+        ["qwiic_adxl313_examples/qwiic_adxl313_ex1_basic_readings.py", "qwiic_adxl313_ex1_basic_readings.py"],
+        ["qwiic_adxl313_examples/qwiic_adxl313_ex2_set_range.py", "qwiic_adxl313_ex2_set_range.py"],
+        ["qwiic_adxl313_examples/qwiic_adxl313_ex3_auto_sleep.py", "qwiic_adxl313_ex3_auto_sleep.py"],
+        ["qwiic_adxl313_examples/qwiic_adxl313_ex4_low_power_mode.py", "qwiic_adxl313_ex4_low_power_mode.py"],
+        ["qwiic_adxl313_examples/qwiic_adxl313_ex5_standby.py", "qwiic_adxl313_ex5_standby.py"],
+        ["qwiic_adxl313_examples/qwiic_adxl313_ex6_interrupt.py", "qwiic_adxl313_ex6_interrupt.py"],
+        ["qwiic_adxl313_examples/qwiic_adxl313_ex7_fifo.py", "qwiic_adxl313_ex7_fifo.py"]
+    ],
+    "version": "3.0.0"
+}

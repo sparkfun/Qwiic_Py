@@ -1,0 +1,10 @@
+{
+    "urls": [
+        ["qwiic_eeprom_examples/qwiic_eeprom_ex1_basic_read_write.py", "qwiic_eeprom_ex1_basic_read_write.py"],
+        ["qwiic_eeprom_examples/qwiic_eeprom_ex2_settings.py", "qwiic_eeprom_ex2_settings.py"],
+        ["qwiic_eeprom_examples/qwiic_eeprom_ex3_advanced_i2c.py", "qwiic_eeprom_ex3_advanced_i2c.py"],
+        ["qwiic_eeprom_examples/qwiic_eeprom_ex4_user_options.py", "qwiic_eeprom_ex4_user_options.py"],
+        ["qwiic_eeprom_examples/qwiic_eeprom_ex5_interface_test.py", "qwiic_eeprom_ex5_interface_test.py"]
+    ],
+    "version": "3.0.0"
+}

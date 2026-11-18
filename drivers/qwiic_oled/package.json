@@ -1,0 +1,20 @@
+{
+    "urls": [
+        ["qwiic_oled/__init__.py", "qwiic_oled/__init__.py"],
+        ["qwiic_oled/oled_fonts.py", "qwiic_oled/oled_fonts.py"],
+        ["qwiic_oled/oled_logos.py", "qwiic_oled/oled_logos.py"],
+        ["qwiic_oled/qwiic_large_oled.py", "qwiic_oled/qwiic_large_oled.py"],
+        ["qwiic_oled/qwiic_micro_oled.py", "qwiic_oled/qwiic_micro_oled.py"],
+        ["qwiic_oled/qwiic_oled_base.py", "qwiic_oled/qwiic_oled_base.py"],
+        ["qwiic_oled/qwiic_oled_display.py", "qwiic_oled/qwiic_oled_display.py"],
+        ["qwiic_oled/fonts/0_font5x7.bin", "qwiic_oled/fonts/0_font5x7.bin"],
+        ["qwiic_oled/fonts/1_font8x16.bin", "qwiic_oled/fonts/1_font8x16.bin"],
+        ["qwiic_oled/fonts/2_7segment.bin", "qwiic_oled/fonts/2_7segment.bin"],
+        ["qwiic_oled/fonts/3_fontlargenumber.bin", "qwiic_oled/fonts/3_fontlargenumber.bin"],
+        ["qwiic_oled/fonts/4_fontlargeletter31x48.bin", "qwiic_oled/fonts/4_fontlargeletter31x48.bin"]
+    ],
+    "deps": [
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
+    ],
+    "version": "3.0.0"
+}

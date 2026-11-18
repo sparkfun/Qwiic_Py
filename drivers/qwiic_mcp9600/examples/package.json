@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_mcp9600_examples/qwiic_mcp9600_ex1_basic.py", "qwiic_mcp9600_ex1_basic.py"],
+        ["qwiic_mcp9600_examples/qwiic_mcp9600_ex2_set_type.py", "qwiic_mcp9600_ex2_set_type.py"],
+        ["qwiic_mcp9600_examples/qwiic_mcp9600_ex3_set_filter.py", "qwiic_mcp9600_ex3_set_filter.py"],
+        ["qwiic_mcp9600_examples/qwiic_mcp9600_ex4_set_resolution.py", "qwiic_mcp9600_ex4_set_resolution.py"],
+        ["qwiic_mcp9600_examples/qwiic_mcp9600_ex5_burst_mode.py", "qwiic_mcp9600_ex5_burst_mode.py"],
+        ["qwiic_mcp9600_examples/qwiic_mcp9600_ex6_config_temp_alert.py", "qwiic_mcp9600_ex6_config_temp_alert.py"]
+    ],
+    "version": "3.0.0"
+}

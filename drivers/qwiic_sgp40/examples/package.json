@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_sgp40_examples/qwiic_sgp40_ex1_basic_readings.py", "qwiic_sgp40_ex1_basic_readings.py"],
+        ["qwiic_sgp40_examples/qwiic_sgp40_ex2_function_test.py", "qwiic_sgp40_ex2_function_test.py"]
+    ],
+    "version": "3.0.0"
+}

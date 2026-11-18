@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_i2c.py", "qwiic_i2c.py"],
+        ["qwiic_i2c_micropython.py", "qwiic_i2c_micropython.py"]
+    ],
+    "version": "3.0.0"
+}

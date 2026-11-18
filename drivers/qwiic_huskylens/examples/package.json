@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_huskylens_examples/qwiic_huskylens_ex1_basic_readings.py", "qwiic_huskylens_ex1_basic_readings.py"],
+        ["qwiic_huskylens_examples/qwiic_huskylens_ex2_learn.py", "qwiic_huskylens_ex2_learn.py"],
+        ["qwiic_huskylens_examples/qwiic_huskylens_ex3_write_to_screen.py", "qwiic_huskylens_ex3_write_to_screen.py"]
+    ],
+    "version": "3.0.0"
+}

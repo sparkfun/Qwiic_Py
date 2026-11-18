@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sparkfun-qwiic-ism330dhcx"
+version = "3.0.0"
+description = "SparkFun Qwiic ISM330DHCX 6DoF accelerometer and gyroscope driver"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [{name = "SparkFun Electronics", email = "info@sparkfun.com"}]
+dependencies = ["sparkfun-qwiic-i2c>=3.0,<4"]
+keywords = ["electronics", "maker", "qwiic", "ism330dhcx"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: MicroPython",
+    "Topic :: System :: Hardware",
+]
+
+[project.urls]
+Homepage = "https://www.sparkfun.com/qwiic"
+Documentation = "https://docs.sparkfun.com/Qwiic_Py/qwiic_ism330dhcx/"
+Source = "https://github.com/sparkfun/Qwiic_Py/tree/main/drivers/qwiic_ism330dhcx"
+Issues = "https://github.com/sparkfun/Qwiic_Py/issues"
+
+[tool.setuptools]
+py-modules = ["qwiic_ism330dhcx"]

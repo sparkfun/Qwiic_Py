@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["qwiic_tca9548a_examples/qwiic_tca9548a_ex1_scan_channels.py", "qwiic_tca9548a_ex1_scan_channels.py"],
+        ["qwiic_tca9548a_examples/qwiic_tca9548a_ex2_two_distance_sensors.py", "qwiic_tca9548a_ex2_two_distance_sensors.py"],
+        ["qwiic_tca9548a_examples/qwiic_tca9548a_ex3_enable_channels.py", "qwiic_tca9548a_ex3_enable_channels.py"],
+        ["qwiic_tca9548a_examples/qwiic_tca9548a_ex4_disable_channels.py", "qwiic_tca9548a_ex4_disable_channels.py"]
+    ],
+    "version": "3.0.0"
+}

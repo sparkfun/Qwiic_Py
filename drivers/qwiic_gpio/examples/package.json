@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_gpio_examples/qwiic_gpio_ex1a_write.py", "qwiic_gpio_ex1a_write.py"],
+        ["qwiic_gpio_examples/qwiic_gpio_ex1b_write_port.py", "qwiic_gpio_ex1b_write_port.py"],
+        ["qwiic_gpio_examples/qwiic_gpio_ex2a_read.py", "qwiic_gpio_ex2a_read.py"],
+        ["qwiic_gpio_examples/qwiic_gpio_ex2b_read_port.py", "qwiic_gpio_ex2b_read_port.py"],
+        ["qwiic_gpio_examples/qwiic_gpio_ex3a_inversion.py", "qwiic_gpio_ex3a_inversion.py"],
+        ["qwiic_gpio_examples/qwiic_gpio_ex3b_inversion_port.py", "qwiic_gpio_ex3b_inversion_port.py"]
+    ],
+    "version": "3.0.0"
+}

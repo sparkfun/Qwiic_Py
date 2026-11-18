@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["pi_servo_hat_examples/pi_servo_hat_ex1_full_sweep_90_deg_servo.py", "pi_servo_hat_ex1_full_sweep_90_deg_servo.py"],
+        ["pi_servo_hat_examples/pi_servo_hat_ex2_full_sweep_180_deg_servo.py", "pi_servo_hat_ex2_full_sweep_180_deg_servo.py"],
+        ["pi_servo_hat_examples/pi_servo_hat_ex3_get_position_180_deg_servo.py", "pi_servo_hat_ex3_get_position_180_deg_servo.py"],
+        ["pi_servo_hat_examples/pi_servo_hat_ex4_change_pwm_frequency_180_deg_servo.py", "pi_servo_hat_ex4_change_pwm_frequency_180_deg_servo.py"]
+    ],
+    "version": "3.0.0"
+}

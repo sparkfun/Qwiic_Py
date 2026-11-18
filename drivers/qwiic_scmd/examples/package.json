@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_scmd_examples/qwiic_scmd_ex1_basic.py", "qwiic_scmd_ex1_basic.py"],
+        ["qwiic_scmd_examples/qwiic_scmd_ex2_two_motor.py", "qwiic_scmd_ex2_two_motor.py"]
+    ],
+    "version": "3.0.0"
+}

@@ -1,0 +1,6 @@
+{
+    "urls": [
+        ["qwiic_ism330dhcx_examples/qwiic_ism330dhcx_ex1_basic.py", "qwiic_ism330dhcx_ex1_basic.py"]
+    ],
+    "version": "3.0.0"
+}

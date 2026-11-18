@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_mcp4725_examples/qwiic_mcp4725_ex1_basic.py", "qwiic_mcp4725_ex1_basic.py"],
+        ["qwiic_mcp4725_examples/qwiic_mcp4725_ex2_waveform.py", "qwiic_mcp4725_ex2_waveform.py"],
+        ["qwiic_mcp4725_examples/qwiic_mcp4725_ex3_write_eeprom.py", "qwiic_mcp4725_ex3_write_eeprom.py"],
+        ["qwiic_mcp4725_examples/qwiic_mcp4725_ex4_read.py", "qwiic_mcp4725_ex4_read.py"],
+        ["qwiic_mcp4725_examples/qwiic_mcp4725_ex5_power_down.py", "qwiic_mcp4725_ex5_power_down.py"],
+        ["qwiic_mcp4725_examples/qwiic_mcp4725_ex6_fast_write.py", "qwiic_mcp4725_ex6_fast_write.py"]
+    ],
+    "version": "3.0.0"
+}

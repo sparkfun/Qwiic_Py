@@ -1,0 +1,12 @@
+{
+    "urls": [
+        ["qwiic_button_examples/qwiic_button_ex1_button_press.py", "qwiic_button_ex1_button_press.py"],
+        ["qwiic_button_examples/qwiic_button_ex2_led_on.py", "qwiic_button_ex2_led_on.py"],
+        ["qwiic_button_examples/qwiic_button_ex3_led_config.py", "qwiic_button_ex3_led_config.py"],
+        ["qwiic_button_examples/qwiic_button_ex4_queue_usage.py", "qwiic_button_ex4_queue_usage.py"],
+        ["qwiic_button_examples/qwiic_button_ex5_pop_queue.py", "qwiic_button_ex5_pop_queue.py"],
+        ["qwiic_button_examples/qwiic_button_ex6_change_i2c_address.py", "qwiic_button_ex6_change_i2c_address.py"],
+        ["qwiic_button_examples/qwiic_button_ex7_two_buttons.py", "qwiic_button_ex7_two_buttons.py"]
+    ],
+    "version": "3.0.0"
+}

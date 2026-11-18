@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_mmc5983ma_examples/qwiic_mmc5983ma_ex1_basic_readings.py", "qwiic_mmc5983ma_ex1_basic_readings.py"],
+        ["qwiic_mmc5983ma_examples/qwiic_mmc5983ma_ex2_calibration.py", "qwiic_mmc5983ma_ex2_calibration.py"],
+        ["qwiic_mmc5983ma_examples/qwiic_mmc5983ma_ex3_compass.py", "qwiic_mmc5983ma_ex3_compass.py"]
+    ],
+    "version": "3.0.0"
+}

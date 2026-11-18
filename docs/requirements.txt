@@ -1,1 +1,3 @@
-m2r
+sphinx>=7,<9
+myst-parser>=3,<5
+sphinx-rtd-theme>=2,<4

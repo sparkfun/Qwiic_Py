@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_as6212_examples/qwiic_as6212_ex1_basic_readings.py", "qwiic_as6212_ex1_basic_readings.py"],
+        ["qwiic_as6212_examples/qwiic_as6212_ex2_single_shot.py", "qwiic_as6212_ex2_single_shot.py"]
+    ],
+    "version": "3.0.0"
+}

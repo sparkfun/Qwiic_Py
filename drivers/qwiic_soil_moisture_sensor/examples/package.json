@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_soil_moisture_sensor_examples/qwiic_soil_moisture_sensor_ex1_get_readings.py", "qwiic_soil_moisture_sensor_ex1_get_readings.py"],
+        ["qwiic_soil_moisture_sensor_examples/qwiic_soil_moisture_sensor_ex2_change_i2c_address.py", "qwiic_soil_moisture_sensor_ex2_change_i2c_address.py"]
+    ],
+    "version": "3.0.0"
+}

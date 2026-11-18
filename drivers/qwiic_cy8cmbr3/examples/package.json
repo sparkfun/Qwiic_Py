@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_cy8cmbr3_examples/qwiic_cy8cmbr3_ex1_basic.py", "qwiic_cy8cmbr3_ex1_basic.py"],
+        ["qwiic_cy8cmbr3_examples/qwiic_cy8cmbr3_ex2_advanced.py", "qwiic_cy8cmbr3_ex2_advanced.py"],
+        ["qwiic_cy8cmbr3_examples/qwiic_cy8cmbr3_ex3_led.py", "qwiic_cy8cmbr3_ex3_led.py"],
+        ["qwiic_cy8cmbr3_examples/qwiic_cy8cmbr3_ex4_i2c_addr.py", "qwiic_cy8cmbr3_ex4_i2c_addr.py"],
+        ["qwiic_cy8cmbr3_examples/qwiic_cy8cmbr3_ex5_multi.py", "qwiic_cy8cmbr3_ex5_multi.py"],
+        ["qwiic_cy8cmbr3_examples/qwiic_cy8cmbr3_ex6_set_range.py", "qwiic_cy8cmbr3_ex6_set_range.py"]
+    ],
+    "version": "3.0.0"
+}

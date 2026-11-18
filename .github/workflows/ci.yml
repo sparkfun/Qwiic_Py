@@ -1,0 +1,120 @@
+# Checks every pull request and push: conventions, generated files, unit
+# tests, packaging on CPython, and the drivers on MicroPython and CircuitPython.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, v3]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Conventions, generated files and unit tests
+    # Pinned: apt's doxygen version decides which warnings --strict fails on
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install mpy-cross ruff -r docs/requirements.txt
+      - name: Driver conventions and mip manifests
+        run: python tools/check_driver.py
+      - name: Registry, meta-package dependencies and driver index are current
+        run: python tools/gen_registry.py --check
+      - name: MIGRATION.md is current
+        run: python tools/gen_migration.py --check
+      - name: Lint
+        run: ruff check .
+      - name: Unit and smoke tests
+        run: python -m unittest discover -s tests -v
+      - name: Docs site builds without warnings
+        run: sphinx-build -W -b html docs docs/_build
+      - name: API reference builds without Doxygen warnings
+        run: |
+          sudo apt-get install -y doxygen graphviz
+          python tools/build_docs.py --strict --output "$RUNNER_TEMP/site"
+
+  wheels:
+    name: Build every package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: |
+          for dir in qwiic_i2c/ drivers/*/ qwiic/; do
+            python -m build --sdist --wheel --outdir dist "$dir"
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist
+
+  install:
+    name: Install and import on CPython ${{ matrix.python }}
+    needs: wheels
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ["3.8", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - name: Install the meta-package (pulls in every driver) from the built wheels
+        run: |
+          python -m venv venv
+          venv/bin/pip install --find-links dist --only-binary sparkfun-qwiic sparkfun-qwiic
+      - name: Import every driver class
+        run: |
+          cd /tmp
+          $GITHUB_WORKSPACE/venv/bin/python -c "
+          import qwiic, qwiic_registry
+          for module, cls, name, addresses in qwiic_registry.DRIVERS:
+              assert qwiic.get_driver_class(cls) is not None, cls
+          print(len(qwiic_registry.DRIVERS), 'driver classes import')
+          "
+
+  micropython:
+    name: Drivers on MicroPython (Unix port)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: micropython/micropython
+          ref: v1.26.1
+          path: micropython
+      - run: sudo apt-get install -y libffi-dev
+      - run: make -C micropython/mpy-cross -j4
+      - run: make -C micropython/ports/unix submodules && make -C micropython/ports/unix -j4
+      - name: Import and construct every driver class
+        run: micropython/ports/unix/build-standard/micropython tests/micropython_smoke.py
+
+  circuitpython:
+    name: CircuitPython bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get install -y gettext
+      - run: pip install circuitpython-build-tools
+      - name: Build the bundle with every supported CircuitPython mpy-cross
+        run: python tools/build_bundle.py --tag ci --output bundles
+      - uses: actions/upload-artifact@v7
+        with:
+          name: circuitpython-bundle
+          path: bundles

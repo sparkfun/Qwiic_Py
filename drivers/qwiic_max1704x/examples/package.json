@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_max1704x_examples/qwiic_max1704x_ex1_basic.py", "qwiic_max1704x_ex1_basic.py"],
+        ["qwiic_max1704x_examples/qwiic_max1704x_ex4_kitchen_sink.py", "qwiic_max1704x_ex4_kitchen_sink.py"]
+    ],
+    "version": "3.0.0"
+}

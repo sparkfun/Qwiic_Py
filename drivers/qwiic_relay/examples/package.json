@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["qwiic_relay_examples/qwiic_relay_ex1_single.py", "qwiic_relay_ex1_single.py"],
+        ["qwiic_relay_examples/qwiic_relay_ex2_dual.py", "qwiic_relay_ex2_dual.py"],
+        ["qwiic_relay_examples/qwiic_relay_ex3_quad.py", "qwiic_relay_ex3_quad.py"],
+        ["qwiic_relay_examples/qwiic_relay_ex4_pwm.py", "qwiic_relay_ex4_pwm.py"]
+    ],
+    "version": "3.0.0"
+}

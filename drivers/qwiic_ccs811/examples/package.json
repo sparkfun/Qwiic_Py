@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_ccs811_examples/qwiic_ccs811_ex1_basic_readings.py", "qwiic_ccs811_ex1_basic_readings.py"],
+        ["qwiic_ccs811_examples/qwiic_ccs811_ex3_ntc_compensated.py", "qwiic_ccs811_ex3_ntc_compensated.py"],
+        ["qwiic_ccs811_examples/qwiic_ccs811_ex7_set_environmental_readings.py", "qwiic_ccs811_ex7_set_environmental_readings.py"]
+    ],
+    "version": "3.0.0"
+}

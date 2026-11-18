@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sparkfun-pi-servo-hat"
+version = "3.0.0"
+description = "SparkFun Pi Servo HAT and Servo pHAT (PCA9685) servo driver"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [{name = "SparkFun Electronics", email = "info@sparkfun.com"}]
+dependencies = ["sparkfun-qwiic-i2c>=3.0,<4", "sparkfun-qwiic-pca9685>=3.0,<4"]
+keywords = ["electronics", "maker", "qwiic", "pca9685", "servo"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: MicroPython",
+    "Topic :: System :: Hardware",
+]
+
+[project.urls]
+Homepage = "https://www.sparkfun.com/qwiic"
+Documentation = "https://docs.sparkfun.com/Qwiic_Py/pi_servo_hat/"
+Source = "https://github.com/sparkfun/Qwiic_Py/tree/main/drivers/pi_servo_hat"
+Issues = "https://github.com/sparkfun/Qwiic_Py/issues"
+
+[tool.setuptools]
+py-modules = ["pi_servo_hat"]

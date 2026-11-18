@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_titan_gps_examples/qwiic_titan_gps_ex1_basic.py", "qwiic_titan_gps_ex1_basic.py"],
+        ["qwiic_titan_gps_examples/qwiic_titan_gps_ex2_all_data.py", "qwiic_titan_gps_ex2_all_data.py"]
+    ],
+    "version": "3.0.0"
+}

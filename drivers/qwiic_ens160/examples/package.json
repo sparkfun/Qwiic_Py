@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["qwiic_ens160_examples/qwiic_ens160_ex1_basic.py", "qwiic_ens160_ex1_basic.py"],
+        ["qwiic_ens160_examples/qwiic_ens160_ex4_bme280_temp_rh_compensation.py", "qwiic_ens160_ex4_bme280_temp_rh_compensation.py"],
+        ["qwiic_ens160_examples/qwiic_ens160_ex6_burn_in.py", "qwiic_ens160_ex6_burn_in.py"],
+        ["qwiic_ens160_examples/qwiic_ens160_ex7_raw_resistance.py", "qwiic_ens160_ex7_raw_resistance.py"]
+    ],
+    "version": "3.0.0"
+}

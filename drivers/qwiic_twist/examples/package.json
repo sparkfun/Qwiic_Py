@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_twist_examples/qwiic_twist_ex1_basic_readings.py", "qwiic_twist_ex1_basic_readings.py"],
+        ["qwiic_twist_examples/qwiic_twist_ex2_crazy_color.py", "qwiic_twist_ex2_crazy_color.py"],
+        ["qwiic_twist_examples/qwiic_twist_ex3_connect_colors.py", "qwiic_twist_ex3_connect_colors.py"]
+    ],
+    "version": "3.0.0"
+}

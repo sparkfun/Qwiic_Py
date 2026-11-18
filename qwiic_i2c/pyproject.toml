@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sparkfun-qwiic-i2c"
+version = "3.0.0"
+description = "SparkFun Qwiic I2C bus layer for CPython, MicroPython and CircuitPython"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [{name = "SparkFun Electronics", email = "info@sparkfun.com"}]
+dependencies = ["smbus2; sys_platform == 'linux'"]
+keywords = ["electronics", "maker", "qwiic", "i2c"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: MicroPython",
+    "Topic :: System :: Hardware",
+]
+
+[project.urls]
+Homepage = "https://www.sparkfun.com/qwiic"
+Documentation = "https://docs.sparkfun.com/Qwiic_Py/qwiic_i2c/"
+Source = "https://github.com/sparkfun/Qwiic_Py/tree/main/qwiic_i2c"
+Issues = "https://github.com/sparkfun/Qwiic_Py/issues"
+
+[tool.setuptools]
+py-modules = ["qwiic_i2c", "qwiic_i2c_micropython", "qwiic_i2c_circuitpython", "qwiic_i2c_linux"]
+
+[tool.qwiic]
+# MicroPython boards only need the core and their own backend
+mip-modules = ["qwiic_i2c", "qwiic_i2c_micropython"]
+bundle-modules = ["qwiic_i2c", "qwiic_i2c_circuitpython"]
