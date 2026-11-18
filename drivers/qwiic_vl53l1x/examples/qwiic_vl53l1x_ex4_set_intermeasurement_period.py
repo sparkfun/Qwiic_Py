@@ -71,32 +71,23 @@ def read_distance(tof):
 	return distance
 
 
-def run_example():
-	print("VL53L1X Qwiic Test\n")
-	tof = qwiic_vl53l1x.QwiicVL53L1X()
+print("VL53L1X Qwiic Test\n")
+tof = qwiic_vl53l1x.QwiicVL53L1X()
 
-	if not tof.begin():						# Checks the sensor and loads its default settings
-		print("The Qwiic VL53L1X device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not tof.begin():						# Checks the sensor and loads its default settings
+	print("The Qwiic VL53L1X device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print("Sensor online!\n")
+print("Sensor online!\n")
 
-	tof.set_inter_measurement_in_ms(40)
-	print("Inter Measurement Period (ms):", tof.get_inter_measurement_in_ms())
+tof.set_inter_measurement_in_ms(40)
+print("Inter Measurement Period (ms):", tof.get_inter_measurement_in_ms())
 
-	while True:
-		distance = read_distance(tof)
+while True:
+	distance = read_distance(tof)
 
-		distance_inches = distance / 25.4
-		distance_feet = distance_inches / 12.0
+	distance_inches = distance / 25.4
+	distance_feet = distance_inches / 12.0
 
-		print("Distance(mm): %s Distance(ft): %s" % (distance, distance_feet))
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as ex_err:
-		print("\nEnding Example 4")
-		sys.exit(0)
+	print("Distance(mm): %s Distance(ft): %s" % (distance, distance_feet))

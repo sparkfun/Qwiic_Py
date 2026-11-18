@@ -50,58 +50,49 @@ _device_errors = { \
     1 << 0 : "MsgInvalid" \
 }
 
-def run_example():
 
-	print("\nSparkFun CCS811 Sensor Example 3 - NTC data to CCS811 for compensation. \n")
-	mySensor = qwiic_ccs811.QwiicCCS811()
+print("\nSparkFun CCS811 Sensor Example 3 - NTC data to CCS811 for compensation. \n")
+mySensor = qwiic_ccs811.QwiicCCS811()
 
-	if not mySensor.is_connected():
-		print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not mySensor.is_connected():
+	print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	mySensor.begin()
+mySensor.begin()
 
-	mySensor.set_reference_resistance(9950)
+mySensor.set_reference_resistance(9950)
 
-	while True:
+while True:
 
-		if mySensor.data_available():
+	if mySensor.data_available():
 
-			mySensor.read_algorithm_results()
+		mySensor.read_algorithm_results()
 
-			print("CO2:\t%.3f ppm" % mySensor.get_co2())
+		print("CO2:\t%.3f ppm" % mySensor.get_co2())
 
-			print("tVOC:\t%.3f ppb" % mySensor.get_tvoc())
+		print("tVOC:\t%.3f ppb" % mySensor.get_tvoc())
 
-			mySensor.read_ntc()
-			print("Measured Resistance: %.3f ohms" % mySensor.get_resistance())
+		mySensor.read_ntc()
+		print("Measured Resistance: %.3f ohms" % mySensor.get_resistance())
 
-			read_temperature = mySensor.get_temperature()
-			print("Converted Temperature: %.2f deg C" % read_temperature)
+		read_temperature = mySensor.get_temperature()
+		print("Converted Temperature: %.2f deg C" % read_temperature)
 
-			mySensor.set_environmental_data( 50, read_temperature)
+		mySensor.set_environmental_data( 50, read_temperature)
 
-		elif mySensor.check_status_error():
+	elif mySensor.check_status_error():
 
-			error = mySensor.get_error_register()
-			if error == 0xFF:   
-				# communication error
-				print("Failed to get Error ID register from sensor")
-			else:
-				str_err = "Unknown Error"
-				for code in _device_errors.keys():
-					if error & code:
-						str_err = _device_errors[code]
-						break
-				print("Device Error: %s" % str_err)
+		error = mySensor.get_error_register()
+		if error == 0xFF:   
+			# communication error
+			print("Failed to get Error ID register from sensor")
+		else:
+			str_err = "Unknown Error"
+			for code in _device_errors.keys():
+				if error & code:
+					str_err = _device_errors[code]
+					break
+			print("Device Error: %s" % str_err)
 
-		qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	qwiic_i2c.delay_ms(1000)

@@ -59,47 +59,6 @@ import qwiic_i2c
 import pi_servo_hat
 
 
-def run_example():
-    print("\nSparkFun Pi Servo HAT Example 2\n")
-
-    # Initialize Constructor
-    hat = pi_servo_hat.PiServoHAT()
-
-    if not hat.is_connected():
-        print("The Pi Servo HAT isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
-
-    hat.begin()
-
-    # Restart Servo Hat (in case Hat is frozen/locked)
-    hat.restart()
-
-    # Test Run
-    #########################################
-    # Moves servo position to 0 degrees (1ms), Channel 0
-    hat.move_servo_position(0, 0, 180)
-
-    # Pause 1 sec
-    qwiic_i2c.delay_ms(1000)
-
-    # Moves servo position to 180 degrees (2ms), Channel 0
-    hat.move_servo_position(0, 180, 180)
-
-    # Pause 1 sec
-    qwiic_i2c.delay_ms(1000)
-
-    # Sweep
-    #########################################
-    while True:
-        for i in range(0, 180):
-            print(i)
-            hat.move_servo_position(0, i, 180)
-            qwiic_i2c.delay_ms(1)
-        for i in range(180, 0, -1):
-            print(i)
-            hat.move_servo_position(0, i, 180)
-            qwiic_i2c.delay_ms(1)
-
     #########################################
     # Code below may damage servo, use with caution
     # Test sweep for full range of servo (outside 0 to 180 degrees).
@@ -114,9 +73,42 @@ def run_example():
     #         qwiic_i2c.delay_ms(1)
 
 
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 2")
-        sys.exit(0)
+print("\nSparkFun Pi Servo HAT Example 2\n")
+
+# Initialize Constructor
+hat = pi_servo_hat.PiServoHAT()
+
+if not hat.is_connected():
+    print("The Pi Servo HAT isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
+
+hat.begin()
+
+# Restart Servo Hat (in case Hat is frozen/locked)
+hat.restart()
+
+# Test Run
+#########################################
+# Moves servo position to 0 degrees (1ms), Channel 0
+hat.move_servo_position(0, 0, 180)
+
+# Pause 1 sec
+qwiic_i2c.delay_ms(1000)
+
+# Moves servo position to 180 degrees (2ms), Channel 0
+hat.move_servo_position(0, 180, 180)
+
+# Pause 1 sec
+qwiic_i2c.delay_ms(1000)
+
+# Sweep
+#########################################
+while True:
+    for i in range(0, 180):
+        print(i)
+        hat.move_servo_position(0, i, 180)
+        qwiic_i2c.delay_ms(1)
+    for i in range(180, 0, -1):
+        print(i)
+        hat.move_servo_position(0, i, 180)
+        qwiic_i2c.delay_ms(1)

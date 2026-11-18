@@ -90,32 +90,23 @@ import qwiic_adxl313
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun ADXL313 Example 1 - Basic Readings\n")
-    my_adxl = qwiic_adxl313.QwiicADXL313()
+print("\nSparkFun ADXL313 Example 1 - Basic Readings\n")
+my_adxl = qwiic_adxl313.QwiicADXL313()
 
-    if not my_adxl.is_connected():
-        print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_adxl.is_connected():
+    print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_adxl.measure_mode_on()
+my_adxl.measure_mode_on()
 
-    while True:
-        if my_adxl.data_ready():
-            my_adxl.read_accel()  # updates my_adxl.x, my_adxl.y and my_adxl.z
-            print("{: 06d}\t{: 06d}\t{: 06d}".format(my_adxl.x, my_adxl.y, my_adxl.z))
-            qwiic_i2c.delay_ms(30)
-        else:
-            print("Waiting for data")
-            qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    if my_adxl.data_ready():
+        my_adxl.read_accel()  # updates my_adxl.x, my_adxl.y and my_adxl.z
+        print("{: 06d}\t{: 06d}\t{: 06d}".format(my_adxl.x, my_adxl.y, my_adxl.z))
+        qwiic_i2c.delay_ms(30)
+    else:
+        print("Waiting for data")
+        qwiic_i2c.delay_ms(500)
 ```
 
 ## Documentation

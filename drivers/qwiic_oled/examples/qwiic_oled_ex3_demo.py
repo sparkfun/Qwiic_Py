@@ -337,45 +337,39 @@ def text_examples(my_oled):
 
 #-------------------------------------------------------------------
 
-def run_example():
-    #  Before you can start using the OLED, call begin() to init
-    #  all of the pins and configure the OLED.
-
-    print("\nOLED Display - Everything Example\n")
-    my_oled = userOLED
-
-    if not my_oled.is_connected():
-        print("The OLED Display isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-
-    my_oled.begin()
-    #  clear(ALL) will clear out the OLED's graphic memory.
-    #  clear(PAGE) will clear the Arduino's display buffer.
-    my_oled.clear(my_oled.ALL)  #  Clear the display's memory (gets rid of artifacts)
-    #  To actually draw anything on the display, you must call the
-    #  display() function.
-    my_oled.display()
-    qwiic_i2c.delay_ms(1000)
-
-    my_oled.clear(my_oled.PAGE)
-
-    print("-"*30)
-    pixel_example(my_oled)
-    print("-"*30)
-    line_example(my_oled)
-    print("-"*30)
-    shape_example(my_oled)
-    print("-"*30)
-    text_examples(my_oled)
-    print("-"*30)
-    print("DONE")
 
 #-------------------------------------------------------------------
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding OLED Everything Example")
-        sys.exit(0)
+
+#  Before you can start using the OLED, call begin() to init
+#  all of the pins and configure the OLED.
+
+print("\nOLED Display - Everything Example\n")
+my_oled = userOLED
+
+if not my_oled.is_connected():
+    print("The OLED Display isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+
+my_oled.begin()
+#  clear(ALL) will clear out the OLED's graphic memory.
+#  clear(PAGE) will clear the Arduino's display buffer.
+my_oled.clear(my_oled.ALL)  #  Clear the display's memory (gets rid of artifacts)
+#  To actually draw anything on the display, you must call the
+#  display() function.
+my_oled.display()
+qwiic_i2c.delay_ms(1000)
+
+my_oled.clear(my_oled.PAGE)
+
+print("-"*30)
+pixel_example(my_oled)
+print("-"*30)
+line_example(my_oled)
+print("-"*30)
+shape_example(my_oled)
+print("-"*30)
+text_examples(my_oled)
+print("-"*30)
+print("DONE")

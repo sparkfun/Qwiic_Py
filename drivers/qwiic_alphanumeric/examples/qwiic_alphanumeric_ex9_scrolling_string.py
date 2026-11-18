@@ -43,30 +43,23 @@ import qwiic_alphanumeric
 import qwiic_i2c
 import sys
 
-def run_example():
-
-    print("\nSparkFun Qwiic Alphanumeric - Example 9: Scrolling String")
-    my_display = qwiic_alphanumeric.QwiicAlphanumeric()
-
-    if my_display.begin(0x70, 0x71) == False:
-        print("\nThe Qwiic Alhanumerics aren't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-
-    print("\nQwiic Alphanumerics passed begin!")
-    
-    my_display.print("GET MILK")
-
-    # Loop through all 8 characters
-    for i in range(8):
-        qwiic_i2c.delay_ms(1000)
-        my_display.shift_left()
         # Alternatively - you could also shift the string to the right
         #my_display.shift_right()
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 9")
-        sys.exit(0)
+
+print("\nSparkFun Qwiic Alphanumeric - Example 9: Scrolling String")
+my_display = qwiic_alphanumeric.QwiicAlphanumeric()
+
+if my_display.begin(0x70, 0x71) == False:
+    print("\nThe Qwiic Alhanumerics aren't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+
+print("\nQwiic Alphanumerics passed begin!")
+
+my_display.print("GET MILK")
+
+# Loop through all 8 characters
+for i in range(8):
+    qwiic_i2c.delay_ms(1000)
+    my_display.shift_left()

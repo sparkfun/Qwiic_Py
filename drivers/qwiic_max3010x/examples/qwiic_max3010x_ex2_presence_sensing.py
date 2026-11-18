@@ -52,70 +52,60 @@ import qwiic_i2c
 import sys
 
 
-def run_example():
+print("\nSparkFun MAX3010x Photodetector - Example 2\n")
+sensor = qwiic_max3010x.QwiicMAX3010x()
 
-	print("\nSparkFun MAX3010x Photodetector - Example 2\n")
-	sensor = qwiic_max3010x.QwiicMAX3010x()
+if not sensor.begin():
+	print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("The Qwiic MAX3010x is connected.")
 
-	if not sensor.begin():
-		print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("The Qwiic MAX3010x is connected.")
+# Setup to sense up to 18 inches, max LED brightness
+led_brightness = 0xFF # Options: 0=Off to 255=50mA
+sample_average = 4 # Options: 1, 2, 4, 8, 16, 32
+led_mode = 2 # Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
+sample_rate = 400 # Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
+pulse_width = 411 # Options: 69, 118, 215, 411
+adc_range = 2048 # Options: 2048, 4096, 8192, 16384
 
-  	# Setup to sense up to 18 inches, max LED brightness
-	led_brightness = 0xFF # Options: 0=Off to 255=50mA
-	sample_average = 4 # Options: 1, 2, 4, 8, 16, 32
-	led_mode = 2 # Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
-	sample_rate = 400 # Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
-	pulse_width = 411 # Options: 69, 118, 215, 411
-	adc_range = 2048 # Options: 2048, 4096, 8192, 16384
+sensor.setup(led_brightness, sample_average, led_mode, sample_rate, pulse_width, adc_range)
+print("Setup complete.")        
 
-	sensor.setup(led_brightness, sample_average, led_mode, sample_rate, pulse_width, adc_range)
-	print("Setup complete.")        
+sensor.set_pulse_amplitude_red(0) # Turn off Red LED
+sensor.set_pulse_amplitude_green(0) # Turn off Green LED
 
-	sensor.set_pulse_amplitude_red(0) # Turn off Red LED
-	sensor.set_pulse_amplitude_green(0) # Turn off Green LED
+samples_taken = 0       # Counter for calculating the hz or read rate
+unblocked_value = 0     # Average IR at power up
+start_time = 0          # Used to calculate measurement rate
 
-	samples_taken = 0       # Counter for calculating the hz or read rate
-	unblocked_value = 0     # Average IR at power up
-	start_time = 0          # Used to calculate measurement rate
+# Take an average of IR readings at power up
+unblocked_value = 0
+for i in range(0,32):
+	unblocked_value += sensor.get_ir() # Read the IR value
+unblocked_value /= 32
 
-	# Take an average of IR readings at power up
-	unblocked_value = 0
-	for i in range(0,32):
-		unblocked_value += sensor.get_ir() # Read the IR value
-	unblocked_value /= 32
-
-	start_time = qwiic_i2c.ticks_ms()
+start_time = qwiic_i2c.ticks_ms()
 
 
-	while True:
-			samples_taken += 1
+while True:
+		samples_taken += 1
 
-			ir_sample = sensor.get_ir()
-			hertz = samples_taken / (qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), start_time) / 1000)
-			current_delta = (ir_sample - unblocked_value)
+		ir_sample = sensor.get_ir()
+		hertz = samples_taken / (qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), start_time) / 1000)
+		current_delta = (ir_sample - unblocked_value)
 
-			hertz = round(hertz, 2)
-			current_delta = round(current_delta, 2)
+		hertz = round(hertz, 2)
+		current_delta = round(current_delta, 2)
 
-			message = ' ' # blank message
-			if current_delta > 100:
-				message = 'Something is there!'
+		message = ' ' # blank message
+		if current_delta > 100:
+			message = 'Something is there!'
 
-			print(\
-			 'IR[', ir_sample , '] \t',\
+		print(\
+		 'IR[', ir_sample , '] \t',\
              'hz[', hertz , '] \t',\
-			 'delta[', current_delta, ']',\
-			 message
-			)
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)
+		 'delta[', current_delta, ']',\
+		 message
+		)

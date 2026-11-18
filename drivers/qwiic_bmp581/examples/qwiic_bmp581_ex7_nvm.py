@@ -41,47 +41,38 @@ import sys
 # characters, but any 6 bytes of data can be stored
 data_to_write = "Hello!"
 
-def run_example():
-	print("\nQwiic BMP581 Example 7 - NVM\n")
 
-	# Create instance of device
-	myBMP581 = qwiic_bmp581.QwiicBMP581()
+print("\nQwiic BMP581 Example 7 - NVM\n")
 
-	# Check if it's connected
-	if not myBMP581.is_connected():
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+# Create instance of device
+myBMP581 = qwiic_bmp581.QwiicBMP581()
 
-	# Initialize the device
-	if not myBMP581.begin():
-		print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
-		return
-	
-	print("BMP581 connected!")
+# Check if it's connected
+if not myBMP581.is_connected():
+	print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	print ("Writing data to NVM:", data_to_write)
-	# The BMP581 contains non-volatile memory (NVM) that is primarily used for
-    # calibration data internally by the sensor. However 6 bytes are user programmable,
-    # stored in 3 2-byte locations (0x20 - 0x22).
-	data_index = 0
-	for addr in range(myBMP581.NVM_START_ADDR, myBMP581.NVM_END_ADDR + 1):
-		data = ord(data_to_write[data_index]) | (ord(data_to_write[data_index + 1]) << 8)
-		myBMP581.nvm_write(addr, data) 
-		data_index += 2
+# Initialize the device
+if not myBMP581.begin():
+	print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
+	sys.exit(1)
 
-	print("Data read back from NVM:")
+print("BMP581 connected!")
 
-	# Now we can read back the data and display it
-	for addr in range(myBMP581.NVM_START_ADDR, myBMP581.NVM_END_ADDR + 1):
-		data = myBMP581.nvm_read(addr)
-		print(chr(data & 0xFF), end='')
-		print(chr((data >> 8) & 0xFF), end='')
+print ("Writing data to NVM:", data_to_write)
+# The BMP581 contains non-volatile memory (NVM) that is primarily used for
+# calibration data internally by the sensor. However 6 bytes are user programmable,
+# stored in 3 2-byte locations (0x20 - 0x22).
+data_index = 0
+for addr in range(myBMP581.NVM_START_ADDR, myBMP581.NVM_END_ADDR + 1):
+	data = ord(data_to_write[data_index]) | (ord(data_to_write[data_index + 1]) << 8)
+	myBMP581.nvm_write(addr, data) 
+	data_index += 2
 
-	return
+print("Data read back from NVM:")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Now we can read back the data and display it
+for addr in range(myBMP581.NVM_START_ADDR, myBMP581.NVM_END_ADDR + 1):
+	data = myBMP581.nvm_read(addr)
+	print(chr(data & 0xFF), end='')
+	print(chr((data >> 8) & 0xFF), end='')

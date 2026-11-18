@@ -43,35 +43,27 @@ import qwiic_pir
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic PIR  Example 2\n")
-	my_pir = qwiic_pir.QwiicPIR()
+print("\nSparkFun Qwiic PIR  Example 2\n")
+my_pir = qwiic_pir.QwiicPIR()
 
-	if not my_pir.begin():
-		print("The Qwiic PIR isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not my_pir.begin():
+	print("The Qwiic PIR isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print ("Waiting 30 seconds for PIR to stabilize")
-	for i in range(0, 30):
-		print(i)
-		qwiic_i2c.delay_ms(1000)
+print ("Waiting 30 seconds for PIR to stabilize")
+for i in range(0, 30):
+	print(i)
+	qwiic_i2c.delay_ms(1000)
 
-	print("Device Stable")
+print("Device Stable")
 
-	while True:
-		if my_pir.available() is True:
-			if my_pir.object_detected():
-				print("Object Detected")
-			if my_pir.object_removed():
-				print("Object Removed")
-			my_pir.clear_event_bits()
-		qwiic_i2c.delay_ms(200)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 2")
-		sys.exit(0)
+while True:
+	if my_pir.available() is True:
+		if my_pir.object_detected():
+			print("Object Detected")
+		if my_pir.object_removed():
+			print("Object Removed")
+		my_pir.clear_event_bits()
+	qwiic_i2c.delay_ms(200)

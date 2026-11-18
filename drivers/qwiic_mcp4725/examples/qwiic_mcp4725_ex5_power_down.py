@@ -36,54 +36,47 @@
 import qwiic_mcp4725
 import sys
 import qwiic_i2c
-def run_example():
-	print("\nQwiic Template Example 5 - Power Down\n")
 
-	# Create instance of device
-	my_dac = qwiic_mcp4725.QwiicMCP4725()
 
-	# Check if it's connected
-	if not my_dac.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+print("\nQwiic Template Example 5 - Power Down\n")
 
-	# Initialize the device
-	my_dac.begin()
-	
-	while True:
-		# We'll start by writing 3.3V to the DAC in normal mode
-		print("Writing 3.3V to DAC")
-		# By default, the write_dac() function will write to the DAC in normal mode if no mode is specified.
-		my_dac.write_dac(4095)  # ~3.3 V if VDD = 3.3V.
-		
-		qwiic_i2c.delay_ms(2000)
+# Create instance of device
+my_dac = qwiic_mcp4725.QwiicMCP4725()
 
-		# Now, we will put the dac in power down mode.
-		# This will reduce the current consumption of the DAC to ~60nA (typical).
-		# The DAC will not output any voltage in power down mode, but it can still receive I2C commands.
-		# The output stage will switch from an amplifier output to a known resistive load (1k, 100k, or 500k).
-		# To wake the DAC from power down mode, write a value to the DAC, with normal mode enabled.
-		# See datasheet pg. 20
-		print("Entering Power Down Mode...")
-		my_dac.write_dac(2048, my_dac.POWER_DOWN_MODE_100K)  # Note, it doesn't matter what value we write here, the DAC will stop performing conversions
-		qwiic_i2c.delay_ms(2000)
+# Check if it's connected
+if not my_dac.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-		print("Writing to the DAC in Power Down Mode (will not output conversion)...")
-		my_dac.write_dac(4095, my_dac.POWER_DOWN_MODE_100K)  # We won't see the voltage we expect, as the DAC is still in power down mode
+# Initialize the device
+my_dac.begin()
 
-		qwiic_i2c.delay_ms(2000)
+while True:
+	# We'll start by writing 3.3V to the DAC in normal mode
+	print("Writing 3.3V to DAC")
+	# By default, the write_dac() function will write to the DAC in normal mode if no mode is specified.
+	my_dac.write_dac(4095)  # ~3.3 V if VDD = 3.3V.
 
-		# Now by issuing a write_dac command with normal mode enabled, we will wake the DAC from power down mode and again will see the value expected
-		print("Writing 0.825V to DAC")
-		my_dac.write_dac(1024, my_dac.POWER_DOWN_MODE_NORMAL)  # ~0.825V if VDD = 3.3V
-		
-		qwiic_i2c.delay_ms(2000)
-			
+	qwiic_i2c.delay_ms(2000)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+	# Now, we will put the dac in power down mode.
+	# This will reduce the current consumption of the DAC to ~60nA (typical).
+	# The DAC will not output any voltage in power down mode, but it can still receive I2C commands.
+	# The output stage will switch from an amplifier output to a known resistive load (1k, 100k, or 500k).
+	# To wake the DAC from power down mode, write a value to the DAC, with normal mode enabled.
+	# See datasheet pg. 20
+	print("Entering Power Down Mode...")
+	my_dac.write_dac(2048, my_dac.POWER_DOWN_MODE_100K)  # Note, it doesn't matter what value we write here, the DAC will stop performing conversions
+	qwiic_i2c.delay_ms(2000)
+
+	print("Writing to the DAC in Power Down Mode (will not output conversion)...")
+	my_dac.write_dac(4095, my_dac.POWER_DOWN_MODE_100K)  # We won't see the voltage we expect, as the DAC is still in power down mode
+
+	qwiic_i2c.delay_ms(2000)
+
+	# Now by issuing a write_dac command with normal mode enabled, we will wake the DAC from power down mode and again will see the value expected
+	print("Writing 0.825V to DAC")
+	my_dac.write_dac(1024, my_dac.POWER_DOWN_MODE_NORMAL)  # ~0.825V if VDD = 3.3V
+
+	qwiic_i2c.delay_ms(2000)

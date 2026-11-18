@@ -49,43 +49,36 @@ my_relays = qwiic_relay.QwiicRelay(qwiic_relay.QUAD_SOLID_STATE_RELAY_DEFAULT_AD
 # my_relays = qwiic_relay.QwiicRelay(qwiic_relay.DUAL_SOLID_STATE_RELAY_DEFAULT_ADDR)
 # my_relays = qwiic_relay.QwiicRelay(qwiic_relay.DUAL_SOLID_STATE_RELAY_JUMPER_CLOSE_ADDR)
 
-def run_example():
-
-    print("\nSparkFun Qwiic Relay Example 4 - PWM\n")
-
-    if not my_relays.begin():
-        print("The Qwiic Relay isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-
-    # Set PWM on each relay. All relays can be set independently, uncomment
-    # lines below to activate them. Note that our range is 0-120 for setting a
-    # PWM value as there are only 120 times where the zero crossing relay can
-    # switch in one second
-    my_relays.set_slow_pwm(1, 30) # 25% duty cycle
-    # my_relays.set_slow_pwm(2, 60) # 50% duty cycle
-    # my_relays.set_slow_pwm(3, 90) # 75% duty cycle
-    # my_relays.set_slow_pwm(4, 120) # 100% duty cycle
-    
-    # Print the status of all relays
-    print("Relay 1 PWM: " + str(my_relays.get_slow_pwm(1)))
-    # print("Relay 2 PWM: " + str(my_relays.get_slow_pwm(2)))
-    # print("Relay 3 PWM: " + str(my_relays.get_slow_pwm(3)))
-    # print("Relay 4 PWM: " + str(my_relays.get_slow_pwm(4)))
-    print()
-
-    # Let the slow PWM run for a while
-    qwiic_i2c.delay_ms(10000)
-    
-    # Set all relays off 
-    my_relays.set_slow_pwm(1, 0)
     # my_relays.set_slow_pwm(2, 0)
     # my_relays.set_slow_pwm(3, 0)
     # my_relays.set_slow_pwm(4, 0)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 4")
-        sys.exit(0)
+
+print("\nSparkFun Qwiic Relay Example 4 - PWM\n")
+
+if not my_relays.begin():
+    print("The Qwiic Relay isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+
+# Set PWM on each relay. All relays can be set independently, uncomment
+# lines below to activate them. Note that our range is 0-120 for setting a
+# PWM value as there are only 120 times where the zero crossing relay can
+# switch in one second
+my_relays.set_slow_pwm(1, 30) # 25% duty cycle
+# my_relays.set_slow_pwm(2, 60) # 50% duty cycle
+# my_relays.set_slow_pwm(3, 90) # 75% duty cycle
+# my_relays.set_slow_pwm(4, 120) # 100% duty cycle
+
+# Print the status of all relays
+print("Relay 1 PWM: " + str(my_relays.get_slow_pwm(1)))
+# print("Relay 2 PWM: " + str(my_relays.get_slow_pwm(2)))
+# print("Relay 3 PWM: " + str(my_relays.get_slow_pwm(3)))
+# print("Relay 4 PWM: " + str(my_relays.get_slow_pwm(4)))
+print()
+
+# Let the slow PWM run for a while
+qwiic_i2c.delay_ms(10000)
+
+# Set all relays off 
+my_relays.set_slow_pwm(1, 0)

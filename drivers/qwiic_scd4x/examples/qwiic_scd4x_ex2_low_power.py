@@ -38,47 +38,40 @@ import qwiic_scd4x
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic SCD4x Example 2 - Low Power\n")
 
-	# Create instance of device
-	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
+print("\nQwiic SCD4x Example 2 - Low Power\n")
 
-	# Check if it's connected
-	if not mySCD4x.is_connected():
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+# Create instance of device
+mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
-	# Initialize the device
-	if not mySCD4x.begin():
-		print("Error while initializing device", file=sys.stderr)
-		return
-	
-	# By default, the SCD4x has data ready every five seconds.
-	# We can enable low power operation and receive a reading every ~30 seconds
+# Check if it's connected
+if not mySCD4x.is_connected():
+	print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	# But first, we need to stop periodic measurements otherwise start_low_power_periodic_measurement will fail
-	mySCD4x.stop_periodic_measurement()
+# Initialize the device
+if not mySCD4x.begin():
+	print("Error while initializing device", file=sys.stderr)
+	sys.exit(1)
 
-	# Now we can enable low power periodic measurements
-	if not mySCD4x.start_low_power_periodic_measurement():
-		print("Error while starting low power periodic measurement", file=sys.stderr)
-		return
-	
-	# The SCD4x will have data ready every ~30 seconds
-	while True:
-		if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
-			print("\nCO2(ppm):", mySCD4x.get_co2())
-			print("Temperature(C):", mySCD4x.get_temperature())
-			print("Humidity(%RH):", mySCD4x.get_humidity())
-		else:
-			print(".", end="")
+# By default, the SCD4x has data ready every five seconds.
+# We can enable low power operation and receive a reading every ~30 seconds
 
-		qwiic_i2c.delay_ms(1000) # Only check for new data every 1 second
+# But first, we need to stop periodic measurements otherwise start_low_power_periodic_measurement will fail
+mySCD4x.stop_periodic_measurement()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Now we can enable low power periodic measurements
+if not mySCD4x.start_low_power_periodic_measurement():
+	print("Error while starting low power periodic measurement", file=sys.stderr)
+	sys.exit(1)
+
+# The SCD4x will have data ready every ~30 seconds
+while True:
+	if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
+		print("\nCO2(ppm):", mySCD4x.get_co2())
+		print("Temperature(C):", mySCD4x.get_temperature())
+		print("Humidity(%RH):", mySCD4x.get_humidity())
+	else:
+		print(".", end="")
+
+	qwiic_i2c.delay_ms(1000) # Only check for new data every 1 second

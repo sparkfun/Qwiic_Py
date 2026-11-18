@@ -94,27 +94,18 @@ import qwiic_proximity
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Proximity Sensor VCN4040 Example 1\n")
-    prox = qwiic_proximity.QwiicProximity()
+print("\nSparkFun Proximity Sensor VCN4040 Example 1\n")
+prox = qwiic_proximity.QwiicProximity()
 
-    if not prox.is_connected():
-        print("The Qwiic Proximity device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not prox.is_connected():
+    print("The Qwiic Proximity device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    prox.begin()
+prox.begin()
 
-    while True:
-        print("Proximity Value: %d" % prox.get_proximity())
-        qwiic_i2c.delay_ms(400)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    print("Proximity Value: %d" % prox.get_proximity())
+    qwiic_i2c.delay_ms(400)
 ```
 
 ## Documentation

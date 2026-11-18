@@ -37,43 +37,36 @@ import qwiic_mmc5983ma
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic MMC5983MA Example 1 - Basic Readings\n")
 
-	# Create instance of device
-	my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
+print("\nQwiic MMC5983MA Example 1 - Basic Readings\n")
 
-	# Check if it's connected
-	if not my_mag.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
 
-	# Initialize the device
-	my_mag.begin()
+# Check if it's connected
+if not my_mag.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Loop forever
-	while True:
-		# Read each axis one by one, or all together
-		# x = my_mag.get_measurement_x_gauss()
-		# y = my_mag.get_measurement_y_gauss()
-		# z = my_mag.get_measurement_z_gauss()
-		x, y, z = my_mag.get_measurement_xyz_gauss()
+# Initialize the device
+my_mag.begin()
 
-		# Print them out
-		print("X: %f" % x)
-		print("Y: %f" % y)
-		print("Z: %f" % z)
+# Loop forever
+while True:
+	# Read each axis one by one, or all together
+	# x = my_mag.get_measurement_x_gauss()
+	# y = my_mag.get_measurement_y_gauss()
+	# z = my_mag.get_measurement_z_gauss()
+	x, y, z = my_mag.get_measurement_xyz_gauss()
 
-		# Extra space to keep numbers separate
-		print()
+	# Print them out
+	print("X: %f" % x)
+	print("Y: %f" % y)
+	print("Z: %f" % z)
 
-		# Delay for a moment
-		qwiic_i2c.delay_ms(100)
+	# Extra space to keep numbers separate
+	print()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+	# Delay for a moment
+	qwiic_i2c.delay_ms(100)

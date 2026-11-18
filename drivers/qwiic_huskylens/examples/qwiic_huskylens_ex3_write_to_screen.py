@@ -12,45 +12,38 @@ import qwiic_huskylens
 import sys
 import qwiic_i2c
 
-def run_example():
-    print("\nQwiic HuskyLens Example 3 - Write to Screen\n")
 
-    # Create instance of device
-    myHuskyLens = qwiic_huskylens.QwiicHuskyLens()
+print("\nQwiic HuskyLens Example 3 - Write to Screen\n")
 
-    # Check if it's connected
-    if myHuskyLens.is_connected() == False:
-        print("Device not connected, please check your connection",
-            file=sys.stderr)
-        return
+# Create instance of device
+myHuskyLens = qwiic_huskylens.QwiicHuskyLens()
 
-    # Initialize the device
-    if myHuskyLens.begin() == False:
-        print("Failed to initialize the device, please check your connection",
-            file=sys.stderr)
-        return
+# Check if it's connected
+if myHuskyLens.is_connected() == False:
+    print("Device not connected, please check your connection",
+        file=sys.stderr)
+    sys.exit(1)
 
-    # Main loop
-    while True:
-        # We can write up to 20 characters at a time. The last 2 parameters are
-        # optional x and y coordinates to position the text on the screen, which
-        # default to 0, 0 (top left corner)
-        print("Writing to screen")
-        myHuskyLens.write_to_screen("Hello, World!", 0, 0) 
-        qwiic_i2c.delay_ms(2000)
-        
-        print("Writing to screen elsewhere")
-        myHuskyLens.write_to_screen("Goodbye, World!", 50, 50)
-        qwiic_i2c.delay_ms(2000)
-        
-        # The text will stay on the screen until we clear it
-        print("Clearing the screen")
-        myHuskyLens.clear_screen()
-        qwiic_i2c.delay_ms(2000)
+# Initialize the device
+if myHuskyLens.begin() == False:
+    print("Failed to initialize the device, please check your connection",
+        file=sys.stderr)
+    sys.exit(1)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example")
-        sys.exit(0)
+# Main loop
+while True:
+    # We can write up to 20 characters at a time. The last 2 parameters are
+    # optional x and y coordinates to position the text on the screen, which
+    # default to 0, 0 (top left corner)
+    print("Writing to screen")
+    myHuskyLens.write_to_screen("Hello, World!", 0, 0) 
+    qwiic_i2c.delay_ms(2000)
+
+    print("Writing to screen elsewhere")
+    myHuskyLens.write_to_screen("Goodbye, World!", 50, 50)
+    qwiic_i2c.delay_ms(2000)
+
+    # The text will stay on the screen until we clear it
+    print("Clearing the screen")
+    myHuskyLens.clear_screen()
+    qwiic_i2c.delay_ms(2000)

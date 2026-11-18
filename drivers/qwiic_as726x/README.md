@@ -91,36 +91,27 @@ import sys
 import qwiic_as726x
 
 
-def run_example():
-    print("\nQwiic AS726x Example 1 - Basic\n")
-    my_as726x = qwiic_as726x.QwiicAS726x()
+print("\nQwiic AS726x Example 1 - Basic\n")
+my_as726x = qwiic_as726x.QwiicAS726x()
 
-    if not my_as726x.begin():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_as726x.begin():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-        my_as726x.take_measurements()
-        if my_as726x.get_version() == my_as726x.SENSOR_TYPE_AS7262:
-            print("V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
-                my_as726x.get_calibrated_violet(), my_as726x.get_calibrated_blue(),
-                my_as726x.get_calibrated_green(), my_as726x.get_calibrated_yellow(),
-                my_as726x.get_calibrated_orange(), my_as726x.get_calibrated_red()), end="")
-        elif my_as726x.get_version() == my_as726x.SENSOR_TYPE_AS7263:
-            print("R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
-                my_as726x.get_calibrated_r(), my_as726x.get_calibrated_s(),
-                my_as726x.get_calibrated_t(), my_as726x.get_calibrated_u(),
-                my_as726x.get_calibrated_v(), my_as726x.get_calibrated_w()), end="")
+while True:
+    my_as726x.take_measurements()
+    if my_as726x.get_version() == my_as726x.SENSOR_TYPE_AS7262:
+        print("V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
+            my_as726x.get_calibrated_violet(), my_as726x.get_calibrated_blue(),
+            my_as726x.get_calibrated_green(), my_as726x.get_calibrated_yellow(),
+            my_as726x.get_calibrated_orange(), my_as726x.get_calibrated_red()), end="")
+    elif my_as726x.get_version() == my_as726x.SENSOR_TYPE_AS7263:
+        print("R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
+            my_as726x.get_calibrated_r(), my_as726x.get_calibrated_s(),
+            my_as726x.get_calibrated_t(), my_as726x.get_calibrated_u(),
+            my_as726x.get_calibrated_v(), my_as726x.get_calibrated_w()), end="")
 
-        print(" tempF[{}]".format(my_as726x.get_temperature_f()))
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    print(" tempF[{}]".format(my_as726x.get_temperature_f()))
 ```
 
 ## Documentation

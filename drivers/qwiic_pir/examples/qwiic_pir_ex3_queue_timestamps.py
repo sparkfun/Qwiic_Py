@@ -43,45 +43,37 @@ import qwiic_pir
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic PIR  Example 3\n")
-	my_pir = qwiic_pir.QwiicPIR()
+print("\nSparkFun Qwiic PIR  Example 3\n")
+my_pir = qwiic_pir.QwiicPIR()
 
-	if not my_pir.begin():
-		print("The Qwiic PIR isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not my_pir.begin():
+	print("The Qwiic PIR isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print ("Waiting 30 seconds for PIR to stabilize")
-	for i in range(0, 30):
-		print(i)
-		qwiic_i2c.delay_ms(1000)
+print ("Waiting 30 seconds for PIR to stabilize")
+for i in range(0, 30):
+	print(i)
+	qwiic_i2c.delay_ms(1000)
 
-	print("Device Stable")
+print("Device Stable")
 
-	while True:
-		if my_pir.is_detected_queue_empty() is False:
-			last_detect = my_pir.time_since_last_detect() / 1000.0
-			first_detect =  my_pir.time_since_first_detect() / 1000.0
-			print("\n" + str(last_detect) + "s since last PIR detect   ")
-			print(str(first_detect) + "s since first PIR detect")
-		else:
-			print("Detected queue is empty")
+while True:
+	if my_pir.is_detected_queue_empty() is False:
+		last_detect = my_pir.time_since_last_detect() / 1000.0
+		first_detect =  my_pir.time_since_first_detect() / 1000.0
+		print("\n" + str(last_detect) + "s since last PIR detect   ")
+		print(str(first_detect) + "s since first PIR detect")
+	else:
+		print("Detected queue is empty")
 
-		if my_pir.is_removed_queue_empty() is False:
-			last_remove = my_pir.time_since_last_remove() / 1000.0
-			first_remove =  my_pir.time_since_first_remove() / 1000.0
-			print("\n" + str(last_remove) + "s since last PIR remove   ")
-			print(str(first_remove) + "s since first PIR remove")
-		else:
-			print("Removed queue is empty")
-			
-		qwiic_i2c.delay_ms(200)
+	if my_pir.is_removed_queue_empty() is False:
+		last_remove = my_pir.time_since_last_remove() / 1000.0
+		first_remove =  my_pir.time_since_first_remove() / 1000.0
+		print("\n" + str(last_remove) + "s since last PIR remove   ")
+		print(str(first_remove) + "s since first PIR remove")
+	else:
+		print("Removed queue is empty")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 3")
-		sys.exit(0)
+	qwiic_i2c.delay_ms(200)

@@ -50,32 +50,24 @@ import qwiic_max3010x
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun MAX3010x Photodetector - Example 1\n")
-	sensor = qwiic_max3010x.QwiicMAX3010x()
+print("\nSparkFun MAX3010x Photodetector - Example 1\n")
+sensor = qwiic_max3010x.QwiicMAX3010x()
 
-	if not sensor.begin():
-		print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("The Qwiic MAX3010x is connected.")
+if not sensor.begin():
+	print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("The Qwiic MAX3010x is connected.")
 
-	sensor.setup()
-	print("Setup complete.")        
+sensor.setup()
+print("Setup complete.")        
 
-	while True:
-			print(\
-			 'R[', sensor.get_red() , '] \t'\
+while True:
+		print(\
+		 'R[', sensor.get_red() , '] \t'\
                                                              'IR[', sensor.get_ir() , '] \t'\
                                                              'G[', sensor.get_green() , ']'\
-			)
-			qwiic_i2c.delay_ms(100)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+		)
+		qwiic_i2c.delay_ms(100)

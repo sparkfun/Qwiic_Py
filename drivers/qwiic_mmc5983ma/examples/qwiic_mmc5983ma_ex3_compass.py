@@ -38,56 +38,49 @@ import sys
 import qwiic_i2c
 import math
 
-def run_example():
-	print("\nQwiic MMC5983MA Example 3 - Compass\n")
 
-	# Create instance of device
-	my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
+print("\nQwiic MMC5983MA Example 3 - Compass\n")
 
-	# Check if it's connected
-	if not my_mag.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
 
-	# Initialize the device
-	my_mag.begin()
+# Check if it's connected
+if not my_mag.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Loop forever
-	while True:
-		# Read only the x and y axes, z is assumeed to be pointing straight up
-		x = my_mag.get_measurement_x_gauss()
-		y = my_mag.get_measurement_y_gauss()
+# Initialize the device
+my_mag.begin()
 
-		# Compute heading, assuming the y-axis is the "forward" direction.
-		#
-		# Note - atan2 usually takes (y, x), but we have to account for a couple
-		# things. The Earth's south pole is actually a  magnetic north pole, so
-		# the field lines run from south to north, meaning we need to negate the
-		# x and y values. Additionally, because the y-axis is the "forward"
-		# direction, so we need to swap the x and y values and negate the x
-		# value again to effectively rotate the coordinate system 90 degrees.
-		heading = math.atan2(x, -y)
+# Loop forever
+while True:
+	# Read only the x and y axes, z is assumeed to be pointing straight up
+	x = my_mag.get_measurement_x_gauss()
+	y = my_mag.get_measurement_y_gauss()
 
-		# Convert to degrees
-		heading = math.degrees(heading)
+	# Compute heading, assuming the y-axis is the "forward" direction.
+	#
+	# Note - atan2 usually takes (y, x), but we have to account for a couple
+	# things. The Earth's south pole is actually a  magnetic north pole, so
+	# the field lines run from south to north, meaning we need to negate the
+	# x and y values. Additionally, because the y-axis is the "forward"
+	# direction, so we need to swap the x and y values and negate the x
+	# value again to effectively rotate the coordinate system 90 degrees.
+	heading = math.atan2(x, -y)
 
-		# Change range from -180 to 180 to 0 to 360
-		if heading < 0:
-			heading = 360 + heading
+	# Convert to degrees
+	heading = math.degrees(heading)
 
-		# Print compass heading
-		#
-		# Note - If the Earth's magnetic field points mostly straight up or down
-		# where you live, this may be inaccurate!
-		print("Heading:", heading)
+	# Change range from -180 to 180 to 0 to 360
+	if heading < 0:
+		heading = 360 + heading
 
-		# Delay for a moment
-		qwiic_i2c.delay_ms(100)
+	# Print compass heading
+	#
+	# Note - If the Earth's magnetic field points mostly straight up or down
+	# where you live, this may be inaccurate!
+	print("Heading:", heading)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+	# Delay for a moment
+	qwiic_i2c.delay_ms(100)

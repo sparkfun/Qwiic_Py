@@ -43,34 +43,24 @@ import qwiic_twist
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun qwiic Twist   Example 1\n")
-	myTwist = qwiic_twist.QwiicTwist()
+print("\nSparkFun qwiic Twist   Example 1\n")
+myTwist = qwiic_twist.QwiicTwist()
 
-	if not myTwist.is_connected():
-		print("The Qwiic twist device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myTwist.is_connected():
+	print("The Qwiic twist device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myTwist.begin()
+myTwist.begin()
 
-	# Set the knob color to pink
-	myTwist.set_color(100, 10, 50)
+# Set the knob color to pink
+myTwist.set_color(100, 10, 50)
 
-	while True:
+while True:
 
-		print("Count: %d, Pressed: %s" % (myTwist.get_count(), \
-			"YES" if myTwist.is_pressed() else "NO", \
-			))
+	print("Count: %d, Pressed: %s" % (myTwist.get_count(), \
+		"YES" if myTwist.is_pressed() else "NO", \
+		))
 
-		qwiic_i2c.delay_ms(300)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(300)

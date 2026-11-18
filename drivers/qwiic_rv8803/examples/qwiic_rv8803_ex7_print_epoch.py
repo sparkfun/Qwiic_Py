@@ -37,33 +37,26 @@ import qwiic_rv8803
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic RV8803 Example 7 - Print Epoch\n")
 
-	# Create instance of device
-	myRTC = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 7 - Print Epoch\n")
 
-	# Check if it's connected
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myRTC = qwiic_rv8803.QwiicRV8803()
 
-	# Initialize the device
-	myRTC.begin()
+# Check if it's connected
+if myRTC.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		myRTC.update_time()
-		# get time in ISO 8601 format
-		print("Current ISO-8601 Time: ", myRTC.string_time_8601())
+# Initialize the device
+myRTC.begin()
 
-		# Get epoch time (optionally pass False to get_epoch() to count from 2000-01-01 00:00:00 rather than 1970-01-01 00:00:00)
-		print("Epoch Time: ", myRTC.get_epoch())
-		qwiic_i2c.delay_ms(1000)
+while True:
+	myRTC.update_time()
+	# get time in ISO 8601 format
+	print("Current ISO-8601 Time: ", myRTC.string_time_8601())
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	# Get epoch time (optionally pass False to get_epoch() to count from 2000-01-01 00:00:00 rather than 1970-01-01 00:00:00)
+	print("Epoch Time: ", myRTC.get_epoch())
+	qwiic_i2c.delay_ms(1000)

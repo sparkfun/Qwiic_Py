@@ -45,42 +45,34 @@ import sys
 mode = qwiic_mcp9600.QwiicMCP9600.SHUTDOWN_MODE_BURST
 samples = qwiic_mcp9600.QwiicMCP9600.BURST_SAMPLE_8
 
-def run_example():
 
-	print("\nQwiic MCP9600 Example 5 - Burst Mode\n")
+print("\nQwiic MCP9600 Example 5 - Burst Mode\n")
 
-	# Create instance of device
-	my_thermo = qwiic_mcp9600.QwiicMCP9600()
+# Create instance of device
+my_thermo = qwiic_mcp9600.QwiicMCP9600()
 
-	# Check if it's connected
-	if not my_thermo.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Check if it's connected
+if not my_thermo.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Initialize the device
-	my_thermo.begin()
+# Initialize the device
+my_thermo.begin()
 
-	# Set the MCP9600 to burst mode!
-	my_thermo.set_burst_samples(samples)
-	my_thermo.set_shutdown_mode(mode)
+# Set the MCP9600 to burst mode!
+my_thermo.set_burst_samples(samples)
+my_thermo.set_shutdown_mode(mode)
 
-	while True:
-		if my_thermo.available():
-			# Read temperatures
-			thermocouple_temp = my_thermo.get_thermocouple_temp()
-			ambient_temp = my_thermo.get_ambient_temp()
-			temp_delta = my_thermo.get_temp_delta()
+while True:
+	if my_thermo.available():
+		# Read temperatures
+		thermocouple_temp = my_thermo.get_thermocouple_temp()
+		ambient_temp = my_thermo.get_ambient_temp()
+		temp_delta = my_thermo.get_temp_delta()
 
-			# Print temperatures
-			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C")
-			
-			# clear the register and start a new burst cycle!
-			my_thermo.start_burst()
+		# Print temperatures
+		print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+		# clear the register and start a new burst cycle!
+		my_thermo.start_burst()

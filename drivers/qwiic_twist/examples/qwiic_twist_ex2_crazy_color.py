@@ -44,33 +44,23 @@ import qwiic_i2c
 import random
 import sys
 
-def run_example():
 
-	print("\nSparkFun qwiic Twist   Example 2 - crazy colors\n")
-	myTwist = qwiic_twist.QwiicTwist()
+print("\nSparkFun qwiic Twist   Example 2 - crazy colors\n")
+myTwist = qwiic_twist.QwiicTwist()
 
-	if not myTwist.is_connected():
-		print("The Qwiic twist device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myTwist.is_connected():
+	print("The Qwiic twist device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myTwist.begin()
+myTwist.begin()
 
-	while True:
+while True:
 
-		print("Count: %d, Pressed: %s" % (myTwist.get_count(), \
-			"YES" if myTwist.is_pressed() else "NO", \
-			))
+	print("Count: %d, Pressed: %s" % (myTwist.get_count(), \
+		"YES" if myTwist.is_pressed() else "NO", \
+		))
 
-		myTwist.set_color( random.randint(0,255), random.randint(0,255),random.randint(0,255))
+	myTwist.set_color( random.randint(0,255), random.randint(0,255),random.randint(0,255))
 
-		qwiic_i2c.delay_ms(300)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2 - Crazy Colors")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(300)

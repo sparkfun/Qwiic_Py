@@ -44,58 +44,48 @@ import qwiic_keypad
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun qwiic Keypad   Example 1\n")
-	myKeypad = qwiic_keypad.QwiicKeypad()
+print("\nSparkFun qwiic Keypad   Example 1\n")
+myKeypad = qwiic_keypad.QwiicKeypad()
 
-	if not myKeypad.is_connected():
-		print("The Qwiic Keypad device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myKeypad.is_connected():
+	print("The Qwiic Keypad device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myKeypad.begin()
+myKeypad.begin()
 
-	print("Initialized. Firmware Version: %s" % myKeypad.get_version())
-	print("Press a button: * to do a space. # to go to next line.")
+print("Initialized. Firmware Version: %s" % myKeypad.get_version())
+print("Press a button: * to do a space. # to go to next line.")
 
-	button = 0
-	while True:
+button = 0
+while True:
 
-		# necessary for keypad to pull button from stack to readable register
-		myKeypad.update_fifo()  
-		button = myKeypad.get_button()
+	# necessary for keypad to pull button from stack to readable register
+	myKeypad.update_fifo()  
+	button = myKeypad.get_button()
 
-		if button == -1:
-			print("No keypad detected")
-			qwiic_i2c.delay_ms(1000)
+	if button == -1:
+		print("No keypad detected")
+		qwiic_i2c.delay_ms(1000)
 
-		elif button != 0:
+	elif button != 0:
 
-			# Get the character version of this char
-			charButton = chr(button)
-			if charButton == '#':
-				print()
-			elif charButton == '*':
-				print(" ", end="")
-			else: 
-				print(charButton, end="")
+		# Get the character version of this char
+		charButton = chr(button)
+		if charButton == '#':
+			print()
+		elif charButton == '*':
+			print(" ", end="")
+		else: 
+			print(charButton, end="")
 
-			# Some platforms won't print until newline character, so a flush is
-			# needed to update. However some platforms (eg. MicroPython) don't
-			# include sys.stdout.flush(), so wrap in a try block
-			try:
-				sys.stdout.flush()
-			except AttributeError:
-				pass
+		# Some platforms won't print until newline character, so a flush is
+		# needed to update. However some platforms (eg. MicroPython) don't
+		# include sys.stdout.flush(), so wrap in a try block
+		try:
+			sys.stdout.flush()
+		except AttributeError:
+			pass
 
-		qwiic_i2c.delay_ms(250)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(250)

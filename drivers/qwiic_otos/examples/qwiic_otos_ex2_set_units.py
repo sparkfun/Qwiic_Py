@@ -41,64 +41,57 @@ import qwiic_otos
 import sys
 import qwiic_i2c
 
-def run_example():
-    print("\nQwiic OTOS Example 2 - Set Units\n")
 
-    # Create instance of device
-    my_otos = qwiic_otos.QwiicOTOS()
+print("\nQwiic OTOS Example 2 - Set Units\n")
 
-    # Check if it's connected
-    if not my_otos.is_connected():
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+# Create instance of device
+my_otos = qwiic_otos.QwiicOTOS()
 
-    # Initialize the device
-    my_otos.begin()
+# Check if it's connected
+if not my_otos.is_connected():
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    print("Ensure the OTOS is flat and stationary during calibration!")
-    for i in range(5, 0, -1):
-        print("Calibrating in %d seconds..." % i)
-        qwiic_i2c.delay_ms(1000)
+# Initialize the device
+my_otos.begin()
 
-    print("Calibrating IMU...")
+print("Ensure the OTOS is flat and stationary during calibration!")
+for i in range(5, 0, -1):
+    print("Calibrating in %d seconds..." % i)
+    qwiic_i2c.delay_ms(1000)
 
-    # Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    my_otos.calibrate_imu()
+print("Calibrating IMU...")
 
-    # Set the desired units for linear and angular measurements. Can be either
-    # meters or inches for linear, and radians or degrees for angular. If not
-    # set, the default is inches and degrees. Note that this setting is not
-    # stored in the sensor, it's part of the library, so you need to set at the
-    # start of all your programs.
-    my_otos.set_linear_unit(my_otos.LINEAR_UNIT_METERS)
-    # my_otos.set_linear_unit(my_otos.LINEAR_UNIT_INCHES)
-    my_otos.set_angular_unit(my_otos.ANGULAR_UNIT_RADIANS)
-    # my_otos.set_angular_unit(my_otos.ANGULAR_UNIT_DEGREES)
+# Calibrate the IMU, which removes the accelerometer and gyroscope offsets
+my_otos.calibrate_imu()
 
-    # Reset the tracking algorithm - this resets the position to the origin,
-    # but can also be used to recover from some rare tracking errors
-    my_otos.reset_tracking()
+# Set the desired units for linear and angular measurements. Can be either
+# meters or inches for linear, and radians or degrees for angular. If not
+# set, the default is inches and degrees. Note that this setting is not
+# stored in the sensor, it's part of the library, so you need to set at the
+# start of all your programs.
+my_otos.set_linear_unit(my_otos.LINEAR_UNIT_METERS)
+# my_otos.set_linear_unit(my_otos.LINEAR_UNIT_INCHES)
+my_otos.set_angular_unit(my_otos.ANGULAR_UNIT_RADIANS)
+# my_otos.set_angular_unit(my_otos.ANGULAR_UNIT_DEGREES)
 
-    # Main loop
-    while True:
-        # Get the latest position, which includes the x and y coordinates, plus
-        # the heading angle
-        my_position = my_otos.get_position()
+# Reset the tracking algorithm - this resets the position to the origin,
+# but can also be used to recover from some rare tracking errors
+my_otos.reset_tracking()
 
-        # Print measurement
-        print()
-        print("Position:")
-        print("X (Meters): {}".format(my_position.x))
-        print("Y (Meters): {}".format(my_position.y))
-        print("Heading (Radians): {}".format(my_position.h))
+# Main loop
+while True:
+    # Get the latest position, which includes the x and y coordinates, plus
+    # the heading angle
+    my_position = my_otos.get_position()
 
-        # Wait a bit so we don't spam the serial port
-        qwiic_i2c.delay_ms(500)
+    # Print measurement
+    print()
+    print("Position:")
+    print("X (Meters): {}".format(my_position.x))
+    print("Y (Meters): {}".format(my_position.y))
+    print("Heading (Radians): {}".format(my_position.h))
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    # Wait a bit so we don't spam the serial port
+    qwiic_i2c.delay_ms(500)

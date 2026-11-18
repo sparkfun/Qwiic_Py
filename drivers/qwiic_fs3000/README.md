@@ -93,31 +93,22 @@ import qwiic_fs3000
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun FS3000 Example 1 - Basic\n")
-    my_fs3000 = qwiic_fs3000.QwiicFS3000()
+print("\nSparkFun FS3000 Example 1 - Basic\n")
+my_fs3000 = qwiic_fs3000.QwiicFS3000()
 
-    if not my_fs3000.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_fs3000.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_fs3000.begin()
+my_fs3000.begin()
 
-    # FS3000-1005 (0-7.23 m/sec): AIRFLOW_RANGE_7_MPS
-    # FS3000-1015 (0-15 m/sec):   AIRFLOW_RANGE_15_MPS
-    my_fs3000.set_range(my_fs3000.AIRFLOW_RANGE_7_MPS)
+# FS3000-1005 (0-7.23 m/sec): AIRFLOW_RANGE_7_MPS
+# FS3000-1015 (0-15 m/sec):   AIRFLOW_RANGE_15_MPS
+my_fs3000.set_range(my_fs3000.AIRFLOW_RANGE_7_MPS)
 
-    while True:
-        print("m/s:", my_fs3000.read_meters_per_second(), "\tmph:", my_fs3000.read_miles_per_hour())
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    print("m/s:", my_fs3000.read_meters_per_second(), "\tmph:", my_fs3000.read_miles_per_hour())
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

@@ -49,39 +49,29 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 13\n")
-	print("\nType CTRL+C to end.\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 13\n")
+print("\nType CTRL+C to end.\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.begin() # call this for default settings (no
-	myLCD.left_to_right()
-	myLCD.no_cursor()
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.begin() # call this for default settings (no
+myLCD.left_to_right()
+myLCD.no_cursor()
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-	while True:
-		myLCD.set_fast_backlight(255, 0, 0) # bright red
-		myLCD.clear_screen()
-		myLCD.print("Red")
-		qwiic_i2c.delay_ms(1000)
+while True:
+	myLCD.set_fast_backlight(255, 0, 0) # bright red
+	myLCD.clear_screen()
+	myLCD.print("Red")
+	qwiic_i2c.delay_ms(1000)
 
-		myLCD.set_fast_backlight(0xFF, 0x8C, 0x00) # orange
-		myLCD.clear_screen()
-		myLCD.print("Orange")
-		qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 13")
-		sys.exit(0)
-
-
+	myLCD.set_fast_backlight(0xFF, 0x8C, 0x00) # orange
+	myLCD.clear_screen()
+	myLCD.print("Orange")
+	qwiic_i2c.delay_ms(1000)

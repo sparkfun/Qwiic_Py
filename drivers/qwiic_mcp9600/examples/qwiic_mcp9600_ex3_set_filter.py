@@ -52,51 +52,43 @@ import qwiic_i2c
 # Change the coefficient here!
 coefficient = 3
 
-def run_example():
 
-	print("\nQwiic MCP9600 Example 3 - Set Filter\n")
+print("\nQwiic MCP9600 Example 3 - Set Filter\n")
 
-	# Create instance of device
-	my_thermo = qwiic_mcp9600.QwiicMCP9600()
+# Create instance of device
+my_thermo = qwiic_mcp9600.QwiicMCP9600()
 
-	# Check if it's connected
-	if not my_thermo.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Check if it's connected
+if not my_thermo.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Initialize the device
-	my_thermo.begin()
-	
-	# Print the filter coefficient that's about to be set
-	print(f"Setting Filter coefficient to {coefficient}!")
+# Initialize the device
+my_thermo.begin()
 
-	my_thermo.set_filter_coefficient(coefficient)
+# Print the filter coefficient that's about to be set
+print(f"Setting Filter coefficient to {coefficient}!")
 
-	# Tell us if the coefficient was set successfully
-	if my_thermo.get_filter_coefficient() == coefficient:
-		print("Filter Coefficient set successfully!")
-	else:
-		print("Setting filter coefficient failed!")
-		print(f"The value of the coefficient is: {my_thermo.get_filter_coefficient()}")
+my_thermo.set_filter_coefficient(coefficient)
 
-	while True:
-		if my_thermo.available():
-			# Read temperatures
-			thermocouple_temp = my_thermo.get_thermocouple_temp()
-			ambient_temp = my_thermo.get_ambient_temp()
-			temp_delta = my_thermo.get_temp_delta()
-			filter_coef = my_thermo.get_filter_coefficient()
+# Tell us if the coefficient was set successfully
+if my_thermo.get_filter_coefficient() == coefficient:
+	print("Filter Coefficient set successfully!")
+else:
+	print("Setting filter coefficient failed!")
+	print(f"The value of the coefficient is: {my_thermo.get_filter_coefficient()}")
 
-			# Print temperatures
-			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C Filter Coefficient: {filter_coef}")
-			
-		# Delay to avoid hammering the I2C bus
-		qwiic_i2c.delay_ms(20)
+while True:
+	if my_thermo.available():
+		# Read temperatures
+		thermocouple_temp = my_thermo.get_thermocouple_temp()
+		ambient_temp = my_thermo.get_ambient_temp()
+		temp_delta = my_thermo.get_temp_delta()
+		filter_coef = my_thermo.get_filter_coefficient()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+		# Print temperatures
+		print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C Filter Coefficient: {filter_coef}")
+
+	# Delay to avoid hammering the I2C bus
+	qwiic_i2c.delay_ms(20)

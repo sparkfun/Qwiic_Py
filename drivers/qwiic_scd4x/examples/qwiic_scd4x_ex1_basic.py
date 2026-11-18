@@ -37,37 +37,30 @@ import qwiic_scd4x
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic SCD4x Example 1 - Basic Readings\n")
 
-	# Create instance of device
-	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
+print("\nQwiic SCD4x Example 1 - Basic Readings\n")
 
-	# Check if it's connected
-	if not mySCD4x.is_connected():
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+# Create instance of device
+mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
-	# Initialize the device
-	if not mySCD4x.begin():
-		print("Error while initializing device", file=sys.stderr)
-		return
-	
-	# The SCD4x has data ready every five seconds
+# Check if it's connected
+if not mySCD4x.is_connected():
+	print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
-			print("\nCO2(ppm):", mySCD4x.get_co2())
-			print("Temperature(C):", mySCD4x.get_temperature())
-			print("Humidity(%RH):", mySCD4x.get_humidity())
-		else:
-			print(".", end="")
+# Initialize the device
+if not mySCD4x.begin():
+	print("Error while initializing device", file=sys.stderr)
+	sys.exit(1)
 
-		qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 seconds
+# The SCD4x has data ready every five seconds
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
+		print("\nCO2(ppm):", mySCD4x.get_co2())
+		print("Temperature(C):", mySCD4x.get_temperature())
+		print("Humidity(%RH):", mySCD4x.get_humidity())
+	else:
+		print(".", end="")
+
+	qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 seconds

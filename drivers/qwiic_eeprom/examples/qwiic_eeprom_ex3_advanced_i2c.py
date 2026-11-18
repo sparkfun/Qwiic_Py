@@ -42,30 +42,22 @@
 import qwiic_eeprom
 import sys
 
-def run_example():
-    
-    EEPROM_ADDRESS = 0b1010001 # 0b1010(A2 A1 A0): A standard I2C EEPROM with the ADR0 bit set to VCC
 
-    print("\nSparkFun Qwiic EEPROM, Example 3\n")
-    my_eeprom = qwiic_eeprom.QwiicEEPROM(EEPROM_ADDRESS)
+EEPROM_ADDRESS = 0b1010001 # 0b1010(A2 A1 A0): A standard I2C EEPROM with the ADR0 bit set to VCC
 
-    if not my_eeprom.begin():
-        print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+print("\nSparkFun Qwiic EEPROM, Example 3\n")
+my_eeprom = qwiic_eeprom.QwiicEEPROM(EEPROM_ADDRESS)
 
-    print("\nEEPROM ready!")
+if not my_eeprom.begin():
+    print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    my_value = -7.35
-    my_eeprom.write_float(20, my_value)   # (location, data)
-    my_read = my_eeprom.read_float(20) # (location to read)
-    # Round to 2-decimal point precision
-    my_read = round(my_read, 2)
-    print("\nI read: " + str(my_read))
+print("\nEEPROM ready!")
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 3")
-        sys.exit(0)
+my_value = -7.35
+my_eeprom.write_float(20, my_value)   # (location, data)
+my_read = my_eeprom.read_float(20) # (location to read)
+# Round to 2-decimal point precision
+my_read = round(my_read, 2)
+print("\nI read: " + str(my_read))

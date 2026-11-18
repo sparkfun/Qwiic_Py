@@ -90,37 +90,30 @@ def sleep_device(device):
 		return
 	print("Device powered off")
 
-def run_example():
-	print("\nQwiic AS7343 Example 6 - Sleep\n")
 
-	# Create instance of device
-	myAS7343 = qwiic_as7343.QwiicAS7343()
+print("\nQwiic AS7343 Example 6 - Sleep\n")
 
-	# Check if it's connected
-	if myAS7343.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myAS7343 = qwiic_as7343.QwiicAS7343()
 
-	# Initialize the device
-	if not myAS7343.begin():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Check if it's connected
+if myAS7343.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		# Take a reading
-		take_reading(myAS7343)
+# Initialize the device
+if not myAS7343.begin():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-		# Put the device to sleep
-		sleep_device(myAS7343)
+while True:
+	# Take a reading
+	take_reading(myAS7343)
 
-		# Wait 5 seconds before taking another reading
-		qwiic_i2c.delay_ms(5000)
-		
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	# Put the device to sleep
+	sleep_device(myAS7343)
+
+	# Wait 5 seconds before taking another reading
+	qwiic_i2c.delay_ms(5000)

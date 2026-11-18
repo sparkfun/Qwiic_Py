@@ -44,35 +44,28 @@ import qwiic_ads1015
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic ADS1015 Example 6 - Display Millivolts\n")
 
-	myAds = qwiic_ads1015.QwiicADS1015()
+print("\nQwiic ADS1015 Example 6 - Display Millivolts\n")
 
-	# Check if it's connected
-	if myAds.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+myAds = qwiic_ads1015.QwiicADS1015()
 
-	myAds.begin()
+# Check if it's connected
+if myAds.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myAds.set_gain(myAds.CONFIG_PGA_1)
+myAds.begin()
 
-	while True:
-		channel_A3 = myAds.get_single_ended(3)
-		print("A3: ", channel_A3, end = '\t')
-		
-		# Get the multiplier for the gain setting
-		multiplier = myAds.get_multiplier()
-		# The private variable _multiplierToVolts is auto-updated each time set_gain() is called
-		print(channel_A3 * multiplier, "mV")
+myAds.set_gain(myAds.CONFIG_PGA_1)
 
-		qwiic_i2c.delay_ms(50)
+while True:
+	channel_A3 = myAds.get_single_ended(3)
+	print("A3: ", channel_A3, end = '\t')
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 6")
-		sys.exit(0)
+	# Get the multiplier for the gain setting
+	multiplier = myAds.get_multiplier()
+	# The private variable _multiplierToVolts is auto-updated each time set_gain() is called
+	print(channel_A3 * multiplier, "mV")
+
+	qwiic_i2c.delay_ms(50)

@@ -44,47 +44,39 @@ import qwiic_scmd
 
 my_motor = qwiic_scmd.QwiicSCMD()
 
-def run_example():
-	print("Motor Test.")
-	R_MTR = 0
-	L_MTR = 1
-	FWD = 0
-	BWD = 1
 
-	if not my_motor.is_connected():
-		print("Motor Driver not connected. Check connections.", \
-			file=sys.stderr)
-		return
-	my_motor.begin()
-	print("Motor initialized.")
-	qwiic_i2c.delay_ms(250)
-	
-	# Zero Motor Speeds
-	my_motor.set_drive(0,0,0)
-	my_motor.set_drive(1,0,0)
-	
-	my_motor.enable()
-	print("Motor enabled")
-	qwiic_i2c.delay_ms(250)
+print("Motor Test.")
+R_MTR = 0
+L_MTR = 1
+FWD = 0
+BWD = 1
+
+if not my_motor.is_connected():
+	print("Motor Driver not connected. Check connections.", \
+		file=sys.stderr)
+	sys.exit(1)
+my_motor.begin()
+print("Motor initialized.")
+qwiic_i2c.delay_ms(250)
+
+# Zero Motor Speeds
+my_motor.set_drive(0,0,0)
+my_motor.set_drive(1,0,0)
+
+my_motor.enable()
+print("Motor enabled")
+qwiic_i2c.delay_ms(250)
 
 
-	while True:
-		speed = 20
-		for speed in range(20,255):
-			print(speed)
-			my_motor.set_drive(R_MTR,FWD,speed)
-			my_motor.set_drive(L_MTR,BWD,speed)
-			qwiic_i2c.delay_ms(50)
-		for speed in range(254,20, -1):
-			print(speed)
-			my_motor.set_drive(R_MTR,FWD,speed)
-			my_motor.set_drive(L_MTR,BWD,speed)
-			qwiic_i2c.delay_ms(50)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("Ending example.")
-		my_motor.disable()
-		sys.exit(0)
+while True:
+	speed = 20
+	for speed in range(20,255):
+		print(speed)
+		my_motor.set_drive(R_MTR,FWD,speed)
+		my_motor.set_drive(L_MTR,BWD,speed)
+		qwiic_i2c.delay_ms(50)
+	for speed in range(254,20, -1):
+		print(speed)
+		my_motor.set_drive(R_MTR,FWD,speed)
+		my_motor.set_drive(L_MTR,BWD,speed)
+		qwiic_i2c.delay_ms(50)

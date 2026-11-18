@@ -40,33 +40,26 @@ import qwiic_ads1015
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic ADS1015 Example 4 - Differential\n")
 
-	myAds = qwiic_ads1015.QwiicADS1015()
+print("\nQwiic ADS1015 Example 4 - Differential\n")
 
-	# Check if it's connected
-	if myAds.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+myAds = qwiic_ads1015.QwiicADS1015()
 
-	myAds.begin()
+# Check if it's connected
+if myAds.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		input = myAds.get_differential() # default (i.e. no arguments)
-  		
-		# Optional "commented out" examples below show how to read differential readings between other pins
-		# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P0N3)
-		# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P1N3)
-		# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P2N3)
+myAds.begin()
 
-		print("Differential: ", input)
-		qwiic_i2c.delay_ms(300)
+while True:
+	input = myAds.get_differential() # default (i.e. no arguments)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 4")
-		sys.exit(0)
+	# Optional "commented out" examples below show how to read differential readings between other pins
+	# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P0N3)
+	# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P1N3)
+	# input = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P2N3)
+
+	print("Differential: ", input)
+	qwiic_i2c.delay_ms(300)

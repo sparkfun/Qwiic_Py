@@ -95,31 +95,22 @@ import qwiic_titan_gps
 import qwiic_i2c
 
 
-def run_example():
-    print("SparkFun GPS Breakout - XA1110!")
-    qwiic_gps = qwiic_titan_gps.QwiicTitanGPS()
+print("SparkFun GPS Breakout - XA1110!")
+qwiic_gps = qwiic_titan_gps.QwiicTitanGPS()
 
-    if not qwiic_gps.is_connected():
-        print("Could not connect to the SparkFun GPS Unit. Double check that it's wired correctly.", file=sys.stderr)
-        return
+if not qwiic_gps.is_connected():
+    print("Could not connect to the SparkFun GPS Unit. Double check that it's wired correctly.", file=sys.stderr)
+    sys.exit(1)
 
-    qwiic_gps.begin()
+qwiic_gps.begin()
 
-    while True:
-        if qwiic_gps.get_nmea_data():
-            print("Latitude: {}, Longitude: {}, Time: {}".format(
-                qwiic_gps.gnss_messages["Latitude"],
-                qwiic_gps.gnss_messages["Longitude"],
-                qwiic_gps.gnss_messages["Time"]))  # UTC time as a list [hh, mm, ss]
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("Ending Basic Example.")
-        sys.exit(0)
+while True:
+    if qwiic_gps.get_nmea_data():
+        print("Latitude: {}, Longitude: {}, Time: {}".format(
+            qwiic_gps.gnss_messages["Latitude"],
+            qwiic_gps.gnss_messages["Longitude"],
+            qwiic_gps.gnss_messages["Time"]))  # UTC time as a list [hh, mm, ss]
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

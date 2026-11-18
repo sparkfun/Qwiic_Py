@@ -36,36 +36,22 @@ import sys
 # SCL - 0x4B
 
 
-def run_example():
+print("\nSparkFun Qwiic TMP102 Sensor Example 2\n")
+myTmpSensor = qwiic_tmp102.QwiicTMP102()
 
-	print("\nSparkFun Qwiic TMP102 Sensor Example 2\n")
-	myTmpSensor = qwiic_tmp102.QwiicTMP102()
+if not myTmpSensor.is_connected():
+	print("The Qwiic TMP102 Sensor device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	if not myTmpSensor.is_connected():
-		print("The Qwiic TMP102 Sensor device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+myTmpSensor.begin()
 
-	myTmpSensor.begin()
+print("Initialized.")
 
-	print("Initialized.")
-
-	while True:
-		myTmpSensor.one_shot(1)
-		while(myTmpSensor.one_shot() == 0):
-			qwiic_i2c.delay_ms(1000)
-		print ("TempC = ", myTmpSensor.read_temp_c())
-		myTmpSensor.sleep()
+while True:
+	myTmpSensor.one_shot(1)
+	while(myTmpSensor.one_shot() == 0):
 		qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)
-
-
-
-
+	print ("TempC = ", myTmpSensor.read_temp_c())
+	myTmpSensor.sleep()
+	qwiic_i2c.delay_ms(1000)

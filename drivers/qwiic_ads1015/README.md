@@ -92,27 +92,18 @@ import qwiic_ads1015
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic ADS1015 Example 1 - Basic Readings\n")
-    my_ads = qwiic_ads1015.QwiicADS1015()
+print("\nQwiic ADS1015 Example 1 - Basic Readings\n")
+my_ads = qwiic_ads1015.QwiicADS1015()
 
-    if not my_ads.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_ads.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_ads.begin()
+my_ads.begin()
 
-    while True:
-        print("A3: ", my_ads.get_single_ended(3))
-        qwiic_i2c.delay_ms(50)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    print("A3: ", my_ads.get_single_ended(3))
+    qwiic_i2c.delay_ms(50)
 ```
 
 ## Documentation

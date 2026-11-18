@@ -87,42 +87,34 @@ def record_user_settings(my_mem, settings):
     my_mem.write_float(LOCATION_SETTINGS + 6, settings.cal_value)
     qwiic_i2c.delay_ms(100)
 
-def run_example():
 
-    print("\nSparkFun Qwiic EEPROM, Example 4\n")
-    my_eeprom = qwiic_eeprom.QwiicEEPROM()
+print("\nSparkFun Qwiic EEPROM, Example 4\n")
+my_eeprom = qwiic_eeprom.QwiicEEPROM()
 
-    if not my_eeprom.begin():
-        print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+if not my_eeprom.begin():
+    print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    print("\nEEPROM ready!")
+print("\nEEPROM ready!")
 
-    settings = Settings()
+settings = Settings()
 
-    load_user_settings(my_eeprom, settings)
+load_user_settings(my_eeprom, settings)
 
-    print("\nBaud rate: " + str(settings.baud_rate))
-    print("\nlog_date: " + str(settings.log_date))
-    print("\ncal_value: " + str(settings.cal_value))
+print("\nBaud rate: " + str(settings.baud_rate))
+print("\nlog_date: " + str(settings.log_date))
+print("\ncal_value: " + str(settings.cal_value))
 
-    # Now we can change something
-    print("\nEnter a new baud rate (1200 to 115200): ")
-    new_baud = int(input())
-    if new_baud < 1200 or new_baud > 115200:
-        print("\nError: baud rate out of range!")
-    else:
-        settings.baud_rate = new_baud
+# Now we can change something
+print("\nEnter a new baud rate (1200 to 115200): ")
+new_baud = int(input())
+if new_baud < 1200 or new_baud > 115200:
+    print("\nError: baud rate out of range!")
+else:
+    settings.baud_rate = new_baud
 
-        print("\nThis is the new baud rate: ")
-        print(settings.baud_rate)
+    print("\nThis is the new baud rate: ")
+    print(settings.baud_rate)
 
-        record_user_settings(my_eeprom, settings)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 4")
-        sys.exit(0)
+    record_user_settings(my_eeprom, settings)

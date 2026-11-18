@@ -36,48 +36,41 @@
 import qwiic_mcp4725
 import sys
 import qwiic_i2c
-def run_example():
-	print("\nQwiic Template Example 1 - Basic\n")
 
-	# Create instance of device
-	my_dac = qwiic_mcp4725.QwiicMCP4725()
 
-	# Check if it's connected
-	if not my_dac.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+print("\nQwiic Template Example 1 - Basic\n")
 
-	# Initialize the device
-	my_dac.begin()
-	
-	while True:
-		# This loop will write three different voltages to the DAC with 
-		# 2 second delays in between each write, so you can see the voltage
-		# change on the output with a multimeter or oscilloscope.
-		
-		# The full range of the 12-bit DAC is 0-4095, which corresponds to VSS (Ground) to VDD (3.3V). 
-		# The equation for output voltage is (see datasheet pg. 19): VDD * (DAC Value / 4096)
+# Create instance of device
+my_dac = qwiic_mcp4725.QwiicMCP4725()
 
-		print("Writing 0V to DAC")
-		my_dac.write_dac(0)  # ~0V if VDD = 3.3V
-		
-		qwiic_i2c.delay_ms(2000)
+# Check if it's connected
+if not my_dac.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-		print("Writing 1.65V to DAC")
-		my_dac.write_dac(2048)  # ~1.65 V if VDD = 3.3V
+# Initialize the device
+my_dac.begin()
 
-		qwiic_i2c.delay_ms(2000)
+while True:
+	# This loop will write three different voltages to the DAC with 
+	# 2 second delays in between each write, so you can see the voltage
+	# change on the output with a multimeter or oscilloscope.
 
-		print("Writing 3.3V to DAC")
-		my_dac.write_dac(4095)  # ~3.3 V if VDD = 3.3V
-		
-		qwiic_i2c.delay_ms(2000)
-	
+	# The full range of the 12-bit DAC is 0-4095, which corresponds to VSS (Ground) to VDD (3.3V). 
+	# The equation for output voltage is (see datasheet pg. 19): VDD * (DAC Value / 4096)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+	print("Writing 0V to DAC")
+	my_dac.write_dac(0)  # ~0V if VDD = 3.3V
+
+	qwiic_i2c.delay_ms(2000)
+
+	print("Writing 1.65V to DAC")
+	my_dac.write_dac(2048)  # ~1.65 V if VDD = 3.3V
+
+	qwiic_i2c.delay_ms(2000)
+
+	print("Writing 3.3V to DAC")
+	my_dac.write_dac(4095)  # ~3.3 V if VDD = 3.3V
+
+	qwiic_i2c.delay_ms(2000)

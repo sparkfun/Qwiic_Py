@@ -43,41 +43,33 @@ import qwiic_pir
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic PIR  Example 4\n")
-	my_pir = qwiic_pir.QwiicPIR()
+print("\nSparkFun Qwiic PIR  Example 4\n")
+my_pir = qwiic_pir.QwiicPIR()
 
-	if not my_pir.begin():
-		print("The Qwiic PIR isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not my_pir.begin():
+	print("The Qwiic PIR isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print ("Waiting 30 seconds for PIR to stabilize")
-	for i in range(0, 30):
-		print(i)
-		qwiic_i2c.delay_ms(1000)
+print ("Waiting 30 seconds for PIR to stabilize")
+for i in range(0, 30):
+	print(i)
+	qwiic_i2c.delay_ms(1000)
 
-	print("Device Stable")
+print("Device Stable")
 
-	while True:
-		print("\nType 'd' to pop from the detected queue.")
-		val = input("Type 'r' to pop from the removed queue: ")
-		# If the character is 'd' or 'D', then pop a value off the detected queue
-		if val == 'd' or val == 'D':
-			print("\nPopped detected queue! The first timestamp in detected queue was: ")
-			print(str(my_pir.pop_detected_queue() / 1000.0))
-			
-		# If the character is 'r' or 'R', then pop a value off the removed queue
-		if val == 'r' or val == 'R':
-			print("\nPopped removed queue! The first timestamp in removed queue was: ")
-			print(str(my_pir.pop_removed_queue() / 1000.0))
-			
-		qwiic_i2c.delay_ms(200)
+while True:
+	print("\nType 'd' to pop from the detected queue.")
+	val = input("Type 'r' to pop from the removed queue: ")
+	# If the character is 'd' or 'D', then pop a value off the detected queue
+	if val == 'd' or val == 'D':
+		print("\nPopped detected queue! The first timestamp in detected queue was: ")
+		print(str(my_pir.pop_detected_queue() / 1000.0))
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 4")
-		sys.exit(0)
+	# If the character is 'r' or 'R', then pop a value off the removed queue
+	if val == 'r' or val == 'R':
+		print("\nPopped removed queue! The first timestamp in removed queue was: ")
+		print(str(my_pir.pop_removed_queue() / 1000.0))
+
+	qwiic_i2c.delay_ms(200)

@@ -37,72 +37,65 @@ import qwiic_veml6030
 import qwiic_i2c
 import sys
 
-def run_example():
-	print("\nQwiic Ambient Light Sensor Example 3 - Threshold Interrupts\n")
 
-	# Create instance of device
-	light_sensor = qwiic_veml6030.QwiicVEML6030()
+print("\nQwiic Ambient Light Sensor Example 3 - Threshold Interrupts\n")
 
-	# Check if it's connected
-	if light_sensor.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+light_sensor = qwiic_veml6030.QwiicVEML6030()
 
-	# Initialize the device
-	light_sensor.begin()
+# Check if it's connected
+if light_sensor.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Set the gain, can be any of the following:
-	# 1/8, 1/4, 1, and 2
-	gain = 1
-	light_sensor.set_gain(gain)
+# Initialize the device
+light_sensor.begin()
 
-	# Set the integration time in ms, can be any of the following:
-	# 25, 50, 100, 200, 400, and 800
-	integ_time = 200
-	light_sensor.set_integ_time(integ_time)
+# Set the gain, can be any of the following:
+# 1/8, 1/4, 1, and 2
+gain = 1
+light_sensor.set_gain(gain)
 
-	# Set low and high threshold values, can be anywhere from 0 to 120k lux.
-	# Note: Normal room lighting is typically around 100 lux, and direct
-	# sunlight can be up to 100k lux (these numbers are not at all precise)
-	low_thresh = 20
-	high_thresh = 200
-	light_sensor.set_int_low_thresh(low_thresh)
-	light_sensor.set_int_high_thresh(high_thresh)
+# Set the integration time in ms, can be any of the following:
+# 25, 50, 100, 200, 400, and 800
+integ_time = 200
+light_sensor.set_integ_time(integ_time)
 
-	# Enable interrupts
-	light_sensor.enable_int()
+# Set low and high threshold values, can be anywhere from 0 to 120k lux.
+# Note: Normal room lighting is typically around 100 lux, and direct
+# sunlight can be up to 100k lux (these numbers are not at all precise)
+low_thresh = 20
+high_thresh = 200
+light_sensor.set_int_low_thresh(low_thresh)
+light_sensor.set_int_high_thresh(high_thresh)
 
-	# Read back the settings and print to confirm they were set correctly
-	low_thresh = light_sensor.read_low_thresh()
-	high_thresh = light_sensor.read_high_thresh()
-	print("Low threshold:", low_thresh)
-	print("High threshold:", high_thresh)
-	
-	# Extra space for some visual separation
-	print()
+# Enable interrupts
+light_sensor.enable_int()
 
-	# Loop forever
-	while True:
-		# Wait for 1 integration time period to synchronize measurements
-		qwiic_i2c.delay_ms(integ_time)
+# Read back the settings and print to confirm they were set correctly
+low_thresh = light_sensor.read_low_thresh()
+high_thresh = light_sensor.read_high_thresh()
+print("Low threshold:", low_thresh)
+print("High threshold:", high_thresh)
 
-		# Get light measured by sensor in lux
-		ambient_light = light_sensor.read_light()
+# Extra space for some visual separation
+print()
 
-		# Print measurement
-		print("Lux:\t%.1f" % ambient_light)
+# Loop forever
+while True:
+	# Wait for 1 integration time period to synchronize measurements
+	qwiic_i2c.delay_ms(integ_time)
 
-		# Check whether an interrupt has occurred
-		interrupt = light_sensor.read_interrupt()
-		if interrupt == light_sensor.VEML6030_INT_HIGH:
-			print("High threshold crossed!")
-		elif interrupt == light_sensor.VEML6030_INT_LOW:
-			print("Low threshold crossed!")
+	# Get light measured by sensor in lux
+	ambient_light = light_sensor.read_light()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	# Print measurement
+	print("Lux:\t%.1f" % ambient_light)
+
+	# Check whether an interrupt has occurred
+	interrupt = light_sensor.read_interrupt()
+	if interrupt == light_sensor.VEML6030_INT_HIGH:
+		print("High threshold crossed!")
+	elif interrupt == light_sensor.VEML6030_INT_LOW:
+		print("Low threshold crossed!")

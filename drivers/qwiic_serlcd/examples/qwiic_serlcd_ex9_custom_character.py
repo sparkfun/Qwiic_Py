@@ -61,102 +61,92 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 9\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 9\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.begin() # call this for default settings (no
-	myLCD.left_to_right()
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
-	
-	# make some custom characters:
-	heart = [ 
-	0b00000, 
-	0b01010, 
-	0b11111, 
-	0b11111, 
-	0b11111, 
-	0b01110, 
-	0b00100, 
-	0b00000]
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.begin() # call this for default settings (no
+myLCD.left_to_right()
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-	smiley = [
-	0b00000,
-	0b00000,
-	0b01010,
-	0b00000,
-	0b00000,
-	0b10001,
-	0b01110,
-	0b00000]
+# make some custom characters:
+heart = [ 
+0b00000, 
+0b01010, 
+0b11111, 
+0b11111, 
+0b11111, 
+0b01110, 
+0b00100, 
+0b00000]
 
-	frownie = [
-	0b00000,
-	0b00000,
-	0b01010,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b01110,
-	0b10001]
+smiley = [
+0b00000,
+0b00000,
+0b01010,
+0b00000,
+0b00000,
+0b10001,
+0b01110,
+0b00000]
 
-	armsDown = [
-	0b00100,
-	0b01010,
-	0b00100,
-	0b00100,
-	0b01110,
-	0b10101,
-	0b00100,
-	0b01010]
+frownie = [
+0b00000,
+0b00000,
+0b01010,
+0b00000,
+0b00000,
+0b00000,
+0b01110,
+0b10001]
 
-	armsUp = [
-	0b00100,
-	0b01010,
-	0b00100,
-	0b10101,
-	0b01110,
-	0b00100,
-	0b00100,
-	0b01010]
+armsDown = [
+0b00100,
+0b01010,
+0b00100,
+0b00100,
+0b01110,
+0b10101,
+0b00100,
+0b01010]
 
-	myLCD.create_char(0, heart)
-	myLCD.create_char(1, smiley)
-	myLCD.create_char(2, frownie)
-	myLCD.create_char(3, armsDown)
-	myLCD.create_char(4, armsUp)
+armsUp = [
+0b00100,
+0b01010,
+0b00100,
+0b10101,
+0b01110,
+0b00100,
+0b00100,
+0b01010]
 
-	myLCD.set_cursor(0,0) # set cursor to the top left
+myLCD.create_char(0, heart)
+myLCD.create_char(1, smiley)
+myLCD.create_char(2, frownie)
+myLCD.create_char(3, armsDown)
+myLCD.create_char(4, armsUp)
 
-	# Print a message to the LCD.
-	myLCD.print("I ")
-	myLCD.write_char(0) # Print the heart character, stored in location 0
-	myLCD.print(" SerLCD! ")
-	myLCD.write_char(1) # Print smiley
+myLCD.set_cursor(0,0) # set cursor to the top left
 
-	while True:
+# Print a message to the LCD.
+myLCD.print("I ")
+myLCD.write_char(0) # Print the heart character, stored in location 0
+myLCD.print(" SerLCD! ")
+myLCD.write_char(1) # Print smiley
 
-		myLCD.set_cursor(4,1) # column, row
-		myLCD.write_char(3) # print little man, arms down
-		qwiic_i2c.delay_ms(200)
+while True:
 
-		myLCD.set_cursor(4,1) # column, row
-		myLCD.write_char(4) # print little man, arms up
-		qwiic_i2c.delay_ms(200)
+	myLCD.set_cursor(4,1) # column, row
+	myLCD.write_char(3) # print little man, arms down
+	qwiic_i2c.delay_ms(200)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 9")
-		sys.exit(0)
-
-
+	myLCD.set_cursor(4,1) # column, row
+	myLCD.write_char(4) # print little man, arms up
+	qwiic_i2c.delay_ms(200)

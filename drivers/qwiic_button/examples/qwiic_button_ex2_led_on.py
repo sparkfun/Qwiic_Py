@@ -45,33 +45,25 @@ import sys
 
 brightness = 100
 
-def run_example():
 
-    print("\nSparkFun Qwiic Button Example 2")
-    my_button = qwiic_button.QwiicButton()
+print("\nSparkFun Qwiic Button Example 2")
+my_button = qwiic_button.QwiicButton()
 
-    if my_button.begin() == False:
-        print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    
-    print("\nButton ready!")
+if my_button.begin() == False:
+    print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    while True:
+print("\nButton ready!")
 
-        if my_button.is_button_pressed() == True:
-            print("The button is pressed!")
-            my_button.led_on(brightness)
-        
-        else:
-            print("The button is not pressed.")
-            my_button.led_off()
-        
-        qwiic_i2c.delay_ms(100)
-    
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 2")
-        sys.exit(0)
+while True:
+
+    if my_button.is_button_pressed() == True:
+        print("The button is pressed!")
+        my_button.led_on(brightness)
+
+    else:
+        print("The button is not pressed.")
+        my_button.led_off()
+
+    qwiic_i2c.delay_ms(100)

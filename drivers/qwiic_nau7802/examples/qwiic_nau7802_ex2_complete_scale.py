@@ -36,70 +36,63 @@
 import qwiic_nau7802
 import sys
 
-def run_example():
-	print("\nQwiic NAU7802 Example 2 - Complete Scale\n")
 
-	# Create instance of device
-	my_scale = qwiic_nau7802.QwiicNAU7802()
+print("\nQwiic NAU7802 Example 2 - Complete Scale\n")
 
-	# Check if it's connected
-	if my_scale.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_scale = qwiic_nau7802.QwiicNAU7802()
 
-	# Initialize the device
-	my_scale.begin()
+# Check if it's connected
+if my_scale.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Ask user for automatic or manual calibration
-	print("Would you like to automatically calibrate? Enter 'Y' for yes, or anything else to manually enter calibration values.")
+# Initialize the device
+my_scale.begin()
+
+# Ask user for automatic or manual calibration
+print("Would you like to automatically calibrate? Enter 'Y' for yes, or anything else to manually enter calibration values.")
+user_input = input()
+
+if user_input == 'Y':
+	print("Automatic calibration!")
+
+	print("Set up scale with no weight on it. Enter anything when ready")
+	input()
+
+	# Calculate zero offset averaged over 64 readings
+	my_scale.calculate_zero_offset(64)
+
+	print("Now place a known weight on the scale. When it's stable, enter the weight without units")
 	user_input = input()
+	weight = float(user_input)
 
-	if user_input == 'Y':
-		print("Automatic calibration!")
-		
-		print("Set up scale with no weight on it. Enter anything when ready")
-		input()
+	# Calculate calibration factor averaged over 64 readings
+	my_scale.calculate_calibration_factor(weight, 64)
 
-		# Calculate zero offset averaged over 64 readings
-		my_scale.calculate_zero_offset(64)
+	print("Calibration complete! Here are your calibration values:")
+	print("Zero offset:", my_scale.get_zero_offset())
+	print("Calibration factor:", my_scale.get_calibration_factor())
 
-		print("Now place a known weight on the scale. When it's stable, enter the weight without units")
-		user_input = input()
-		weight = float(user_input)
+	print("Enter anything when ready to continue")
+	input()
+else:
+	print("Manual calibration!")
 
-		# Calculate calibration factor averaged over 64 readings
-		my_scale.calculate_calibration_factor(weight, 64)
+	print("Enter zero offset")
+	user_input = input()
+	zero_offset = int(user_input)
+	my_scale.set_zero_offset(zero_offset)
 
-		print("Calibration complete! Here are your calibration values:")
-		print("Zero offset:", my_scale.get_zero_offset())
-		print("Calibration factor:", my_scale.get_calibration_factor())
-		
-		print("Enter anything when ready to continue")
-		input()
-	else:
-		print("Manual calibration!")
+	print("Enter calibration factor")
+	user_input = input()
+	calibration_factor = float(user_input)
+	my_scale.set_calibration_factor(calibration_factor)
 
-		print("Enter zero offset")
-		user_input = input()
-		zero_offset = int(user_input)
-		my_scale.set_zero_offset(zero_offset)
-
-		print("Enter calibration factor")
-		user_input = input()
-		calibration_factor = float(user_input)
-		my_scale.set_calibration_factor(calibration_factor)
-
-	# Loop forever
-	while True:
-		# Check if data is available
-		if my_scale.available():
-			# Print measurement
-			print("Weight:", my_scale.get_weight())
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Loop forever
+while True:
+	# Check if data is available
+	if my_scale.available():
+		# Print measurement
+		print("Weight:", my_scale.get_weight())

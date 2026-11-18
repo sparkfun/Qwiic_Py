@@ -36,45 +36,38 @@
 import qwiic_cap1203
 import sys
 
-def run_example():
-	print("\nQwiic CAP1203 Example 6 - Disable Interrupt\n")
 
-	# Create instance of device
-	my_device = qwiic_cap1203.QwiicCAP1203()
+print("\nQwiic CAP1203 Example 6 - Disable Interrupt\n")
 
-	# Check if it's connected
-	if my_device.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_device = qwiic_cap1203.QwiicCAP1203()
 
-	# Initialize the device
-	my_device.begin()
+# Check if it's connected
+if my_device.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Interrupt is ENABLED as default.
-	# When the interrupt pin is DISABLED, the alert LED
-	# does not turn on. When the interrupt pin is ENABLED,
-	# the alert LED turns on when a touch is detected.
-	my_device.set_interrupt_disabled()  # Disable Interrupt
-	# my_device.set_interrupt_enabled()   # Enable Interrupt
+# Initialize the device
+my_device.begin()
 
-	# Check the current status of the interrupt pin.
-	# Returns True if interrupt pin is enabled and
-	# False if disabled.
-	if my_device.is_interrupt_enabled():
-		print("Interrupt: ENABLED")
-	else:
-		print("Interrupt: DISABLED")
+# Interrupt is ENABLED as default.
+# When the interrupt pin is DISABLED, the alert LED
+# does not turn on. When the interrupt pin is ENABLED,
+# the alert LED turns on when a touch is detected.
+my_device.set_interrupt_disabled()  # Disable Interrupt
+# my_device.set_interrupt_enabled()   # Enable Interrupt
 
-	while True:
-		if my_device.is_touched():
-			print("Touch")
-			while my_device.is_touched():
-				pass
+# Check the current status of the interrupt pin.
+# Returns True if interrupt pin is enabled and
+# False if disabled.
+if my_device.is_interrupt_enabled():
+	print("Interrupt: ENABLED")
+else:
+	print("Interrupt: DISABLED")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if my_device.is_touched():
+		print("Touch")
+		while my_device.is_touched():
+			pass

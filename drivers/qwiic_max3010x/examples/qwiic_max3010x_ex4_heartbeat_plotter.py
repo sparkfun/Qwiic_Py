@@ -108,35 +108,25 @@ def animate(i, ys):
 	return line,
 
 
-def run_example():
+print("\nSparkFun MAX3010x Photodetector - Example 4\n")
 
-	print("\nSparkFun MAX3010x Photodetector - Example 4\n")
+if not sensor.begin():
+	print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("The Qwiic MAX3010x is connected.")
 
-	if not sensor.begin():
-		print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("The Qwiic MAX3010x is connected.")
+# Setup to sensor
+led_brightness = 0x1F # Options: 0=Off to 255=50mA
+sample_average = 8 # Options: 1, 2, 4, 8, 16, 32
+led_mode = 3 # Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
+sample_rate = 100 # Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
+pulse_width = 411 # Options: 69, 118, 215, 411
+adc_range = 4096 # Options: 2048, 4096, 8192, 16384
 
-  	# Setup to sensor
-	led_brightness = 0x1F # Options: 0=Off to 255=50mA
-	sample_average = 8 # Options: 1, 2, 4, 8, 16, 32
-	led_mode = 3 # Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
-	sample_rate = 100 # Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
-	pulse_width = 411 # Options: 69, 118, 215, 411
-	adc_range = 4096 # Options: 2048, 4096, 8192, 16384
-
-	sensor.setup(led_brightness, sample_average, led_mode, sample_rate, pulse_width, adc_range)
-	print("Setup complete.")
-	# Set up plot to call animate() function periodically
-	ani = animation.FuncAnimation(fig, animate, fargs=(ys,), interval=10, blit=True)
-	plt.show()
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 4")
-		sys.exit(0)
+sensor.setup(led_brightness, sample_average, led_mode, sample_rate, pulse_width, adc_range)
+print("Setup complete.")
+# Set up plot to call animate() function periodically
+ani = animation.FuncAnimation(fig, animate, fargs=(ys,), interval=10, blit=True)
+plt.show()

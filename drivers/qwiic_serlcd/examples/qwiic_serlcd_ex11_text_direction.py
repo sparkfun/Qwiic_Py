@@ -48,48 +48,38 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 11\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 11\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.begin() # call this for default settings (no
-	myLCD.left_to_right()
-	myLCD.cursor()
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.begin() # call this for default settings (no
+myLCD.left_to_right()
+myLCD.cursor()
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-	thisChar = 'a'
+thisChar = 'a'
 
-	while True:
-		
-		if thisChar == 'j': # reverse directions at 'm'
-			myLCD.right_to_left() # go right for the next letter
-		
-		if thisChar == 'q': # reverse again at 's'
-			myLCD.left_to_right() # go left for the next letter
-			qwiic_i2c.delay_ms(1000)
-		
-		if thisChar > 'z': # reset at 'z'
-			myLCD.home() # go to (0,0)
-			myLCD.clear_screen() # clear screen
-			thisChar = 'a' # start again at 0
-		
-		myLCD.print(thisChar) # print the character
-		qwiic_i2c.delay_ms(500) # wait a second
-		thisChar = chr(ord(thisChar) + 1) # increment the letter
+while True:
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 11")
-		sys.exit(0)
+	if thisChar == 'j': # reverse directions at 'm'
+		myLCD.right_to_left() # go right for the next letter
 
+	if thisChar == 'q': # reverse again at 's'
+		myLCD.left_to_right() # go left for the next letter
+		qwiic_i2c.delay_ms(1000)
 
+	if thisChar > 'z': # reset at 'z'
+		myLCD.home() # go to (0,0)
+		myLCD.clear_screen() # clear screen
+		thisChar = 'a' # start again at 0
+
+	myLCD.print(thisChar) # print the character
+	qwiic_i2c.delay_ms(500) # wait a second
+	thisChar = chr(ord(thisChar) + 1) # increment the letter

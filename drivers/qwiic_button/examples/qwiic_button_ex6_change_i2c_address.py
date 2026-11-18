@@ -46,48 +46,40 @@ import sys
 # If you've already changed the I2C address, change this to the current address!
 current_address = 0x6F
 
-def run_example():
 
-    print("\nSparkFun Qwiic Button Example 6")
-    my_button = qwiic_button.QwiicButton(current_address)
+print("\nSparkFun Qwiic Button Example 6")
+my_button = qwiic_button.QwiicButton(current_address)
 
+if my_button.begin() == False:
+    print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+
+print("\nButton ready!")
+
+print("Enter a new I2C address for the Qwiic Button to use.")
+print("Any address from 0x08 to 0x77 works.")
+print("Don't use the 0x prefix. For instance, if you wanted to")
+print("change the address to 0x5B, you would type 5B and hit enter.")
+
+new_address = input("New Address: ")
+new_address = int(new_address, 16)
+
+# Check if the user entered a valid address
+if new_address >= 0x08 and new_address <= 0x77:
+    print("Characters received and new address valid!")
+    print("Attempting to set Qwiic Button address...")
+
+    my_button.set_i2c_address(new_address)
+    print("Address successfully changed!")
+    # Check that the Qwiic Button acknowledges on the new address
+    qwiic_i2c.delay_ms(20)
     if my_button.begin() == False:
-        print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
+        print("The Qwiic Button isn't connected to the system. Please check your connection", \
             file=sys.stderr)
-        return
-        
-    print("\nButton ready!")
 
-    print("Enter a new I2C address for the Qwiic Button to use.")
-    print("Any address from 0x08 to 0x77 works.")
-    print("Don't use the 0x prefix. For instance, if you wanted to")
-    print("change the address to 0x5B, you would type 5B and hit enter.")
-
-    new_address = input("New Address: ")
-    new_address = int(new_address, 16)
-
-    # Check if the user entered a valid address
-    if new_address >= 0x08 and new_address <= 0x77:
-        print("Characters received and new address valid!")
-        print("Attempting to set Qwiic Button address...")
-
-        my_button.set_i2c_address(new_address)
-        print("Address successfully changed!")
-        # Check that the Qwiic Button acknowledges on the new address
-        qwiic_i2c.delay_ms(20)
-        if my_button.begin() == False:
-            print("The Qwiic Button isn't connected to the system. Please check your connection", \
-                file=sys.stderr)
-            
-        else:
-            print("Button acknowledged on new address!")
-            
     else:
-        print("Address entered not a valid I2C address")
+        print("Button acknowledged on new address!")
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 6")
-        sys.exit(0)
+else:
+    print("Address entered not a valid I2C address")

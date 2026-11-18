@@ -49,47 +49,40 @@ userOLED = qwiic_oled.QwiicMicroOLED()   # Micro OLED             https://www.sp
 # userOLED = qwiic_oled.QwiicOLEDDisplay() # "Narrow" OLED          https://www.sparkfun.com/products/24606
 # userOLED = qwiic_oled.QwiicLargeOLED()  # Qwiic OLED 1.3in        https://www.sparkfun.com/products/23453
 
-def run_example():
-    #  Before you can start using the OLED, call begin() to init
-    #  all of the pins and configure the OLED.
 
-    print("\nOLED Display - Hello World Example\n")
+#  Before you can start using the OLED, call begin() to init
+#  all of the pins and configure the OLED.
 
-    #  Create instance with parameters for Qwiic OLED Display
-    myOLED = userOLED
+print("\nOLED Display - Hello World Example\n")
 
-    if not myOLED.is_connected():
-        print("The OLED Display isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+#  Create instance with parameters for Qwiic OLED Display
+myOLED = userOLED
 
-    myOLED.begin()
+if not myOLED.is_connected():
+    print("The OLED Display isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    #  clear(ALL) will clear out the OLED's graphic memory.
-    myOLED.clear(myOLED.ALL) #  Clear the display's memory (gets rid of artifacts)
+myOLED.begin()
 
-    #  To actually draw anything on the display, you must call the display() function.
-    myOLED.display()  #  Display buffer contents
-    qwiic_i2c.delay_ms(3000)
+#  clear(ALL) will clear out the OLED's graphic memory.
+myOLED.clear(myOLED.ALL) #  Clear the display's memory (gets rid of artifacts)
 
-    #  clear(PAGE) will clear the Arduino's display buffer.
-    myOLED.clear(myOLED.PAGE)  #  Clear the display's buffer
-    
-    #  Display buffer contents
-    myOLED.display()
-    qwiic_i2c.delay_ms(3000)
+#  To actually draw anything on the display, you must call the display() function.
+myOLED.display()  #  Display buffer contents
+qwiic_i2c.delay_ms(3000)
 
-    #  Print "Hello World"
-    #  ---------------------------------------------------------------------------
-    #  Add text
-    myOLED.print("Hello World")
+#  clear(PAGE) will clear the Arduino's display buffer.
+myOLED.clear(myOLED.PAGE)  #  Clear the display's buffer
 
-    #  Display buffer contents
-    myOLED.display()
+#  Display buffer contents
+myOLED.display()
+qwiic_i2c.delay_ms(3000)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding OLED Hello Example")
-        sys.exit(0)
+#  Print "Hello World"
+#  ---------------------------------------------------------------------------
+#  Add text
+myOLED.print("Hello World")
+
+#  Display buffer contents
+myOLED.display()

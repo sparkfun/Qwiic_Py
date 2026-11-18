@@ -85,33 +85,22 @@ def interrupt_callback(channel):
     
 GPIO.add_event_detect(INTERRUPT_PIN, GPIO.FALLING, callback=interrupt_callback, bouncetime=5)
 
-def run_example():
 
-    print("\nSparkFun Top pHAT Button Example 2\n")
+print("\nSparkFun Top pHAT Button Example 2\n")
 
-    if my_buttons.is_connected() == False:
-        print("The Top pHAT Button device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-       
-    my_buttons.set_pressed_interrupt(True)
-    my_buttons.set_clicked_interrupt(True) #Enable both hardware interrupts
+if my_buttons.is_connected() == False:
+    print("The Top pHAT Button device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    # Read the buttons once now. If an interrupt was already pending (for example
-    # from an earlier run), INT is already low and no falling edge would ever
-    # arrive. Reading the buttons clears it, so the next press is detected.
-    interrupt_callback(INTERRUPT_PIN)
+my_buttons.set_pressed_interrupt(True)
+my_buttons.set_clicked_interrupt(True) #Enable both hardware interrupts
 
-    while True:
-        
-        qwiic_i2c.delay_ms(100)
+# Read the buttons once now. If an interrupt was already pending (for example
+# from an earlier run), INT is already low and no falling edge would ever
+# arrive. Reading the buttons clears it, so the next press is detected.
+interrupt_callback(INTERRUPT_PIN)
 
+while True:
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 2")
-        sys.exit(0)
-
-
+    qwiic_i2c.delay_ms(100)

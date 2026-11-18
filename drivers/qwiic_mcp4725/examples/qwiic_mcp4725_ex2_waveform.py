@@ -106,30 +106,23 @@ sintab = [  2048, 2073, 2098, 2123, 2148, 2174, 2199, 2224,
   1648, 1673, 1698, 1723, 1747, 1772, 1797, 1822,
   1847, 1872, 1897, 1922, 1948, 1973, 1998, 2023]
 
-def run_example():
-	print("\nQwiic Template Example 2 - Waveform\n")
 
-	# Create instance of device
-	my_dac = qwiic_mcp4725.QwiicMCP4725()
+print("\nQwiic Template Example 2 - Waveform\n")
 
-	# Check if it's connected
-	if not my_dac.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_dac = qwiic_mcp4725.QwiicMCP4725()
 
-	# Initialize the device
-	my_dac.begin()
+# Check if it's connected
+if not my_dac.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	lookup_index = 0
-	
-	while True:
-		my_dac.write_dac(sintab[lookup_index])
-		lookup_index = (lookup_index + 1) % 512
+# Initialize the device
+my_dac.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+lookup_index = 0
+
+while True:
+	my_dac.write_dac(sintab[lookup_index])
+	lookup_index = (lookup_index + 1) % 512

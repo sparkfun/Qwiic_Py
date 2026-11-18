@@ -59,67 +59,59 @@ import qwiic_as6212
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic AS6212 Sensor Example 1\n")
-	myTempSensor = qwiic_as6212.QwiicAS6212()
+print("\nSparkFun Qwiic AS6212 Sensor Example 1\n")
+myTempSensor = qwiic_as6212.QwiicAS6212()
 
-	if not myTempSensor.is_connected():
-		print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myTempSensor.is_connected():
+	print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myTempSensor.begin()
+myTempSensor.begin()
+qwiic_i2c.delay_ms(1000)
+
+print("Initialized.")
+
+# Initialize configuration settings
+# These settings are saved in the sensor, even if it loses power
+
+# set the number of consecutive faults before triggering alarm.
+# valid options: 1,2,3 or 4
+myTempSensor.set_consecutive_faults(1)
+
+# set the polarity of the Alert. (0:Active LOW, 1:Active HIGH).
+myTempSensor.set_alert_polarity(myTempSensor.AS6212_ALERT_ACTIVE_LOW)
+
+# set the sensor in Comparator Mode (0) or Interrupt Mode (1).
+myTempSensor.set_interrupt_mode(myTempSensor.AS6212_MODE_COMPARATOR)
+
+# set the Conversion Cycle Time (how quickly the sensor gets a new reading)
+myTempSensor.set_conversion_cycletime(myTempSensor.AS6212_CONVERSION_CYCLE_TIME_250MS)
+
+# set T_HIGH, the upper limit to trigger the alert on
+myTempSensor.set_high_temp_f(78.0)  # set T_HIGH in F
+# myTempSensor.set_high_temp_c(25.56) # set T_HIGH in C
+
+# set T_LOW, the lower limit to shut turn off the alert
+myTempSensor.set_low_temp_f(75.0)	# set T_LOW in F
+# myTempSensor.set_low_temp_c(23.89)	# set T_LOW in C
+
+print("TLOW F: ", myTempSensor.read_low_temp_f())
+print("THIGH F: ", myTempSensor.read_high_temp_f())
+
+while True:
+	myTempSensor.set_sleep_mode(0) # turn sleep  mode off (0)
+	qwiic_i2c.delay_ms(250) # allow time to wake up and complete first conversion
+
+	temperature = myTempSensor.read_temp_f()
+
+	# Check for alert
+	alert_register_state = myTempSensor.get_alert_status()		# read the Alert from register
+
+	# Place sensor in sleep mode to save power.
+	# Current consumption typically ~0.1uA.
+	myTempSensor.set_sleep_mode(1) # turn sleep  mode on (1)
+
+	print("Temperature: ", temperature, "\tAlert Register: ", alert_register_state)
 	qwiic_i2c.delay_ms(1000)
-
-	print("Initialized.")
-
-	# Initialize configuration settings
-	# These settings are saved in the sensor, even if it loses power
-  
-	# set the number of consecutive faults before triggering alarm.
-	# valid options: 1,2,3 or 4
-	myTempSensor.set_consecutive_faults(1)
-  
-	# set the polarity of the Alert. (0:Active LOW, 1:Active HIGH).
-	myTempSensor.set_alert_polarity(myTempSensor.AS6212_ALERT_ACTIVE_LOW)
-  
-	# set the sensor in Comparator Mode (0) or Interrupt Mode (1).
-	myTempSensor.set_interrupt_mode(myTempSensor.AS6212_MODE_COMPARATOR)
-  
-	# set the Conversion Cycle Time (how quickly the sensor gets a new reading)
-	myTempSensor.set_conversion_cycletime(myTempSensor.AS6212_CONVERSION_CYCLE_TIME_250MS)
-
-	# set T_HIGH, the upper limit to trigger the alert on
-	myTempSensor.set_high_temp_f(78.0)  # set T_HIGH in F
-	# myTempSensor.set_high_temp_c(25.56) # set T_HIGH in C
-  
-	# set T_LOW, the lower limit to shut turn off the alert
-	myTempSensor.set_low_temp_f(75.0)	# set T_LOW in F
-	# myTempSensor.set_low_temp_c(23.89)	# set T_LOW in C
-
-	print("TLOW F: ", myTempSensor.read_low_temp_f())
-	print("THIGH F: ", myTempSensor.read_high_temp_f())
-		
-	while True:
-		myTempSensor.set_sleep_mode(0) # turn sleep  mode off (0)
-		qwiic_i2c.delay_ms(250) # allow time to wake up and complete first conversion
-		
-		temperature = myTempSensor.read_temp_f()
-		
-		# Check for alert
-		alert_register_state = myTempSensor.get_alert_status()		# read the Alert from register
-		
-		# Place sensor in sleep mode to save power.
-		# Current consumption typically ~0.1uA.
-		myTempSensor.set_sleep_mode(1) # turn sleep  mode on (1)
-		
-		print("Temperature: ", temperature, "\tAlert Register: ", alert_register_state)
-		qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)

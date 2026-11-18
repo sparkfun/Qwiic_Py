@@ -42,71 +42,64 @@ import qwiic_as7343
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic AS7343 Example 7 - Web Terminal Bar Graphs\n")
 
-	# Create instance of device
-	myAS7343 = qwiic_as7343.QwiicAS7343()
+print("\nQwiic AS7343 Example 7 - Web Terminal Bar Graphs\n")
 
-	# Check if it's connected
-	if myAS7343.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myAS7343 = qwiic_as7343.QwiicAS7343()
 
-	# Initialize the device
-	if not myAS7343.begin():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	
-	# Power on the device
-	myAS7343.power_on()
-	print("Device powered on")
+# Check if it's connected
+if myAS7343.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Set AutoSmux to output all 18 channels
-	if not myAS7343.set_auto_smux(myAS7343.AUTO_SMUX_18_CHANNELS):
-		print("Failed to set AutoSmux", file=sys.stderr)
-		return
-	print("AutoSmux set to 18 channels")
+# Initialize the device
+if not myAS7343.begin():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Enable spectral measurements
-	if not myAS7343.spectral_measurement_enable():
-		print("Failed to enable spectral measurements", file=sys.stderr)
-		return
-	print("Spectral measurements enabled")
+# Power on the device
+myAS7343.power_on()
+print("Device powered on")
 
-	while True:
-		myAS7343.set_led_drive(0) # 0 = 4mA
-		myAS7343.set_led_on()
+# Set AutoSmux to output all 18 channels
+if not myAS7343.set_auto_smux(myAS7343.AUTO_SMUX_18_CHANNELS):
+	print("Failed to set AutoSmux", file=sys.stderr)
+	sys.exit(1)
+print("AutoSmux set to 18 channels")
 
-		qwiic_i2c.delay_ms(100) # Wait 100 ms for LED to fully illuminate our target
-		
-		# Read the spectral data
-		myAS7343.read_all_spectral_data()
+# Enable spectral measurements
+if not myAS7343.spectral_measurement_enable():
+	print("Failed to enable spectral measurements", file=sys.stderr)
+	sys.exit(1)
+print("Spectral measurements enabled")
 
-		myAS7343.set_led_off()
+while True:
+	myAS7343.set_led_drive(0) # 0 = 4mA
+	myAS7343.set_led_on()
 
-		# Print our comma-separated spectral data in the format expected by the web terminal
-		print(f"{myAS7343.get_data(myAS7343.CH_PURPLE_F1_405NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_DARK_BLUE_F2_425NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_BLUE_FZ_450NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_LIGHT_BLUE_F3_475NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_BLUE_F4_515NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_GREEN_F5_550NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_GREEN_FY_555NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_ORANGE_FXL_600NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_BROWN_F6_640NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_RED_F7_690NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_DARK_RED_F8_745NM)},"
-			  f"{myAS7343.get_data(myAS7343.CH_VIS1)},"
-			  f"{myAS7343.get_data(myAS7343.CH_NIR_855NM)}\n", end='')
+	qwiic_i2c.delay_ms(100) # Wait 100 ms for LED to fully illuminate our target
 
-		qwiic_i2c.delay_ms(500) # Wait 500 ms before next reading
+	# Read the spectral data
+	myAS7343.read_all_spectral_data()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	myAS7343.set_led_off()
+
+	# Print our comma-separated spectral data in the format expected by the web terminal
+	print(f"{myAS7343.get_data(myAS7343.CH_PURPLE_F1_405NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_DARK_BLUE_F2_425NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_BLUE_FZ_450NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_LIGHT_BLUE_F3_475NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_BLUE_F4_515NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_GREEN_F5_550NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_GREEN_FY_555NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_ORANGE_FXL_600NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_BROWN_F6_640NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_RED_F7_690NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_DARK_RED_F8_745NM)},"
+		  f"{myAS7343.get_data(myAS7343.CH_VIS1)},"
+		  f"{myAS7343.get_data(myAS7343.CH_NIR_855NM)}\n", end='')
+
+	qwiic_i2c.delay_ms(500) # Wait 500 ms before next reading

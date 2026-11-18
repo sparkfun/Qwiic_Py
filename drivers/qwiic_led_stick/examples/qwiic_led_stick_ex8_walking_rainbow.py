@@ -92,23 +92,15 @@ def walking_rainbow(led_stick, rainbow_length, led_length, delay_ms):
         led_stick.set_all_led_unique_color(red_array, green_array, blue_array, led_length)
         qwiic_i2c.delay_ms(delay_ms)
 
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 8")
-    my_stick = qwiic_led_stick.QwiicLEDStick()
+print("\nSparkFun Qwiic LED Stick Example 8")
+my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    if my_stick.begin() == False:
-        print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
 
-    while True:
-        walking_rainbow(my_stick, 20, 10, 300)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 8")
-        sys.exit(0)
+while True:
+    walking_rainbow(my_stick, 20, 10, 300)

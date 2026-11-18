@@ -92,27 +92,18 @@ import qwiic_cy8cmbr3
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic CY8CMBR3 Example 1 - Basic\n")
-    my_soil_sensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
+print("\nQwiic CY8CMBR3 Example 1 - Basic\n")
+my_soil_sensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
 
-    if not my_soil_sensor.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_soil_sensor.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_soil_sensor.begin()
+my_soil_sensor.begin()
 
-    while True:
-        print("Soil Capacitance: " + str(my_soil_sensor.get_capacitance_pf()) + " pF")
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    print("Soil Capacitance: " + str(my_soil_sensor.get_capacitance_pf()) + " pF")
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

@@ -39,72 +39,65 @@ import qwiic_as7343
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic AS7343 Example 5 - Flicker Detection\n")
 
-	# Create instance of device
-	myAS7343 = qwiic_as7343.QwiicAS7343()
+print("\nQwiic AS7343 Example 5 - Flicker Detection\n")
 
-	# Check if it's connected
-	if myAS7343.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myAS7343 = qwiic_as7343.QwiicAS7343()
 
-	# Initialize the device
-	if not myAS7343.begin():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	
-	# Power on the device
-	myAS7343.power_on()
-	print("Device powered on")
+# Check if it's connected
+if myAS7343.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Set AutoSmux to output all 18 channels
-	if not myAS7343.set_auto_smux(myAS7343.AUTO_SMUX_18_CHANNELS):
-		print("Failed to set AutoSmux", file=sys.stderr)
-		return
-	print("AutoSmux set to 18 channels")
+# Initialize the device
+if not myAS7343.begin():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myAS7343.flicker_detection_enable()
+# Power on the device
+myAS7343.power_on()
+print("Device powered on")
 
-	# Enable spectral measurements
-	if not myAS7343.spectral_measurement_enable():
-		print("Failed to enable spectral measurements", file=sys.stderr)
-		return
-	print("Spectral measurements enabled")
+# Set AutoSmux to output all 18 channels
+if not myAS7343.set_auto_smux(myAS7343.AUTO_SMUX_18_CHANNELS):
+	print("Failed to set AutoSmux", file=sys.stderr)
+	sys.exit(1)
+print("AutoSmux set to 18 channels")
 
-	# Turn off the LED for use with flicker detection
-	myAS7343.set_led_off()
-	qwiic_i2c.delay_ms(1000) # Wait 1 second for the sensor to stabilize
+myAS7343.flicker_detection_enable()
 
-	while True:
-		fdValid = myAS7343.get_fd_valid_status()
-		fdSaturation = myAS7343.get_fd_saturation_status()
-		fdFrequency = myAS7343.get_fd_frequency()
+# Enable spectral measurements
+if not myAS7343.spectral_measurement_enable():
+	print("Failed to enable spectral measurements", file=sys.stderr)
+	sys.exit(1)
+print("Spectral measurements enabled")
 
-		# Check if the measurement is valid
-		if not fdValid:
-			print("Flicker detection measurement is not valid")
-			return
-		
-		# Check if the measurement is saturated
-		if fdSaturation:
-			print("Flicker detection measurement is saturated")
-			return
-		
-		# If the measurement is valid and not saturated, print the frequency
-		if fdFrequency == 0:
-			print("No flicker detected")
-		else:
-			print("Flicker detected at frequency: {} Hz".format(fdFrequency))
+# Turn off the LED for use with flicker detection
+myAS7343.set_led_off()
+qwiic_i2c.delay_ms(1000) # Wait 1 second for the sensor to stabilize
 
-		qwiic_i2c.delay_ms(1000) # Wait before the next reading
+while True:
+	fdValid = myAS7343.get_fd_valid_status()
+	fdSaturation = myAS7343.get_fd_saturation_status()
+	fdFrequency = myAS7343.get_fd_frequency()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	# Check if the measurement is valid
+	if not fdValid:
+		print("Flicker detection measurement is not valid")
+		sys.exit(1)
+
+	# Check if the measurement is saturated
+	if fdSaturation:
+		print("Flicker detection measurement is saturated")
+		sys.exit(1)
+
+	# If the measurement is valid and not saturated, print the frequency
+	if fdFrequency == 0:
+		print("No flicker detected")
+	else:
+		print("Flicker detected at frequency: {} Hz".format(fdFrequency))
+
+	qwiic_i2c.delay_ms(1000) # Wait before the next reading

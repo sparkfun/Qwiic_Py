@@ -43,35 +43,24 @@ import qwiic_proximity
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Proximity Sensor VCN4040 Example 3\n")
-	oProx = qwiic_proximity.QwiicProximity()
+print("\nSparkFun Proximity Sensor VCN4040 Example 3\n")
+oProx = qwiic_proximity.QwiicProximity()
 
-	if not oProx.is_connected():
-		print("The Qwiic Proximity device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not oProx.is_connected():
+	print("The Qwiic Proximity device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# begin Setup
-	oProx.begin()
+# begin Setup
+oProx.begin()
 
-	oProx.power_off_proximity()  	# Power down the proximity portion of the sensor
-	oProx.power_on_ambient()  	# Power Up the ambient sensor
-
-
-	while True:
-		ambientValue = oProx.get_ambient()
-		print("Ambient Value: %d" % ambientValue)
-
-		qwiic_i2c.delay_ms(400)
+oProx.power_off_proximity()  	# Power down the proximity portion of the sensor
+oProx.power_on_ambient()  	# Power Up the ambient sensor
 
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 3")
-		sys.exit(0)
+while True:
+	ambientValue = oProx.get_ambient()
+	print("Ambient Value: %d" % ambientValue)
 
-
+	qwiic_i2c.delay_ms(400)

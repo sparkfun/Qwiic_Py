@@ -36,49 +36,42 @@
 import qwiic_cap1203
 import sys
 
-def run_example():
-	print("\nQwiic CAP1203 Example 7 - Set Sensitivity\n")
 
-	# Create instance of device
-	my_device = qwiic_cap1203.QwiicCAP1203()
+print("\nQwiic CAP1203 Example 7 - Set Sensitivity\n")
 
-	# Check if it's connected
-	if my_device.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_device = qwiic_cap1203.QwiicCAP1203()
 
-	# Initialize the device
-	my_device.begin()
+# Check if it's connected
+if my_device.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Set the sensitivity multiplier for different applications,
-	# such as different sized touch pads. The default sensitivity 
-	# multiplier is set to 2x.
-	#
-	# Different sensitivity settings:
-	# SENSITIVITY_128X  # Most sensitive
-	# SENSITIVITY_64X
-	# SENSITIVITY_32X
-	# SENSITIVITY_16X
-	# SENSITIVITY_8X
-	# SENSITIVITY_4X
-	# SENSITIVITY_2X
-	# SENSITIVITY_1X    # Least sensitive
-	my_device.set_sensitivity(my_device.SENSITIVITY_4X)
+# Initialize the device
+my_device.begin()
 
-	# Returns the sensitivity multiplier for the
-	# current sensitivity settings.
-	print("Sensitivity Multiplier:", my_device.get_sensitivity(), "x")
+# Set the sensitivity multiplier for different applications,
+# such as different sized touch pads. The default sensitivity 
+# multiplier is set to 2x.
+#
+# Different sensitivity settings:
+# SENSITIVITY_128X  # Most sensitive
+# SENSITIVITY_64X
+# SENSITIVITY_32X
+# SENSITIVITY_16X
+# SENSITIVITY_8X
+# SENSITIVITY_4X
+# SENSITIVITY_2X
+# SENSITIVITY_1X    # Least sensitive
+my_device.set_sensitivity(my_device.SENSITIVITY_4X)
 
-	while True:
-		if my_device.is_touched():
-			print("Touch")
-			while my_device.is_touched():
-				pass
+# Returns the sensitivity multiplier for the
+# current sensitivity settings.
+print("Sensitivity Multiplier:", my_device.get_sensitivity(), "x")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if my_device.is_touched():
+		print("Touch")
+		while my_device.is_touched():
+			pass

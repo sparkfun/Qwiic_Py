@@ -37,58 +37,51 @@ import qwiic_veml6030
 import qwiic_i2c
 import sys
 
-def run_example():
-	print("\nQwiic Ambient Light Sensor Example 4 - Power Saving\n")
 
-	# Create instance of device
-	light_sensor = qwiic_veml6030.QwiicVEML6030()
+print("\nQwiic Ambient Light Sensor Example 4 - Power Saving\n")
 
-	# Check if it's connected
-	if light_sensor.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+light_sensor = qwiic_veml6030.QwiicVEML6030()
 
-	# Initialize the device
-	light_sensor.begin()
+# Check if it's connected
+if light_sensor.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# The datsheet has a table on page 9 listing the tpical current consumption
-	# with various settings. The settings below are for the minimum current
-	# consumption of 2uA. Note that this alo result in the longest refresh time
-	# of 4.1s, so there's a tradeoff between current and measurement time
-	gain = 2
-	integ_time = 100
-	power_mode = 4
-	light_sensor.set_gain(gain)
-	light_sensor.set_integ_time(integ_time)
-	light_sensor.set_pow_sav_mode(power_mode)
+# Initialize the device
+light_sensor.begin()
 
-	# Enable power saving mode
-	light_sensor.enable_pow_save()
+# The datsheet has a table on page 9 listing the tpical current consumption
+# with various settings. The settings below are for the minimum current
+# consumption of 2uA. Note that this alo result in the longest refresh time
+# of 4.1s, so there's a tradeoff between current and measurement time
+gain = 2
+integ_time = 100
+power_mode = 4
+light_sensor.set_gain(gain)
+light_sensor.set_integ_time(integ_time)
+light_sensor.set_pow_sav_mode(power_mode)
 
-	# Read back the settings and print to confirm they were set correctly
-	power_mode = light_sensor.read_pow_sav_mode()
-	power_save_enabled = light_sensor.read_pow_sav_enabled()
-	print("Power save mode:", power_mode)
-	print("Power save enabled:", power_save_enabled)
-	
-	# Extra space for some visual separation
-	print()
+# Enable power saving mode
+light_sensor.enable_pow_save()
 
-	# Loop forever
-	while True:
-		# Wait for the refresh time specified in page 9 of the datasheet
-		qwiic_i2c.delay_ms(4100)
+# Read back the settings and print to confirm they were set correctly
+power_mode = light_sensor.read_pow_sav_mode()
+power_save_enabled = light_sensor.read_pow_sav_enabled()
+print("Power save mode:", power_mode)
+print("Power save enabled:", power_save_enabled)
 
-		# Get light measured by sensor in lux
-		ambient_light = light_sensor.read_light()
+# Extra space for some visual separation
+print()
 
-		# Print measurement
-		print("Lux:\t%.1f" % ambient_light)
+# Loop forever
+while True:
+	# Wait for the refresh time specified in page 9 of the datasheet
+	qwiic_i2c.delay_ms(4100)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	# Get light measured by sensor in lux
+	ambient_light = light_sensor.read_light()
+
+	# Print measurement
+	print("Lux:\t%.1f" % ambient_light)

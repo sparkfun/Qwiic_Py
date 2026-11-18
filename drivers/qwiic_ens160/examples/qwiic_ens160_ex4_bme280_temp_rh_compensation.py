@@ -47,85 +47,78 @@ import qwiic_bme280 # https://github.com/sparkfun/Qwiic_Py/tree/main/drivers/qwi
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic ENS160 Example 4 - Humidity and Temperature Sensor Compensation - BME280\n")
 
-	# Create instance of Air Quality Sensor
-	myEns = qwiic_ens160.QwiicENS160()
+print("\nQwiic ENS160 Example 4 - Humidity and Temperature Sensor Compensation - BME280\n")
 
-	# Check if it's connected
-	if not myEns.is_connected():
-		print("The ENS device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of Air Quality Sensor
+myEns = qwiic_ens160.QwiicENS160()
 
-	# Initialize the device
-	myEns.begin()
+# Check if it's connected
+if not myEns.is_connected():
+	print("The ENS device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Create instance of Humidity and Temperature Sensor
-	myBme = qwiic_bme280.QwiicBME280()
+# Initialize the device
+myEns.begin()
 
-	# Check if it's connected
-	if not myBme.is_connected():
-		print("The BME device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of Humidity and Temperature Sensor
+myBme = qwiic_bme280.QwiicBME280()
 
-	# Initialize the device
-	myBme.begin()
+# Check if it's connected
+if not myBme.is_connected():
+	print("The BME device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Fetch Humidity and temperature for compensation
-	rh = myBme.read_humidity()
-	temp_c = myBme.get_temperature_celsius()
-	print("Relative Humidity: {}".format(rh))
-	print("Temperature (Celcius): {}".format(temp_c))
-	
-	# ENS setup and compensation:
-	myEns.set_operating_mode(myEns.OP_MODE_RESET)
+# Initialize the device
+myBme.begin()
 
-	qwiic_i2c.delay_ms(100)
+# Fetch Humidity and temperature for compensation
+rh = myBme.read_humidity()
+temp_c = myBme.get_temperature_celsius()
+print("Relative Humidity: {}".format(rh))
+print("Temperature (Celcius): {}".format(temp_c))
 
-	myEns.set_temp_compensation_celsius(temp_c)
-	myEns.set_rh_compensation(rh)
+# ENS setup and compensation:
+myEns.set_operating_mode(myEns.OP_MODE_RESET)
 
-	qwiic_i2c.delay_ms(500)
+qwiic_i2c.delay_ms(100)
 
-	# Set to standard operation
-	# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
-	myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
-	
-	# There are four values here: 
-	# 0 - Operating ok: Standard Operation
-	# 1 - Warm-up: occurs for 3 minutes after power-on.
-	# 2 - Initial Start-up: Occurs for the first hour of operation.
-	# 	  and only once in sensor's lifetime.
-	# 3 - No Valid Output
-	ens_status = myEns.get_flags()
-	print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): {}".format(ens_status))
+myEns.set_temp_compensation_celsius(temp_c)
+myEns.set_rh_compensation(rh)
 
-	# Wait for the RH and Temp compensation to be set and ready to read
-	while not myEns.check_data_status():
-		pass
-	
-	# Read out the RH and Temp compensation actually used by the device
-	print("---------------------------")
-	print("Compensation Relative Humidity (%): ", myEns.get_rh())
-	print("---------------------------")
-	print("Compensation Temperature (Celsius): ", myEns.get_temp_celsius())
-	print("---------------------------")
+qwiic_i2c.delay_ms(500)
 
-	# Print the compensated values from the ENS160
-	while True:
-		if myEns.check_data_status():		
-			print("Air Quality Index (1-5) : ", myEns.get_aqi())
-			print("Total Volatile Organic Compounds (ppb): ", myEns.get_tvoc())
-			print("CO2 concentration (ppm): ", myEns.get_eco2())
-			
-		qwiic_i2c.delay_ms(200)
+# Set to standard operation
+# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
+myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# There are four values here: 
+# 0 - Operating ok: Standard Operation
+# 1 - Warm-up: occurs for 3 minutes after power-on.
+# 2 - Initial Start-up: Occurs for the first hour of operation.
+# 	  and only once in sensor's lifetime.
+# 3 - No Valid Output
+ens_status = myEns.get_flags()
+print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): {}".format(ens_status))
+
+# Wait for the RH and Temp compensation to be set and ready to read
+while not myEns.check_data_status():
+	pass
+
+# Read out the RH and Temp compensation actually used by the device
+print("---------------------------")
+print("Compensation Relative Humidity (%): ", myEns.get_rh())
+print("---------------------------")
+print("Compensation Temperature (Celsius): ", myEns.get_temp_celsius())
+print("---------------------------")
+
+# Print the compensated values from the ENS160
+while True:
+	if myEns.check_data_status():		
+		print("Air Quality Index (1-5) : ", myEns.get_aqi())
+		print("Total Volatile Organic Compounds (ppb): ", myEns.get_tvoc())
+		print("CO2 concentration (ppm): ", myEns.get_eco2())
+
+	qwiic_i2c.delay_ms(200)

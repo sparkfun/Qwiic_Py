@@ -43,33 +43,25 @@ import qwiic_alphanumeric
 import qwiic_i2c
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic Alphanumeric - Example 4: Set Brightness")
-    my_display = qwiic_alphanumeric.QwiicAlphanumeric()
+print("\nSparkFun Qwiic Alphanumeric - Example 4: Set Brightness")
+my_display = qwiic_alphanumeric.QwiicAlphanumeric()
 
-    if my_display.begin() == False:
-        print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your wiring.", \
-            file=sys.stderr)
-        return
+if my_display.begin() == False:
+    print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your wiring.", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    print("\nQwiic Alphanumeric Ready!")
-    
-    my_display.print("Milk")
-    
-    # Repeat a few times
-    for i in range(4):
-        # Loop through all brightness settings
-        for i in range(0, 16):
-            # The input to set_brightness() is a duty cycle over 16
-            # So, the acceptable inputs to this function are ints between 0
-            # (1/16 brightness) and 15 (full brightness)
-            my_display.set_brightness(i)
-            qwiic_i2c.delay_ms(100)
-    
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 4")
-        sys.exit(0)
+print("\nQwiic Alphanumeric Ready!")
+
+my_display.print("Milk")
+
+# Repeat a few times
+for i in range(4):
+    # Loop through all brightness settings
+    for i in range(0, 16):
+        # The input to set_brightness() is a duty cycle over 16
+        # So, the acceptable inputs to this function are ints between 0
+        # (1/16 brightness) and 15 (full brightness)
+        my_display.set_brightness(i)
+        qwiic_i2c.delay_ms(100)

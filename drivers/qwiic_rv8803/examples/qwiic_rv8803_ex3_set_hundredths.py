@@ -38,43 +38,36 @@ import qwiic_rv8803
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic RV8803 Example 3 - Set Hundredths\n")
 
-	# Create instance of device
-	myRTC = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 3 - Set Hundredths\n")
 
-	# Check if it's connected
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myRTC = qwiic_rv8803.QwiicRV8803()
 
-	# Initialize the device
-	myRTC.begin()
+# Check if it's connected
+if myRTC.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Configure EVI event capture with button debounce so we can catch button presses on the RTC
-	myRTC.set_evi_event_capture(True)
-	myRTC.set_evi_debounce_time(myRTC.EVI_DEBOUNCE_256HZ)
+# Initialize the device
+myRTC.begin()
 
-	while True:
-		if myRTC.get_interrupt_flag(myRTC.FLAG_EVI):
-			print("Button pressed, resetting hundredths to 0!")
-			myRTC.set_hundredths_to_zero()
-			myRTC.clear_interrupt_flag(myRTC.FLAG_EVI)
-			
+# Configure EVI event capture with button debounce so we can catch button presses on the RTC
+myRTC.set_evi_event_capture(True)
+myRTC.set_evi_debounce_time(myRTC.EVI_DEBOUNCE_256HZ)
 
-		myRTC.update_time()
-		hundredths = myRTC.get_hundredths()
-		print ("Current Time: ", end="")
-		print (myRTC.string_date_usa())
-		print (" ", myRTC.string_time(), " hundredths =", hundredths)
+while True:
+	if myRTC.get_interrupt_flag(myRTC.FLAG_EVI):
+		print("Button pressed, resetting hundredths to 0!")
+		myRTC.set_hundredths_to_zero()
+		myRTC.clear_interrupt_flag(myRTC.FLAG_EVI)
 
-		qwiic_i2c.delay_ms(1000)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	myRTC.update_time()
+	hundredths = myRTC.get_hundredths()
+	print ("Current Time: ", end="")
+	print (myRTC.string_date_usa())
+	print (" ", myRTC.string_time(), " hundredths =", hundredths)
+
+	qwiic_i2c.delay_ms(1000)

@@ -93,41 +93,32 @@ import qwiic_kx13x
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun KX13X Accelerometer Example 1\n")
-    my_kx = qwiic_kx13x.QwiicKX132()
+print("\nSparkFun KX13X Accelerometer Example 1\n")
+my_kx = qwiic_kx13x.QwiicKX132()
 
-    if not my_kx.is_connected():
-        print("The Qwiic KX13X Accelerometer device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_kx.is_connected():
+    print("The Qwiic KX13X Accelerometer device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    if my_kx.begin():
-        print("Ready.")
-    else:
-        print("Make sure you're using the KX132 and not the KX134")
+if my_kx.begin():
+    print("Ready.")
+else:
+    print("Make sure you're using the KX132 and not the KX134")
 
-    if my_kx.software_reset():
-        print("Reset")
+if my_kx.software_reset():
+    print("Reset")
 
-    # Many settings can only be changed while the accelerometer is off
-    my_kx.enable_accel(False)
-    my_kx.set_range(my_kx.KX132_RANGE16G)
-    my_kx.enable_data_engine()
-    my_kx.enable_accel()
+# Many settings can only be changed while the accelerometer is off
+my_kx.enable_accel(False)
+my_kx.set_range(my_kx.KX132_RANGE16G)
+my_kx.enable_data_engine()
+my_kx.enable_accel()
 
-    while True:
-        if my_kx.data_ready():
-            my_kx.get_accel_data()
-            print("X: {0} Y: {1} Z: {2}".format(my_kx.kx132_accel.x, my_kx.kx132_accel.y, my_kx.kx132_accel.z))
-            qwiic_i2c.delay_ms(20)  # 1 / output data rate, which is 50 Hz by default
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    if my_kx.data_ready():
+        my_kx.get_accel_data()
+        print("X: {0} Y: {1} Z: {2}".format(my_kx.kx132_accel.x, my_kx.kx132_accel.y, my_kx.kx132_accel.z))
+        qwiic_i2c.delay_ms(20)  # 1 / output data rate, which is 50 Hz by default
 ```
 
 ## Documentation

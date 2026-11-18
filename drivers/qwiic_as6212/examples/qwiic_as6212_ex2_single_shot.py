@@ -80,42 +80,34 @@ import qwiic_as6212
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic AS6212 Sensor Example 2 - Single Shot Readings\n")
-	myTempSensor = qwiic_as6212.QwiicAS6212()
+print("\nSparkFun Qwiic AS6212 Sensor Example 2 - Single Shot Readings\n")
+myTempSensor = qwiic_as6212.QwiicAS6212()
 
-	if not myTempSensor.is_connected():
-		print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myTempSensor.is_connected():
+	print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myTempSensor.begin()
+myTempSensor.begin()
+qwiic_i2c.delay_ms(1000)
+
+print("Initialized.")
+
+myTempSensor.set_sleep_mode(1) # turn sleep  mode on (1)
+print("Sleep mode ON")
+qwiic_i2c.delay_ms(1000)
+
+while True:
+	myTempSensor.trigger_single_shot_conversion() # trigger SS
+
+	#wait for conversion to complete (~51ms)
+	conversion_time = 0
+	while myTempSensor.get_single_shot_status() == 1:
+		conversion_time += 1
+		qwiic_i2c.delay_ms(1) # 1ms
+
+	temp_f = myTempSensor.read_temp_f()
+
+	print("Temperature: %.2fF \t Conversion time: %ims" % (temp_f, conversion_time))
 	qwiic_i2c.delay_ms(1000)
-
-	print("Initialized.")
-
-	myTempSensor.set_sleep_mode(1) # turn sleep  mode on (1)
-	print("Sleep mode ON")
-	qwiic_i2c.delay_ms(1000)
-
-	while True:
-		myTempSensor.trigger_single_shot_conversion() # trigger SS
-
-		#wait for conversion to complete (~51ms)
-		conversion_time = 0
-		while myTempSensor.get_single_shot_status() == 1:
-			conversion_time += 1
-			qwiic_i2c.delay_ms(1) # 1ms
-			
-		temp_f = myTempSensor.read_temp_f()
-		
-		print("Temperature: %.2fF \t Conversion time: %ims" % (temp_f, conversion_time))
-		qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)

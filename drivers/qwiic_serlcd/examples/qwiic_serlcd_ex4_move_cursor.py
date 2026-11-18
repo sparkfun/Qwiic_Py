@@ -50,54 +50,44 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 4\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 4\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.clear_screen()
-	myLCD.cursor() # Turn on the underline cursor
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.clear_screen()
+myLCD.cursor() # Turn on the underline cursor
 
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
-	myLCD.print("Watch the cursor!")
-	
-	while True:
-		# move cursor left with three function calls
-		myLCD.move_cursor_left()
-		qwiic_i2c.delay_ms(500)
-		myLCD.move_cursor_left()
-		qwiic_i2c.delay_ms(500)
-		myLCD.move_cursor_left()
-		qwiic_i2c.delay_ms(500)
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+myLCD.print("Watch the cursor!")
 
-		# move curor right three spaces in one function call
-		myLCD.move_cursor_right(3) # notice the optional count argument of "3"
-		qwiic_i2c.delay_ms(500)
+while True:
+	# move cursor left with three function calls
+	myLCD.move_cursor_left()
+	qwiic_i2c.delay_ms(500)
+	myLCD.move_cursor_left()
+	qwiic_i2c.delay_ms(500)
+	myLCD.move_cursor_left()
+	qwiic_i2c.delay_ms(500)
 
-		# move cursor left three spaces in one function call
-		myLCD.move_cursor_left(3)
-		qwiic_i2c.delay_ms(500)
+	# move curor right three spaces in one function call
+	myLCD.move_cursor_right(3) # notice the optional count argument of "3"
+	qwiic_i2c.delay_ms(500)
 
-		# move cursor right with three function calls
-		myLCD.move_cursor_right()
-		qwiic_i2c.delay_ms(500)
-		myLCD.move_cursor_right()
-		qwiic_i2c.delay_ms(500)
-		myLCD.move_cursor_right()
-		qwiic_i2c.delay_ms(500)
+	# move cursor left three spaces in one function call
+	myLCD.move_cursor_left(3)
+	qwiic_i2c.delay_ms(500)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 4")
-		sys.exit(0)
-
-
+	# move cursor right with three function calls
+	myLCD.move_cursor_right()
+	qwiic_i2c.delay_ms(500)
+	myLCD.move_cursor_right()
+	qwiic_i2c.delay_ms(500)
+	myLCD.move_cursor_right()
+	qwiic_i2c.delay_ms(500)

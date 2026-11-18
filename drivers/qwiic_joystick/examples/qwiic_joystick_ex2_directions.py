@@ -43,46 +43,36 @@ import qwiic_joystick
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun qwiic Joystick   Example 2\n")
-	myJoystick = qwiic_joystick.QwiicJoystick()
+print("\nSparkFun qwiic Joystick   Example 2\n")
+myJoystick = qwiic_joystick.QwiicJoystick()
 
-	if not myJoystick.is_connected():
-		print("The Qwiic Joystick device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myJoystick.is_connected():
+	print("The Qwiic Joystick device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myJoystick.begin()
+myJoystick.begin()
 
-	print("Initialized. Firmware Version: %s" % myJoystick.get_version())
+print("Initialized. Firmware Version: %s" % myJoystick.get_version())
 
-	while True:
+while True:
 
-		x = myJoystick.get_horizontal()
-		y = myJoystick.get_vertical()
-		b = myJoystick.get_button()
+	x = myJoystick.get_horizontal()
+	y = myJoystick.get_vertical()
+	b = myJoystick.get_button()
 
-		if x > 575:
-			print("L")
-		elif x < 450:
-			print("R")
+	if x > 575:
+		print("L")
+	elif x < 450:
+		print("R")
 
-		if y > 575:
-			print("U")
-		elif y < 450:
-			print("D")
+	if y > 575:
+		print("U")
+	elif y < 450:
+		print("D")
 
-		if b == 0:
-			print("Button")
-			
-		qwiic_i2c.delay_ms(500)
+	if b == 0:
+		print("Button")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(500)

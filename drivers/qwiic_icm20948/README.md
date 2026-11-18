@@ -94,34 +94,25 @@ import qwiic_i2c
 import qwiic_icm20948
 
 
-def run_example():
-    print("\nSparkFun 9DoF ICM-20948 Sensor Example 1\n")
-    imu = qwiic_icm20948.QwiicICM20948()
+print("\nSparkFun 9DoF ICM-20948 Sensor Example 1\n")
+imu = qwiic_icm20948.QwiicICM20948()
 
-    if not imu.is_connected():
-        print("The Qwiic ICM20948 device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not imu.is_connected():
+    print("The Qwiic ICM20948 device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    imu.begin()
+imu.begin()
 
-    while True:
-        if imu.data_ready():
-            imu.get_agmt()  # updates ax_raw, ay_raw, az_raw, gx_raw, ... mz_raw
-            print("ax: %6d ay: %6d az: %6d" % (imu.ax_raw, imu.ay_raw, imu.az_raw))
-            print("gx: %6d gy: %6d gz: %6d" % (imu.gx_raw, imu.gy_raw, imu.gz_raw))
-            print("mx: %6d my: %6d mz: %6d\n" % (imu.mx_raw, imu.my_raw, imu.mz_raw))
-            qwiic_i2c.delay_ms(30)
-        else:
-            print("Waiting for data")
-            qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    if imu.data_ready():
+        imu.get_agmt()  # updates ax_raw, ay_raw, az_raw, gx_raw, ... mz_raw
+        print("ax: %6d ay: %6d az: %6d" % (imu.ax_raw, imu.ay_raw, imu.az_raw))
+        print("gx: %6d gy: %6d gz: %6d" % (imu.gx_raw, imu.gy_raw, imu.gz_raw))
+        print("mx: %6d my: %6d mz: %6d\n" % (imu.mx_raw, imu.my_raw, imu.mz_raw))
+        qwiic_i2c.delay_ms(30)
+    else:
+        print("Waiting for data")
+        qwiic_i2c.delay_ms(500)
 ```
 
 ## Documentation

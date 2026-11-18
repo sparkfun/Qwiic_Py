@@ -58,32 +58,24 @@ def color_gradient(led_stick, r1, b1, g1, r2, g2, b2, led_length):
         # Set the pixel to the calculated color
         led_stick.set_single_led_color(i + 1, r_value, g_value, b_value)
 
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 6")
-    my_stick = qwiic_led_stick.QwiicLEDStick()
+print("\nSparkFun Qwiic LED Stick Example 6")
+my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    if my_stick.begin() == False:
-        print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
 
-    # Set the colors for the gradient
-    # These are for the first color
-    r1 =238
-    g1 = 49
-    b1 = 36
-    # These are for the last color    
-    r2 = 66
-    g2 = 235
-    b2 = 23
+# Set the colors for the gradient
+# These are for the first color
+r1 =238
+g1 = 49
+b1 = 36
+# These are for the last color    
+r2 = 66
+g2 = 235
+b2 = 23
 
-    color_gradient(my_stick, r1, g1, b1, r2, g2, b2, 10)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 6")
-        sys.exit(0)
+color_gradient(my_stick, r1, g1, b1, r2, g2, b2, 10)

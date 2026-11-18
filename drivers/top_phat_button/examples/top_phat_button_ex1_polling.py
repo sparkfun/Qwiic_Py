@@ -45,56 +45,47 @@ import sys
 
 my_buttons = top_phat_button.TopPHATButton()
 
-def run_example():
 
-    print("\nSparkFun Top pHAT Button Example 1\n")
+print("\nSparkFun Top pHAT Button Example 1\n")
 
-    if my_buttons.is_connected() == False:
-        print("The Top pHAT Button device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    
-    my_buttons.set_pressed_interrupt(False)
-    my_buttons.set_clicked_interrupt(False)
-    
-    while True:
-        my_buttons.get_button_pressed() #These functions must be called to update button variables to their latest setting
-        my_buttons.get_button_clicked() #These functions must be called to update button variables to their latest setting  
-        if my_buttons.a_pressed == True:
-            print("A Pressed")
-        if my_buttons.a_clicked == True:
-            print("A Released")
-        if my_buttons.b_pressed == True:
-            print("B Pressed")
-        if my_buttons.b_clicked == True:
-            print("B Released")
-        if my_buttons.up_pressed == True:
-            print("Up Pressed")
-        if my_buttons.up_clicked == True:
-            print("Up Released")
-        if my_buttons.down_pressed == True:
-            print("Down Pressed")
-        if my_buttons.down_clicked == True:
-            print("Down Released")
-        if my_buttons.left_pressed == True:
-            print("Left Pressed")
-        if my_buttons.left_clicked == True:
-            print("Left Released")
-        if my_buttons.right_pressed == True:
-            print("Right Pressed")
-        if my_buttons.right_clicked == True:
-            print("Right Released")
-        if my_buttons.center_pressed == True:
-            print("Center Pressed")
-        if my_buttons.center_clicked == True:
-            print("Center Released")
-    
-        qwiic_i2c.delay_ms(100)
+if my_buttons.is_connected() == False:
+    print("The Top pHAT Button device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
+my_buttons.set_pressed_interrupt(False)
+my_buttons.set_clicked_interrupt(False)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    my_buttons.get_button_pressed() #These functions must be called to update button variables to their latest setting
+    my_buttons.get_button_clicked() #These functions must be called to update button variables to their latest setting  
+    if my_buttons.a_pressed == True:
+        print("A Pressed")
+    if my_buttons.a_clicked == True:
+        print("A Released")
+    if my_buttons.b_pressed == True:
+        print("B Pressed")
+    if my_buttons.b_clicked == True:
+        print("B Released")
+    if my_buttons.up_pressed == True:
+        print("Up Pressed")
+    if my_buttons.up_clicked == True:
+        print("Up Released")
+    if my_buttons.down_pressed == True:
+        print("Down Pressed")
+    if my_buttons.down_clicked == True:
+        print("Down Released")
+    if my_buttons.left_pressed == True:
+        print("Left Pressed")
+    if my_buttons.left_clicked == True:
+        print("Left Released")
+    if my_buttons.right_pressed == True:
+        print("Right Pressed")
+    if my_buttons.right_clicked == True:
+        print("Right Released")
+    if my_buttons.center_pressed == True:
+        print("Center Pressed")
+    if my_buttons.center_clicked == True:
+        print("Center Released")
+
+    qwiic_i2c.delay_ms(100)

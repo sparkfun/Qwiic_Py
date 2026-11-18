@@ -43,42 +43,32 @@ import qwiic_icm20948
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun 9DoF ICM-20948 Sensor  Example 1\n")
-	imu = qwiic_icm20948.QwiicICM20948()
+print("\nSparkFun 9DoF ICM-20948 Sensor  Example 1\n")
+imu = qwiic_icm20948.QwiicICM20948()
 
-	if not imu.is_connected():
-		print("The Qwiic ICM20948 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not imu.is_connected():
+	print("The Qwiic ICM20948 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	imu.begin()
+imu.begin()
 
-	while True:
-		if imu.data_ready():
-			imu.get_agmt() # read all axis and temp from sensor, note this also updates all instance variables
-			print(\
-			 'ax: {: 06d}'.format(imu.ax_raw)\
-			, '\t', 'ay: {: 06d}'.format(imu.ay_raw)\
-			, '\t', 'az: {: 06d}'.format(imu.az_raw)\
-			, '\t', 'gx: {: 06d}'.format(imu.gx_raw)\
-			, '\t', 'gy: {: 06d}'.format(imu.gy_raw)\
-			, '\t', 'gz: {: 06d}'.format(imu.gz_raw)\
-			, '\t', 'mx: {: 06d}'.format(imu.mx_raw)\
-			, '\t', 'my: {: 06d}'.format(imu.my_raw)\
-			, '\t', 'mz: {: 06d}'.format(imu.mz_raw)\
-			)
-			qwiic_i2c.delay_ms(30)
-		else:
-			print("Waiting for data")
-			qwiic_i2c.delay_ms(500)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 1")
-		sys.exit(0)
-
-
+while True:
+	if imu.data_ready():
+		imu.get_agmt() # read all axis and temp from sensor, note this also updates all instance variables
+		print(\
+		 'ax: {: 06d}'.format(imu.ax_raw)\
+		, '\t', 'ay: {: 06d}'.format(imu.ay_raw)\
+		, '\t', 'az: {: 06d}'.format(imu.az_raw)\
+		, '\t', 'gx: {: 06d}'.format(imu.gx_raw)\
+		, '\t', 'gy: {: 06d}'.format(imu.gy_raw)\
+		, '\t', 'gz: {: 06d}'.format(imu.gz_raw)\
+		, '\t', 'mx: {: 06d}'.format(imu.mx_raw)\
+		, '\t', 'my: {: 06d}'.format(imu.my_raw)\
+		, '\t', 'mz: {: 06d}'.format(imu.mz_raw)\
+		)
+		qwiic_i2c.delay_ms(30)
+	else:
+		print("Waiting for data")
+		qwiic_i2c.delay_ms(500)

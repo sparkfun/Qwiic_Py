@@ -54,40 +54,32 @@ import qwiic_rfid
 import qwiic_i2c
 import sys
 
-def run_example():
-    
-    print("\nSparkFun Qwiic RFID Example 2\n")
-    my_rfid = qwiic_rfid.QwiicRFID()
 
-    if my_rfid.begin() == False:
-        print("The Qwiic RFID Reader isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+print("\nSparkFun Qwiic RFID Example 2\n")
+my_rfid = qwiic_rfid.QwiicRFID()
 
-    print("\nReady to scan some tags!")
+if my_rfid.begin() == False:
+    print("The Qwiic RFID Reader isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    all_tags = [None] * my_rfid.MAX_TAG_STORAGE
-    all_times = [None] * my_rfid.MAX_TAG_STORAGE
+print("\nReady to scan some tags!")
 
-    while True:
-        print("\nScan some tags, they will all be printed in 10 seconds!")
+all_tags = [None] * my_rfid.MAX_TAG_STORAGE
+all_times = [None] * my_rfid.MAX_TAG_STORAGE
 
-        qwiic_i2c.delay_ms(10000)
-            
-        my_rfid.get_all_tags(all_tags)
-        my_rfid.get_all_prec_times(all_times)
+while True:
+    print("\nScan some tags, they will all be printed in 10 seconds!")
 
-        for i in range(0, my_rfid.MAX_TAG_STORAGE):
-            if all_tags[i] == "000000":
-                break
-            
-            print("\nScan " + str(i) + ":")
-            print("Tag ID: " + all_tags[i])
-            print("Scanned " + str(all_times[i]) + " seconds ago")
+    qwiic_i2c.delay_ms(10000)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 2")
-        sys.exit(0)
+    my_rfid.get_all_tags(all_tags)
+    my_rfid.get_all_prec_times(all_times)
+
+    for i in range(0, my_rfid.MAX_TAG_STORAGE):
+        if all_tags[i] == "000000":
+            break
+
+        print("\nScan " + str(i) + ":")
+        print("Tag ID: " + all_tags[i])
+        print("Scanned " + str(all_times[i]) + " seconds ago")

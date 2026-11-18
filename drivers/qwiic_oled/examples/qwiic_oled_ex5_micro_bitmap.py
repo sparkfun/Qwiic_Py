@@ -72,46 +72,38 @@ bender = [ \
   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 ]
 
-def run_example():
 
-  #  Before you can start using the OLED, call begin() to init
-  #  all of the pins and configure the OLED.
+#  Before you can start using the OLED, call begin() to init
+#  all of the pins and configure the OLED.
 
-  print("\nSparkFun Micro OLED Bitmap Example\n")
-  myOLED = userOLED
+print("\nSparkFun Micro OLED Bitmap Example\n")
+myOLED = userOLED
 
-  if not myOLED.is_connected():
-    print("The Qwiic Micro OLED device isn't connected to the system. Please check your connection", \
-      file=sys.stderr)
-    return
+if not myOLED.is_connected():
+  print("The Qwiic Micro OLED device isn't connected to the system. Please check your connection", \
+    file=sys.stderr)
+  sys.exit(1)
 
-  myOLED.begin()
+myOLED.begin()
 
-  #  clear(ALL) will clear out the OLED's graphic memory.
-  myOLED.clear(myOLED.ALL) #  Clear the display's memory (gets rid of artifacts)
-  
-  #  Display buffer contents
-  myOLED.display()
-  qwiic_i2c.delay_ms(3000)
+#  clear(ALL) will clear out the OLED's graphic memory.
+myOLED.clear(myOLED.ALL) #  Clear the display's memory (gets rid of artifacts)
 
-  #  clear(PAGE) will clear the Arduino's display buffer.
-  myOLED.clear(myOLED.PAGE)  #  Clear the display's buffer
+#  Display buffer contents
+myOLED.display()
+qwiic_i2c.delay_ms(3000)
 
-  #  Display buffer contents
-  myOLED.display()
-  qwiic_i2c.delay_ms(3000)
+#  clear(PAGE) will clear the Arduino's display buffer.
+myOLED.clear(myOLED.PAGE)  #  Clear the display's buffer
 
-  #  Draw Bitmap
-  #  ---------------------------------------------------------------------------
-  #  Add bitmap to buffer
-  myOLED.draw_bitmap(bender)
+#  Display buffer contents
+myOLED.display()
+qwiic_i2c.delay_ms(3000)
 
-  #  To actually draw anything on the display, you must call the display() function.
-  myOLED.display()
+#  Draw Bitmap
+#  ---------------------------------------------------------------------------
+#  Add bitmap to buffer
+myOLED.draw_bitmap(bender)
 
-if __name__ == '__main__':
-  try:
-    run_example()
-  except (KeyboardInterrupt, SystemExit) as exErr:
-    print("\nEnding OLED bitmap Example")
-    sys.exit(0)
+#  To actually draw anything on the display, you must call the display() function.
+myOLED.display()

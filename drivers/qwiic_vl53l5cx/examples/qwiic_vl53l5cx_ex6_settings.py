@@ -38,130 +38,123 @@ import sys
 from math import sqrt
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic VL53LCX Example 6 - Advanced Settings\n")
 
-	# Create instance of device
-	myVL53L5CX = qwiic_vl53l5cx.QwiicVL53L5CX() 
+print("\nQwiic VL53LCX Example 6 - Advanced Settings\n")
 
-	# Check if it's connected
-	if myVL53L5CX.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+# Create instance of device
+myVL53L5CX = qwiic_vl53l5cx.QwiicVL53L5CX() 
 
-	# Initialize the device
-	print ("Initializing sensor board. This can take up to 10s. Please wait.")
-	if myVL53L5CX.begin() == False:
-		print("Sensor initialization unsuccessful. Exiting...", file=sys.stderr)
-		sys.exit(1)
+# Check if it's connected
+if myVL53L5CX.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	myVL53L5CX.set_resolution(8*8) # enable all 64 pads
-	image_resolution = myVL53L5CX.get_resolution()  # Query sensor for current resolution - either 4x4 or 8x8
-	image_width = int(sqrt(image_resolution)) # Calculate printing width
-	
-	# Set the ranging mode
-	if myVL53L5CX.set_ranging_mode(myVL53L5CX.RANGING_MODE_AUTONOMOUS) != myVL53L5CX.STATUS_OK:
-		print("Failed to set ranging mode")
-		sys.exit(1)
+# Initialize the device
+print ("Initializing sensor board. This can take up to 10s. Please wait.")
+if myVL53L5CX.begin() == False:
+	print("Sensor initialization unsuccessful. Exiting...", file=sys.stderr)
+	sys.exit(1)
 
-	# Check that the sensor has been set to the expected mode
-	if myVL53L5CX.get_ranging_mode() != myVL53L5CX.RANGING_MODE_AUTONOMOUS:
-		print("Failed to read correct ranging mode")
-		sys.exit(1)
+myVL53L5CX.set_resolution(8*8) # enable all 64 pads
+image_resolution = myVL53L5CX.get_resolution()  # Query sensor for current resolution - either 4x4 or 8x8
+image_width = int(sqrt(image_resolution)) # Calculate printing width
 
-	# Set device to sleep mode
-	if myVL53L5CX.set_power_mode(myVL53L5CX.POWER_MODE_SLEEP) != myVL53L5CX.STATUS_OK:
-		print("Failed to set power mode to sleep")
-		sys.exit(1)
-	
-	# Check that the sensor has been set to the expected mode
-	if myVL53L5CX.get_power_mode() != myVL53L5CX.POWER_MODE_SLEEP:
-		print("Failed to read correct power mode")
-		sys.exit(1)
-	else:
-		print("Shhhh... device is sleeping!")
-	
-	print("Waking up device in 5...")
-	qwiic_i2c.delay_ms(1000)
-	print("4...")
-	qwiic_i2c.delay_ms(1000)
-	print("3...")
-	qwiic_i2c.delay_ms(1000)
-	print("2...")
-	qwiic_i2c.delay_ms(1000)
-	print("1...")
-	qwiic_i2c.delay_ms(1000)
+# Set the ranging mode
+if myVL53L5CX.set_ranging_mode(myVL53L5CX.RANGING_MODE_AUTONOMOUS) != myVL53L5CX.STATUS_OK:
+	print("Failed to set ranging mode")
+	sys.exit(1)
 
-	if myVL53L5CX.set_power_mode(myVL53L5CX.POWER_MODE_WAKEUP) != myVL53L5CX.STATUS_OK:
-		print("Failed to set power mode to wake")
-		sys.exit(1)
-	
-	# Check that the sensor has been set to the expected mode
-	if myVL53L5CX.get_power_mode() != myVL53L5CX.POWER_MODE_WAKEUP:
-		print("Failed to read correct power mode")
-		sys.exit(1)
-	else:
-		print("Device is awake!")
+# Check that the sensor has been set to the expected mode
+if myVL53L5CX.get_ranging_mode() != myVL53L5CX.RANGING_MODE_AUTONOMOUS:
+	print("Failed to read correct ranging mode")
+	sys.exit(1)
+
+# Set device to sleep mode
+if myVL53L5CX.set_power_mode(myVL53L5CX.POWER_MODE_SLEEP) != myVL53L5CX.STATUS_OK:
+	print("Failed to set power mode to sleep")
+	sys.exit(1)
+
+# Check that the sensor has been set to the expected mode
+if myVL53L5CX.get_power_mode() != myVL53L5CX.POWER_MODE_SLEEP:
+	print("Failed to read correct power mode")
+	sys.exit(1)
+else:
+	print("Shhhh... device is sleeping!")
+
+print("Waking up device in 5...")
+qwiic_i2c.delay_ms(1000)
+print("4...")
+qwiic_i2c.delay_ms(1000)
+print("3...")
+qwiic_i2c.delay_ms(1000)
+print("2...")
+qwiic_i2c.delay_ms(1000)
+print("1...")
+qwiic_i2c.delay_ms(1000)
+
+if myVL53L5CX.set_power_mode(myVL53L5CX.POWER_MODE_WAKEUP) != myVL53L5CX.STATUS_OK:
+	print("Failed to set power mode to wake")
+	sys.exit(1)
+
+# Check that the sensor has been set to the expected mode
+if myVL53L5CX.get_power_mode() != myVL53L5CX.POWER_MODE_WAKEUP:
+	print("Failed to read correct power mode")
+	sys.exit(1)
+else:
+	print("Device is awake!")
 
 
-	print("Current Integration Time:", myVL53L5CX.get_integration_time_ms(), "ms")
+print("Current Integration Time:", myVL53L5CX.get_integration_time_ms(), "ms")
 
-	if myVL53L5CX.set_integration_time_ms(8) != myVL53L5CX.STATUS_OK:
-		print("Failed to set integration time")
-		sys.exit(1)
-	
-	# Check that the integration time has been set to the expected value
-	print("New Integration Time:", myVL53L5CX.get_integration_time_ms(), "ms")
+if myVL53L5CX.set_integration_time_ms(8) != myVL53L5CX.STATUS_OK:
+	print("Failed to set integration time")
+	sys.exit(1)
 
-	# Set the sharpener value
-	print("Current Sharpener Value:", str(myVL53L5CX.get_sharpener_percent()) + "%")
+# Check that the integration time has been set to the expected value
+print("New Integration Time:", myVL53L5CX.get_integration_time_ms(), "ms")
 
-	if myVL53L5CX.set_sharpener_percent(19) != myVL53L5CX.STATUS_OK:
-		print("Failed to set sharpener value")
-		sys.exit(1)
-	
-	# Check that the sharpener value has been set to the expected value
-	print("New Sharpener Value:", str(myVL53L5CX.get_sharpener_percent()) + "%")
-	
-	# Set the Target Order
-	order = myVL53L5CX.get_target_order()
-	print("Current Target Order:", order)
-	
-	if order == myVL53L5CX.TARGET_ORDER_STRONGEST:
-		print("Target Order is Strongest")
-	elif order == myVL53L5CX.TARGET_ORDER_CLOSEST:
-		print("Target Order is Closest")
-	
-	if myVL53L5CX.set_target_order(myVL53L5CX.TARGET_ORDER_CLOSEST) != myVL53L5CX.STATUS_OK:
-		print("Failed to set target order")
-		sys.exit(1)
-	
-	# Check that the target order has been set to the expected value
-	order = myVL53L5CX.get_target_order()
-	if order == myVL53L5CX.TARGET_ORDER_STRONGEST:
-		print("New Target Order is Strongest")
-	elif order == myVL53L5CX.TARGET_ORDER_CLOSEST:
-		print("New Target Order is Closest")
-	
-	if myVL53L5CX.start_ranging() != myVL53L5CX.STATUS_OK:
-		print("Failed to start ranging")
-		sys.exit(1)
+# Set the sharpener value
+print("Current Sharpener Value:", str(myVL53L5CX.get_sharpener_percent()) + "%")
 
-	while True:
-		if myVL53L5CX.check_data_ready():
-			measurement_data = myVL53L5CX.get_ranging_data()
-			for y in range (0, (image_width * (image_width - 1) )+ 1, image_width):
-				for x in range (image_width - 1, -1, -1):
-					print("\t", end="")
-					print(measurement_data.distance_mm[x + y], end = "")
-				print("\n")
+if myVL53L5CX.set_sharpener_percent(19) != myVL53L5CX.STATUS_OK:
+	print("Failed to set sharpener value")
+	sys.exit(1)
+
+# Check that the sharpener value has been set to the expected value
+print("New Sharpener Value:", str(myVL53L5CX.get_sharpener_percent()) + "%")
+
+# Set the Target Order
+order = myVL53L5CX.get_target_order()
+print("Current Target Order:", order)
+
+if order == myVL53L5CX.TARGET_ORDER_STRONGEST:
+	print("Target Order is Strongest")
+elif order == myVL53L5CX.TARGET_ORDER_CLOSEST:
+	print("Target Order is Closest")
+
+if myVL53L5CX.set_target_order(myVL53L5CX.TARGET_ORDER_CLOSEST) != myVL53L5CX.STATUS_OK:
+	print("Failed to set target order")
+	sys.exit(1)
+
+# Check that the target order has been set to the expected value
+order = myVL53L5CX.get_target_order()
+if order == myVL53L5CX.TARGET_ORDER_STRONGEST:
+	print("New Target Order is Strongest")
+elif order == myVL53L5CX.TARGET_ORDER_CLOSEST:
+	print("New Target Order is Closest")
+
+if myVL53L5CX.start_ranging() != myVL53L5CX.STATUS_OK:
+	print("Failed to start ranging")
+	sys.exit(1)
+
+while True:
+	if myVL53L5CX.check_data_ready():
+		measurement_data = myVL53L5CX.get_ranging_data()
+		for y in range (0, (image_width * (image_width - 1) )+ 1, image_width):
+			for x in range (image_width - 1, -1, -1):
+				print("\t", end="")
+				print(measurement_data.distance_mm[x + y], end = "")
 			print("\n")
-		
-		qwiic_i2c.delay_ms(5)
-	
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+		print("\n")
+
+	qwiic_i2c.delay_ms(5)

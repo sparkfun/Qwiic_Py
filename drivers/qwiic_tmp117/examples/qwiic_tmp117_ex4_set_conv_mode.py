@@ -47,47 +47,40 @@ def conv_mode_to_string(mode):
 	else:
 		return "Invalid Conversion Mode"
 
-def run_example():
-	print("\nQwiic TMP117 Example 4 - Set Conversion Mode\n")
 
-	# Create instance of device
-	myTMP117 = qwiic_tmp117.QwiicTMP117()
+print("\nQwiic TMP117 Example 4 - Set Conversion Mode\n")
 
-	# Check if it's connected
-	if myTMP117.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myTMP117 = qwiic_tmp117.QwiicTMP117()
 
-	# Initialize the device
-	myTMP117.begin()
+# Check if it's connected
+if myTMP117.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print("Conversion Modes: ")
-	print("1: Continuous Conversion Mode")
-	print("2: Shutdown Mode")
-	print("3: One-Shot Mode")
+# Initialize the device
+myTMP117.begin()
 
-	currentMode = myTMP117.get_conversion_mode()
-	print("Current Mode:", conv_mode_to_string(currentMode))
+print("Conversion Modes: ")
+print("1: Continuous Conversion Mode")
+print("2: Shutdown Mode")
+print("3: One-Shot Mode")
 
-	while True:
-		print("Please Enter a Conversion Mode from above (number 1-3): ")
-		newMode = int(input())
-		if newMode == 1:
-			myTMP117.set_continuous_conversion_mode()
-		elif newMode == 2:
-			myTMP117.set_shutdown_mode()
-		elif newMode == 3:
-			myTMP117.set_one_shot_mode()
-		else:
-			print("Invalid Conversion Mode (must be a number between 1-3)")
-			continue
-		
-		print("New Conversion Mode:", conv_mode_to_string(myTMP117.get_conversion_mode()))
+currentMode = myTMP117.get_conversion_mode()
+print("Current Mode:", conv_mode_to_string(currentMode))
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	print("Please Enter a Conversion Mode from above (number 1-3): ")
+	newMode = int(input())
+	if newMode == 1:
+		myTMP117.set_continuous_conversion_mode()
+	elif newMode == 2:
+		myTMP117.set_shutdown_mode()
+	elif newMode == 3:
+		myTMP117.set_one_shot_mode()
+	else:
+		print("Invalid Conversion Mode (must be a number between 1-3)")
+		continue
+
+	print("New Conversion Mode:", conv_mode_to_string(myTMP117.get_conversion_mode()))

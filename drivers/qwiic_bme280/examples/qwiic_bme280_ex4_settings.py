@@ -43,44 +43,33 @@ import qwiic_bme280
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun BME280 Sensor  Example 4\n")
-	mySensor = qwiic_bme280.QwiicBME280()
+print("\nSparkFun BME280 Sensor  Example 4\n")
+mySensor = qwiic_bme280.QwiicBME280()
 
-	if not mySensor.is_connected():
-		print("The Qwiic BME280 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not mySensor.is_connected():
+	print("The Qwiic BME280 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	mySensor.begin()
+mySensor.begin()
 
-	# setup the sensor
-	mySensor.set_filter(1)	# 0 to 4 is valid. Filter coefficient. See 3.4.4
-	mySensor.set_standby_time(0)	# 0 to 7 valid. Time between readings. See table 27.
-	
-	mySensor.set_temperature_oversample(1)	# 0 to 16 are valid. 0 disables temp sensing. See table 24.
-	mySensor.set_pressure_oversample(1)	# 0 to 16 are valid. 0 disables pressure sensing. See table 23.
-	mySensor.set_humidity_oversample(1)	# 0 to 16 are valid. 0 disables humidity sensing. See table 19.
-	mySensor.set_mode(mySensor.MODE_NORMAL)	# MODE_SLEEP, MODE_FORCED, MODE_NORMAL is valid. See 3.3
+# setup the sensor
+mySensor.set_filter(1)	# 0 to 4 is valid. Filter coefficient. See 3.4.4
+mySensor.set_standby_time(0)	# 0 to 7 valid. Time between readings. See table 27.
 
-	while True:
-		print("Humidity:\t%.3f" % mySensor.read_humidity())
+mySensor.set_temperature_oversample(1)	# 0 to 16 are valid. 0 disables temp sensing. See table 24.
+mySensor.set_pressure_oversample(1)	# 0 to 16 are valid. 0 disables pressure sensing. See table 23.
+mySensor.set_humidity_oversample(1)	# 0 to 16 are valid. 0 disables humidity sensing. See table 19.
+mySensor.set_mode(mySensor.MODE_NORMAL)	# MODE_SLEEP, MODE_FORCED, MODE_NORMAL is valid. See 3.3
 
-		print("Pressure:\t%.3f" % mySensor.read_pressure())	
+while True:
+	print("Humidity:\t%.3f" % mySensor.read_humidity())
 
-		print("Altitude:\t%.3f" % mySensor.get_altitude_feet())
+	print("Pressure:\t%.3f" % mySensor.read_pressure())	
 
-		print("Temperature:\t%.2f\n" % mySensor.get_temperature_fahrenheit())
+	print("Altitude:\t%.3f" % mySensor.get_altitude_feet())
 
-		qwiic_i2c.delay_ms(1000)
+	print("Temperature:\t%.2f\n" % mySensor.get_temperature_fahrenheit())
 
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 4")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(1000)

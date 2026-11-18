@@ -93,38 +93,29 @@ import qwiic_ens160
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic ENS160 Example 1 - Basic\n")
-    my_ens = qwiic_ens160.QwiicENS160()
+print("\nQwiic ENS160 Example 1 - Basic\n")
+my_ens = qwiic_ens160.QwiicENS160()
 
-    if not my_ens.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_ens.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_ens.begin()
+my_ens.begin()
 
-    my_ens.set_operating_mode(my_ens.OP_MODE_RESET)
-    qwiic_i2c.delay_ms(100)
-    my_ens.set_operating_mode(my_ens.OP_MODE_STANDARD)
+my_ens.set_operating_mode(my_ens.OP_MODE_RESET)
+qwiic_i2c.delay_ms(100)
+my_ens.set_operating_mode(my_ens.OP_MODE_STANDARD)
 
-    print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", my_ens.get_flags())
+print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", my_ens.get_flags())
 
-    while True:
-        if my_ens.check_data_status():
-            print("Air Quality Index (1-5) : ", my_ens.get_aqi())
-            print("Total Volatile Organic Compounds (ppb): ", my_ens.get_tvoc())
-            print("CO2 concentration (ppm): ", my_ens.get_eco2())
-            print("\n------------------------\n")
+while True:
+    if my_ens.check_data_status():
+        print("Air Quality Index (1-5) : ", my_ens.get_aqi())
+        print("Total Volatile Organic Compounds (ppb): ", my_ens.get_tvoc())
+        print("CO2 concentration (ppm): ", my_ens.get_eco2())
+        print("\n------------------------\n")
 
-        qwiic_i2c.delay_ms(200)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    qwiic_i2c.delay_ms(200)
 ```
 
 ## Documentation

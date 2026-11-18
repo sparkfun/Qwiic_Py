@@ -38,61 +38,61 @@ import qwiic_cy8cmbr3
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic Template Example 6 - Set Range\n")
 
-	# Create instance of device
-	mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
+print("\nQwiic Template Example 6 - Set Range\n")
 
-	# Check if it's connected
-	if mySoilSensor.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
 
-	# Initialize the device
-	mySoilSensor.begin()
+# Check if it's connected
+if mySoilSensor.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Capacitance PF is great, easy to use, and standard/objective accross all soil types, densities, and conditions.
-	# However, it has limited resolution (1 count / pF) and range (0-255pF). Depending on your application, you may want to use
-	# raw counts instead for higher resolution and range.
+# Initialize the device
+mySoilSensor.begin()
 
-	# The sensor will automatically configure the range of its "Raw Count" Readings based on 
-	# the capacitance that it senses during power up/initialization. This allows it to maximize
-	# resolution for the expected capacitance range. However, if the capacitance changes significantly
-	# (for example, a moisture sensor going from dry to very wet), the raw count readings may saturate
-	# and get stuck at a maximum value. You can run reset() again to reconfigure the raw count range if needed.
+# Capacitance PF is great, easy to use, and standard/objective accross all soil types, densities, and conditions.
+# However, it has limited resolution (1 count / pF) and range (0-255pF). Depending on your application, you may want to use
+# raw counts instead for higher resolution and range.
 
-	# The range setting is volatile (it will be reset when power is removed from the sensor or the sensor is reset) 
+# The sensor will automatically configure the range of its "Raw Count" Readings based on 
+# the capacitance that it senses during power up/initialization. This allows it to maximize
+# resolution for the expected capacitance range. However, if the capacitance changes significantly
+# (for example, a moisture sensor going from dry to very wet), the raw count readings may saturate
+# and get stuck at a maximum value. You can run reset() again to reconfigure the raw count range if needed.
 
-	prompting = True
-	autoRangeSet = False
+# The range setting is volatile (it will be reset when power is removed from the sensor or the sensor is reset) 
 
-	# Infinite loop reading data
-	while True:
-		for i in range (5):
-			# Read and print the soil capacitance
-			# "raw" counts is what we're setting the range of, capacitance pF behaves the same regardless of range setting
-			capacitance = mySoilSensor.get_capacitance_pf()
-			print("Soil Capacitance: " + str(capacitance) + " pF")
+prompting = True
+autoRangeSet = False
 
-			# We can pass a boolean "True" value to get_raw_count() to have the sensor
-			# automatically adjust the raw count range if it detects saturation.
+# Infinite loop reading data
+while True:
+	for i in range (5):
+		# Read and print the soil capacitance
+		# "raw" counts is what we're setting the range of, capacitance pF behaves the same regardless of range setting
+		capacitance = mySoilSensor.get_capacitance_pf()
+		print("Soil Capacitance: " + str(capacitance) + " pF")
 
-			# Don't touch the active part of the sensor (the bottom with the ruler) while auto-range setting is enabled
-			# Or it will configure to a very high capacitance value, 
-			# and auto-range setting will be ineffective until a manual reconfiguration is done.
-			raw_counts = mySoilSensor.get_raw_count(autoRangeSet)
-			print("Soil Raw Counts: " + str(raw_counts) + " counts\n")
+		# We can pass a boolean "True" value to get_raw_count() to have the sensor
+		# automatically adjust the raw count range if it detects saturation.
 
-			if mySoilSensor.check_saturation(raw_counts):
-				print("WARNING: Raw counts are saturated! Consider recalibrating the sensor to adjust the range.\n")
-			
-			# Sleep for a second to avoid spamming the output
-			qwiic_i2c.delay_ms(1000)
-		if prompting:
-			choice = input(
-				"\nSelect one of the following:\n"
+		# Don't touch the active part of the sensor (the bottom with the ruler) while auto-range setting is enabled
+		# Or it will configure to a very high capacitance value, 
+		# and auto-range setting will be ineffective until a manual reconfiguration is done.
+		raw_counts = mySoilSensor.get_raw_count(autoRangeSet)
+		print("Soil Raw Counts: " + str(raw_counts) + " counts\n")
+
+		if mySoilSensor.check_saturation(raw_counts):
+			print("WARNING: Raw counts are saturated! Consider recalibrating the sensor to adjust the range.\n")
+
+		# Sleep for a second to avoid spamming the output
+		qwiic_i2c.delay_ms(1000)
+	if prompting:
+		choice = input(
+			"\nSelect one of the following:\n"
 				"1) Manually Reconfigure Range\n"
 				"2) Continue for 5 more readings with current range setting\n"
 				"3) Turn on auto-range setting (Don't touch the sensor while this is enabled)\n"
@@ -100,32 +100,25 @@ def run_example():
 				"5) Do not prompt again\n"
 				"6) Exit\n\n"
 				"Enter choice (1, 2, 3, 4, 5, or 6): "
-			)
-			if choice == '1':
-				input("Place the sensor in the wettest possible state (i.e. soil fully saturated) and press Enter to reconfigure the range...")
-				print("Reconfiguring sensor range...")
-				mySoilSensor.reset()
-				print("Range reconfiguration complete.")
-			elif choice == '2':
-				continue
-			elif choice == '3':
-				autoRangeSet = True
-				print("Auto-range setting enabled.")
-			elif choice == '4':
-				autoRangeSet = False
-				print("Auto-range setting disabled.")
-			elif choice == '5':
-				prompting = False
-				print("Prompting disabled.")
-			elif choice == '6':
-				print("Exiting example.")
-				return
-			else:
-				print("Invalid choice. Continuing with current range setting.")
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+		)
+		if choice == '1':
+			input("Place the sensor in the wettest possible state (i.e. soil fully saturated) and press Enter to reconfigure the range...")
+			print("Reconfiguring sensor range...")
+			mySoilSensor.reset()
+			print("Range reconfiguration complete.")
+		elif choice == '2':
+			continue
+		elif choice == '3':
+			autoRangeSet = True
+			print("Auto-range setting enabled.")
+		elif choice == '4':
+			autoRangeSet = False
+			print("Auto-range setting disabled.")
+		elif choice == '5':
+			prompting = False
+			print("Prompting disabled.")
+		elif choice == '6':
+			print("Exiting example.")
+			sys.exit(0)
+		else:
+			print("Invalid choice. Continuing with current range setting.")

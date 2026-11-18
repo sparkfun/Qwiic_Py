@@ -38,49 +38,42 @@ import qwiic_scd4x
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic SCD4x Example 3 - Disable Auto Calibration\n")
 
-	# Create instance of device
-	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
+print("\nQwiic SCD4x Example 3 - Disable Auto Calibration\n")
 
-	# Check if it's connected
-	if not mySCD4x.is_connected():
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+# Create instance of device
+mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
-	# Initialize the device
+# Check if it's connected
+if not mySCD4x.is_connected():
+	print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	# begin() has three boolean parameters:
-   	# meas_begin: set to true to begin periodic measurements automatically;
-    #            set to false to leave periodic measurements disabled.
-    #            Default is true.
-   	# auto_calibrate: set to true to leave automatic calibration enabled;
-    #                set to false to disable automatic calibration.
-    #                Default is true.
-   	# skip_stop_periodic_measurement: set to true to make .begin skip the initial call of stop_periodic_measurement;
-    #                               set to false to make .begin stop periodic measurements before doing anything else.
-    #                               Default is false.
-  	# Please see the next example for a full description of skip_stop_periodic_measurement
+# Initialize the device
 
-	# In this example we call begin and set auto_calibrate to false to disable automatic calibration
-	if not mySCD4x.begin(auto_calibrate=False):
-		print("Error while initializing device", file=sys.stderr)
-		return
+# begin() has three boolean parameters:
+# meas_begin: set to true to begin periodic measurements automatically;
+#            set to false to leave periodic measurements disabled.
+#            Default is true.
+# auto_calibrate: set to true to leave automatic calibration enabled;
+#                set to false to disable automatic calibration.
+#                Default is true.
+# skip_stop_periodic_measurement: set to true to make .begin skip the initial call of stop_periodic_measurement;
+#                               set to false to make .begin stop periodic measurements before doing anything else.
+#                               Default is false.
+# Please see the next example for a full description of skip_stop_periodic_measurement
 
-	while True:
-		if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
-			print("\nCO2(ppm):", mySCD4x.get_co2())
-			print("Temperature(C):", mySCD4x.get_temperature())
-			print("Humidity(%RH):", mySCD4x.get_humidity())
-		else:
-			print(".", end="")
-		
-		qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 second
+# In this example we call begin and set auto_calibrate to false to disable automatic calibration
+if not mySCD4x.begin(auto_calibrate=False):
+	print("Error while initializing device", file=sys.stderr)
+	sys.exit(1)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
+		print("\nCO2(ppm):", mySCD4x.get_co2())
+		print("Temperature(C):", mySCD4x.get_temperature())
+		print("Humidity(%RH):", mySCD4x.get_humidity())
+	else:
+		print(".", end="")
+
+	qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 second

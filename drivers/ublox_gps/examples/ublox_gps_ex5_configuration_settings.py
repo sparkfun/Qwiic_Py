@@ -41,21 +41,16 @@ from ublox_gps import UbloxGPS
 port = serial.Serial('/dev/serial0', baudrate=38400, timeout=1)
 gps = UbloxGPS(port)
 
-def run():
 
-    try:
-        print("Listening for UBX Messages")
-        while True:
-            try:
-                # Get NMEA Protocol Version (key CFG-NMEA-PROTVER)
-                get_val = gps.ubx_get_val(0x20930001)
-                print(get_val)
-            except (ValueError, IOError) as err:
-                print(err)
+try:
+    print("Listening for UBX Messages")
+    while True:
+        try:
+            # Get NMEA Protocol Version (key CFG-NMEA-PROTVER)
+            get_val = gps.ubx_get_val(0x20930001)
+            print(get_val)
+        except (ValueError, IOError) as err:
+            print(err)
 
-    finally:
-        port.close()
-
-
-if __name__ == '__main__':
-    run()
+finally:
+    port.close()

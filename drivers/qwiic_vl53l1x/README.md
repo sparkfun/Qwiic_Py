@@ -92,31 +92,22 @@ import qwiic_vl53l1x
 import qwiic_i2c
 
 
-def run_example():
-    print("VL53L1X Qwiic Test\n")
-    tof = qwiic_vl53l1x.QwiicVL53L1X()
+print("VL53L1X Qwiic Test\n")
+tof = qwiic_vl53l1x.QwiicVL53L1X()
 
-    if not tof.begin():
-        print("The Qwiic VL53L1X device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not tof.begin():
+    print("The Qwiic VL53L1X device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-        tof.start_ranging()
-        while not tof.check_for_data_ready():
-            qwiic_i2c.delay_ms(1)
-        distance = tof.get_distance()
-        tof.clear_interrupt()
-        tof.stop_ranging()
+while True:
+    tof.start_ranging()
+    while not tof.check_for_data_ready():
+        qwiic_i2c.delay_ms(1)
+    distance = tof.get_distance()
+    tof.clear_interrupt()
+    tof.stop_ranging()
 
-        print("Distance(mm): %s" % distance)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+    print("Distance(mm): %s" % distance)
 ```
 
 ## Documentation

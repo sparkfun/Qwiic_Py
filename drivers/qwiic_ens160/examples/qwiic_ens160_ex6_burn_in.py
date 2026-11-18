@@ -40,72 +40,64 @@ import qwiic_ens160
 import sys
 import qwiic_i2c
 
-def run_example():
-	# TODO Replace template and title
-	print("\nQwiic ENS160 Example 6 - Burn In\n")
 
-	# Create instance of device
-	myEns = qwiic_ens160.QwiicENS160()
+# TODO Replace template and title
+print("\nQwiic ENS160 Example 6 - Burn In\n")
 
-	# Check if it's connected
-	if not myEns.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myEns = qwiic_ens160.QwiicENS160()
 
-	# Initialize the device
-	myEns.begin()
+# Check if it's connected
+if not myEns.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myEns.set_operating_mode(myEns.OP_MODE_RESET)
+# Initialize the device
+myEns.begin()
 
-	qwiic_i2c.delay_ms(100)
+myEns.set_operating_mode(myEns.OP_MODE_RESET)
 
-	# Set to standard operation
-	# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
-	myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
+qwiic_i2c.delay_ms(100)
 
-	# There are four values here: 
-	# 0 - Operating ok: Standard Operation
-	# 1 - Warm-up: occurs for 3 minutes after power-on.
-	# 2 - Initial Start-up: Occurs for the first hour of operation.
-	# 	  and only once in sensor's lifetime.
-	# 3 - No Valid Output
-	print("Waiting for the device to warm up, this will take ~3 minutes")
-	print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ")
+# Set to standard operation
+# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
+myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
 
-	# Wait for the sensor to warm up before we enter our main loop 
-	warming_up = True
-	while warming_up:
-		print("Waiting for the device to warm up...")
-		ens_status = myEns.get_flags()
+# There are four values here: 
+# 0 - Operating ok: Standard Operation
+# 1 - Warm-up: occurs for 3 minutes after power-on.
+# 2 - Initial Start-up: Occurs for the first hour of operation.
+# 	  and only once in sensor's lifetime.
+# 3 - No Valid Output
+print("Waiting for the device to warm up, this will take ~3 minutes")
+print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ")
 
-		print(str(ens_status))
-	
-		if (ens_status == myEns.VALIDITY_FLAG_START_UP) or (ens_status == myEns.VALIDITY_FLAG_NORMAL):
-			print("ENS160 is warmed up! ")
-			warming_up = False
+# Wait for the sensor to warm up before we enter our main loop 
+warming_up = True
+while warming_up:
+	print("Waiting for the device to warm up...")
+	ens_status = myEns.get_flags()
 
-		if ens_status == myEns.VALIDITY_FLAG_INVALID: 
-			print("Invalid Ouput...Freezing.")
-			while True: 
-				pass
-		
-		qwiic_i2c.delay_ms(1000)
+	print(str(ens_status))
 
-	# Now enter main loop
-	while True:
-		if myEns.check_data_status():
-			print("Air Quality Index (1-5) : ", myEns.get_aqi())
-			print("Total Volatile Organic Compounds (ppb): ", myEns.get_tvoc())
-			print("CO2 concentration (ppm): ", myEns.get_eco2())
-			print("\n------------------------\n")
-		
-		qwiic_i2c.delay_ms(200)
+	if (ens_status == myEns.VALIDITY_FLAG_START_UP) or (ens_status == myEns.VALIDITY_FLAG_NORMAL):
+		print("ENS160 is warmed up! ")
+		warming_up = False
 
+	if ens_status == myEns.VALIDITY_FLAG_INVALID: 
+		print("Invalid Ouput...Freezing.")
+		while True: 
+			pass
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	qwiic_i2c.delay_ms(1000)
+
+# Now enter main loop
+while True:
+	if myEns.check_data_status():
+		print("Air Quality Index (1-5) : ", myEns.get_aqi())
+		print("Total Volatile Organic Compounds (ppb): ", myEns.get_tvoc())
+		print("CO2 concentration (ppm): ", myEns.get_eco2())
+		print("\n------------------------\n")
+
+	qwiic_i2c.delay_ms(200)

@@ -50,49 +50,39 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 7\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 7\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.clear_screen()
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.clear_screen()
 
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
-	myLCD.print("Hello World!")
-	
-	while True:
-		# scroll 13 positions (string length) to the left
-		# to move it offscreen left:
-		for i in range(13):
-			myLCD.scroll_display_left() # scroll one position left
-			qwiic_i2c.delay_ms(150) # wait a bit
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+myLCD.print("Hello World!")
 
-		# scroll 29 positions (string length + display length) to the right
-		# to move it offscreen right:
-		for i in range(29):
-			myLCD.scroll_display_right() # scroll one position right
-			qwiic_i2c.delay_ms(150) # wait a bit
+while True:
+	# scroll 13 positions (string length) to the left
+	# to move it offscreen left:
+	for i in range(13):
+		myLCD.scroll_display_left() # scroll one position left
+		qwiic_i2c.delay_ms(150) # wait a bit
 
-		# scroll 16 positions (display length + string length) to the left
-		# to move it back to center:
-		for i in range(16):
-			myLCD.scroll_display_left() # scroll one position left
-			qwiic_i2c.delay_ms(150) # wait a bit
+	# scroll 29 positions (string length + display length) to the right
+	# to move it offscreen right:
+	for i in range(29):
+		myLCD.scroll_display_right() # scroll one position right
+		qwiic_i2c.delay_ms(150) # wait a bit
 
-		qwiic_i2c.delay_ms(1000) # delay at the end of the full loop
+	# scroll 16 positions (display length + string length) to the left
+	# to move it back to center:
+	for i in range(16):
+		myLCD.scroll_display_left() # scroll one position left
+		qwiic_i2c.delay_ms(150) # wait a bit
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 7")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(1000) # delay at the end of the full loop

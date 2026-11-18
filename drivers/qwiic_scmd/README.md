@@ -95,36 +95,27 @@ R_MTR = 0
 FWD = 0
 
 
-def run_example():
-    print("Motor Test.")
-    my_motor = qwiic_scmd.QwiicSCMD()
+print("Motor Test.")
+my_motor = qwiic_scmd.QwiicSCMD()
 
-    if not my_motor.is_connected():
-        print("Motor Driver not connected. Check connections.", file=sys.stderr)
-        return
+if not my_motor.is_connected():
+    print("Motor Driver not connected. Check connections.", file=sys.stderr)
+    sys.exit(1)
 
-    my_motor.begin()
-    my_motor.set_drive(R_MTR, FWD, 0)
-    my_motor.enable()
+my_motor.begin()
+my_motor.set_drive(R_MTR, FWD, 0)
+my_motor.enable()
 
-    try:
-        while True:
-            for speed in range(20, 255):
-                my_motor.set_drive(R_MTR, FWD, speed)
-                qwiic_i2c.delay_ms(50)
-            for speed in range(254, 20, -1):
-                my_motor.set_drive(R_MTR, FWD, speed)
-                qwiic_i2c.delay_ms(50)
-    finally:
-        my_motor.disable()
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("Ending example.")
-        sys.exit(0)
+try:
+    while True:
+        for speed in range(20, 255):
+            my_motor.set_drive(R_MTR, FWD, speed)
+            qwiic_i2c.delay_ms(50)
+        for speed in range(254, 20, -1):
+            my_motor.set_drive(R_MTR, FWD, speed)
+            qwiic_i2c.delay_ms(50)
+finally:
+    my_motor.disable()
 ```
 
 ## Documentation

@@ -57,74 +57,65 @@ import qwiic_i2c
 import sys
 
 
-def run_example():
+print("\nSparkFun MAX3010x Photodetector - Example 5\n")
+sensor = qwiic_max3010x.QwiicMAX3010x()
 
-	print("\nSparkFun MAX3010x Photodetector - Example 5\n")
-	sensor = qwiic_max3010x.QwiicMAX3010x()
+if not sensor.begin():
+	print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("The Qwiic MAX3010x is connected.")
 
-	if not sensor.begin():
-		print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("The Qwiic MAX3010x is connected.")
+print("Place your index finger on the sensor with steady pressure.")
 
-	print("Place your index finger on the sensor with steady pressure.")
+sensor.setup()
+print("Setup complete.")
 
-	sensor.setup()
-	print("Setup complete.")
+sensor.set_pulse_amplitude_red(0x0A) # Turn Red LED to low to indicate sensor is running
+sensor.set_pulse_amplitude_green(0) # Turn off Green LED
 
-	sensor.set_pulse_amplitude_red(0x0A) # Turn Red LED to low to indicate sensor is running
-	sensor.set_pulse_amplitude_green(0) # Turn off Green LED
+RATE_SIZE = 4 # Increase this for more averaging. 4 is good.
+rates = list(range(RATE_SIZE)) # list of heart rates
+rate_spot = 0
+last_beat = 0 # Time at which the last beat occurred
+beats_per_minute = 0.00
+beat_avg = 0
+samples_taken = 0 # Counter for calculating the hz or read rate
+start_time = qwiic_i2c.ticks_ms() # Used to calculate measurement rate
 
-	RATE_SIZE = 4 # Increase this for more averaging. 4 is good.
-	rates = list(range(RATE_SIZE)) # list of heart rates
-	rate_spot = 0
-	last_beat = 0 # Time at which the last beat occurred
-	beats_per_minute = 0.00
-	beat_avg = 0
-	samples_taken = 0 # Counter for calculating the hz or read rate
-	start_time = qwiic_i2c.ticks_ms() # Used to calculate measurement rate
-	
-	while True:
-                
-		ir_value = sensor.get_ir()
-		samples_taken += 1
-		if sensor.check_for_beat(ir_value):
-			# We sensed a beat!
-			print('BEAT')
-			delta = qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), last_beat)
-			last_beat = qwiic_i2c.ticks_ms()	
-	
-			beats_per_minute = 60 / (delta / 1000.0)
-			beats_per_minute = round(beats_per_minute,1)
-	
-			if beats_per_minute < 255 and beats_per_minute > 20:
-				rate_spot += 1
-				rate_spot %= RATE_SIZE # Wrap variable
-				rates[rate_spot] = beats_per_minute # Store this reading in the array
+while True:
 
-				# Take average of readings
-				beat_avg = 0
-				for x in range(0, RATE_SIZE):
-					beat_avg += rates[x]
-				beat_avg /= RATE_SIZE
-				beat_avg = round(beat_avg)
-        
-		hz = round(float(samples_taken) / ( qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), start_time) / 1000.0 ) , 2)
-		if (samples_taken % 200 ) == 0:
-                        
-			print(\
-				'IR=', ir_value , ' \t',\
+	ir_value = sensor.get_ir()
+	samples_taken += 1
+	if sensor.check_for_beat(ir_value):
+		# We sensed a beat!
+		print('BEAT')
+		delta = qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), last_beat)
+		last_beat = qwiic_i2c.ticks_ms()	
+
+		beats_per_minute = 60 / (delta / 1000.0)
+		beats_per_minute = round(beats_per_minute,1)
+
+		if beats_per_minute < 255 and beats_per_minute > 20:
+			rate_spot += 1
+			rate_spot %= RATE_SIZE # Wrap variable
+			rates[rate_spot] = beats_per_minute # Store this reading in the array
+
+			# Take average of readings
+			beat_avg = 0
+			for x in range(0, RATE_SIZE):
+				beat_avg += rates[x]
+			beat_avg /= RATE_SIZE
+			beat_avg = round(beat_avg)
+
+	hz = round(float(samples_taken) / ( qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), start_time) / 1000.0 ) , 2)
+	if (samples_taken % 200 ) == 0:
+
+		print(\
+			'IR=', ir_value , ' \t',\
             				'BPM=', beats_per_minute , '\t',\
                                                                                 #'DCE', get_dce() , '\t',\
             				'Avg=', beat_avg , '\t',\
-				'hz=', hz, \
-				)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 5")
-		sys.exit(0)
+			'hz=', hz, \
+			)

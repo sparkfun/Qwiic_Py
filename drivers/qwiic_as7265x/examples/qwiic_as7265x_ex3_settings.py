@@ -36,98 +36,91 @@
 import qwiic_as7265x
 import sys
 
-def run_example():
-    print("\nQwiic Spectral Triad Example 3 - Settings\n")
 
-    print("Point the Triad away and press a key to begin with illumination...")
-    input()
+print("\nQwiic Spectral Triad Example 3 - Settings\n")
 
-    # Create instance of device
-    myAS7265x = qwiic_as7265x.QwiicAS7265x()
+print("Point the Triad away and press a key to begin with illumination...")
+input()
 
-    # Check if it's connected
-    if myAS7265x.is_connected() == False:
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+# Create instance of device
+myAS7265x = qwiic_as7265x.QwiicAS7265x()
 
-    # Initialize the device
-    if myAS7265x.begin() == False:
-        print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
-        return
-    
-    # There are four gain settings. There are four gain settings. It is possible to saturate the reading so don't simply jump to 64x.
-    # GAIN_1X  # 1x
-    # GAIN_37X # 3.7x
-    # GAIN_16X # 16x
-    # GAIN_64X # 64x (default)
-    myAS7265x.set_gain(myAS7265x.GAIN_16X)
+# Check if it's connected
+if myAS7265x.is_connected() == False:
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    # There are four measurement modes, 
-    # MEASUREMENT_MODE_4CHAN     # 4-channel reading 
-                                # on the as7262: V, B, G, Y (O and R will be 0)
-                                # on the as7263: S, T, U, V (R and W will be 0)
-    # MEASUREMENT_MODE_4CHAN2    # 4-channel reading, of 2nd set of channels
-                                # on the as7262: G, Y, O, R (V and B will be 0)
-                                # on the as7263: R, T, U, W (S and V will be 0)
-    # MEASUREMENT_MODE_6CHAN_CONTINUOUS # 6-channel continuous reading
-    # MEASUREMENT_MODE_6CHAN_ONE_SHOT (default) # 6-channel one-shot reading
-    myAS7265x.set_measurement_mode(myAS7265x.MEASUREMENT_MODE_6CHAN_ONE_SHOT)
+# Initialize the device
+if myAS7265x.begin() == False:
+    print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
+    sys.exit(1)
 
-    # Integration cycles is from 0 (2.78ms) to 255 (711ms)
-    # myAS7265x.set_integration_cycles(49) # default is 50*2.8ms = 140ms per reading
-    myAS7265x.set_integration_cycles(1) # 2*2.8ms = 5.6ms per reading
+# There are four gain settings. There are four gain settings. It is possible to saturate the reading so don't simply jump to 64x.
+# GAIN_1X  # 1x
+# GAIN_37X # 3.7x
+# GAIN_16X # 16x
+# GAIN_64X # 64x (default)
+myAS7265x.set_gain(myAS7265x.GAIN_16X)
 
-    # Drive current can be set for each LED, but each LED has a different max current
-    # LED_CURRENT_LIMIT_12_5MA # 12.5mA (default)
-    # LED_CURRENT_LIMIT_25MA  # 25mA (NOT ALLOWED FOR UV)
-    # LED_CURRENT_LIMIT_50MA  # 50mA (NOT ALLOWED FOR UV)
-    # LED_CURRENT_LIMIT_100MA # 100mA (NOT ALLOWED FOR UV OR IR)
-    myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_WHITE) 
+# There are four measurement modes, 
+# MEASUREMENT_MODE_4CHAN     # 4-channel reading 
+                            # on the as7262: V, B, G, Y (O and R will be 0)
+                            # on the as7263: S, T, U, V (R and W will be 0)
+# MEASUREMENT_MODE_4CHAN2    # 4-channel reading, of 2nd set of channels
+                            # on the as7262: G, Y, O, R (V and B will be 0)
+                            # on the as7263: R, T, U, W (S and V will be 0)
+# MEASUREMENT_MODE_6CHAN_CONTINUOUS # 6-channel continuous reading
+# MEASUREMENT_MODE_6CHAN_ONE_SHOT (default) # 6-channel one-shot reading
+myAS7265x.set_measurement_mode(myAS7265x.MEASUREMENT_MODE_6CHAN_ONE_SHOT)
 
-    # UV LED has max forward current of 30mA so DO NOT set the drive current higher
-    myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_UV)
-    
-    # IR LED has max forward current of 65mA so DO NOT set the drive current higher
-    myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_IR)
+# Integration cycles is from 0 (2.78ms) to 255 (711ms)
+# myAS7265x.set_integration_cycles(49) # default is 50*2.8ms = 140ms per reading
+myAS7265x.set_integration_cycles(1) # 2*2.8ms = 5.6ms per reading
 
-    # The status indicator Blue LED can be enabled/disabled and have its current set
-    # can also call enable_indicator() # Default
-    myAS7265x.disable_indicator(); 
-    
-    # The interrupt pin is active low and can be enabled or disabled
-    # can also call disable_interrupt()
-    myAS7265x.enable_interrupt(); # Default
+# Drive current can be set for each LED, but each LED has a different max current
+# LED_CURRENT_LIMIT_12_5MA # 12.5mA (default)
+# LED_CURRENT_LIMIT_25MA  # 25mA (NOT ALLOWED FOR UV)
+# LED_CURRENT_LIMIT_50MA  # 50mA (NOT ALLOWED FOR UV)
+# LED_CURRENT_LIMIT_100MA # 100mA (NOT ALLOWED FOR UV OR IR)
+myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_WHITE) 
 
-    print("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W,K,L")
+# UV LED has max forward current of 30mA so DO NOT set the drive current higher
+myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_UV)
 
-    while True:
-        # This is a hard wait while all 18 channels are measured
-        myAS7265x.take_measurements_with_bulb()
-        print(str(myAS7265x.get_calibrated_a()) + ",", end="")  # 410nm
-        print(str(myAS7265x.get_calibrated_b()) + ",", end="")  # 435nm
-        print(str(myAS7265x.get_calibrated_c()) + ",", end="")  # 460nm
-        print(str(myAS7265x.get_calibrated_d()) + ",", end="")  # 485nm
-        print(str(myAS7265x.get_calibrated_e()) + ",", end="")  # 510nm
-        print(str(myAS7265x.get_calibrated_f()) + ",", end="")  # 535nm
+# IR LED has max forward current of 65mA so DO NOT set the drive current higher
+myAS7265x.set_bulb_current(myAS7265x.LED_CURRENT_LIMIT_12_5MA, myAS7265x.LED_IR)
 
-        print(str(myAS7265x.get_calibrated_g()) + ",", end="")  # 560nm
-        print(str(myAS7265x.get_calibrated_h()) + ",", end="")  # 585nm
-        print(str(myAS7265x.get_calibrated_r()) + ",", end="")  # 610nm
-        print(str(myAS7265x.get_calibrated_i()) + ",", end="")  # 645nm
-        print(str(myAS7265x.get_calibrated_s()) + ",", end="")  # 680nm
-        print(str(myAS7265x.get_calibrated_j()) + ",", end="")  # 705nm
+# The status indicator Blue LED can be enabled/disabled and have its current set
+# can also call enable_indicator() # Default
+myAS7265x.disable_indicator(); 
 
-        print(str(myAS7265x.get_calibrated_t()) + ",", end="")  # 730nm
-        print(str(myAS7265x.get_calibrated_u()) + ",", end="")  # 760nm
-        print(str(myAS7265x.get_calibrated_v()) + ",", end="")  # 810nm
-        print(str(myAS7265x.get_calibrated_w()) + ",", end="")  # 860nm
-        print(str(myAS7265x.get_calibrated_k()) + ",", end="")  # 900nm
-        print(str(myAS7265x.get_calibrated_l()))  # 940nm	
+# The interrupt pin is active low and can be enabled or disabled
+# can also call disable_interrupt()
+myAS7265x.enable_interrupt(); # Default
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example")
-        sys.exit(0)
+print("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W,K,L")
+
+while True:
+    # This is a hard wait while all 18 channels are measured
+    myAS7265x.take_measurements_with_bulb()
+    print(str(myAS7265x.get_calibrated_a()) + ",", end="")  # 410nm
+    print(str(myAS7265x.get_calibrated_b()) + ",", end="")  # 435nm
+    print(str(myAS7265x.get_calibrated_c()) + ",", end="")  # 460nm
+    print(str(myAS7265x.get_calibrated_d()) + ",", end="")  # 485nm
+    print(str(myAS7265x.get_calibrated_e()) + ",", end="")  # 510nm
+    print(str(myAS7265x.get_calibrated_f()) + ",", end="")  # 535nm
+
+    print(str(myAS7265x.get_calibrated_g()) + ",", end="")  # 560nm
+    print(str(myAS7265x.get_calibrated_h()) + ",", end="")  # 585nm
+    print(str(myAS7265x.get_calibrated_r()) + ",", end="")  # 610nm
+    print(str(myAS7265x.get_calibrated_i()) + ",", end="")  # 645nm
+    print(str(myAS7265x.get_calibrated_s()) + ",", end="")  # 680nm
+    print(str(myAS7265x.get_calibrated_j()) + ",", end="")  # 705nm
+
+    print(str(myAS7265x.get_calibrated_t()) + ",", end="")  # 730nm
+    print(str(myAS7265x.get_calibrated_u()) + ",", end="")  # 760nm
+    print(str(myAS7265x.get_calibrated_v()) + ",", end="")  # 810nm
+    print(str(myAS7265x.get_calibrated_w()) + ",", end="")  # 860nm
+    print(str(myAS7265x.get_calibrated_k()) + ",", end="")  # 900nm
+    print(str(myAS7265x.get_calibrated_l()))  # 940nm	

@@ -37,31 +37,24 @@ import qwiic_rv8803
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic RV8803 Example 2 - Print Time\n")
 
-	# Create instance of device
-	myRTC = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 2 - Print Time\n")
 
-	# Check if it's connected
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myRTC = qwiic_rv8803.QwiicRV8803()
 
-	# Initialize the device
-	myRTC.begin()
+# Check if it's connected
+if myRTC.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		myRTC.update_time()
-		print ("Current Time: ", end="")
-		print (myRTC.string_date_usa(), end="")
-		print (" ", myRTC.string_time())
-		qwiic_i2c.delay_ms(1000)
+# Initialize the device
+myRTC.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	myRTC.update_time()
+	print ("Current Time: ", end="")
+	print (myRTC.string_date_usa(), end="")
+	print (" ", myRTC.string_time())
+	qwiic_i2c.delay_ms(1000)

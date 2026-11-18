@@ -43,36 +43,29 @@ import qwiic_i2c
 device_address = qwiic_ultrasonic.QwiicUltrasonic.DEFAULT_ADDRESS
 # device_address = 0x00
 
-def run_example():
-	print("\nQwiic Ultrasonic Example 1 - Basic Readings\n")
 
-	# Create instance of device
-	my_ultrasonic = qwiic_ultrasonic.QwiicUltrasonic(address=device_address)
+print("\nQwiic Ultrasonic Example 1 - Basic Readings\n")
 
-	# Check if it's connected
-	if not my_ultrasonic.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_ultrasonic = qwiic_ultrasonic.QwiicUltrasonic(address=device_address)
 
-	# Initialize the device
-	my_ultrasonic.begin()
+# Check if it's connected
+if not my_ultrasonic.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Loop forever
-	while True:
-		# Get measurement from sensor. Note that the measured distance actually
-		# comes from the previous trigger, so measurements will be slightly delayed
-		distance = my_ultrasonic.trigger_and_read()
+# Initialize the device
+my_ultrasonic.begin()
 
-		# Print measurement
-		print("Distance (mm):", distance)
+# Loop forever
+while True:
+	# Get measurement from sensor. Note that the measured distance actually
+	# comes from the previous trigger, so measurements will be slightly delayed
+	distance = my_ultrasonic.trigger_and_read()
 
-		# Wait a bit
-		qwiic_i2c.delay_ms(100)
+	# Print measurement
+	print("Distance (mm):", distance)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+	# Wait a bit
+	qwiic_i2c.delay_ms(100)

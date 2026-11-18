@@ -40,29 +40,22 @@ import qwiic_ads1015
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic ADS1015 Example 3 - Address\n")
 
-	# Create instance of device
-	# note, you must cut a trace and close the "0x49" jumper for this to work.
-	myAds = qwiic_ads1015.QwiicADS1015(0x49) # 0x49 is the address of the ADS1015 with the jumper soldered (default is 0x48)
+print("\nQwiic ADS1015 Example 3 - Address\n")
 
-	# Check if it's connected
-	if myAds.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+# note, you must cut a trace and close the "0x49" jumper for this to work.
+myAds = qwiic_ads1015.QwiicADS1015(0x49) # 0x49 is the address of the ADS1015 with the jumper soldered (default is 0x48)
 
-	myAds.begin()
+# Check if it's connected
+if myAds.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		channel_A3 = myAds.get_single_ended(3)
-		print("A3: ", channel_A3)
-		qwiic_i2c.delay_ms(50)
+myAds.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 3")
-		sys.exit(0)
+while True:
+	channel_A3 = myAds.get_single_ended(3)
+	print("A3: ", channel_A3)
+	qwiic_i2c.delay_ms(50)

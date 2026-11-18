@@ -50,46 +50,38 @@ import sys
 # If you've already changed the I2C address, change this to the current address!
 current_address = qwiic_rfid.QwiicRFID.available_addresses[0]
 
-def run_example():
 
-    print("\nSparkFun Qwiic RFID Reader Example 3")
-    my_rfid = qwiic_rfid.QwiicRFID(current_address)
+print("\nSparkFun Qwiic RFID Reader Example 3")
+my_rfid = qwiic_rfid.QwiicRFID(current_address)
 
+if my_rfid.begin() == False:
+    print("\nThe Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
+
+print("\nReady!")
+
+print("Enter a new I2C address for the Qwiic RFID Reader to use.")
+print("Any address from 0x08 to 0x77 works.")
+print("Don't use the 0x prefix. For instance if you wanted to")
+print("change the address to 0x5B, you would type 5B and hit enter.")
+
+new_address = input("New Address: ")
+new_address = int(new_address, 16)
+
+# Check if the user entered a valid address
+if new_address >= 0x08 and new_address <= 0x77:
+    print("Characters received and new address valid!")
+    print("Attempting to set RFID reader address...")
+
+    my_rfid.change_address(new_address)
+    print("Address successfully changed!")
+    # Check that the RFID Reader acknowledges on new address
+    qwiic_i2c.delay_ms(20)
     if my_rfid.begin() == False:
-        print("\nThe Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+        print("The Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
 
-    print("\nReady!")
+    else:
+        print("RFID Reader acknowledged on new address!")
 
-    print("Enter a new I2C address for the Qwiic RFID Reader to use.")
-    print("Any address from 0x08 to 0x77 works.")
-    print("Don't use the 0x prefix. For instance if you wanted to")
-    print("change the address to 0x5B, you would type 5B and hit enter.")
-
-    new_address = input("New Address: ")
-    new_address = int(new_address, 16)
-
-    # Check if the user entered a valid address
-    if new_address >= 0x08 and new_address <= 0x77:
-        print("Characters received and new address valid!")
-        print("Attempting to set RFID reader address...")
-        
-        my_rfid.change_address(new_address)
-        print("Address successfully changed!")
-        # Check that the RFID Reader acknowledges on new address
-        qwiic_i2c.delay_ms(20)
-        if my_rfid.begin() == False:
-            print("The Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
-
-        else:
-            print("RFID Reader acknowledged on new address!")
-    
-    else: 
-        print("Address entered not a valid I2C address")
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 3")
-        sys.exit(0)
+else: 
+    print("Address entered not a valid I2C address")

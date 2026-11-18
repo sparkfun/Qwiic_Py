@@ -92,42 +92,33 @@ import qwiic_keypad
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Qwiic Keypad Example 1\n")
-    my_keypad = qwiic_keypad.QwiicKeypad()
+print("\nSparkFun Qwiic Keypad Example 1\n")
+my_keypad = qwiic_keypad.QwiicKeypad()
 
-    if not my_keypad.is_connected():
-        print("The Qwiic Keypad device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_keypad.is_connected():
+    print("The Qwiic Keypad device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_keypad.begin()
+my_keypad.begin()
 
-    print("Initialized. Firmware Version: %s" % my_keypad.get_version())
-    print("Press a button: * to do a space. # to go to next line.")
+print("Initialized. Firmware Version: %s" % my_keypad.get_version())
+print("Press a button: * to do a space. # to go to next line.")
 
-    while True:
-        # Necessary for the keypad to pull a button from the stack to the readable register
-        my_keypad.update_fifo()
-        button = my_keypad.get_button()
+while True:
+    # Necessary for the keypad to pull a button from the stack to the readable register
+    my_keypad.update_fifo()
+    button = my_keypad.get_button()
 
-        if button != 0:
-            char_button = chr(button)
-            if char_button == "#":
-                print()
-            elif char_button == "*":
-                print(" ", end="")
-            else:
-                print(char_button, end="")
+    if button != 0:
+        char_button = chr(button)
+        if char_button == "#":
+            print()
+        elif char_button == "*":
+            print(" ", end="")
+        else:
+            print(char_button, end="")
 
-        qwiic_i2c.delay_ms(250)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+    qwiic_i2c.delay_ms(250)
 ```
 
 ## Documentation

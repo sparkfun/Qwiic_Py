@@ -36,80 +36,73 @@
 import qwiic_cap1203
 import sys
 
-def run_example():
-	print("\nQwiic CAP1203 Example 4 - Power Button\n")
 
-	# Create instance of device
-	my_device = qwiic_cap1203.QwiicCAP1203()
+print("\nQwiic CAP1203 Example 4 - Power Button\n")
 
-	# Check if it's connected
-	if my_device.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_device = qwiic_cap1203.QwiicCAP1203()
 
-	# Initialize the device
-	my_device.begin()
+# Check if it's connected
+if my_device.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Set which pad acts as the power button: PAD_LEFT, PAD_MIDDLE, PAD_RIGHT
-	# my_device.set_power_button_pad(my_device.PAD_LEFT)
-	my_device.set_power_button_pad(my_device.PAD_MIDDLE)
-	# my_device.set_power_button_pad(my_device.PAD_RIGHT)
+# Initialize the device
+my_device.begin()
 
-    # Get the current pad which acts as the power button.
-    # The function returns the pad as an interger which
-    # maps to a specific position.
-	# 
-    # PAD   POSITION
-    # 1     Left
-    # 2     Middle
-    # 3     Right
-	pad = my_device.get_power_button_pad()
-	if pad == 1:
-		print("Power Button Pad: Left")
-	elif pad == 2:
-		print("Power Button Pad: Middle")
-	elif pad == 3:
-		print("Power Button Pad: Right")
+# Set which pad acts as the power button: PAD_LEFT, PAD_MIDDLE, PAD_RIGHT
+# my_device.set_power_button_pad(my_device.PAD_LEFT)
+my_device.set_power_button_pad(my_device.PAD_MIDDLE)
+# my_device.set_power_button_pad(my_device.PAD_RIGHT)
 
-	# Set the length of time (in ms) which the designated
-	# power button must indicate a touch before being
-	# recognized as a power button touch.
-	# my_device.set_power_button_time(my_device.PWR_TIME_280_MS)    # 280 ms
-	# my_device.set_power_button_time(my_device.PWR_TIME_560_MS)    # 560 ms
-	# my_device.set_power_button_time(my_device.PWR_TIME_1120_MS)   # 1120 ms
-	my_device.set_power_button_time(my_device.PWR_TIME_2240_MS)  # 2240 ms
+# Get the current pad which acts as the power button.
+# The function returns the pad as an interger which
+# maps to a specific position.
+# 
+# PAD   POSITION
+# 1     Left
+# 2     Middle
+# 3     Right
+pad = my_device.get_power_button_pad()
+if pad == 1:
+	print("Power Button Pad: Left")
+elif pad == 2:
+	print("Power Button Pad: Middle")
+elif pad == 3:
+	print("Power Button Pad: Right")
 
-	# Get the length of time the designated power button
-	# must indicate a touch before being recognized as a
-	# power button touch.
-	print("Power Button Time: " + str(my_device.get_power_button_time()) + " ms")
+# Set the length of time (in ms) which the designated
+# power button must indicate a touch before being
+# recognized as a power button touch.
+# my_device.set_power_button_time(my_device.PWR_TIME_280_MS)    # 280 ms
+# my_device.set_power_button_time(my_device.PWR_TIME_560_MS)    # 560 ms
+# my_device.set_power_button_time(my_device.PWR_TIME_1120_MS)   # 1120 ms
+my_device.set_power_button_time(my_device.PWR_TIME_2240_MS)  # 2240 ms
 
-	# Enable or disable the power button functionality.
-	# When the power button is ENABLED, the specified pad
-	# (from set_power_button_pad()) acts as a power
-	# button. When the power button is DISABLED, all pads
-	# act as regular capacitive touch sensors.
-	my_device.set_power_button_enabled()  # Enable power button
-	# my_device.set_power_button_disabled()  # Disable power button
+# Get the length of time the designated power button
+# must indicate a touch before being recognized as a
+# power button touch.
+print("Power Button Time: " + str(my_device.get_power_button_time()) + " ms")
 
-	# Returns the state of the power button. Returns true
-	# if ENABLED, otherwise returns false.
-	if my_device.is_power_button_enabled() == True:
-		print("Power Button: ENABLED")
-	else:
-		print("Power Button: DISABLED")
+# Enable or disable the power button functionality.
+# When the power button is ENABLED, the specified pad
+# (from set_power_button_pad()) acts as a power
+# button. When the power button is DISABLED, all pads
+# act as regular capacitive touch sensors.
+my_device.set_power_button_enabled()  # Enable power button
+# my_device.set_power_button_disabled()  # Disable power button
 
-	while True:
-		if my_device.is_power_button_touched():
-			print("Power Button")
-			while my_device.is_power_button_touched():
-				# Wait until user removes finger
-				pass
+# Returns the state of the power button. Returns true
+# if ENABLED, otherwise returns false.
+if my_device.is_power_button_enabled() == True:
+	print("Power Button: ENABLED")
+else:
+	print("Power Button: DISABLED")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if my_device.is_power_button_touched():
+		print("Power Button")
+		while my_device.is_power_button_touched():
+			# Wait until user removes finger
+			pass

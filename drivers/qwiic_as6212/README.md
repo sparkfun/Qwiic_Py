@@ -94,27 +94,18 @@ import qwiic_as6212
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Qwiic AS6212 Sensor Example\n")
-    my_sensor = qwiic_as6212.QwiicAS6212()
+print("\nSparkFun Qwiic AS6212 Sensor Example\n")
+my_sensor = qwiic_as6212.QwiicAS6212()
 
-    if not my_sensor.is_connected():
-        print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_sensor.is_connected():
+    print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_sensor.begin()
+my_sensor.begin()
 
-    while True:
-        print("Temperature: %.2fF" % my_sensor.read_temp_f())
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    print("Temperature: %.2fF" % my_sensor.read_temp_f())
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

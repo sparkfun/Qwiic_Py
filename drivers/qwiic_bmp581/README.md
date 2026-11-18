@@ -93,31 +93,22 @@ import qwiic_bmp581
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic BMP581 Example 1 - Basic Readings\n")
-    my_bmp581 = qwiic_bmp581.QwiicBMP581()
+print("\nQwiic BMP581 Example 1 - Basic Readings\n")
+my_bmp581 = qwiic_bmp581.QwiicBMP581()
 
-    if not my_bmp581.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_bmp581.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    if not my_bmp581.begin():
-        print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
-        return
+if not my_bmp581.begin():
+    print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-        data = my_bmp581.get_sensor_data()
-        print("Temperature (C): ", data.temperature, end="\t\t")
-        print("Pressure (Pa): ", data.pressure)
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    data = my_bmp581.get_sensor_data()
+    print("Temperature (C): ", data.temperature, end="\t\t")
+    print("Pressure (Pa): ", data.pressure)
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

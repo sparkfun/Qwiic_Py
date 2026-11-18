@@ -53,66 +53,57 @@ import qwiic_vl53l1x # Install the qwiic_vl53l1x driver too (pip, mip or circup)
 NUMBER_OF_SENSORS = 2 # Change this number if you have more than 2 VL53L1X sensors. Connect all sensors to lowest available ports on MUX
 
 
-def run_example():
-    print("\nSparkFun TCA9548A 8-Channel Mux Example 2\n")
+print("\nSparkFun TCA9548A 8-Channel Mux Example 2\n")
 
-    # Create an instance of our MUX object
-    my_tca = qwiic_tca9548a.QwiicTCA9548A()
+# Create an instance of our MUX object
+my_tca = qwiic_tca9548a.QwiicTCA9548A()
 
-    if not my_tca.is_connected():
-        print("The Qwiic TCA9548A 8-Channel Mux device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_tca.is_connected():
+    print("The Qwiic TCA9548A 8-Channel Mux device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    # Create a list of distance sensor objects
-    distance_sensors = [None] * NUMBER_OF_SENSORS
+# Create a list of distance sensor objects
+distance_sensors = [None] * NUMBER_OF_SENSORS
 
-    for i in range(NUMBER_OF_SENSORS):
-        distance_sensors[i] = qwiic_vl53l1x.QwiicVL53L1X()
+for i in range(NUMBER_OF_SENSORS):
+    distance_sensors[i] = qwiic_vl53l1x.QwiicVL53L1X()
 
-    print("Disabling all MUX Ports")
+print("Disabling all MUX Ports")
+my_tca.disable_all()
+print("Enabled channels:", my_tca.list_channels())
+
+# Now configure each sensor one at a time
+for i in range(NUMBER_OF_SENSORS):
+    print("Enabling sensor on channel", i)
     my_tca.disable_all()
-    print("Enabled channels:", my_tca.list_channels())
+    my_tca.enable_channels([i])
 
-    # Now configure each sensor one at a time
+    # If a device is connected, initialize it
+    while True:
+        if distance_sensors[i].begin():
+            print("Sensor", i, " connected!")
+            break
+        else:
+            print("Sensor", i, " not connected! Retrying...")
+            qwiic_i2c.delay_ms(500)
+
+while True:
+    # Loop through each sensor and enable its MUX channel then read the distance
     for i in range(NUMBER_OF_SENSORS):
-        print("Enabling sensor on channel", i)
+        # Enable the MUX channel for the sensor we want to read
         my_tca.disable_all()
         my_tca.enable_channels([i])
 
-        # If a device is connected, initialize it
-        while True:
-            if distance_sensors[i].begin():
-                print("Sensor", i, " connected!")
-                break
-            else:
-                print("Sensor", i, " not connected! Retrying...")
-                qwiic_i2c.delay_ms(500)
+        # Read distance from the sensor
+        distance_sensors[i].start_ranging()
+        qwiic_i2c.delay_ms(5)
+        distance = distance_sensors[i].get_distance()
+        qwiic_i2c.delay_ms(5)
+        distance_sensors[i].stop_ranging()
 
-    while True:
-        # Loop through each sensor and enable its MUX channel then read the distance
-        for i in range(NUMBER_OF_SENSORS):
-            # Enable the MUX channel for the sensor we want to read
-            my_tca.disable_all()
-            my_tca.enable_channels([i])
+        distance_inches = distance / 25.4
+        distance_feet = distance_inches / 12.0
 
-            # Read distance from the sensor
-            distance_sensors[i].start_ranging()
-            qwiic_i2c.delay_ms(5)
-            distance = distance_sensors[i].get_distance()
-            qwiic_i2c.delay_ms(5)
-            distance_sensors[i].stop_ranging()
+        print("Distance", i, "(in): ", distance_inches, "    Distance", i, "(ft): ", distance_feet)
 
-            distance_inches = distance / 25.4
-            distance_feet = distance_inches / 12.0
-
-            print("Distance", i, "(in): ", distance_inches, "    Distance", i, "(ft): ", distance_feet)
-
-        qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 2")
-        sys.exit(0)
+    qwiic_i2c.delay_ms(500)

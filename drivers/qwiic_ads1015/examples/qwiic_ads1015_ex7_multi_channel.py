@@ -43,72 +43,66 @@
 import qwiic_ads1015
 import sys
 
-def run_example():
-	print("\nQwiic ADS1015 Example 7 - MultiChannel\n")
-
-	myAds = qwiic_ads1015.QwiicADS1015()
-
-	# Check if it's connected
-	if myAds.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-
-	myAds.begin()
-
-	# Set the gain
-	# Possible Values are: 
-		# CONFIG_PGA_TWO_THIRDS,
-		# CONFIG_PGA_1,
-		# CONFIG_PGA_2,
-		# CONFIG_PGA_4,
-		# CONFIG_PGA_8,
-		# CONFIG_PGA_16
-
-	myAds.set_gain(myAds.CONFIG_PGA_2)
-
-	# Set the Sample Rate
-	# Possible Values are:
-		# CONFIG_RATE_128HZ
-		# CONFIG_RATE_250HZ
-		# CONFIG_RATE_490HZ
-		# CONFIG_RATE_920HZ
-		# CONFIG_RATE_1600HZ
-		# CONFIG_RATE_2400HZ
-		# CONFIG_RATE_3300HZ
-	myAds.set_sample_rate(myAds.CONFIG_RATE_1600HZ)
-
-	# 	For the fastest conversion timing, we need to check the Config Register Operational Status bit
-	#   to see when the conversion is complete - instead of using a fixed delay.
-	#   However, we can only do this if we use single-shot mode.
-	#   Because this breaks backward-compatibility, _useConversionReady is disabled by default.
-	#   To enable it, call:
-	myAds.use_conversion_ready(True)
-
-	while True:
-		channel_A0 = myAds.get_single_ended(0)
-		channel_A1 = myAds.get_single_ended(1)
-		
-		channel_A0_mV = myAds.get_single_ended_millivolts(0)
-		channel_A1_mV = myAds.get_single_ended_millivolts(1)
-		
-		# get_differential options are:
-			# CONFIG_MUX_DIFF_P0N1 # A0-A1 (default)
-			# CONFIG_MUX_DIFF_P0N3 # A0-A3
-			# CONFIG_MUX_DIFF_P1N3 # A1-A3
-			# CONFIG_MUX_DIFF_P2N3 # A2-A3
-		channel_A0_A1 = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P0N1)
-		channel_A0_A1_mV = myAds.get_differential_millivolts(myAds.CONFIG_MUX_DIFF_P0N1)
-
-
-		print("A0: ", channel_A0, "(", channel_A0_mV, "mv)", end = '\t')
-		print("A1: ", channel_A1, "(", channel_A1_mV, "mv)", end = '\t')
-		print("A0-A1: ", channel_A0_A1, "(", channel_A0_A1_mV, "mv)")
 		# No delay, go as fast as possible, only slowed by the time it takes to print()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 7")
-		sys.exit(0)
+
+print("\nQwiic ADS1015 Example 7 - MultiChannel\n")
+
+myAds = qwiic_ads1015.QwiicADS1015()
+
+# Check if it's connected
+if myAds.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+
+myAds.begin()
+
+# Set the gain
+# Possible Values are: 
+	# CONFIG_PGA_TWO_THIRDS,
+	# CONFIG_PGA_1,
+	# CONFIG_PGA_2,
+	# CONFIG_PGA_4,
+	# CONFIG_PGA_8,
+	# CONFIG_PGA_16
+
+myAds.set_gain(myAds.CONFIG_PGA_2)
+
+# Set the Sample Rate
+# Possible Values are:
+	# CONFIG_RATE_128HZ
+	# CONFIG_RATE_250HZ
+	# CONFIG_RATE_490HZ
+	# CONFIG_RATE_920HZ
+	# CONFIG_RATE_1600HZ
+	# CONFIG_RATE_2400HZ
+	# CONFIG_RATE_3300HZ
+myAds.set_sample_rate(myAds.CONFIG_RATE_1600HZ)
+
+# 	For the fastest conversion timing, we need to check the Config Register Operational Status bit
+#   to see when the conversion is complete - instead of using a fixed delay.
+#   However, we can only do this if we use single-shot mode.
+#   Because this breaks backward-compatibility, _useConversionReady is disabled by default.
+#   To enable it, call:
+myAds.use_conversion_ready(True)
+
+while True:
+	channel_A0 = myAds.get_single_ended(0)
+	channel_A1 = myAds.get_single_ended(1)
+
+	channel_A0_mV = myAds.get_single_ended_millivolts(0)
+	channel_A1_mV = myAds.get_single_ended_millivolts(1)
+
+	# get_differential options are:
+		# CONFIG_MUX_DIFF_P0N1 # A0-A1 (default)
+		# CONFIG_MUX_DIFF_P0N3 # A0-A3
+		# CONFIG_MUX_DIFF_P1N3 # A1-A3
+		# CONFIG_MUX_DIFF_P2N3 # A2-A3
+	channel_A0_A1 = myAds.get_differential(myAds.CONFIG_MUX_DIFF_P0N1)
+	channel_A0_A1_mV = myAds.get_differential_millivolts(myAds.CONFIG_MUX_DIFF_P0N1)
+
+
+	print("A0: ", channel_A0, "(", channel_A0_mV, "mv)", end = '\t')
+	print("A1: ", channel_A1, "(", channel_A1_mV, "mv)", end = '\t')
+	print("A0-A1: ", channel_A0_A1, "(", channel_A0_A1_mV, "mv)")

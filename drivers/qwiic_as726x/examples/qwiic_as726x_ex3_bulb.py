@@ -36,59 +36,52 @@
 import qwiic_as726x
 import sys
 
-def run_example():
-	print("\nQwiic AS726x Example 3 - Bulb\n")
 
-	# Create instance of device
-	myAS726x = qwiic_as726x.QwiicAS726x()
+print("\nQwiic AS726x Example 3 - Bulb\n")
 
-	# Check if it's connected
-	if myAS726x.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myAS726x = qwiic_as726x.QwiicAS726x()
 
-	# Set a desired custom Gain or Measurement Mode here, to be passed to the begin() function
-	gain = myAS726x.GAIN_16X
-	measurement_mode = myAS726x.MEASUREMENT_MODE_4CHAN # 4-channel reading 
-													 # on the as7262: V, B, G, Y (O and R will be 0)
-						 							 # on the as7263: S, T, U, V (R and W will be 0)
+# Check if it's connected
+if myAS726x.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Initialize the device with non-default settings
-	myAS726x.begin(gain, measurement_mode)
+# Set a desired custom Gain or Measurement Mode here, to be passed to the begin() function
+gain = myAS726x.GAIN_16X
+measurement_mode = myAS726x.MEASUREMENT_MODE_4CHAN # 4-channel reading 
+												 # on the as7262: V, B, G, Y (O and R will be 0)
+					 							 # on the as7263: S, T, U, V (R and W will be 0)
 
-	while True:
-		# Enable the bulb for our measurements
-		myAS726x.take_measurements_with_bulb()
+# Initialize the device with non-default settings
+myAS726x.begin(gain, measurement_mode)
 
-		# Check which device is connected
-		if myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7262:
-			# Visible readings
-			print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
-				myAS726x.get_calibrated_violet(),
-				myAS726x.get_calibrated_blue(),
-				myAS726x.get_calibrated_green(),
-				myAS726x.get_calibrated_yellow(),
-				myAS726x.get_calibrated_orange(),
-				myAS726x.get_calibrated_red()
-			), end="")
-		
-		elif myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7263:
-			# Near IR readings
-			print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
-				myAS726x.get_calibrated_r(),
-				myAS726x.get_calibrated_s(),
-				myAS726x.get_calibrated_t(),
-				myAS726x.get_calibrated_u(),
-				myAS726x.get_calibrated_v(),
-				myAS726x.get_calibrated_w()
-			), end="")
+while True:
+	# Enable the bulb for our measurements
+	myAS726x.take_measurements_with_bulb()
 
-		print(" tempF[{}]".format(myAS726x.get_temperature_f()))
+	# Check which device is connected
+	if myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7262:
+		# Visible readings
+		print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
+			myAS726x.get_calibrated_violet(),
+			myAS726x.get_calibrated_blue(),
+			myAS726x.get_calibrated_green(),
+			myAS726x.get_calibrated_yellow(),
+			myAS726x.get_calibrated_orange(),
+			myAS726x.get_calibrated_red()
+		), end="")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	elif myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7263:
+		# Near IR readings
+		print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
+			myAS726x.get_calibrated_r(),
+			myAS726x.get_calibrated_s(),
+			myAS726x.get_calibrated_t(),
+			myAS726x.get_calibrated_u(),
+			myAS726x.get_calibrated_v(),
+			myAS726x.get_calibrated_w()
+		), end="")
+
+	print(" tempF[{}]".format(myAS726x.get_temperature_f()))

@@ -42,38 +42,30 @@ import qwiic_led_stick
 import qwiic_i2c
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 4")
-    my_stick = qwiic_led_stick.QwiicLEDStick()
+print("\nSparkFun Qwiic LED Stick Example 4")
+my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    if my_stick.begin() == False:
-        print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
 
-    # Initialize LEDs as a rainbow followed by 1 white pixel
-    red_list = [255, 255, 170, 0, 0, 0, 0, 170, 255, 255]
-    green_list = [0, 170, 255, 255, 255, 170, 0, 0, 0, 255]
-    blue_list = [0, 0, 0, 0, 170, 255, 255, 255, 170, 255]
+# Initialize LEDs as a rainbow followed by 1 white pixel
+red_list = [255, 255, 170, 0, 0, 0, 0, 170, 255, 255]
+green_list = [0, 170, 255, 255, 255, 170, 0, 0, 0, 255]
+blue_list = [0, 0, 0, 0, 170, 255, 255, 255, 170, 255]
 
-    # Turn on the LED Stick according to the 3 arrays
-    my_stick.set_all_led_unique_color(red_list, green_list, blue_list, 10)
+# Turn on the LED Stick according to the 3 arrays
+my_stick.set_all_led_unique_color(red_list, green_list, blue_list, 10)
 
-    while True:
+while True:
 
-        # This will step through each available brightness setting
-        # Brightness values can be from 0 - 31
-        for i in range(0, 32):
-            my_stick.set_all_led_brightness(i)
+    # This will step through each available brightness setting
+    # Brightness values can be from 0 - 31
+    for i in range(0, 32):
+        my_stick.set_all_led_brightness(i)
 
-            print("\nBrightness level: " + str(i))
-            qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 4")
-        sys.exit(0)
+        print("\nBrightness level: " + str(i))
+        qwiic_i2c.delay_ms(1000)

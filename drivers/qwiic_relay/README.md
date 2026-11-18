@@ -95,32 +95,23 @@ import qwiic_i2c
 import qwiic_relay
 
 
-def run_example():
-    print("\nSparkFun Qwiic Relay Example 1 - Single\n")
+print("\nSparkFun Qwiic Relay Example 1 - Single\n")
 
-    # Be sure to initialize your relay with the proper address.
-    my_relay = qwiic_relay.QwiicRelay(qwiic_relay.SINGLE_RELAY_DEFAULT_ADDR)
+# Be sure to initialize your relay with the proper address.
+my_relay = qwiic_relay.QwiicRelay(qwiic_relay.SINGLE_RELAY_DEFAULT_ADDR)
 
-    if not my_relay.begin():
-        print("The Qwiic Relay isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_relay.begin():
+    print("The Qwiic Relay isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    for i in range(2):
-        my_relay.set_relay_on()
-        print("Relay state: " + str(my_relay.get_relay_state()))
-        qwiic_i2c.delay_ms(1000)
+for i in range(2):
+    my_relay.set_relay_on()
+    print("Relay state: " + str(my_relay.get_relay_state()))
+    qwiic_i2c.delay_ms(1000)
 
-        my_relay.set_relay_off()
-        print("Relay state: " + str(my_relay.get_relay_state()))
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+    my_relay.set_relay_off()
+    print("Relay state: " + str(my_relay.get_relay_state()))
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

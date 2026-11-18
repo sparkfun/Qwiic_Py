@@ -43,41 +43,33 @@ import qwiic_alphanumeric
 import qwiic_i2c
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic Alphanumeric - Example 3: Print Char")
-    my_display = qwiic_alphanumeric.QwiicAlphanumeric()
+print("\nSparkFun Qwiic Alphanumeric - Example 3: Print Char")
+my_display = qwiic_alphanumeric.QwiicAlphanumeric()
 
-    if my_display.begin() == False:
-        print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connection.", \
-            file=sys.stderr)
-        return
-    
-    print("\nQwiic Alphanumeric ready!")
-        
-    my_display.print_char('W', 0)
-    my_display.print_char('H', 1)
-    my_display.print_char('A', 2)
-    my_display.print_char('T', 3)
+if my_display.begin() == False:
+    print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connection.", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    my_display.update_display()
+print("\nQwiic Alphanumeric ready!")
 
-    qwiic_i2c.delay_ms(1000)
-    
-    # Display all available characters
-    for i in range(ord(' '), ord('~')):
-        if i is not ord(':') or ord('.'):
-            my_display.print_char(chr(i), 0)
-            my_display.print_char(chr(i), 1)
-            my_display.print_char(chr(i), 2)
-            my_display.print_char(chr(i), 3)
-            my_display.update_display()
-            qwiic_i2c.delay_ms(100)
-            my_display.clear()
+my_display.print_char('W', 0)
+my_display.print_char('H', 1)
+my_display.print_char('A', 2)
+my_display.print_char('T', 3)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 3")
-        sys.exit(0)
+my_display.update_display()
+
+qwiic_i2c.delay_ms(1000)
+
+# Display all available characters
+for i in range(ord(' '), ord('~')):
+    if i is not ord(':') or ord('.'):
+        my_display.print_char(chr(i), 0)
+        my_display.print_char(chr(i), 1)
+        my_display.print_char(chr(i), 2)
+        my_display.print_char(chr(i), 3)
+        my_display.update_display()
+        qwiic_i2c.delay_ms(100)
+        my_display.clear()

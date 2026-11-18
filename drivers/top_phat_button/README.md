@@ -90,38 +90,29 @@ import top_phat_button
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Top pHAT Button Example 1\n")
-    my_buttons = top_phat_button.TopPHATButton()
+print("\nSparkFun Top pHAT Button Example 1\n")
+my_buttons = top_phat_button.TopPHATButton()
 
-    if not my_buttons.is_connected():
-        print("The Top pHAT Button device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_buttons.is_connected():
+    print("The Top pHAT Button device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_buttons.set_pressed_interrupt(False)
-    my_buttons.set_clicked_interrupt(False)
+my_buttons.set_pressed_interrupt(False)
+my_buttons.set_clicked_interrupt(False)
 
-    while True:
-        # Update the button variables (a_pressed, a_clicked, ...)
-        my_buttons.get_button_pressed()
-        my_buttons.get_button_clicked()
-        if my_buttons.a_pressed:
-            print("A Pressed")
-        if my_buttons.a_clicked:
-            print("A Released")
-        if my_buttons.center_pressed:
-            print("Center Pressed")
-        if my_buttons.center_clicked:
-            print("Center Released")
-        qwiic_i2c.delay_ms(100)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    # Update the button variables (a_pressed, a_clicked, ...)
+    my_buttons.get_button_pressed()
+    my_buttons.get_button_clicked()
+    if my_buttons.a_pressed:
+        print("A Pressed")
+    if my_buttons.a_clicked:
+        print("A Released")
+    if my_buttons.center_pressed:
+        print("Center Pressed")
+    if my_buttons.center_clicked:
+        print("Center Released")
+    qwiic_i2c.delay_ms(100)
 ```
 
 ## Documentation

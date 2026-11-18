@@ -92,27 +92,18 @@ import qwiic_veml6030
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic Ambient Light Sensor Example 1 - Basic Readings\n")
-    light_sensor = qwiic_veml6030.QwiicVEML6030()
+print("\nQwiic Ambient Light Sensor Example 1 - Basic Readings\n")
+light_sensor = qwiic_veml6030.QwiicVEML6030()
 
-    if not light_sensor.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not light_sensor.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    light_sensor.begin()
+light_sensor.begin()
 
-    while True:
-        qwiic_i2c.delay_ms(1000)
-        print("Lux:\t%.1f" % light_sensor.read_light())
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    qwiic_i2c.delay_ms(1000)
+    print("Lux:\t%.1f" % light_sensor.read_light())
 ```
 
 ## Documentation

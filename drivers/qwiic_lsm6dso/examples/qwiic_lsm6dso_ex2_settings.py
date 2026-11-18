@@ -37,61 +37,54 @@ import qwiic_lsm6dso
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic LSM6DSO Example 2 - Settings\n")
 
-	# Create instance of device
-	my_imu = qwiic_lsm6dso.QwiicLSM6DSO()
+print("\nQwiic LSM6DSO Example 2 - Settings\n")
 
-	# Check if it's connected
-	if not my_imu.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_imu = qwiic_lsm6dso.QwiicLSM6DSO()
 
-	# Initialize the device
-	my_imu.begin()
+# Check if it's connected
+if not my_imu.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# The accelerometer range can be 2g, 4g, 8g, or 16g
-	# A higher range means less chance of clipping, but less resolution
-	my_imu.set_accel_range(my_imu.FS_XL_16G)
-	
-	# The gyroscope range can be 125dps, 250dps, 500dps, 1000dps, or 2000dps
-	# A higher range means less chance of clipping, but less resolution
-	my_imu.set_gyro_range(my_imu.FS_G_2000DPS)
-	
-	# Both the accelerometer and gyroscope can have independent data rates, but
-	# it's recommended to use the same rate for both. Valid choices are:
-	# 12.5Hz, 26Hz, 52Hz, 104Hz, 208Hz, 416Hz, 833Hz, 1660Hz, 3330Hz, and 6660Hz
-	# Higher data rates are more accurate, but use more power
-	my_imu.set_accel_data_rate(my_imu.ODR_6660HZ)
-	my_imu.set_gyro_data_rate(my_imu.ODR_6660HZ)
+# Initialize the device
+my_imu.begin()
 
-	# Note - if you want to minimize power consumption, the accelerometer and
-	# gyroscope can be disabled by setting the rate to zero (called DISABLE).
-	# Additionally, the accelerometer can be set to an even lower rate of 1.6Hz
-	# my_imu.set_accel_data_rate(my_imu.ODR_1_6HZ)
-	# my_imu.set_gyro_data_rate(my_imu.ODR_DISABLE)
+# The accelerometer range can be 2g, 4g, 8g, or 16g
+# A higher range means less chance of clipping, but less resolution
+my_imu.set_accel_range(my_imu.FS_XL_16G)
 
-	# Loop forever while printing data
-	while True:
-		# Read all the accelerometer and gyro data
-		acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z = my_imu.read_float_accel_gyro_all()
-		
-		# Now print the results!
-		print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (acc_x, acc_y, acc_z))
-		print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyr_x, gyr_y, gyr_z))
+# The gyroscope range can be 125dps, 250dps, 500dps, 1000dps, or 2000dps
+# A higher range means less chance of clipping, but less resolution
+my_imu.set_gyro_range(my_imu.FS_G_2000DPS)
 
-		# Add some space between readings
-		print()
+# Both the accelerometer and gyroscope can have independent data rates, but
+# it's recommended to use the same rate for both. Valid choices are:
+# 12.5Hz, 26Hz, 52Hz, 104Hz, 208Hz, 416Hz, 833Hz, 1660Hz, 3330Hz, and 6660Hz
+# Higher data rates are more accurate, but use more power
+my_imu.set_accel_data_rate(my_imu.ODR_6660HZ)
+my_imu.set_gyro_data_rate(my_imu.ODR_6660HZ)
 
-		# We'll do a very brief delay in order to log more data. This can help
-		# make it easier to see the difference between settings
-		qwiic_i2c.delay_ms(10)
+# Note - if you want to minimize power consumption, the accelerometer and
+# gyroscope can be disabled by setting the rate to zero (called DISABLE).
+# Additionally, the accelerometer can be set to an even lower rate of 1.6Hz
+# my_imu.set_accel_data_rate(my_imu.ODR_1_6HZ)
+# my_imu.set_gyro_data_rate(my_imu.ODR_DISABLE)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+# Loop forever while printing data
+while True:
+	# Read all the accelerometer and gyro data
+	acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z = my_imu.read_float_accel_gyro_all()
+
+	# Now print the results!
+	print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (acc_x, acc_y, acc_z))
+	print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyr_x, gyr_y, gyr_z))
+
+	# Add some space between readings
+	print()
+
+	# We'll do a very brief delay in order to log more data. This can help
+	# make it easier to see the difference between settings
+	qwiic_i2c.delay_ms(10)

@@ -71,24 +71,16 @@ def cycle_rainbow(led_stick, delay_ms):
     for b in range(255, 0, -1):
         led_stick.set_all_led_color(255, 0, b)
         qwiic_i2c.delay_ms(delay_ms)
-        
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 7")
-    my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    if my_stick.begin() == False:
-        print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
+print("\nSparkFun Qwiic LED Stick Example 7")
+my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    while True:
-        cycle_rainbow(my_stick, 10)
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 7")
-        sys.exit(0)
+while True:
+    cycle_rainbow(my_stick, 10)

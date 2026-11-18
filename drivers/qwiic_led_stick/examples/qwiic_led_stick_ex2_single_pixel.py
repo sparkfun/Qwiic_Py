@@ -41,33 +41,25 @@ import qwiic_led_stick
 import qwiic_i2c
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 2")
-    my_stick = qwiic_led_stick.QwiicLEDStick()
+print("\nSparkFun Qwiic LED Stick Example 2")
+my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    if my_stick.begin() == False:
-        print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
 
-    while True:
+while True:
 
-        # Turn all LEDs off
-        my_stick.led_off()
-        # Turn on LED #4, red
-        my_stick.set_single_led_color(4, 255, 0, 0)
-        qwiic_i2c.delay_ms(1000)
-        # Turn all LEDs off
-        my_stick.led_off()
-        # Turn on LED #6, red
-        my_stick.set_single_led_color(6, 255, 0, 0)
-        qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 2")
-        sys.exit(0)
+    # Turn all LEDs off
+    my_stick.led_off()
+    # Turn on LED #4, red
+    my_stick.set_single_led_color(4, 255, 0, 0)
+    qwiic_i2c.delay_ms(1000)
+    # Turn all LEDs off
+    my_stick.led_off()
+    # Turn on LED #6, red
+    my_stick.set_single_led_color(6, 255, 0, 0)
+    qwiic_i2c.delay_ms(1000)

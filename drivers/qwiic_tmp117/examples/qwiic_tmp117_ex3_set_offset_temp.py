@@ -38,40 +38,33 @@ import qwiic_tmp117
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic TMP117 Example 3 - Set Offset Temperature Value\n")
 
-	# Create instance of device
-	myTMP117 = qwiic_tmp117.QwiicTMP117()
+print("\nQwiic TMP117 Example 3 - Set Offset Temperature Value\n")
 
-	# Check if it's connected
-	if myTMP117.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myTMP117 = qwiic_tmp117.QwiicTMP117()
 
-	# Initialize the device
-	myTMP117.begin()
+# Check if it's connected
+if myTMP117.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Set the offset temperature value
-	tempOffset = myTMP117.get_temperature_offset()
-	print("Current Offset Temperature (in C):", tempOffset)
+# Initialize the device
+myTMP117.begin()
 
-	while True:
-		if myTMP117.data_ready():
-			print("Please enter a new temperature offset between -255.98 and +255.98 (in C): ")
-			tempOffset = float(input())
-			if tempOffset < -255.98 or tempOffset > 255.98:
-				print("Invalid temperature offset. Please enter a value between -255.98 and +255.98 (in C).")
-			else:
-				myTMP117.set_temperature_offset(tempOffset)
-				print("New Offset Temperature (in C):", myTMP117.get_temperature_offset())
-				qwiic_i2c.delay_ms(1000) # Wait for the offset to be set
-				print("Temperature with Offset (C):", myTMP117.read_temp_c())
+# Set the offset temperature value
+tempOffset = myTMP117.get_temperature_offset()
+print("Current Offset Temperature (in C):", tempOffset)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if myTMP117.data_ready():
+		print("Please enter a new temperature offset between -255.98 and +255.98 (in C): ")
+		tempOffset = float(input())
+		if tempOffset < -255.98 or tempOffset > 255.98:
+			print("Invalid temperature offset. Please enter a value between -255.98 and +255.98 (in C).")
+		else:
+			myTMP117.set_temperature_offset(tempOffset)
+			print("New Offset Temperature (in C):", myTMP117.get_temperature_offset())
+			qwiic_i2c.delay_ms(1000) # Wait for the offset to be set
+			print("Temperature with Offset (C):", myTMP117.read_temp_c())

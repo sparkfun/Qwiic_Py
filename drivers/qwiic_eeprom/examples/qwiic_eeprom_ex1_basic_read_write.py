@@ -42,41 +42,34 @@
 import qwiic_eeprom
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic EEPROM, Example 1\n")
-    my_eeprom = qwiic_eeprom.QwiicEEPROM()
+print("\nSparkFun Qwiic EEPROM, Example 1\n")
+my_eeprom = qwiic_eeprom.QwiicEEPROM()
 
-    if not my_eeprom.begin():
-        print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    
-    print("\nEEPROM ready!")
+if not my_eeprom.begin():
+    print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    print("\nMem size in bytes: " + str(my_eeprom.length()))
+print("\nEEPROM ready!")
 
-    my_value1 = 200 # 0xC8
-    my_eeprom.write_byte(300, my_value1)  # (location = 0x12C, data byte)
-    my_read1 = my_eeprom.read_byte(300) # (location = 0x12C)
-    print("\nI read: " + str(my_read1)) # Should be 0xC8 = 200
-    
-    my_value2 = -366
-    my_eeprom.write_int(10, my_value2)
-    my_read2 = my_eeprom.read_int(10)    # (location)
-    print("\nI read: " + str(my_read2))
+print("\nMem size in bytes: " + str(my_eeprom.length()))
 
-    my_value3 = -7.35
-    my_eeprom.write_float(9, my_value3)
-    my_read3 = my_eeprom.read_float(9)    # (location)
-    # Round to 2-decimal point precision
-    my_read3 = round(my_read3, 2)
-    print("\nI read: " + str(my_read3))
+my_value1 = 200 # 0xC8
+my_eeprom.write_byte(300, my_value1)  # (location = 0x12C, data byte)
+my_read1 = my_eeprom.read_byte(300) # (location = 0x12C)
+print("\nI read: " + str(my_read1)) # Should be 0xC8 = 200
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
-        sys.exit(0)
+my_value2 = -366
+my_eeprom.write_int(10, my_value2)
+my_read2 = my_eeprom.read_int(10)    # (location)
+print("\nI read: " + str(my_read2))
+
+my_value3 = -7.35
+my_eeprom.write_float(9, my_value3)
+my_read3 = my_eeprom.read_float(9)    # (location)
+# Round to 2-decimal point precision
+my_read3 = round(my_read3, 2)
+print("\nI read: " + str(my_read3))
+
     

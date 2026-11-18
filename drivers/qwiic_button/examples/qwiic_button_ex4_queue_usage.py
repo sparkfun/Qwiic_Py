@@ -42,46 +42,38 @@ import qwiic_button
 import qwiic_i2c
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic Button Example 4")
-    my_button = qwiic_button.QwiicButton()
+print("\nSparkFun Qwiic Button Example 4")
+my_button = qwiic_button.QwiicButton()
 
-    if my_button.begin() == False:
-        print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    
-    print("\nButton ready!")
+if my_button.begin() == False:
+    print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-            
-        # If the queue of pressed events is not empty
-        if my_button.is_pressed_queue_empty() == False:
-            # Then print the time since the last and first button press
-            print(str(my_button.time_since_last_press() / 1000.0) + "s since he button was last pressed   ")
-            print(str(my_button.time_since_first_press() / 1000.0) +"s since the button was first pressed ")
-        # If the queue is empty
-        else: 
-            print("Button Pressed Queue is empty! ")
+print("\nButton ready!")
 
-        # If the queue of clicked events is not empty
-        if my_button.is_clicked_queue_empty() == False:
-            # Then print the time since the last and first button click
-            print(str(my_button.time_since_last_click() / 1000.0) + "s since the button was last clicked  ")
-            print(str(my_button.time_since_first_click() / 1000.0) + "s since the button was first clicked")
-        # If the queue is empty
-        else:
-            print("Button Clicked Queue is empty!")
+while True:
 
-        # Add some visual separation
-        print()
+    # If the queue of pressed events is not empty
+    if my_button.is_pressed_queue_empty() == False:
+        # Then print the time since the last and first button press
+        print(str(my_button.time_since_last_press() / 1000.0) + "s since he button was last pressed   ")
+        print(str(my_button.time_since_first_press() / 1000.0) +"s since the button was first pressed ")
+    # If the queue is empty
+    else: 
+        print("Button Pressed Queue is empty! ")
 
-        qwiic_i2c.delay_ms(100)    # Let's not hammer too hard on the I2C bus
+    # If the queue of clicked events is not empty
+    if my_button.is_clicked_queue_empty() == False:
+        # Then print the time since the last and first button click
+        print(str(my_button.time_since_last_click() / 1000.0) + "s since the button was last clicked  ")
+        print(str(my_button.time_since_first_click() / 1000.0) + "s since the button was first clicked")
+    # If the queue is empty
+    else:
+        print("Button Clicked Queue is empty!")
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 4")
-        sys.exit(0)
+    # Add some visual separation
+    print()
+
+    qwiic_i2c.delay_ms(100)    # Let's not hammer too hard on the I2C bus

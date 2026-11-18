@@ -49,44 +49,34 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 8\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 8\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.begin() # call this for default settings (no
-	myLCD.left_to_right()
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
-	
-	while True:
-		myLCD.set_cursor(0, 0) # set the cursor to (0,0)
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.begin() # call this for default settings (no
+myLCD.left_to_right()
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-		for thisChar in range(10): # print from 0 to 9
-			myLCD.print(str(thisChar))
-			qwiic_i2c.delay_ms(500)
+while True:
+	myLCD.set_cursor(0, 0) # set the cursor to (0,0)
 
-		myLCD.autoscroll() # set the display to automatically scroll
+	for thisChar in range(10): # print from 0 to 9
+		myLCD.print(str(thisChar))
+		qwiic_i2c.delay_ms(500)
 
-		for thisChar in range(0,10): # print from 0 to 9
-			myLCD.set_cursor(10+thisChar,1)
-			myLCD.print(str(thisChar))
-			qwiic_i2c.delay_ms(500)
-  
-		myLCD.no_autoscroll() # turn off automatic scrolling	
-		myLCD.clear_screen() # clear screen for the next loop
+	myLCD.autoscroll() # set the display to automatically scroll
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 8")
-		sys.exit(0)
+	for thisChar in range(0,10): # print from 0 to 9
+		myLCD.set_cursor(10+thisChar,1)
+		myLCD.print(str(thisChar))
+		qwiic_i2c.delay_ms(500)
 
-
+	myLCD.no_autoscroll() # turn off automatic scrolling	
+	myLCD.clear_screen() # clear screen for the next loop

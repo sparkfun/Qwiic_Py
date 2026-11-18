@@ -43,28 +43,20 @@ import qwiic_sgp40
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic Air Quality Sensor - SGP40, Example 1\n")
-	my_sgp40 = qwiic_sgp40.QwiicSGP40()
-	
-	print("\nWaiting 10 seconds for the SGP40 to warm-up.")
-	if not my_sgp40.begin():
-		print("\nThe Qwiic SGP40 isn't connected to the system or failed its self test. Please check your connection", \
-			file=sys.stderr)
-		return
-	
-	print("\nSGP40 ready!")
-	
-	while True:
-		
-		print("\nVOC Index is: " + str(my_sgp40.get_voc_index()))
-		
-		qwiic_i2c.delay_ms(1000)
+print("\nSparkFun Qwiic Air Quality Sensor - SGP40, Example 1\n")
+my_sgp40 = qwiic_sgp40.QwiicSGP40()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+print("\nWaiting 10 seconds for the SGP40 to warm-up.")
+if not my_sgp40.begin():
+	print("\nThe Qwiic SGP40 isn't connected to the system or failed its self test. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+
+print("\nSGP40 ready!")
+
+while True:
+
+	print("\nVOC Index is: " + str(my_sgp40.get_voc_index()))
+
+	qwiic_i2c.delay_ms(1000)

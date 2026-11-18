@@ -59,84 +59,75 @@ import qwiic_i2c
 import pi_servo_hat
 
 
-def run_example():
-    print("\nSparkFun Pi Servo HAT Example 4\n")
+print("\nSparkFun Pi Servo HAT Example 4\n")
 
-    # Initialize Constructor
-    hat = pi_servo_hat.PiServoHAT()
+# Initialize Constructor
+hat = pi_servo_hat.PiServoHAT()
 
-    if not hat.is_connected():
-        print("The Pi Servo HAT isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not hat.is_connected():
+    print("The Pi Servo HAT isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    hat.begin()
+hat.begin()
 
-    # Restart Servo Hat (in case Hat is frozen/locked)
-    hat.restart()
+# Restart Servo Hat (in case Hat is frozen/locked)
+hat.restart()
 
-    # Test Run
-    #########################################
-    # Moves servo position to 0 degrees (1ms), Channel 0
-    hat.move_servo_position(0, 0, 180)
+# Test Run
+#########################################
+# Moves servo position to 0 degrees (1ms), Channel 0
+hat.move_servo_position(0, 0, 180)
 
-    # Pause 1 sec
-    qwiic_i2c.delay_ms(1000)
+# Pause 1 sec
+qwiic_i2c.delay_ms(1000)
 
-    # Moves servo position to 180 degrees (2ms), Channel 0
-    hat.move_servo_position(0, 180, 180)
+# Moves servo position to 180 degrees (2ms), Channel 0
+hat.move_servo_position(0, 180, 180)
 
-    # Pause 1 sec
-    qwiic_i2c.delay_ms(1000)
+# Pause 1 sec
+qwiic_i2c.delay_ms(1000)
 
-    # 50 Hz Test
-    #########################################
-    # Set PWM Frequency to 50 Hz
-    hat.set_pwm_frequency(50)
+# 50 Hz Test
+#########################################
+# Set PWM Frequency to 50 Hz
+hat.set_pwm_frequency(50)
 
-    # Sweep from 0 to 180 degrees and back
-    for i in range(0, 180):
-        hat.move_servo_position(0, i, 180)
-        print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
-        qwiic_i2c.delay_ms(10)
-    for i in range(180, 0, -1):
-        hat.move_servo_position(0, i, 180)
-        print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
-        qwiic_i2c.delay_ms(10)
+# Sweep from 0 to 180 degrees and back
+for i in range(0, 180):
+    hat.move_servo_position(0, i, 180)
+    print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
+    qwiic_i2c.delay_ms(10)
+for i in range(180, 0, -1):
+    hat.move_servo_position(0, i, 180)
+    print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
+    qwiic_i2c.delay_ms(10)
 
-    # 100 Hz Test
-    #########################################
-    # Set PWM Frequency to 100 Hz
-    hat.set_pwm_frequency(100)
+# 100 Hz Test
+#########################################
+# Set PWM Frequency to 100 Hz
+hat.set_pwm_frequency(100)
 
-    # Sweep from 0 to 180 degrees and back
-    for i in range(0, 180):
-        hat.move_servo_position(0, i, 180)
-        print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
-        qwiic_i2c.delay_ms(50)
-    for i in range(180, 0, -1):
-        hat.move_servo_position(0, i, 180)
-        print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
-        qwiic_i2c.delay_ms(50)
+# Sweep from 0 to 180 degrees and back
+for i in range(0, 180):
+    hat.move_servo_position(0, i, 180)
+    print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
+    qwiic_i2c.delay_ms(50)
+for i in range(180, 0, -1):
+    hat.move_servo_position(0, i, 180)
+    print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
+    qwiic_i2c.delay_ms(50)
 
-    # 200 Hz Test
-    #########################################
-    # Set PWM Frequency to 200 Hz
-    hat.set_pwm_frequency(200)
+# 200 Hz Test
+#########################################
+# Set PWM Frequency to 200 Hz
+hat.set_pwm_frequency(200)
 
-    # Sweep from 0 to 180 degrees and back
-    for i in range(0, 180):
-        hat.move_servo_position(0, i, 180)
-        print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
-        qwiic_i2c.delay_ms(50)
-    for i in range(180, 0, -1):
-        hat.move_servo_position(0, i, 180)
-        print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
-        qwiic_i2c.delay_ms(50)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 4")
-        sys.exit(0)
+# Sweep from 0 to 180 degrees and back
+for i in range(0, 180):
+    hat.move_servo_position(0, i, 180)
+    print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
+    qwiic_i2c.delay_ms(50)
+for i in range(180, 0, -1):
+    hat.move_servo_position(0, i, 180)
+    print("Input: %d Estimated Pos: %s" % (i, hat.get_servo_position(0, 180)))
+    qwiic_i2c.delay_ms(50)

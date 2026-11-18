@@ -38,57 +38,50 @@ import qwiic_rv8803
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic RV8803 Example 4b - Countdown Interrupt\n")
 
-	# Create instance of device
-	myRTC = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 4b - Countdown Interrupt\n")
 
-	# Check if it's connected
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myRTC = qwiic_rv8803.QwiicRV8803()
 
-	# Initialize the device
-	myRTC.begin()
+# Check if it's connected
+if myRTC.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# To configure a periodic interrupt, we'll need to do some math to figure out how to set our registers. 
-	# We are able to change how many clock ticks we want to count (0-4095), and also the length of each clock tick. 
-	# (4 options: 4096 Hz, 64 Hz, 1 Hz, 1/60 Hz)
+# Initialize the device
+myRTC.begin()
 
-	#   The time ranges covered by each freqeuncy setting are as follows
-	#   4096 Hz: 244.14 uS - .9998 Second;                            244.14 uS per LSB             COUNTDOWN_TIMER_FREQUENCY_4096_HZ
-	#   64 Hz: 15.625 mS - 63.984 Seconds;                            15.625 mS per LSB             COUNTDOWN_TIMER_FREQUENCY_64_HZ
-	#   1 Hz: 1 Second - 4095 Seconds (68 minutes 16 seconds);        1 Second per LSB              COUNTDOWN_TIMER_FREQUENCY_1_HZ
-	#   1/60 Hz: 1 Minute = 4095 Minutes (68 hours 16 minutes)        1 Minute per LSB              COUNTDOWN_TIMER_FREQUENCY_1_60TH_HZ
+# To configure a periodic interrupt, we'll need to do some math to figure out how to set our registers. 
+# We are able to change how many clock ticks we want to count (0-4095), and also the length of each clock tick. 
+# (4 options: 4096 Hz, 64 Hz, 1 Hz, 1/60 Hz)
 
-	# As an example, we'll configure a ~3.5 second interrupt. 
-	# We'll choose 60 Hz as our frequency as we want something > 1 second, 
-	# but still want enough granularity to fire an interrupt at 3.5 seconds, not 3 or 4.
-	# Since the resolution for this setting is 15.625 mS per LSB, we'll convert 3.5 seconds to 3500 ms. 
-	# We'll then simply divide the time we want by the resolution to get the number of clock ticks we need to wait to fire the interrupt
-	# 3500 / 15.625 = 224 Clock ticks
+#   The time ranges covered by each freqeuncy setting are as follows
+#   4096 Hz: 244.14 uS - .9998 Second;                            244.14 uS per LSB             COUNTDOWN_TIMER_FREQUENCY_4096_HZ
+#   64 Hz: 15.625 mS - 63.984 Seconds;                            15.625 mS per LSB             COUNTDOWN_TIMER_FREQUENCY_64_HZ
+#   1 Hz: 1 Second - 4095 Seconds (68 minutes 16 seconds);        1 Second per LSB              COUNTDOWN_TIMER_FREQUENCY_1_HZ
+#   1/60 Hz: 1 Minute = 4095 Minutes (68 hours 16 minutes)        1 Minute per LSB              COUNTDOWN_TIMER_FREQUENCY_1_60TH_HZ
 
-	myRTC.disable_all_interrupts()
-	myRTC.clear_all_interrupt_flags() # Clear all flags in case any interrupts have occurred.
-	myRTC.set_countdown_timer_frequency(myRTC.COUNTDOWN_TIMER_FREQUENCY_64HZ)
-	myRTC.set_countdown_timer_clock_ticks(224)
-	myRTC.enable_hardware_interrupt(myRTC.TIMER_INTERRUPT)
-	myRTC.set_countdown_timer_enable(True) # This will start the timer on hte last clock tick of the I2C transaction
-	lastInterruptTime = qwiic_i2c.ticks_ms() # Time from our microcontroller, not the RTC
+# As an example, we'll configure a ~3.5 second interrupt. 
+# We'll choose 60 Hz as our frequency as we want something > 1 second, 
+# but still want enough granularity to fire an interrupt at 3.5 seconds, not 3 or 4.
+# Since the resolution for this setting is 15.625 mS per LSB, we'll convert 3.5 seconds to 3500 ms. 
+# We'll then simply divide the time we want by the resolution to get the number of clock ticks we need to wait to fire the interrupt
+# 3500 / 15.625 = 224 Clock ticks
 
-	while True:
-		if myRTC.get_interrupt_flag(myRTC.FLAG_TIMER):
-			now = qwiic_i2c.ticks_ms()
-			timeSinceLastInterrupt = qwiic_i2c.ticks_diff(now, lastInterruptTime)
-			lastInterruptTime = now
-			myRTC.clear_interrupt_flag(myRTC.FLAG_TIMER)
-			print("Timer Interrupt Triggered! Time since last interrupt: ", timeSinceLastInterrupt, " ms")
+myRTC.disable_all_interrupts()
+myRTC.clear_all_interrupt_flags() # Clear all flags in case any interrupts have occurred.
+myRTC.set_countdown_timer_frequency(myRTC.COUNTDOWN_TIMER_FREQUENCY_64HZ)
+myRTC.set_countdown_timer_clock_ticks(224)
+myRTC.enable_hardware_interrupt(myRTC.TIMER_INTERRUPT)
+myRTC.set_countdown_timer_enable(True) # This will start the timer on hte last clock tick of the I2C transaction
+lastInterruptTime = qwiic_i2c.ticks_ms() # Time from our microcontroller, not the RTC
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if myRTC.get_interrupt_flag(myRTC.FLAG_TIMER):
+		now = qwiic_i2c.ticks_ms()
+		timeSinceLastInterrupt = qwiic_i2c.ticks_diff(now, lastInterruptTime)
+		lastInterruptTime = now
+		myRTC.clear_interrupt_flag(myRTC.FLAG_TIMER)
+		print("Timer Interrupt Triggered! Time since last interrupt: ", timeSinceLastInterrupt, " ms")

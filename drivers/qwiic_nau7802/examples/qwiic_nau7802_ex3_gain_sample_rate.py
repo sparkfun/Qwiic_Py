@@ -36,41 +36,34 @@
 import qwiic_nau7802
 import sys
 
-def run_example():
-	print("\nQwiic NAU7802 Example 3 - Gain Sample Rate\n")
 
-	# Create instance of device
-	my_scale = qwiic_nau7802.QwiicNAU7802()
+print("\nQwiic NAU7802 Example 3 - Gain Sample Rate\n")
 
-	# Check if it's connected
-	if my_scale.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_scale = qwiic_nau7802.QwiicNAU7802()
 
-	# Initialize the device
-	my_scale.begin()
+# Check if it's connected
+if my_scale.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Set gain. Can be 1, 2, 4, 8, 16, 32, 64, or 128
-	my_scale.set_gain(my_scale.NAU7802_GAIN_2)
+# Initialize the device
+my_scale.begin()
 
-	# Set gain. Can be 10, 20, 40, 80, or 320Hz
-	my_scale.set_sample_rate(my_scale.NAU7802_SPS_40)
+# Set gain. Can be 1, 2, 4, 8, 16, 32, 64, or 128
+my_scale.set_gain(my_scale.NAU7802_GAIN_2)
 
-	# Perform internal calibration. Recommended after power up, gain changes,
-	# sample rate changes, or channel changes.
-	my_scale.calibrate_afe()
+# Set gain. Can be 10, 20, 40, 80, or 320Hz
+my_scale.set_sample_rate(my_scale.NAU7802_SPS_40)
 
-	# Loop forever
-	while True:
-		# Check if data is available
-		if my_scale.available():
-			# Print measurement
-			print("Reading:", my_scale.get_reading())
+# Perform internal calibration. Recommended after power up, gain changes,
+# sample rate changes, or channel changes.
+my_scale.calibrate_afe()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Loop forever
+while True:
+	# Check if data is available
+	if my_scale.available():
+		# Print measurement
+		print("Reading:", my_scale.get_reading())

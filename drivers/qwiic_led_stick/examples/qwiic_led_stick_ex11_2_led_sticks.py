@@ -40,32 +40,24 @@
 import qwiic_led_stick
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 11")
-    my_stick1 = qwiic_led_stick.QwiicLEDStick()
-    my_stick2 = qwiic_led_stick.QwiicLEDStick(0x29)
+print("\nSparkFun Qwiic LED Stick Example 11")
+my_stick1 = qwiic_led_stick.QwiicLEDStick()
+my_stick2 = qwiic_led_stick.QwiicLEDStick(0x29)
 
-    if my_stick1.begin() == False:
-        print("\nThe Qwiic LED Stick 1 isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick 1 ready!")
+if my_stick1.begin() == False:
+    print("\nThe Qwiic LED Stick 1 isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick 1 ready!")
 
-    if my_stick2.begin() == False:
-        print("\nThe Qwiic LED Stick 2 isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick 2 ready!")
+if my_stick2.begin() == False:
+    print("\nThe Qwiic LED Stick 2 isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick 2 ready!")
 
-    # Set all of LED Stick 1 to white
-    my_stick1.set_all_led_color(10, 10, 10)
-    # Set all of LED Stick 2 to red
-    my_stick2.set_all_led_color(255, 0, 0)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 11")
-        sys.exit(0)
+# Set all of LED Stick 1 to white
+my_stick1.set_all_led_color(10, 10, 10)
+# Set all of LED Stick 2 to red
+my_stick2.set_all_led_color(255, 0, 0)

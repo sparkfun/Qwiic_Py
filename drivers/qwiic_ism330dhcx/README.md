@@ -92,41 +92,32 @@ import qwiic_i2c
 import qwiic_ism330dhcx
 
 
-def run_example():
-    print("\nQwiic ISM330DHCX Example 1 - Basic Readings\n")
-    my_ism = qwiic_ism330dhcx.QwiicISM330DHCX()
+print("\nQwiic ISM330DHCX Example 1 - Basic Readings\n")
+my_ism = qwiic_ism330dhcx.QwiicISM330DHCX()
 
-    if not my_ism.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_ism.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_ism.begin()
-    my_ism.device_reset()
-    while not my_ism.get_device_reset():
-        qwiic_i2c.delay_ms(1000)
+my_ism.begin()
+my_ism.device_reset()
+while not my_ism.get_device_reset():
+    qwiic_i2c.delay_ms(1000)
 
-    my_ism.set_device_config()
-    my_ism.set_block_data_update()
-    my_ism.set_accel_data_rate(my_ism.XL_ODR_104HZ)
-    my_ism.set_accel_full_scale(my_ism.XL_FS_4G)
-    my_ism.set_gyro_data_rate(my_ism.GYRO_ODR_104HZ)
-    my_ism.set_gyro_full_scale(my_ism.GYRO_FS_500DPS)
+my_ism.set_device_config()
+my_ism.set_block_data_update()
+my_ism.set_accel_data_rate(my_ism.XL_ODR_104HZ)
+my_ism.set_accel_full_scale(my_ism.XL_FS_4G)
+my_ism.set_gyro_data_rate(my_ism.GYRO_ODR_104HZ)
+my_ism.set_gyro_full_scale(my_ism.GYRO_FS_500DPS)
 
-    while True:
-        if my_ism.check_status():
-            accel = my_ism.get_accel()
-            gyro = my_ism.get_gyro()
-            print("Accel X: %f, Y: %f, Z: %f mg" % (accel.x_data, accel.y_data, accel.z_data))
-            print("Gyro X: %f, Y: %f, Z: %f mdps" % (gyro.x_data, gyro.y_data, gyro.z_data))
-        qwiic_i2c.delay_ms(100)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    if my_ism.check_status():
+        accel = my_ism.get_accel()
+        gyro = my_ism.get_gyro()
+        print("Accel X: %f, Y: %f, Z: %f mg" % (accel.x_data, accel.y_data, accel.z_data))
+        print("Gyro X: %f, Y: %f, Z: %f mdps" % (gyro.x_data, gyro.y_data, gyro.z_data))
+    qwiic_i2c.delay_ms(100)
 ```
 
 ## Documentation

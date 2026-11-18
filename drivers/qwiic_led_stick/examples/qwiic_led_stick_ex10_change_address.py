@@ -43,46 +43,39 @@ import qwiic_led_stick
 import qwiic_i2c
 import sys
 
-def run_example():
-    # Change this to whatever the i2c address currently is
-    old_address = qwiic_led_stick.QwiicLEDStick.available_addresses[0]
 
-    print("\nSparkFun Qwiic LED Stick Example 10")
-    my_stick = qwiic_led_stick.QwiicLEDStick(old_address)
+# Change this to whatever the i2c address currently is
+old_address = qwiic_led_stick.QwiicLEDStick.available_addresses[0]
 
+print("\nSparkFun Qwiic LED Stick Example 10")
+my_stick = qwiic_led_stick.QwiicLEDStick(old_address)
+
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
+
+print("\nEnter a new I2C address for the Qwiic LED Stick to use.")
+print("\nDon't use the 0x prefix. For instance, if you wanted to")
+print("\nchange the address to 0x5B, you would type 5B and hit enter.")
+
+new_address = input("\nNew address: ")
+new_address = int(new_address, 16)
+
+# Check if the user entered a valid address
+if new_address > 0x08 and new_address < 0x77:
+    print("\nCharacters received and new address is valid!")
+    print("\nAttempting to set Qwiic LED Stick address...")
+
+    if my_stick.change_address(new_address) == True:
+        print("\nAddress successfully changed!")
+    # Check that the Qwiic LED Stick acknowledges on the new address
+    qwiic_i2c.delay_ms(20)
     if my_stick.begin() == False:
         print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
-
-    print("\nEnter a new I2C address for the Qwiic LED Stick to use.")
-    print("\nDon't use the 0x prefix. For instance, if you wanted to")
-    print("\nchange the address to 0x5B, you would type 5B and hit enter.")
-
-    new_address = input("\nNew address: ")
-    new_address = int(new_address, 16)
-
-    # Check if the user entered a valid address
-    if new_address > 0x08 and new_address < 0x77:
-        print("\nCharacters received and new address is valid!")
-        print("\nAttempting to set Qwiic LED Stick address...")
-
-        if my_stick.change_address(new_address) == True:
-            print("\nAddress successfully changed!")
-        # Check that the Qwiic LED Stick acknowledges on the new address
-        qwiic_i2c.delay_ms(20)
-        if my_stick.begin() == False:
-            print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        else:
-            print("\nLED Stick acknowledged on new address!")
+        file=sys.stderr)
     else:
-        print("\nAddress entered not a valid I2C address.")
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 10")
-        sys.exit(0)
+        print("\nLED Stick acknowledged on new address!")
+else:
+    print("\nAddress entered not a valid I2C address.")

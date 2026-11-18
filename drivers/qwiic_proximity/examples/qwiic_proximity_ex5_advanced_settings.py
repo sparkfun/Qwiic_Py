@@ -43,59 +43,48 @@ import qwiic_proximity
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Proximity Sensor VCN4040 Example 5\n")
-	oProx = qwiic_proximity.QwiicProximity()
+print("\nSparkFun Proximity Sensor VCN4040 Example 5\n")
+oProx = qwiic_proximity.QwiicProximity()
 
-	if not oProx.is_connected():
-		print("The Qwiic Proximity device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not oProx.is_connected():
+	print("The Qwiic Proximity device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# begin Setup
-	oProx.begin()
+# begin Setup
+oProx.begin()
 
-	oProx.power_on_ambient()  	# Power Up the ambient sensor
+oProx.power_on_ambient()  	# Power Up the ambient sensor
 
-	# Set the integration time for the proximity sensor
-	# 1 to 8 is valid
-	oProx.set_prox_integration_time(8)
+# Set the integration time for the proximity sensor
+# 1 to 8 is valid
+oProx.set_prox_integration_time(8)
 
-	# Set the integration time for the ambient light sensor in milliseconds
-	# 80 to 640ms is valid
-	oProx.set_ambient_integration_time(80)
+# Set the integration time for the ambient light sensor in milliseconds
+# 80 to 640ms is valid
+oProx.set_ambient_integration_time(80)
 
-	# If sensor sees more than this, interrupt pin will go low
-	oProx.set_prox_high_threshold(2000)
+# If sensor sees more than this, interrupt pin will go low
+oProx.set_prox_high_threshold(2000)
 
-	# The int pin will stay low until the value goes below the low threshold value
-	oProx.set_prox_low_threshold(150)
+# The int pin will stay low until the value goes below the low threshold value
+oProx.set_prox_low_threshold(150)
 
-	# Enable both 'away' and 'close' interrupts
-	oProx.set_prox_interrupt_type(oProx.VCNL4040_PS_INT_BOTH)
+# Enable both 'away' and 'close' interrupts
+oProx.set_prox_interrupt_type(oProx.VCNL4040_PS_INT_BOTH)
 
-	# This causes the int pin to go low every time a reading is outside the thresholds
-	# Get a multimeter and probe the INT pin to see this feature in action
-	oProx.enable_prox_logic_mode()
+# This causes the int pin to go low every time a reading is outside the thresholds
+# Get a multimeter and probe the INT pin to see this feature in action
+oProx.enable_prox_logic_mode()
 
-	while True:
+while True:
 
-		proxValue = oProx.get_proximity()
-		print("Proximity Value: \t[%5d]" % proxValue)
-		
-		ambientValue = oProx.get_ambient()
-		print("Ambient Value: \t\t[%5d]\n" % ambientValue)
+	proxValue = oProx.get_proximity()
+	print("Proximity Value: \t[%5d]" % proxValue)
 
-
-		qwiic_i2c.delay_ms(1000)
+	ambientValue = oProx.get_ambient()
+	print("Ambient Value: \t\t[%5d]\n" % ambientValue)
 
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 5")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(1000)

@@ -46,37 +46,29 @@
 import qwiic_eeprom
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic EEPROM, Example 2\n")
-    my_eeprom = qwiic_eeprom.QwiicEEPROM()
+print("\nSparkFun Qwiic EEPROM, Example 2\n")
+my_eeprom = qwiic_eeprom.QwiicEEPROM()
 
-    if not my_eeprom.begin():
-        print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    
-    print("\nEEPROM ready!")
+if not my_eeprom.begin():
+    print("\nThe Qwiic EEPROM isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    # Set settings for this EEPROM
-    my_eeprom.set_memory_size(512 * 1024 // 8) # In bytes. 512kbit = 64kbyte
-    my_eeprom.set_page_size(128)    # in bytes. Has 128 byte page size.
-    my_eeprom.disable_poll_for_write_complete()  # Supports I2C polling of write completion
-    my_eeprom.set_page_write_time(3)    # 3 ms max write time
+print("\nEEPROM ready!")
 
-    print("\nMem size in bytes: " + str(my_eeprom.get_memory_size()))
-    print("\nPage size in bytes: " + str(my_eeprom.get_page_size()))
-    
-    my_value = -7.35
-    my_eeprom.write_float(20, my_value) # (location, data)
-    my_read = my_eeprom.read_float(20)  # (location)
-    # Round to 2-decimal point precision
-    my_read = round(my_read, 2)
-    print("\nI read: " + str(my_read))
+# Set settings for this EEPROM
+my_eeprom.set_memory_size(512 * 1024 // 8) # In bytes. 512kbit = 64kbyte
+my_eeprom.set_page_size(128)    # in bytes. Has 128 byte page size.
+my_eeprom.disable_poll_for_write_complete()  # Supports I2C polling of write completion
+my_eeprom.set_page_write_time(3)    # 3 ms max write time
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 2")
-        sys.exit(0)
+print("\nMem size in bytes: " + str(my_eeprom.get_memory_size()))
+print("\nPage size in bytes: " + str(my_eeprom.get_page_size()))
+
+my_value = -7.35
+my_eeprom.write_float(20, my_value) # (location, data)
+my_read = my_eeprom.read_float(20)  # (location)
+# Round to 2-decimal point precision
+my_read = round(my_read, 2)
+print("\nI read: " + str(my_read))

@@ -92,38 +92,29 @@ import qwiic_max1704x
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic MAX1704X Example 1 - Simple\n")
-    # Defaults to the MAX17043. For the MAX17048, pass
-    # device_type=qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048
-    my_lipo = qwiic_max1704x.QwiicMAX1704X()
+print("\nQwiic MAX1704X Example 1 - Simple\n")
+# Defaults to the MAX17043. For the MAX17048, pass
+# device_type=qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048
+my_lipo = qwiic_max1704x.QwiicMAX1704X()
 
-    if not my_lipo.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_lipo.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_lipo.begin()
-    my_lipo.quick_start()
-    my_lipo.set_threshold(20)
+my_lipo.begin()
+my_lipo.quick_start()
+my_lipo.set_threshold(20)
 
-    while True:
-        print("Voltage: %.2fV" % my_lipo.get_voltage())
-        print("State of Charge: %.2f%%" % my_lipo.get_soc())
+while True:
+    print("Voltage: %.2fV" % my_lipo.get_voltage())
+    print("State of Charge: %.2f%%" % my_lipo.get_soc())
 
-        if my_lipo.get_alert():
-            print("Battery SoC is below threshold!")
-        else:
-            print("Battery SoC is above threshold.")
+    if my_lipo.get_alert():
+        print("Battery SoC is below threshold!")
+    else:
+        print("Battery SoC is above threshold.")
 
-        qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    qwiic_i2c.delay_ms(500)
 ```
 
 ## Documentation

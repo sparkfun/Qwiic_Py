@@ -43,31 +43,21 @@ import qwiic_dual_encoder_reader
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic Dual Encoder Reader Example 1\n")
-	my_encoders = qwiic_dual_encoder_reader.QwiicDualEncoderReader()
+print("\nSparkFun Qwiic Dual Encoder Reader Example 1\n")
+my_encoders = qwiic_dual_encoder_reader.QwiicDualEncoderReader()
 
-	if my_encoders.is_connected() == False:
-		print("The Qwiic Dual Encoder Reader device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if my_encoders.is_connected() == False:
+	print("The Qwiic Dual Encoder Reader device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	my_encoders.begin()
+my_encoders.begin()
 
-	while True:
+while True:
 
-		print("Count1: %d, Count2: %s" % (my_encoders.get_count1(), \
-			my_encoders.get_count2(), \
-			))
+	print("Count1: %d, Count2: %s" % (my_encoders.get_count1(), \
+		my_encoders.get_count2(), \
+		))
 
-		qwiic_i2c.delay_ms(300)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 1")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(300)

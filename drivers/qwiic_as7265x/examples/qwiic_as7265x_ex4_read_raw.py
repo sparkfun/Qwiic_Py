@@ -37,53 +37,46 @@
 import qwiic_as7265x
 import sys
 
-def run_example():
-    print("\nQwiic Spectral Triad Example 4 - Read Raw\n")
 
-    # Create instance of device
-    myAS7265x = qwiic_as7265x.QwiicAS7265x()
+print("\nQwiic Spectral Triad Example 4 - Read Raw\n")
 
-    # Check if it's connected
-    if myAS7265x.is_connected() == False:
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+# Create instance of device
+myAS7265x = qwiic_as7265x.QwiicAS7265x()
 
-    # Initialize the device
-    if myAS7265x.begin() == False:
-        print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
-        return
+# Check if it's connected
+if myAS7265x.is_connected() == False:
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    myAS7265x.disable_indicator()
-    print("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W,K,L")
+# Initialize the device
+if myAS7265x.begin() == False:
+    print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
+    sys.exit(1)
 
-    while True:
-        # This is a hard wait while all 18 channels are measured
-        myAS7265x.take_measurements()
-        print(str(myAS7265x.get_a()) + ",", end="")  # 410nm
-        print(str(myAS7265x.get_b()) + ",", end="")  # 435nm
-        print(str(myAS7265x.get_c()) + ",", end="")  # 460nm
-        print(str(myAS7265x.get_d()) + ",", end="")  # 485nm
-        print(str(myAS7265x.get_e()) + ",", end="")  # 510nm
-        print(str(myAS7265x.get_f()) + ",", end="")  # 535nm
+myAS7265x.disable_indicator()
+print("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W,K,L")
 
-        print(str(myAS7265x.get_g()) + ",", end="")  # 560nm
-        print(str(myAS7265x.get_h()) + ",", end="")  # 585nm
-        print(str(myAS7265x.get_r()) + ",", end="")  # 610nm
-        print(str(myAS7265x.get_i()) + ",", end="")  # 645nm
-        print(str(myAS7265x.get_s()) + ",", end="")  # 680nm
-        print(str(myAS7265x.get_j()) + ",", end="")  # 705nm
+while True:
+    # This is a hard wait while all 18 channels are measured
+    myAS7265x.take_measurements()
+    print(str(myAS7265x.get_a()) + ",", end="")  # 410nm
+    print(str(myAS7265x.get_b()) + ",", end="")  # 435nm
+    print(str(myAS7265x.get_c()) + ",", end="")  # 460nm
+    print(str(myAS7265x.get_d()) + ",", end="")  # 485nm
+    print(str(myAS7265x.get_e()) + ",", end="")  # 510nm
+    print(str(myAS7265x.get_f()) + ",", end="")  # 535nm
 
-        print(str(myAS7265x.get_t()) + ",", end="")  # 730nm
-        print(str(myAS7265x.get_u()) + ",", end="")  # 760nm
-        print(str(myAS7265x.get_v()) + ",", end="")  # 810nm
-        print(str(myAS7265x.get_w()) + ",", end="")  # 860nm
-        print(str(myAS7265x.get_k()) + ",", end="")  # 900nm
-        print(str(myAS7265x.get_l()))  # 940nm	
+    print(str(myAS7265x.get_g()) + ",", end="")  # 560nm
+    print(str(myAS7265x.get_h()) + ",", end="")  # 585nm
+    print(str(myAS7265x.get_r()) + ",", end="")  # 610nm
+    print(str(myAS7265x.get_i()) + ",", end="")  # 645nm
+    print(str(myAS7265x.get_s()) + ",", end="")  # 680nm
+    print(str(myAS7265x.get_j()) + ",", end="")  # 705nm
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example")
-        sys.exit(0)
+    print(str(myAS7265x.get_t()) + ",", end="")  # 730nm
+    print(str(myAS7265x.get_u()) + ",", end="")  # 760nm
+    print(str(myAS7265x.get_v()) + ",", end="")  # 810nm
+    print(str(myAS7265x.get_w()) + ",", end="")  # 860nm
+    print(str(myAS7265x.get_k()) + ",", end="")  # 900nm
+    print(str(myAS7265x.get_l()))  # 940nm	

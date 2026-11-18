@@ -92,42 +92,33 @@ import qwiic_as7343
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic AS7343 Example 1 - Basic Readings\n")
-    my_as7343 = qwiic_as7343.QwiicAS7343()
+print("\nQwiic AS7343 Example 1 - Basic Readings\n")
+my_as7343 = qwiic_as7343.QwiicAS7343()
 
-    if not my_as7343.begin():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_as7343.begin():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_as7343.power_on()
+my_as7343.power_on()
 
-    if not my_as7343.set_auto_smux(my_as7343.AUTO_SMUX_18_CHANNELS):
-        print("Failed to set AutoSmux", file=sys.stderr)
-        return
+if not my_as7343.set_auto_smux(my_as7343.AUTO_SMUX_18_CHANNELS):
+    print("Failed to set AutoSmux", file=sys.stderr)
+    sys.exit(1)
 
-    if not my_as7343.spectral_measurement_enable():
-        print("Failed to enable spectral measurements", file=sys.stderr)
-        return
+if not my_as7343.spectral_measurement_enable():
+    print("Failed to enable spectral measurements", file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-        my_as7343.set_led_drive(0)  # 0 = 4mA
-        my_as7343.set_led_on()
-        qwiic_i2c.delay_ms(100)  # Wait for the LED to fully illuminate the target
+while True:
+    my_as7343.set_led_drive(0)  # 0 = 4mA
+    my_as7343.set_led_on()
+    qwiic_i2c.delay_ms(100)  # Wait for the LED to fully illuminate the target
 
-        my_as7343.read_all_spectral_data()
-        my_as7343.set_led_off()
+    my_as7343.read_all_spectral_data()
+    my_as7343.set_led_off()
 
-        print(my_as7343.get_blue(), my_as7343.get_red(), my_as7343.get_green(), my_as7343.get_nir(), sep=",")
-        qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    print(my_as7343.get_blue(), my_as7343.get_red(), my_as7343.get_green(), my_as7343.get_nir(), sep=",")
+    qwiic_i2c.delay_ms(500)
 ```
 
 ## Documentation

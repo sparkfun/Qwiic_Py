@@ -92,30 +92,21 @@ import qwiic_rfid
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Qwiic RFID Reader Example 1")
-    my_rfid = qwiic_rfid.QwiicRFID()
+print("\nSparkFun Qwiic RFID Reader Example 1")
+my_rfid = qwiic_rfid.QwiicRFID()
 
-    if not my_rfid.begin():
-        print("The Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_rfid.begin():
+    print("The Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    print("Ready to scan some tags!")
+print("Ready to scan some tags!")
 
-    while True:
-        tag_id = my_rfid.get_tag()
-        if tag_id != "000000":
-            print("Tag ID: " + tag_id)
-            print("Scanned %s seconds ago" % my_rfid.get_prec_req_time())
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    tag_id = my_rfid.get_tag()
+    if tag_id != "000000":
+        print("Tag ID: " + tag_id)
+        print("Scanned %s seconds ago" % my_rfid.get_prec_req_time())
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

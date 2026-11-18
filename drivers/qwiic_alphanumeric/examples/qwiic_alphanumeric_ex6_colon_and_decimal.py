@@ -42,21 +42,6 @@
 import qwiic_alphanumeric
 import sys
 
-def run_example():
-
-    print("\nSparkFun Qwiic Alphanumeric - Example 6: Colon and Decimal")
-    my_display = qwiic_alphanumeric.QwiicAlphanumeric()
-
-    if my_display.begin() == False:
-        print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connections.", \
-            file=sys.stderr)
-        return
-    
-    print("\nQwiic Alphanumeric ready!")
-
-    # You can print colons and decimals
-    # NOTE: they can only go in the character position deterined by the layout of the display
-    my_display.print("12:3.4")
     
     # You can also turn decimals and colon on and off manually
     # my_display.decimal_on() # Turn all decimals on  
@@ -68,9 +53,17 @@ def run_example():
     # my_display.colon_on_single(1)   # Turn colon on for display one
     # my_display.colon_off_single(1)  # Turn colon off for display one
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 6")
-        sys.exit(0)
+
+print("\nSparkFun Qwiic Alphanumeric - Example 6: Colon and Decimal")
+my_display = qwiic_alphanumeric.QwiicAlphanumeric()
+
+if my_display.begin() == False:
+    print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connections.", \
+        file=sys.stderr)
+    sys.exit(1)
+
+print("\nQwiic Alphanumeric ready!")
+
+# You can print colons and decimals
+# NOTE: they can only go in the character position deterined by the layout of the display
+my_display.print("12:3.4")

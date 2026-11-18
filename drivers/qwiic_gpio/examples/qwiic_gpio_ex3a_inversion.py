@@ -43,31 +43,22 @@ import qwiic_i2c
 import sys
 
 
-def run_example():
+print("\nSparkFun Qwiic GPIO Example 3a\n")
+my_gpio = qwiic_gpio.QwiicGPIO()
 
-    print("\nSparkFun Qwiic GPIO Example 3a\n")
-    my_gpio = qwiic_gpio.QwiicGPIO()
+if not my_gpio.is_connected():
+    print("The Qwiic GPIO isn't connected to the system. Please check your connection",
+          file=sys.stderr)
+    sys.exit(1)
 
-    if not my_gpio.is_connected():
-        print("The Qwiic GPIO isn't connected to the system. Please check your connection",
-              file=sys.stderr)
-        return
+my_gpio.begin()
+my_gpio.pin_mode(0, my_gpio.GPIO_IN)
 
-    my_gpio.begin()
-    my_gpio.pin_mode(0, my_gpio.GPIO_IN)
-    
-    # Note that inversion of a pin only works on the input register.
-    my_gpio.invert_pin(0, my_gpio.INVERT)
-    # my_gpio.invert_pin(0, my_gpio.NO_INVERT); # Uncomment this line to remove the logic inversion on pin 0.
+# Note that inversion of a pin only works on the input register.
+my_gpio.invert_pin(0, my_gpio.INVERT)
+# my_gpio.invert_pin(0, my_gpio.NO_INVERT); # Uncomment this line to remove the logic inversion on pin 0.
 
-    while True:
-        logic_level = my_gpio.digital_read(0)
-        print("GPIO 0: " + ("HIGH" if logic_level == my_gpio.GPIO_HI else "LOW"))
-        qwiic_i2c.delay_ms(250)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 3a")
-        sys.exit(0)
+while True:
+    logic_level = my_gpio.digital_read(0)
+    print("GPIO 0: " + ("HIGH" if logic_level == my_gpio.GPIO_HI else "LOW"))
+    qwiic_i2c.delay_ms(250)

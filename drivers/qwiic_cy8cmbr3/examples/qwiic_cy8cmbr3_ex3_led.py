@@ -41,40 +41,33 @@ import qwiic_i2c
 # Define soil moisture threshold for LED control
 threshold = 8 # Example threshold for dry soil
 
-def run_example():
-	print("\nQwiic Template Example 3 - LED Control\n")
 
-	# Create instance of device
-	mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
+print("\nQwiic Template Example 3 - LED Control\n")
 
-	# Check if it's connected
-	if mySoilSensor.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
 
-	# Initialize the device
-	mySoilSensor.begin()
+# Check if it's connected
+if mySoilSensor.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Infinite loop reading data
-	while True:
-		# Read and print the soil capacitance
-		capacitance = mySoilSensor.get_capacitance_pf()
-		print("Soil Capacitance: " + str(capacitance) + " pF")
-		print("Threshold: " + str(threshold) + " pF")
-		# Control LED based on soil moisture threshold
-		if capacitance < threshold:
-			mySoilSensor.led_on()  # Turn LED on for dry soil
-			print("LED ON - Capacitance below threshold\n")
-		else:
-			mySoilSensor.led_off()  # Turn LED off for moist soil
-			print("LED OFF - Capacitance above threshold\n")
-		# Sleep for a second to avoid spamming the output
-		qwiic_i2c.delay_ms(1000)
+# Initialize the device
+mySoilSensor.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Infinite loop reading data
+while True:
+	# Read and print the soil capacitance
+	capacitance = mySoilSensor.get_capacitance_pf()
+	print("Soil Capacitance: " + str(capacitance) + " pF")
+	print("Threshold: " + str(threshold) + " pF")
+	# Control LED based on soil moisture threshold
+	if capacitance < threshold:
+		mySoilSensor.led_on()  # Turn LED on for dry soil
+		print("LED ON - Capacitance below threshold\n")
+	else:
+		mySoilSensor.led_off()  # Turn LED off for moist soil
+		print("LED OFF - Capacitance above threshold\n")
+	# Sleep for a second to avoid spamming the output
+	qwiic_i2c.delay_ms(1000)

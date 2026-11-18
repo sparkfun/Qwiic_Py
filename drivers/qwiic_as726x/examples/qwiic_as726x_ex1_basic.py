@@ -36,51 +36,44 @@
 import qwiic_as726x
 import sys
 
-def run_example():
-	print("\nQwiic AS726x Example 1 - Basic\n")
 
-	# Create instance of device
-	myAS726x = qwiic_as726x.QwiicAS726x()
+print("\nQwiic AS726x Example 1 - Basic\n")
 
-	# Check if it's connected
-	if myAS726x.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myAS726x = qwiic_as726x.QwiicAS726x()
 
-	# Initialize the device
-	myAS726x.begin()
+# Check if it's connected
+if myAS726x.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		myAS726x.take_measurements()
-		# Check which device is connected
-		if myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7262:
-			# Visible readings
-			print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
-				myAS726x.get_calibrated_violet(),
-				myAS726x.get_calibrated_blue(),
-				myAS726x.get_calibrated_green(),
-				myAS726x.get_calibrated_yellow(),
-				myAS726x.get_calibrated_orange(),
-				myAS726x.get_calibrated_red()
-			), end="")
-		
-		elif myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7263:
-			# Near IR readings
-			print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
-				myAS726x.get_calibrated_r(),
-				myAS726x.get_calibrated_s(),
-				myAS726x.get_calibrated_t(),
-				myAS726x.get_calibrated_u(),
-				myAS726x.get_calibrated_v(),
-				myAS726x.get_calibrated_w()
-			), end="")
+# Initialize the device
+myAS726x.begin()
 
-		print(" tempF[{}]".format(myAS726x.get_temperature_f()))
+while True:
+	myAS726x.take_measurements()
+	# Check which device is connected
+	if myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7262:
+		# Visible readings
+		print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
+			myAS726x.get_calibrated_violet(),
+			myAS726x.get_calibrated_blue(),
+			myAS726x.get_calibrated_green(),
+			myAS726x.get_calibrated_yellow(),
+			myAS726x.get_calibrated_orange(),
+			myAS726x.get_calibrated_red()
+		), end="")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	elif myAS726x.get_version() == myAS726x.SENSOR_TYPE_AS7263:
+		# Near IR readings
+		print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
+			myAS726x.get_calibrated_r(),
+			myAS726x.get_calibrated_s(),
+			myAS726x.get_calibrated_t(),
+			myAS726x.get_calibrated_u(),
+			myAS726x.get_calibrated_v(),
+			myAS726x.get_calibrated_w()
+		), end="")
+
+	print(" tempF[{}]".format(myAS726x.get_temperature_f()))

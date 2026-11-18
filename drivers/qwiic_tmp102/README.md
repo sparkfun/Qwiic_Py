@@ -92,41 +92,32 @@ import qwiic_tmp102
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Qwiic TMP102 Sensor Example 1\n")
-    my_sensor = qwiic_tmp102.QwiicTMP102()
+print("\nSparkFun Qwiic TMP102 Sensor Example 1\n")
+my_sensor = qwiic_tmp102.QwiicTMP102()
 
-    if not my_sensor.is_connected():
-        print("The Qwiic TMP102 Sensor device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_sensor.is_connected():
+    print("The Qwiic TMP102 Sensor device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_sensor.begin()
+my_sensor.begin()
 
-    my_sensor.set_fault(0)              # 1 fault before an alert
-    my_sensor.set_alert_polarity(1)     # Active HIGH
-    my_sensor.set_alert_mode(0)         # Comparator mode
-    my_sensor.set_conversion_rate(2)    # 4 Hz
-    my_sensor.set_extended_mode(0)      # 12-bit, -55C to +128C
-    my_sensor.set_high_temp_f(85.0)     # T_HIGH
-    my_sensor.set_low_temp_f(84.0)      # T_LOW
+my_sensor.set_fault(0)              # 1 fault before an alert
+my_sensor.set_alert_polarity(1)     # Active HIGH
+my_sensor.set_alert_mode(0)         # Comparator mode
+my_sensor.set_conversion_rate(2)    # 4 Hz
+my_sensor.set_extended_mode(0)      # 12-bit, -55C to +128C
+my_sensor.set_high_temp_f(85.0)     # T_HIGH
+my_sensor.set_low_temp_f(84.0)      # T_LOW
 
-    while True:
-        my_sensor.wakeup()
-        temperature = my_sensor.read_temp_f()
-        alert = my_sensor.alert()
-        my_sensor.sleep()
+while True:
+    my_sensor.wakeup()
+    temperature = my_sensor.read_temp_f()
+    alert = my_sensor.alert()
+    my_sensor.sleep()
 
-        print("Temperature: ", temperature)
-        print("Alert Register: ", alert)
-        qwiic_i2c.delay_ms(2000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+    print("Temperature: ", temperature)
+    print("Alert Register: ", alert)
+    qwiic_i2c.delay_ms(2000)
 ```
 
 ## Documentation

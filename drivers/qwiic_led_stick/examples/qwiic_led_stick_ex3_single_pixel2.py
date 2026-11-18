@@ -40,28 +40,20 @@
 import qwiic_led_stick
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 3")
-    my_stick = qwiic_led_stick.QwiicLEDStick()
+print("\nSparkFun Qwiic LED Stick Example 3")
+my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    if my_stick.begin() == False:
-        print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
 
-    # Create 3 lists of the same length as the LED Stick, initialize with arbitrary values
-    # Pixel_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    red_list = [214, 78, 183, 198, 59, 134, 15, 209, 219, 186]
-    green_list = [59, 216, 170, 21, 114, 63, 226, 92, 155, 175]
-    blue_list = [214, 147, 25, 124, 153, 163, 188, 33, 175, 221]
+# Create 3 lists of the same length as the LED Stick, initialize with arbitrary values
+# Pixel_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+red_list = [214, 78, 183, 198, 59, 134, 15, 209, 219, 186]
+green_list = [59, 216, 170, 21, 114, 63, 226, 92, 155, 175]
+blue_list = [214, 147, 25, 124, 153, 163, 188, 33, 175, 221]
 
-    my_stick.set_all_led_unique_color(red_list, green_list, blue_list, 10)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 3")
-        sys.exit(0)
+my_stick.set_all_led_unique_color(red_list, green_list, blue_list, 10)

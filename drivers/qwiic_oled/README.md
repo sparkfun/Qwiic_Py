@@ -94,34 +94,25 @@ import qwiic_oled
 import qwiic_i2c
 
 
-def run_example():
-    print("\nOLED Display - Hello World Example\n")
+print("\nOLED Display - Hello World Example\n")
 
-    my_oled = qwiic_oled.QwiicMicroOLED()  # Micro OLED
-    # my_oled = qwiic_oled.QwiicOLEDDisplay()  # 0.91in 128x32 OLED
-    # my_oled = qwiic_oled.QwiicLargeOLED()  # 1.3in 128x64 OLED
+my_oled = qwiic_oled.QwiicMicroOLED()  # Micro OLED
+# my_oled = qwiic_oled.QwiicOLEDDisplay()  # 0.91in 128x32 OLED
+# my_oled = qwiic_oled.QwiicLargeOLED()  # 1.3in 128x64 OLED
 
-    if not my_oled.is_connected():
-        print("The OLED Display isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_oled.is_connected():
+    print("The OLED Display isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_oled.begin()
+my_oled.begin()
 
-    my_oled.clear(my_oled.ALL)  # Clear the display's memory (gets rid of artifacts)
-    my_oled.display()  # Display buffer contents
-    qwiic_i2c.delay_ms(3000)
+my_oled.clear(my_oled.ALL)  # Clear the display's memory (gets rid of artifacts)
+my_oled.display()  # Display buffer contents
+qwiic_i2c.delay_ms(3000)
 
-    my_oled.clear(my_oled.PAGE)  # Clear the display's buffer
-    my_oled.print("Hello World")
-    my_oled.display()
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding OLED Hello Example")
-        sys.exit(0)
+my_oled.clear(my_oled.PAGE)  # Clear the display's buffer
+my_oled.print("Hello World")
+my_oled.display()
 ```
 
 ## Documentation

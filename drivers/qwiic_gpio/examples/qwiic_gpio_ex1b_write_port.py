@@ -49,30 +49,22 @@ def flip_gpio( gpio_config ):
         else:
             gpio_config[i] = qwiic_gpio.QwiicGPIO.GPIO_HI
 
-def run_example():
 
-    print("\nSparkFun Qwiic GPIO Example 1\n")
-    my_gpio = qwiic_gpio.QwiicGPIO()
+print("\nSparkFun Qwiic GPIO Example 1\n")
+my_gpio = qwiic_gpio.QwiicGPIO()
 
-    if not my_gpio.is_connected():
-        print("The Qwiic GPIO isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+if not my_gpio.is_connected():
+    print("The Qwiic GPIO isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    my_gpio.begin()
-    my_gpio.pin_mode_port( [ my_gpio.GPIO_OUT] * my_gpio.NUM_GPIO ) # Set all 8 pins to output
+my_gpio.begin()
+my_gpio.pin_mode_port( [ my_gpio.GPIO_OUT] * my_gpio.NUM_GPIO ) # Set all 8 pins to output
 
-    gpio_config = [ my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO ]
+gpio_config = [ my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO, my_gpio.GPIO_HI, my_gpio.GPIO_LO ]
 
-    while True:
-        print("Writing new GPIO port outputs!")
-        my_gpio.digital_write_port( gpio_config )
-        flip_gpio( gpio_config )
-        qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    print("Writing new GPIO port outputs!")
+    my_gpio.digital_write_port( gpio_config )
+    flip_gpio( gpio_config )
+    qwiic_i2c.delay_ms(1000)

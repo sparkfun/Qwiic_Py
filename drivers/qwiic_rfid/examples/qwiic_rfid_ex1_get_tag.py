@@ -50,37 +50,29 @@ import qwiic_rfid
 import qwiic_i2c
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic RFID Reader Example 1")
-    my_rfid = qwiic_rfid.QwiicRFID()
+print("\nSparkFun Qwiic RFID Reader Example 1")
+my_rfid = qwiic_rfid.QwiicRFID()
 
-    if my_rfid.begin() == False:
-        print("\nThe Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
-    
-    print("\nReady to scan some tags!")
-    
-    while True:
-        # Get latest tag ID
-        tag_id = my_rfid.get_tag()
-        
-        # Check whether ID is valid
-        if tag_id != "000000":
-            print("\n Tag scanned!")
-            print("Tag ID: " + tag_id)
+if my_rfid.begin() == False:
+    print("\nThe Qwiic RFID Reader isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-            scan_time = my_rfid.get_prec_req_time()
-            # If this time is too precise, try:
-            # scan_time = my_rfid.get_req_time()
-            print("Scanned " + str(scan_time) + " seconds ago")
-        
-        # Long-ish delay to not spam I2C bus, and to demonstrate the scan time
-        qwiic_i2c.delay_ms(1000)
+print("\nReady to scan some tags!")
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    # Get latest tag ID
+    tag_id = my_rfid.get_tag()
+
+    # Check whether ID is valid
+    if tag_id != "000000":
+        print("\n Tag scanned!")
+        print("Tag ID: " + tag_id)
+
+        scan_time = my_rfid.get_prec_req_time()
+        # If this time is too precise, try:
+        # scan_time = my_rfid.get_req_time()
+        print("Scanned " + str(scan_time) + " seconds ago")
+
+    # Long-ish delay to not spam I2C bus, and to demonstrate the scan time
+    qwiic_i2c.delay_ms(1000)

@@ -91,27 +91,18 @@ import sys
 import qwiic_nau7802
 
 
-def run_example():
-    print("\nQwiic NAU7802 Example 1 - Basic Readings\n")
-    my_scale = qwiic_nau7802.QwiicNAU7802()
+print("\nQwiic NAU7802 Example 1 - Basic Readings\n")
+my_scale = qwiic_nau7802.QwiicNAU7802()
 
-    if not my_scale.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_scale.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_scale.begin()
+my_scale.begin()
 
-    while True:
-        if my_scale.available():
-            print("Reading:", my_scale.get_reading())
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    if my_scale.available():
+        print("Reading:", my_scale.get_reading())
 ```
 
 ## Documentation

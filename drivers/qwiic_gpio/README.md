@@ -92,32 +92,23 @@ import qwiic_gpio
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Qwiic GPIO Example 1\n")
-    my_gpio = qwiic_gpio.QwiicGPIO()
+print("\nSparkFun Qwiic GPIO Example 1\n")
+my_gpio = qwiic_gpio.QwiicGPIO()
 
-    if not my_gpio.is_connected():
-        print("The Qwiic GPIO isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_gpio.is_connected():
+    print("The Qwiic GPIO isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_gpio.begin()
-    my_gpio.pin_mode(0, my_gpio.GPIO_OUT)
+my_gpio.begin()
+my_gpio.pin_mode(0, my_gpio.GPIO_OUT)
 
-    while True:
-        my_gpio.digital_write(0, my_gpio.GPIO_HI)
-        print("set pin 0 hi!")
-        qwiic_i2c.delay_ms(1000)
-        my_gpio.digital_write(0, my_gpio.GPIO_LO)
-        print("set pin 0 lo!")
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    my_gpio.digital_write(0, my_gpio.GPIO_HI)
+    print("set pin 0 hi!")
+    qwiic_i2c.delay_ms(1000)
+    my_gpio.digital_write(0, my_gpio.GPIO_LO)
+    print("set pin 0 lo!")
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

@@ -51,36 +51,27 @@ import qwiic_i2c
 import qwiic_tca9548a
 
 
-def run_example():
-    print("\nSparkFun TCA9548A 8-Channel Mux Example 3\n")
+print("\nSparkFun TCA9548A 8-Channel Mux Example 3\n")
 
-    # Initialize Constructor
-    my_tca = qwiic_tca9548a.QwiicTCA9548A()
+# Initialize Constructor
+my_tca = qwiic_tca9548a.QwiicTCA9548A()
 
-    if not my_tca.is_connected():
-        print("The Qwiic TCA9548A 8-Channel Mux device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_tca.is_connected():
+    print("The Qwiic TCA9548A 8-Channel Mux device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    # List Channel Configuration
-    print("Enabled channels:", my_tca.list_channels())
+# List Channel Configuration
+print("Enabled channels:", my_tca.list_channels())
 
-    # Enable Channels 0 and 4
-    my_tca.enable_channels([0, 4])
-    print("Enabled channels:", my_tca.list_channels())
+# Enable Channels 0 and 4
+my_tca.enable_channels([0, 4])
+print("Enabled channels:", my_tca.list_channels())
 
-    # Pause 1 sec
-    qwiic_i2c.delay_ms(1000)
+# Pause 1 sec
+qwiic_i2c.delay_ms(1000)
 
-    # Enable Channel 7
-    my_tca.enable_channels(7)
+# Enable Channel 7
+my_tca.enable_channels(7)
 
-    # List Channel Configuration
-    print("Enabled channels:", my_tca.list_channels())
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 3")
-        sys.exit(0)
+# List Channel Configuration
+print("Enabled channels:", my_tca.list_channels())

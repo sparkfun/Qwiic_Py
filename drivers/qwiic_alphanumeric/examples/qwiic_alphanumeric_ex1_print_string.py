@@ -43,23 +43,15 @@
 import qwiic_alphanumeric
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic Alphanumeric - Example 1: Print String")
-    my_display = qwiic_alphanumeric.QwiicAlphanumeric()
+print("\nSparkFun Qwiic Alphanumeric - Example 1: Print String")
+my_display = qwiic_alphanumeric.QwiicAlphanumeric()
 
-    if my_display.begin() == False:
-        print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connection.", \
-            file=sys.stderr)
-        return
-    
-    print("\nQwiic Alphanumeric ready!")
+if my_display.begin() == False:
+    print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connection.", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    my_display.print("Milk")
+print("\nQwiic Alphanumeric ready!")
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 1")
-        sys.exit(0)
+my_display.print("Milk")

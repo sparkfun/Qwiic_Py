@@ -91,34 +91,25 @@ import sys
 import qwiic_as7265x
 
 
-def run_example():
-    print("\nQwiic Spectral Triad Example 1 - Basic\n")
-    my_as7265x = qwiic_as7265x.QwiicAS7265x()
+print("\nQwiic Spectral Triad Example 1 - Basic\n")
+my_as7265x = qwiic_as7265x.QwiicAS7265x()
 
-    if not my_as7265x.begin():
-        print("Unable to initialize the AS7265x. Please check your connection", file=sys.stderr)
-        return
+if not my_as7265x.begin():
+    print("Unable to initialize the AS7265x. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    print("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W,K,L")
+print("A,B,C,D,E,F,G,H,R,I,S,J,T,U,V,W,K,L")
 
-    while True:
-        my_as7265x.take_measurements()
-        print(",".join(str(value) for value in [
-            my_as7265x.get_calibrated_a(), my_as7265x.get_calibrated_b(), my_as7265x.get_calibrated_c(),
-            my_as7265x.get_calibrated_d(), my_as7265x.get_calibrated_e(), my_as7265x.get_calibrated_f(),
-            my_as7265x.get_calibrated_g(), my_as7265x.get_calibrated_h(), my_as7265x.get_calibrated_r(),
-            my_as7265x.get_calibrated_i(), my_as7265x.get_calibrated_s(), my_as7265x.get_calibrated_j(),
-            my_as7265x.get_calibrated_t(), my_as7265x.get_calibrated_u(), my_as7265x.get_calibrated_v(),
-            my_as7265x.get_calibrated_w(), my_as7265x.get_calibrated_k(), my_as7265x.get_calibrated_l(),
-        ]))
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    my_as7265x.take_measurements()
+    print(",".join(str(value) for value in [
+        my_as7265x.get_calibrated_a(), my_as7265x.get_calibrated_b(), my_as7265x.get_calibrated_c(),
+        my_as7265x.get_calibrated_d(), my_as7265x.get_calibrated_e(), my_as7265x.get_calibrated_f(),
+        my_as7265x.get_calibrated_g(), my_as7265x.get_calibrated_h(), my_as7265x.get_calibrated_r(),
+        my_as7265x.get_calibrated_i(), my_as7265x.get_calibrated_s(), my_as7265x.get_calibrated_j(),
+        my_as7265x.get_calibrated_t(), my_as7265x.get_calibrated_u(), my_as7265x.get_calibrated_v(),
+        my_as7265x.get_calibrated_w(), my_as7265x.get_calibrated_k(), my_as7265x.get_calibrated_l(),
+    ]))
 ```
 
 ## Documentation

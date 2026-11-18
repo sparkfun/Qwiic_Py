@@ -98,6 +98,12 @@ def check_source(report, driver, path, is_example):
             report.error(path, line, "print() in a driver: return values or raise instead")
 
     if is_example:
+        # Examples are plain scripts (convention 12)
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef) and node.name in ("run_example", "run"):
+                report.error(path, node.lineno, "example wraps its code in %s(): put it at the top level" % node.name)
+            elif isinstance(node, ast.If) and "__main__" in ast.dump(node.test):
+                report.error(path, node.lineno, "example has an if __name__ == '__main__' guard: put the code at the top level")
         return
 
     # Public constants (module or class level, assigned a literal) are UPPER_CASE

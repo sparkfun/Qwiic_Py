@@ -44,43 +44,36 @@ import qwiic_i2c
 # address example script (qwiic_cy8cmbr3_ex4_i2c_addr.py)
 addresses = [0x30, 0x31] # Add more addresses as needed
 
-def run_example():
-	print("\nQwiic Template Example 5 - Multiple Sensors\n")
 
-	sensors = []
+print("\nQwiic Template Example 5 - Multiple Sensors\n")
 
-	# Create a device instance for each address (Note the "address" parameter)
-	for addr in addresses:
-		sensors.append(qwiic_cy8cmbr3.QwiicCY8CMBR3(address=addr))
+sensors = []
 
-	# Check if each sensor is connected
+# Create a device instance for each address (Note the "address" parameter)
+for addr in addresses:
+	sensors.append(qwiic_cy8cmbr3.QwiicCY8CMBR3(address=addr))
+
+# Check if each sensor is connected
+for sensor in sensors:
+	if sensor.is_connected() == False:
+		print("The device at address " + hex(sensor.address) + " isn't connected to the system. Please check your connection", \
+			file=sys.stderr)
+		print("Make sure you have already set the I2C address correctly for each sensor with the address example script (qwiic_cy8cmbr3_ex4_i2c_addr.py)", \
+			file=sys.stderr)
+		sys.exit(1)
+
+# Initialize the devices 
+for sensor in sensors:
+	if not sensor.begin():
+		print("Failed to initialize sensor at address: " + hex(sensor.address), file=sys.stderr)
+		sys.exit(1)
+
+# Infinite loop reading data
+while True:
+	# Read and print the soil capacitance from each sensor
 	for sensor in sensors:
-		if sensor.is_connected() == False:
-			print("The device at address " + hex(sensor.address) + " isn't connected to the system. Please check your connection", \
-				file=sys.stderr)
-			print("Make sure you have already set the I2C address correctly for each sensor with the address example script (qwiic_cy8cmbr3_ex4_i2c_addr.py)", \
-				file=sys.stderr)
-			return
-
-	# Initialize the devices 
-	for sensor in sensors:
-		if not sensor.begin():
-			print("Failed to initialize sensor at address: " + hex(sensor.address), file=sys.stderr)
-			return
-
-	# Infinite loop reading data
-	while True:
-		# Read and print the soil capacitance from each sensor
-		for sensor in sensors:
-			capacitance = sensor.get_capacitance_pf()
-			print("Sensor 0x" + hex(sensor.address) + " Soil Capacitance: " + str(capacitance) + " pF")
-		print("")  # Blank line between readings
-		# Sleep for a second to avoid spamming the output
-		qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+		capacitance = sensor.get_capacitance_pf()
+		print("Sensor 0x" + hex(sensor.address) + " Soil Capacitance: " + str(capacitance) + " pF")
+	print("")  # Blank line between readings
+	# Sleep for a second to avoid spamming the output
+	qwiic_i2c.delay_ms(1000)

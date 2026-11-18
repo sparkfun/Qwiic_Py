@@ -45,34 +45,25 @@ import sys
 
 debounce_time_ms = 200
 
-def run_example():
 
-	print("\nSparkFun Qwiic PIR  Example 1\n")
-	my_pir = qwiic_pir.QwiicPIR()
+print("\nSparkFun Qwiic PIR  Example 1\n")
+my_pir = qwiic_pir.QwiicPIR()
 
-	if not my_pir.begin():
-		print("The Qwiic PIR isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-		
-	print ("Waiting 30 seconds for PIR to stabilize")
-	for i in range(0, 30):
-		print(i)
-		qwiic_i2c.delay_ms(1000)
+if not my_pir.begin():
+	print("The Qwiic PIR isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print("Device Stable")
+print ("Waiting 30 seconds for PIR to stabilize")
+for i in range(0, 30):
+	print(i)
+	qwiic_i2c.delay_ms(1000)
 
-	while True:
-		if my_pir.raw_reading() is True:
-			print("Object Detected")
-		else:
-			print("Object Removed")
-		qwiic_i2c.delay_ms(debounce_time_ms)
+print("Device Stable")
 
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 1")
-		sys.exit(0)
+while True:
+	if my_pir.raw_reading() is True:
+		print("Object Detected")
+	else:
+		print("Object Removed")
+	qwiic_i2c.delay_ms(debounce_time_ms)

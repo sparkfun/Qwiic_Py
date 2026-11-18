@@ -94,38 +94,29 @@ import qwiic_vl53l5cx
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic VL53LCX Example 1 - DistanceArray\n")
-    sensor = qwiic_vl53l5cx.QwiicVL53L5CX()
+print("\nQwiic VL53LCX Example 1 - DistanceArray\n")
+sensor = qwiic_vl53l5cx.QwiicVL53L5CX()
 
-    if not sensor.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not sensor.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    print("Initializing sensor board. This can take up to 10s. Please wait.")
-    if not sensor.begin():
-        print("Sensor initialization unsuccessful. Exiting...", file=sys.stderr)
-        return
+print("Initializing sensor board. This can take up to 10s. Please wait.")
+if not sensor.begin():
+    print("Sensor initialization unsuccessful. Exiting...", file=sys.stderr)
+    sys.exit(1)
 
-    sensor.set_resolution(8 * 8)
-    width = 8
-    sensor.start_ranging()
+sensor.set_resolution(8 * 8)
+width = 8
+sensor.start_ranging()
 
-    while True:
-        if sensor.check_data_ready():
-            data = sensor.get_ranging_data()
-            for y in range(0, width * width, width):
-                print("\t".join(str(data.distance_mm[x + y]) for x in range(width - 1, -1, -1)))
-            print()
-        qwiic_i2c.delay_ms(5)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    if sensor.check_data_ready():
+        data = sensor.get_ranging_data()
+        for y in range(0, width * width, width):
+            print("\t".join(str(data.distance_mm[x + y]) for x in range(width - 1, -1, -1)))
+        print()
+    qwiic_i2c.delay_ms(5)
 ```
 
 ## Documentation

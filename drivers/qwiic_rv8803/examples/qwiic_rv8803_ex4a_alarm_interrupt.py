@@ -51,46 +51,39 @@ hourAlarmEnable = False
 weekdayAlarmEnable = False
 dateAlarmEnable = False
 
-def run_example():
-	print("\nQwiic RV8803 Example 4a - Alarm Interrupt\n")
 
-	# Create instance of device
-	myRTC = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 4a - Alarm Interrupt\n")
 
-	# Check if it's connected
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myRTC = qwiic_rv8803.QwiicRV8803()
 
-	# Initialize the device
-	myRTC.begin()
+# Check if it's connected
+if myRTC.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myRTC.disable_all_interrupts()
-	myRTC.clear_all_interrupt_flags()
-	#The alarm interrupt compares the alarm interrupt registers with the current time registers. We must choose which registers we want to compare by setting bits to true or false
-	myRTC.set_items_to_match_for_alarm(minuteAlarmEnable, hourAlarmEnable, weekdayAlarmEnable, dateAlarmEnable)
-	myRTC.set_alarm_minutes(minuteAlarmValue)
-	myRTC.set_alarm_hours(hourAlarmValue)
-	myRTC.set_alarm_weekday(weekdayAlarmValue)
-	# myRTC.set_alarm_date(dateAlarmValue) # uncomment this line if you want to set a date alarm instead of weekday
-	myRTC.enable_hardware_interrupt(myRTC.ALARM_INTERRUPT)
+# Initialize the device
+myRTC.begin()
 
-	while True:
-		if myRTC.get_interrupt_flag(myRTC.FLAG_ALARM):
-			print("Alarm Triggered! Clearing flag...")
-			myRTC.clear_interrupt_flag(myRTC.FLAG_ALARM)
-		else:
-			myRTC.update_time()
-			print("Waiting for alarm to trigger. Current Time: ", end="")
-			print (myRTC.string_date_usa(), end="")
-			print (" ", myRTC.string_time())
+myRTC.disable_all_interrupts()
+myRTC.clear_all_interrupt_flags()
+#The alarm interrupt compares the alarm interrupt registers with the current time registers. We must choose which registers we want to compare by setting bits to true or false
+myRTC.set_items_to_match_for_alarm(minuteAlarmEnable, hourAlarmEnable, weekdayAlarmEnable, dateAlarmEnable)
+myRTC.set_alarm_minutes(minuteAlarmValue)
+myRTC.set_alarm_hours(hourAlarmValue)
+myRTC.set_alarm_weekday(weekdayAlarmValue)
+# myRTC.set_alarm_date(dateAlarmValue) # uncomment this line if you want to set a date alarm instead of weekday
+myRTC.enable_hardware_interrupt(myRTC.ALARM_INTERRUPT)
 
-		qwiic_i2c.delay_ms(1000)
+while True:
+	if myRTC.get_interrupt_flag(myRTC.FLAG_ALARM):
+		print("Alarm Triggered! Clearing flag...")
+		myRTC.clear_interrupt_flag(myRTC.FLAG_ALARM)
+	else:
+		myRTC.update_time()
+		print("Waiting for alarm to trigger. Current Time: ", end="")
+		print (myRTC.string_date_usa(), end="")
+		print (" ", myRTC.string_time())
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	qwiic_i2c.delay_ms(1000)

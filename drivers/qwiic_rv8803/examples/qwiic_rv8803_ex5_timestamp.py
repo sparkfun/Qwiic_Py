@@ -36,37 +36,30 @@
 import qwiic_rv8803
 import sys
 
-def run_example():
-	print("\nQwiic RV8803 Example 5 - Timestamp\n")
 
-	# Create instance of device
-	myRTC = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 5 - Timestamp\n")
 
-	# Check if it's connected
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myRTC = qwiic_rv8803.QwiicRV8803()
 
-	# Initialize the device
-	myRTC.begin()
+# Check if it's connected
+if myRTC.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Configure EVI event capture with button debounce so we can catch button presses on the RTC
-	myRTC.set_evi_event_capture(True)
-	myRTC.set_evi_debounce_time(myRTC.EVI_DEBOUNCE_256HZ)
+# Initialize the device
+myRTC.begin()
 
-	while True:
-		if myRTC.get_interrupt_flag(myRTC.FLAG_EVI):
-			myRTC.update_time()
-			myRTC.clear_interrupt_flag(myRTC.FLAG_EVI)
-			print ("Current Time: ", end="")
-			print (myRTC.string_date_usa(), end="")
-			# get timestamp
-			print (" ", myRTC.string_timestamp())
+# Configure EVI event capture with button debounce so we can catch button presses on the RTC
+myRTC.set_evi_event_capture(True)
+myRTC.set_evi_debounce_time(myRTC.EVI_DEBOUNCE_256HZ)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if myRTC.get_interrupt_flag(myRTC.FLAG_EVI):
+		myRTC.update_time()
+		myRTC.clear_interrupt_flag(myRTC.FLAG_EVI)
+		print ("Current Time: ", end="")
+		print (myRTC.string_date_usa(), end="")
+		# get timestamp
+		print (" ", myRTC.string_timestamp())

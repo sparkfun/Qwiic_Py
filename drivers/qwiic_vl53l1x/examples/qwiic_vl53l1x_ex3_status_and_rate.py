@@ -79,42 +79,33 @@ def read_distance(tof):
 	return distance
 
 
-def run_example():
-	print("VL53L1X Qwiic Test\n")
-	tof = qwiic_vl53l1x.QwiicVL53L1X()
+print("VL53L1X Qwiic Test\n")
+tof = qwiic_vl53l1x.QwiicVL53L1X()
 
-	if not tof.begin():						# Checks the sensor and loads its default settings
-		print("The Qwiic VL53L1X device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not tof.begin():						# Checks the sensor and loads its default settings
+	print("The Qwiic VL53L1X device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print("Sensor online!\n")
+print("Sensor online!\n")
 
-	tof.set_distance_mode(1)	# Sets Distance Mode Short (Long- Change value to 2)
+tof.set_distance_mode(1)	# Sets Distance Mode Short (Long- Change value to 2)
 
-	distance = [] # Initialize list
+distance = [] # Initialize list
 
-	while True:
-		start = qwiic_i2c.ticks_ms()
-		distance.append(read_distance(tof))
-		end = qwiic_i2c.ticks_ms()
+while True:
+	start = qwiic_i2c.ticks_ms()
+	distance.append(read_distance(tof))
+	end = qwiic_i2c.ticks_ms()
 
-		if len(distance) < 10:
-			avgdistance = mean(distance)
-		else:
-			distance.remove(distance[0])
-			avgdistance = mean(distance[len(distance)-10:len(distance)+1]) # Running average of last 10 measurements
+	if len(distance) < 10:
+		avgdistance = mean(distance)
+	else:
+		distance.remove(distance[0])
+		avgdistance = mean(distance[len(distance)-10:len(distance)+1]) # Running average of last 10 measurements
 
-		signalrate = tof.get_signal_rate()
-		rangestatus = tof.get_range_status()
-		elapsed_ms = max(qwiic_i2c.ticks_diff(end, start), 1)
+	signalrate = tof.get_signal_rate()
+	rangestatus = tof.get_range_status()
+	elapsed_ms = max(qwiic_i2c.ticks_diff(end, start), 1)
 
-		print("Distance(mm): %s avgDistance(mm): %.2f Signal Rate: %s Range Status: %s Hz: %.5f" % (distance[len(distance)-1], avgdistance, signalrate, rangestatus, 1000.0 / elapsed_ms))
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as ex_err:
-		print("\nEnding Example 3")
-		sys.exit(0)
+	print("Distance(mm): %s avgDistance(mm): %.2f Signal Rate: %s Range Status: %s Hz: %.5f" % (distance[len(distance)-1], avgdistance, signalrate, rangestatus, 1000.0 / elapsed_ms))

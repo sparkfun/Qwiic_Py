@@ -43,25 +43,17 @@
 import qwiic_alphanumeric
 import sys
 
-def run_example():
 
-    print("\nSparkFun Qwiic Alphanumeric - Example 7: Unkown Char")
-    my_display = qwiic_alphanumeric.QwiicAlphanumeric()
+print("\nSparkFun Qwiic Alphanumeric - Example 7: Unkown Char")
+my_display = qwiic_alphanumeric.QwiicAlphanumeric()
 
-    if my_display.begin() == False:
-        print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connection.", \
-            file=sys.stderr)
-        return
-    
-    print("\nQwiic Alphanumeric ready!")
-    
-    # Because '\t' is a character unkown to the library, expect the display
-    # to turn on all sefments for that unknown digit/character
-    my_display.print("\t\t\t\t")   # Tabs are not printable characters
+if my_display.begin() == False:
+    print("\nThe Qwiic Alphanumeric isn't connected to the system. Please check your connection.", \
+        file=sys.stderr)
+    sys.exit(1)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 7")
-        sys.exit(0)
+print("\nQwiic Alphanumeric ready!")
+
+# Because '\t' is a character unkown to the library, expect the display
+# to turn on all sefments for that unknown digit/character
+my_display.print("\t\t\t\t")   # Tabs are not printable characters

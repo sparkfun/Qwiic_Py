@@ -39,44 +39,38 @@
 import qwiic_fs3000
 import sys
 import qwiic_i2c
-def run_example():
-	print("\nQwiic Template Example 1 - Basic\n")
 
-	# Create instance of device
-	my_fs3000 = qwiic_fs3000.QwiicFS3000() 
 
-	# Check if it's connected
-	if not my_fs3000.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+print("\nQwiic Template Example 1 - Basic\n")
 
-	# Initialize the device
-	my_fs3000.begin()
+# Create instance of device
+my_fs3000 = qwiic_fs3000.QwiicFS3000() 
 
-	# Set the range to match which version of the sensor you are using.
-	# FS3000-1005 (0-7.23 m/sec) --->>>  AIRFLOW_RANGE_7_MPS
-	# FS3000-1015 (0-15 m/sec)   --->>>  AIRFLOW_RANGE_15_MPS
-	my_fs3000.set_range(my_fs3000.AIRFLOW_RANGE_7_MPS)
-		
-	while True:
-		# Read the sensor
-		raw = my_fs3000.read_raw()
-		m_s = my_fs3000.read_meters_per_second()
-		mph = my_fs3000.read_miles_per_hour()
-		
-		if raw == -1 or m_s == -1 or mph == -1:
-			continue # -1 indicates an error
-		
-		print("FS3000 Readings \tRaw: ", raw, end="")
-		print("\tm/s: ", m_s, end="")
-		print("\tmph:", mph)
+# Check if it's connected
+if not my_fs3000.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-		qwiic_i2c.delay_ms(1000)  # note, response time on the sensor is 125ms
+# Initialize the device
+my_fs3000.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 1")
-		sys.exit(0)
+# Set the range to match which version of the sensor you are using.
+# FS3000-1005 (0-7.23 m/sec) --->>>  AIRFLOW_RANGE_7_MPS
+# FS3000-1015 (0-15 m/sec)   --->>>  AIRFLOW_RANGE_15_MPS
+my_fs3000.set_range(my_fs3000.AIRFLOW_RANGE_7_MPS)
+
+while True:
+	# Read the sensor
+	raw = my_fs3000.read_raw()
+	m_s = my_fs3000.read_meters_per_second()
+	mph = my_fs3000.read_miles_per_hour()
+
+	if raw == -1 or m_s == -1 or mph == -1:
+		continue # -1 indicates an error
+
+	print("FS3000 Readings \tRaw: ", raw, end="")
+	print("\tm/s: ", m_s, end="")
+	print("\tmph:", mph)
+
+	qwiic_i2c.delay_ms(1000)  # note, response time on the sensor is 125ms

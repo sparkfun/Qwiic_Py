@@ -41,41 +41,33 @@
 import qwiic_tmp117
 import sys
 
-def run_example():
-	print("\nQwiic TMP117 Example 7 - Set Address\n")
 
-	# The default address of the device is 0x48, but it can be changed to any of the following:
-	# 0x48, 0x49, 0x4A, or 0x4B
-	# The address can be changed by cutting the default address trace and 
-	# applying a solder jumper to the back of the device
-	# See the hookup guide for more information on applying a solder jumper for address selection
+print("\nQwiic TMP117 Example 7 - Set Address\n")
 
-	# Once your address has been physically changed, you must pass this address to instantiations of 
-	# the QwiicTMP117 class as seen below:
+# The default address of the device is 0x48, but it can be changed to any of the following:
+# 0x48, 0x49, 0x4A, or 0x4B
+# The address can be changed by cutting the default address trace and 
+# applying a solder jumper to the back of the device
+# See the hookup guide for more information on applying a solder jumper for address selection
 
-	# Put your desired address (0x48-0x4B) here:
-	newAddress = 0x48
+# Once your address has been physically changed, you must pass this address to instantiations of 
+# the QwiicTMP117 class as seen below:
 
-	# Create instance of device
-	myTMP117 = qwiic_tmp117.QwiicTMP117(address=newAddress)
+# Put your desired address (0x48-0x4B) here:
+newAddress = 0x48
 
-	# Check if it's connected
-	if myTMP117.is_connected() == False:
-		print("The device isn't connected to the system, or your supplied address does not align with the current jumper configuration.", \
-			file=sys.stderr)
-		print("Please check your connection and the address jumper on the back of the device.", \
-			file=sys.stderr)
-		return
-	
-	# Initialize the device
-	myTMP117.begin()
+# Create instance of device
+myTMP117 = qwiic_tmp117.QwiicTMP117(address=newAddress)
 
-	print("New Device Address:", hex(myTMP117.get_address()))
-	return
+# Check if it's connected
+if myTMP117.is_connected() == False:
+	print("The device isn't connected to the system, or your supplied address does not align with the current jumper configuration.", \
+		file=sys.stderr)
+	print("Please check your connection and the address jumper on the back of the device.", \
+		file=sys.stderr)
+	sys.exit(1)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Initialize the device
+myTMP117.begin()
+
+print("New Device Address:", hex(myTMP117.get_address()))

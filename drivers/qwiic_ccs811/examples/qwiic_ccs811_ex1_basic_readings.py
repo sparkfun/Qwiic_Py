@@ -40,41 +40,32 @@ import qwiic_ccs811
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun CCS811 Sensor Basic Example \n")
-	mySensor = qwiic_ccs811.QwiicCCS811()
+print("\nSparkFun CCS811 Sensor Basic Example \n")
+mySensor = qwiic_ccs811.QwiicCCS811()
 
-	if not mySensor.is_connected():
-		print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not mySensor.is_connected():
+	print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# On a Raspberry Pi the CCS811 needs a slower I2C clock (see the README)
-	if not mySensor.is_rpi_i2c_baudrate_ok():
-		print("NOTE: For the CCS811 to work on a Raspberry Pi, add the line\n"
+# On a Raspberry Pi the CCS811 needs a slower I2C clock (see the README)
+if not mySensor.is_rpi_i2c_baudrate_ok():
+	print("NOTE: For the CCS811 to work on a Raspberry Pi, add the line\n"
 			"  dtparam=i2c_arm_baudrate=10000\n"
 			"to /boot/firmware/config.txt (/boot/config.txt on older systems) and reboot.\n", file=sys.stderr)
 
-	if not mySensor.begin():
-		print("Unable to initialize the CCS811. Please check your connection", file=sys.stderr)
-		return
+if not mySensor.begin():
+	print("Unable to initialize the CCS811. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	while True:
+while True:
 
-		mySensor.read_algorithm_results()
+	mySensor.read_algorithm_results()
 
-		print("CO2:\t%.3f" % mySensor.get_co2())
+	print("CO2:\t%.3f" % mySensor.get_co2())
 
-		print("tVOC:\t%.3f\n" % mySensor.get_tvoc())	
-
-		
-		qwiic_i2c.delay_ms(1000)
+	print("tVOC:\t%.3f\n" % mySensor.get_tvoc())	
 
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Basic Example")
-		sys.exit(0)
+	qwiic_i2c.delay_ms(1000)

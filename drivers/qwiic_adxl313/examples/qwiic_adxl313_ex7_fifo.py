@@ -85,109 +85,98 @@ import qwiic_adxl313
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun ADXL313 Example 7 - FIFO reading with debug info about timing.\n")
-	my_adxl = qwiic_adxl313.QwiicADXL313()
+print("\nSparkFun ADXL313 Example 7 - FIFO reading with debug info about timing.\n")
+my_adxl = qwiic_adxl313.QwiicADXL313()
 
-	if my_adxl.is_connected() == False:
-		print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("Device connected successfully.")        
-  
-	my_adxl.standby()	# Must be in standby before changing settings.
-						# This is here just in case we already had sensor powered and/or
-						# configured from a previous setup.
+if my_adxl.is_connected() == False:
+	print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("Device connected successfully.")        
 
-	my_adxl.set_range(my_adxl.ADXL313_RANGE_4_G)
+my_adxl.standby()	# Must be in standby before changing settings.
+					# This is here just in case we already had sensor powered and/or
+					# configured from a previous setup.
 
-	# set bandwidth
-	# note, 12.5Hz was chosen for this example to highlight the FIFO wait/read cycle
-	# you can tweak BW and the fifo sample threshhold to suit your application.
-	my_adxl.set_bandwidth(my_adxl.ADXL313_BW_12_5)
+my_adxl.set_range(my_adxl.ADXL313_RANGE_4_G)
 
-	# setup activity sensing options
-	my_adxl.set_activity_x(False)		# disable x-axis participation in detecting activity
-	my_adxl.set_activity_y(False)		# disable y-axis participation in detecting activity
-	my_adxl.set_activity_z(False)		# disable z-axis participation in detecting activity
+# set bandwidth
+# note, 12.5Hz was chosen for this example to highlight the FIFO wait/read cycle
+# you can tweak BW and the fifo sample threshhold to suit your application.
+my_adxl.set_bandwidth(my_adxl.ADXL313_BW_12_5)
 
-	# setup inactivity sensing options
-	my_adxl.set_inactivity_x(False)		# disable x-axis participation in detecting inactivity
-	my_adxl.set_inactivity_y(False)		# disable y-axis participation in detecting inactivity
-	my_adxl.set_inactivity_z(False)		# disable z-axis participation in detecting inactivity
+# setup activity sensing options
+my_adxl.set_activity_x(False)		# disable x-axis participation in detecting activity
+my_adxl.set_activity_y(False)		# disable y-axis participation in detecting activity
+my_adxl.set_activity_z(False)		# disable z-axis participation in detecting activity
 
-	# FIFO SETUP
-	my_adxl.set_fifo_mode(my_adxl.ADXL313_FIFO_MODE_STREAM)
-	my_adxl.set_fifo_samples_threshold(30) # can be 1-32
+# setup inactivity sensing options
+my_adxl.set_inactivity_x(False)		# disable x-axis participation in detecting inactivity
+my_adxl.set_inactivity_y(False)		# disable y-axis participation in detecting inactivity
+my_adxl.set_inactivity_z(False)		# disable z-axis participation in detecting inactivity
 
-	# Interrupt Mapping
-	# when fifo fills up to watermark level, it will effect the int1 pin on the sensor
-	my_adxl.set_interrupt_mapping(my_adxl.ADXL313_INT_WATERMARK_BIT, my_adxl.ADXL313_INT1_PIN)
+# FIFO SETUP
+my_adxl.set_fifo_mode(my_adxl.ADXL313_FIFO_MODE_STREAM)
+my_adxl.set_fifo_samples_threshold(30) # can be 1-32
 
-	# enable/disable interrupts
-	# note, we set them all here, just in case there were previous settings,
-	# that need to be changed for this example to work properly.
-	my_adxl.activity_int(0)		# disable activity
-	my_adxl.inactivity_int(0)		# disable inactivity
-	my_adxl.data_ready_int(0)		# disable dataready
-	my_adxl.watermark_int(1)		# enable watermark
+# Interrupt Mapping
+# when fifo fills up to watermark level, it will effect the int1 pin on the sensor
+my_adxl.set_interrupt_mapping(my_adxl.ADXL313_INT_WATERMARK_BIT, my_adxl.ADXL313_INT1_PIN)
 
-	my_adxl.autosleep_off()		# just in case it was set from a previous setup
-	
-	my_adxl.measure_mode_on()		# wakes up sensor from stanby and puts into measurement mode
+# enable/disable interrupts
+# note, we set them all here, just in case there were previous settings,
+# that need to be changed for this example to work properly.
+my_adxl.activity_int(0)		# disable activity
+my_adxl.inactivity_int(0)		# disable inactivity
+my_adxl.data_ready_int(0)		# disable dataready
+my_adxl.watermark_int(1)		# enable watermark
 
-	# print int enable statuses, to verify we're setup correctly
-	print("activity int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_ACTIVITY_BIT))
-	print("inactivity int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_INACTIVITY_BIT))
-	print("data_ready int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_DATA_READY_BIT))
-	print("FIFO watermark int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_WATERMARK_BIT))
-	print("FIFO watermark Samples Threshhold: ", my_adxl.get_fifo_samples_threshold())
-	print("FIFO mode: ", my_adxl.get_fifo_mode())
-	
-	last_watermark_time = qwiic_i2c.ticks_ms()
+my_adxl.autosleep_off()		# just in case it was set from a previous setup
 
-	my_adxl.clear_fifo() # clear FIFO for a fresh start on this example.
-	# The FIFO may have been full from previous use
-	# and then would fail to cause an interrupt when starting this example.
+my_adxl.measure_mode_on()		# wakes up sensor from stanby and puts into measurement mode
 
-	dot_timer = 0 # used to print some "dots" during down time in cycle
-	while True:
-		my_adxl.update_int_source_statuses() # this will update all INTSOURCE statuses.
-		if my_adxl.ADXL313_INTSOURCE_WATERMARK:
-			entries = my_adxl.get_fifo_entries_amount()
-			now = qwiic_i2c.ticks_ms()
-			timegap_ms = qwiic_i2c.ticks_diff(now, last_watermark_time)
-			
-			print("\nWatermark Interrupt! Time since last read: ", timegap_ms, "ms Entries:", entries)
-			last_watermark_time = now
-			samples = []
-			while entries > 0:
-				my_adxl.update_int_source_statuses() # this will update all INTSOURCE statuses.
-				if my_adxl.ADXL313_INTSOURCE_DATAREADY:
-					my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
+# print int enable statuses, to verify we're setup correctly
+print("activity int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_ACTIVITY_BIT))
+print("inactivity int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_INACTIVITY_BIT))
+print("data_ready int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_DATA_READY_BIT))
+print("FIFO watermark int enable: ", my_adxl.is_interrupt_enabled(my_adxl.ADXL313_INT_WATERMARK_BIT))
+print("FIFO watermark Samples Threshhold: ", my_adxl.get_fifo_samples_threshold())
+print("FIFO mode: ", my_adxl.get_fifo_mode())
 
-					# Store the data and print it once the FIFO is empty, because printing is too slow
-					samples.append((my_adxl.x, my_adxl.y, my_adxl.z))
-					entries -= 1 # we've read one more entry, so let's keep track and keep going until we're done
-				else:
-					print("Waiting for Data.")
-			for x, y, z in samples:
-				print(x, "\t", y, "\t", z)
-		
-		qwiic_i2c.delay_us(1) # sleep 1 microsecond
-		dot_timer += 1
-		if dot_timer > 100:
-			print(".", end = '')
-			dot_timer = 0
+last_watermark_time = qwiic_i2c.ticks_ms()
 
+my_adxl.clear_fifo() # clear FIFO for a fresh start on this example.
+# The FIFO may have been full from previous use
+# and then would fail to cause an interrupt when starting this example.
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 7")
-		sys.exit(0)
+dot_timer = 0 # used to print some "dots" during down time in cycle
+while True:
+	my_adxl.update_int_source_statuses() # this will update all INTSOURCE statuses.
+	if my_adxl.ADXL313_INTSOURCE_WATERMARK:
+		entries = my_adxl.get_fifo_entries_amount()
+		now = qwiic_i2c.ticks_ms()
+		timegap_ms = qwiic_i2c.ticks_diff(now, last_watermark_time)
 
+		print("\nWatermark Interrupt! Time since last read: ", timegap_ms, "ms Entries:", entries)
+		last_watermark_time = now
+		samples = []
+		while entries > 0:
+			my_adxl.update_int_source_statuses() # this will update all INTSOURCE statuses.
+			if my_adxl.ADXL313_INTSOURCE_DATAREADY:
+				my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
 
+				# Store the data and print it once the FIFO is empty, because printing is too slow
+				samples.append((my_adxl.x, my_adxl.y, my_adxl.z))
+				entries -= 1 # we've read one more entry, so let's keep track and keep going until we're done
+			else:
+				print("Waiting for Data.")
+		for x, y, z in samples:
+			print(x, "\t", y, "\t", z)
+
+	qwiic_i2c.delay_us(1) # sleep 1 microsecond
+	dot_timer += 1
+	if dot_timer > 100:
+		print(".", end = '')
+		dot_timer = 0

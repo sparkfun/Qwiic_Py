@@ -93,33 +93,24 @@ import qwiic_i2c
 import qwiic_pca9685
 
 
-def run_example():
-    print("\nSparkFun PCA9685 Example 1\n")
-    my_pwm = qwiic_pca9685.QwiicPCA9685()
+print("\nSparkFun PCA9685 Example 1\n")
+my_pwm = qwiic_pca9685.QwiicPCA9685()
 
-    if not my_pwm.is_connected():
-        print("The Qwiic PCA9685 device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_pwm.is_connected():
+    print("The Qwiic PCA9685 device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_pwm.begin()
-    my_pwm.set_pre_scale(50)            # 50 Hz PWM
-    my_pwm.set_channel_word(0, 1, 0)    # channel 0 pulse starts at count 0
+my_pwm.begin()
+my_pwm.set_pre_scale(50)            # 50 Hz PWM
+my_pwm.set_channel_word(0, 1, 0)    # channel 0 pulse starts at count 0
 
-    while True:
-        for i in range(205, 410):       # 1 ms to 2 ms
-            my_pwm.set_channel_word(0, 0, i)
-            qwiic_i2c.delay_ms(50)
-        for i in range(410, 205, -1):
-            my_pwm.set_channel_word(0, 0, i)
-            qwiic_i2c.delay_ms(50)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    for i in range(205, 410):       # 1 ms to 2 ms
+        my_pwm.set_channel_word(0, 0, i)
+        qwiic_i2c.delay_ms(50)
+    for i in range(410, 205, -1):
+        my_pwm.set_channel_word(0, 0, i)
+        qwiic_i2c.delay_ms(50)
 ```
 
 ## Documentation

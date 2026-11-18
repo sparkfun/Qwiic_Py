@@ -44,45 +44,34 @@ import qwiic_keypad
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun qwiic Keypad   Example 2\n")
-	myKeypad = qwiic_keypad.QwiicKeypad()
+print("\nSparkFun qwiic Keypad   Example 2\n")
+myKeypad = qwiic_keypad.QwiicKeypad()
 
-	if not myKeypad.is_connected():
-		print("The Qwiic Keypad device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myKeypad.is_connected():
+	print("The Qwiic Keypad device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myKeypad.begin()
+myKeypad.begin()
 
-	print("Initialized. Firmware Version: %s" % myKeypad.get_version())
-
-
-	button = 0
-	while True:
-
-		# necessary for keypad to pull button from stack to readable register
-		myKeypad.update_fifo()  
-		button = myKeypad.get_button()
-		deltaT = myKeypad.time_since_pressed()
-
-		if button == -1:
-			print("No keypad detected")
-			qwiic_i2c.delay_ms(1000)
-			continue
-
-		elif button != 0:
-			print("Button %s was pressed, %d milliseconds ago." % (chr(button), deltaT))
-		
-		qwiic_i2c.delay_ms(250)
-		
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)
+print("Initialized. Firmware Version: %s" % myKeypad.get_version())
 
 
+button = 0
+while True:
+
+	# necessary for keypad to pull button from stack to readable register
+	myKeypad.update_fifo()  
+	button = myKeypad.get_button()
+	deltaT = myKeypad.time_since_pressed()
+
+	if button == -1:
+		print("No keypad detected")
+		qwiic_i2c.delay_ms(1000)
+		continue
+
+	elif button != 0:
+		print("Button %s was pressed, %d milliseconds ago." % (chr(button), deltaT))
+
+	qwiic_i2c.delay_ms(250)

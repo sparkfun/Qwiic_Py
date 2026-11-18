@@ -36,40 +36,31 @@
 import qwiic_as7265x
 import sys
 
-def run_example():
-    print("\nQwiic Spectral Triad Example 7 - Get Version\n")
 
-    # Create instance of device
-    myAS7265x = qwiic_as7265x.QwiicAS7265x()
+print("\nQwiic Spectral Triad Example 7 - Get Version\n")
 
-    # Check if it's connected
-    if myAS7265x.is_connected() == False:
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+# Create instance of device
+myAS7265x = qwiic_as7265x.QwiicAS7265x()
 
-    # Initialize the device
-    if myAS7265x.begin() == False:
-        print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
-        return
+# Check if it's connected
+if myAS7265x.is_connected() == False:
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    deviceType = myAS7265x.get_device_type()
-    hardwareVersion = myAS7265x.get_hardware_version()
-    majorFirmwareVersion = myAS7265x.get_major_firmware_version()
-    patchFirmwareVersion = myAS7265x.get_patch_firmware_version()
-    buildFirmwareVersion = myAS7265x.get_build_firmware_version()
+# Initialize the device
+if myAS7265x.begin() == False:
+    print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
+    sys.exit(1)
 
-    print("Device Type:", hex(deviceType))
-    print("HardwareVersion:", hex(hardwareVersion))
-    print("Major Firmware Version:", hex(majorFirmwareVersion))
-    print("Patch Firmware Version:", hex(patchFirmwareVersion))
-    print("Build Firmware Version:", hex(buildFirmwareVersion))
+deviceType = myAS7265x.get_device_type()
+hardwareVersion = myAS7265x.get_hardware_version()
+majorFirmwareVersion = myAS7265x.get_major_firmware_version()
+patchFirmwareVersion = myAS7265x.get_patch_firmware_version()
+buildFirmwareVersion = myAS7265x.get_build_firmware_version()
 
-    return
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example")
-        sys.exit(0)
+print("Device Type:", hex(deviceType))
+print("HardwareVersion:", hex(hardwareVersion))
+print("Major Firmware Version:", hex(majorFirmwareVersion))
+print("Patch Firmware Version:", hex(patchFirmwareVersion))
+print("Build Firmware Version:", hex(buildFirmwareVersion))

@@ -36,39 +36,32 @@
 import qwiic_rv8803
 import sys
 
-def run_example():
-	print("\nQwiic RV8803 Example 6 - Fine Tuning\n")
 
-	# Create instance of device
-	myRTC = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 6 - Fine Tuning\n")
 
-	# Check if it's connected
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myRTC = qwiic_rv8803.QwiicRV8803()
 
-	# Initialize the device
-	myRTC.begin()
+# Check if it's connected
+if myRTC.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# We now must measure the frequency on the Clock Out carefully to calibrate our crystal. To start generating a signal on Clock Out, tie CLKOE High.
- 	# Change measuredFrequency accordingly, note that you can only correct +/-7.6288 ppm
-	myRTC.set_calibration_offset(0) # zero out any previous calibration
-	myRTC.set_clock_out_timer_frequency(myRTC.CLOCK_OUT_FREQUENCY_1HZ) # set the clock out to 1Hz square wave
-	measuredFrequency = 1.0000012 # measured frequency in HZ (CHANGE THIS TO YOUR MEASURED VALUE)
-	newPPM = (measuredFrequency - 1) * 1000000 # Calculate PPM difference between measuredFrequency and our desired 1 Hz wave
-	# myRTC.set_calibration_offset(newPPM) # Uncomment this line after you have changed the value of measuredFrequency to load the new calibration into the RTC
-	print("Tie CLKOE high to measure the frequency on the Clock Out pin.")
-	print("Measure the frequency and input it into measuredFrequency in this calibration script.")
-	print("Then uncomment the line to set the calibration offset to the new value.")
-	
-	# Wait forever (until user interrupts the program) so we can manually measure the square wave
-	while True:
-		pass
+# Initialize the device
+myRTC.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# We now must measure the frequency on the Clock Out carefully to calibrate our crystal. To start generating a signal on Clock Out, tie CLKOE High.
+# Change measuredFrequency accordingly, note that you can only correct +/-7.6288 ppm
+myRTC.set_calibration_offset(0) # zero out any previous calibration
+myRTC.set_clock_out_timer_frequency(myRTC.CLOCK_OUT_FREQUENCY_1HZ) # set the clock out to 1Hz square wave
+measuredFrequency = 1.0000012 # measured frequency in HZ (CHANGE THIS TO YOUR MEASURED VALUE)
+newPPM = (measuredFrequency - 1) * 1000000 # Calculate PPM difference between measuredFrequency and our desired 1 Hz wave
+# myRTC.set_calibration_offset(newPPM) # Uncomment this line after you have changed the value of measuredFrequency to load the new calibration into the RTC
+print("Tie CLKOE high to measure the frequency on the Clock Out pin.")
+print("Measure the frequency and input it into measuredFrequency in this calibration script.")
+print("Then uncomment the line to set the calibration offset to the new value.")
+
+# Wait forever (until user interrupts the program) so we can manually measure the square wave
+while True:
+	pass

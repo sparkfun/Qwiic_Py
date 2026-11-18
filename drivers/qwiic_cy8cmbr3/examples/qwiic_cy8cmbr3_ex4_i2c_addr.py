@@ -41,39 +41,32 @@ import qwiic_i2c
 oldAddress = qwiic_cy8cmbr3.QwiicCY8CMBR3.DEFAULT_ADDRESS  # Change this to your new address if you have modified it already
 newAddress = 0x50 # Example new address to set (addresses from 0x08 to 0x77 are valid)
 
-def run_example():
-	print("\nQwiic Template Example 6 - I2C Address\n")
 
-	# Create instance of device
-	mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3(address=oldAddress)
-    
-	# Check if it's connected
-	if mySoilSensor.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		print("If you have already changed the I2C address, please update the 'oldAddress' variable in this code.", \
-			file=sys.stderr)
-		return
+print("\nQwiic Template Example 6 - I2C Address\n")
 
-	# Initialize the device
-	mySoilSensor.begin()
-	
-    # Change the I2C address
-	if not mySoilSensor.set_i2c_address(newAddress):
-		print("Failed to change I2C address")
-		return
+# Create instance of device
+mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3(address=oldAddress)
 
-	# Infinite loop reading data
-	while True:
-		# Read and print the soil capacitance (from new address)
-		capacitance = mySoilSensor.get_capacitance_pf()
-		print("Soil Capacitance: " + str(capacitance) + " pF")
-		# Sleep for a second to avoid spamming the output
-		qwiic_i2c.delay_ms(1000)
+# Check if it's connected
+if mySoilSensor.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	print("If you have already changed the I2C address, please update the 'oldAddress' variable in this code.", \
+		file=sys.stderr)
+	sys.exit(1)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Initialize the device
+mySoilSensor.begin()
+
+# Change the I2C address
+if not mySoilSensor.set_i2c_address(newAddress):
+	print("Failed to change I2C address")
+	sys.exit(1)
+
+# Infinite loop reading data
+while True:
+	# Read and print the soil capacitance (from new address)
+	capacitance = mySoilSensor.get_capacitance_pf()
+	print("Soil Capacitance: " + str(capacitance) + " pF")
+	# Sleep for a second to avoid spamming the output
+	qwiic_i2c.delay_ms(1000)

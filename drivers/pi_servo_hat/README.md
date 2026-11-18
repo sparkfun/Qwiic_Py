@@ -93,32 +93,23 @@ import qwiic_i2c
 import pi_servo_hat
 
 
-def run_example():
-    print("\nSparkFun Pi Servo HAT Example 1\n")
-    hat = pi_servo_hat.PiServoHAT()
+print("\nSparkFun Pi Servo HAT Example 1\n")
+hat = pi_servo_hat.PiServoHAT()
 
-    if not hat.is_connected():
-        print("The Pi Servo HAT isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not hat.is_connected():
+    print("The Pi Servo HAT isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    hat.begin()
-    hat.restart()
+hat.begin()
+hat.restart()
 
-    while True:
-        for i in range(0, 90):
-            hat.move_servo_position(0, i)
-            qwiic_i2c.delay_ms(10)
-        for i in range(90, 0, -1):
-            hat.move_servo_position(0, i)
-            qwiic_i2c.delay_ms(10)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    for i in range(0, 90):
+        hat.move_servo_position(0, i)
+        qwiic_i2c.delay_ms(10)
+    for i in range(90, 0, -1):
+        hat.move_servo_position(0, i)
+        qwiic_i2c.delay_ms(10)
 ```
 
 ## Documentation

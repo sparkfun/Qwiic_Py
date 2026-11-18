@@ -92,30 +92,21 @@ import qwiic_i2c
 import qwiic_mmc5983ma
 
 
-def run_example():
-    print("\nQwiic MMC5983MA Example 1 - Basic Readings\n")
-    my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
+print("\nQwiic MMC5983MA Example 1 - Basic Readings\n")
+my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
 
-    if not my_mag.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_mag.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_mag.begin()
+my_mag.begin()
 
-    while True:
-        x, y, z = my_mag.get_measurement_xyz_gauss()
-        print("X: %f" % x)
-        print("Y: %f" % y)
-        print("Z: %f\n" % z)
-        qwiic_i2c.delay_ms(100)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    x, y, z = my_mag.get_measurement_xyz_gauss()
+    print("X: %f" % x)
+    print("Y: %f" % y)
+    print("Z: %f\n" % z)
+    qwiic_i2c.delay_ms(100)
 ```
 
 ## Documentation

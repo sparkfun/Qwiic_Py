@@ -92,29 +92,20 @@ import qwiic_micropressure
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic MicroPressure Example 1 - Basic Readings\n")
-    my_micro_pressure = qwiic_micropressure.QwiicMicroPressure()
+print("\nQwiic MicroPressure Example 1 - Basic Readings\n")
+my_micro_pressure = qwiic_micropressure.QwiicMicroPressure()
 
-    if not my_micro_pressure.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_micro_pressure.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_micro_pressure.begin()
+my_micro_pressure.begin()
 
-    while True:
-        print("Pressure(PSI): ", my_micro_pressure.read_pressure())
-        print("Pressure(Pa): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_PA))
-        print("Pressure(Bar): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_BAR))
-        qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+while True:
+    print("Pressure(PSI): ", my_micro_pressure.read_pressure())
+    print("Pressure(Pa): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_PA))
+    print("Pressure(Bar): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_BAR))
+    qwiic_i2c.delay_ms(500)
 ```
 
 ## Documentation

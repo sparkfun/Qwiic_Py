@@ -60,50 +60,40 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 16\n")
-	print("\nType CTRL+C to end.\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 16\n")
+print("\nType CTRL+C to end.\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.begin() # call this for default settings (no
-	myLCD.left_to_right()
-	myLCD.no_cursor()
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+myLCD.set_backlight(255, 255, 255) # bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.begin() # call this for default settings (no
+myLCD.left_to_right()
+myLCD.no_cursor()
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-	myLCD.clear_screen()
-	myLCD.print("Tea-O-Matic")
+myLCD.clear_screen()
+myLCD.print("Tea-O-Matic")
+qwiic_i2c.delay_ms(1000)
+
+myLCD.save_splash() # save this current text as the splash screen at next power up
+
+myLCD.enable_splash() # This will cause the splash to be displayed at power on
+#myLCD.disable_splash() # This will supress the splash from being displayed at power on
+
+counter = 0
+
+myLCD.clear_screen()
+myLCD.print("Cups of tea: ")
+
+while True:				
+	print("counter: %d" % counter)
+	myLCD.set_cursor(0,1)
+	myLCD.print(str(counter))
+	counter = counter + 1
 	qwiic_i2c.delay_ms(1000)
-
-	myLCD.save_splash() # save this current text as the splash screen at next power up
-
-	myLCD.enable_splash() # This will cause the splash to be displayed at power on
-	#myLCD.disable_splash() # This will supress the splash from being displayed at power on
-
-	counter = 0
-
-	myLCD.clear_screen()
-	myLCD.print("Cups of tea: ")
-
-	while True:				
-		print("counter: %d" % counter)
-		myLCD.set_cursor(0,1)
-		myLCD.print(str(counter))
-		counter = counter + 1
-		qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 16")
-		sys.exit(0)
-
-

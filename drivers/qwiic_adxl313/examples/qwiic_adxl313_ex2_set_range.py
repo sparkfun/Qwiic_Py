@@ -46,50 +46,40 @@ import qwiic_adxl313
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun ADXL313 Example 2 - Set Range\n")
-	my_adxl = qwiic_adxl313.QwiicADXL313()
+print("\nSparkFun ADXL313 Example 2 - Set Range\n")
+my_adxl = qwiic_adxl313.QwiicADXL313()
 
-	if my_adxl.is_connected() == False:
-		print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if my_adxl.is_connected() == False:
+	print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("Device connected successfully.")        
+
+my_adxl.standby();	# Must be in standby before changing settings.
+					# This is here just in case we already had sensor powered and/or
+					# configured from a previous setup.
+
+my_adxl.set_range(my_adxl.ADXL313_RANGE_2_G);
+
+# Try some other range settings by uncommented your choice below
+#my_adxl.set_range(my_adxl.ADXL313_RANGE_05_G);
+#my_adxl.set_range(my_adxl.ADXL313_RANGE_1_G);
+#my_adxl.set_range(my_adxl.ADXL313_RANGE_2_G);
+#my_adxl.set_range(my_adxl.ADXL313_RANGE_4_G);
+
+my_adxl.measure_mode_on()
+
+while True:
+	if my_adxl.data_ready():
+		my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
+		print(\
+		 '{: 06d}'.format(my_adxl.x)\
+		, '\t', '{: 06d}'.format(my_adxl.y)\
+		, '\t', '{: 06d}'.format(my_adxl.z)\
+		)
+		qwiic_i2c.delay_ms(30)
 	else:
-		print("Device connected successfully.")        
-  
-	my_adxl.standby();	# Must be in standby before changing settings.
-						# This is here just in case we already had sensor powered and/or
-						# configured from a previous setup.
-
-	my_adxl.set_range(my_adxl.ADXL313_RANGE_2_G);
-
-	# Try some other range settings by uncommented your choice below
-	#my_adxl.set_range(my_adxl.ADXL313_RANGE_05_G);
-	#my_adxl.set_range(my_adxl.ADXL313_RANGE_1_G);
-	#my_adxl.set_range(my_adxl.ADXL313_RANGE_2_G);
-	#my_adxl.set_range(my_adxl.ADXL313_RANGE_4_G);
-	
-	my_adxl.measure_mode_on()
-
-	while True:
-		if my_adxl.data_ready():
-			my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
-			print(\
-			 '{: 06d}'.format(my_adxl.x)\
-			, '\t', '{: 06d}'.format(my_adxl.y)\
-			, '\t', '{: 06d}'.format(my_adxl.z)\
-			)
-			qwiic_i2c.delay_ms(30)
-		else:
-			print("Waiting for data")
-			qwiic_i2c.delay_ms(500)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 2")
-		sys.exit(0)
-
-
+		print("Waiting for data")
+		qwiic_i2c.delay_ms(500)

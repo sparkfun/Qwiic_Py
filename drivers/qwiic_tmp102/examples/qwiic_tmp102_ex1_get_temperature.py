@@ -43,71 +43,60 @@ import qwiic_tmp102
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic TMP102 Sensor Example 1\n")
-	myTmpSensor = qwiic_tmp102.QwiicTMP102()
+print("\nSparkFun Qwiic TMP102 Sensor Example 1\n")
+myTmpSensor = qwiic_tmp102.QwiicTMP102()
 
-	if not myTmpSensor.is_connected():
-		print("The Qwiic TMP102 Sensor device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myTmpSensor.is_connected():
+	print("The Qwiic TMP102 Sensor device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myTmpSensor.begin()
+myTmpSensor.begin()
 
-	print("Initialized.")
+print("Initialized.")
 
-	# Initialize sensor0 settings
-	# These settings are saved in the sensor, even if it loses power
-  
-	# set the number of consecutive faults before triggering alarm.
-	# 0-3: 0:1 fault, 1:2 faults, 2:4 faults, 3:6 faults.
-	myTmpSensor.set_fault(0)
-  
-	# set the polarity of the Alarm. (0:Active LOW, 1:Active HIGH).
-	myTmpSensor.set_alert_polarity(1)	# Active HIGH
-  
-	# set the sensor in Comparator Mode (0) or Interrupt Mode (1).
-	myTmpSensor.set_alert_mode(0)	# Comparator Mode.
-  
-	# set the Conversion Rate (how quickly the sensor gets a new reading)
-	#0-3: 0:0.25Hz, 1:1Hz, 2:4Hz, 3:8Hz
-	myTmpSensor.set_conversion_rate(2)
-  
-	#set Extended Mode.
-	#0:12-bit Temperature(-55C to +128C) 1:13-bit Temperature(-55C to +150C)
-	myTmpSensor.set_extended_mode(0)
+# Initialize sensor0 settings
+# These settings are saved in the sensor, even if it loses power
 
-	#set T_HIGH, the upper limit to trigger the alert on
-	myTmpSensor.set_high_temp_f(85.0)  # set T_HIGH in F
-	#myTmpSensor.set_high_temp_c(29.4) # set T_HIGH in C
-  
-	#set T_LOW, the lower limit to shut turn off the alert
-	myTmpSensor.set_low_temp_f(84.0)	# set T_LOW in F
-	#myTmpSensor.set_low_temp_c(26.67)	# set T_LOW in C
-		
-	while True:
-		myTmpSensor.wakeup()
-		
-		temperature = myTmpSensor.read_temp_f()
-		
-		# Check for alert
-		alert_register_state = myTmpSensor.alert()		# read the Alert from register
-		
-		# Place sensor in sleep mode to save power.
-		# Current consumption typically <0.5uA.
-		myTmpSensor.sleep()
-		
-		print("Temperature: ", temperature)
-		print("Alert Register: ", alert_register_state)
-		qwiic_i2c.delay_ms(2000)
-	
+# set the number of consecutive faults before triggering alarm.
+# 0-3: 0:1 fault, 1:2 faults, 2:4 faults, 3:6 faults.
+myTmpSensor.set_fault(0)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+# set the polarity of the Alarm. (0:Active LOW, 1:Active HIGH).
+myTmpSensor.set_alert_polarity(1)	# Active HIGH
 
+# set the sensor in Comparator Mode (0) or Interrupt Mode (1).
+myTmpSensor.set_alert_mode(0)	# Comparator Mode.
 
+# set the Conversion Rate (how quickly the sensor gets a new reading)
+#0-3: 0:0.25Hz, 1:1Hz, 2:4Hz, 3:8Hz
+myTmpSensor.set_conversion_rate(2)
+
+#set Extended Mode.
+#0:12-bit Temperature(-55C to +128C) 1:13-bit Temperature(-55C to +150C)
+myTmpSensor.set_extended_mode(0)
+
+#set T_HIGH, the upper limit to trigger the alert on
+myTmpSensor.set_high_temp_f(85.0)  # set T_HIGH in F
+#myTmpSensor.set_high_temp_c(29.4) # set T_HIGH in C
+
+#set T_LOW, the lower limit to shut turn off the alert
+myTmpSensor.set_low_temp_f(84.0)	# set T_LOW in F
+#myTmpSensor.set_low_temp_c(26.67)	# set T_LOW in C
+
+while True:
+	myTmpSensor.wakeup()
+
+	temperature = myTmpSensor.read_temp_f()
+
+	# Check for alert
+	alert_register_state = myTmpSensor.alert()		# read the Alert from register
+
+	# Place sensor in sleep mode to save power.
+	# Current consumption typically <0.5uA.
+	myTmpSensor.sleep()
+
+	print("Temperature: ", temperature)
+	print("Alert Register: ", alert_register_state)
+	qwiic_i2c.delay_ms(2000)

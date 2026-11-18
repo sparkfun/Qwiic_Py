@@ -91,31 +91,22 @@ import sys
 import qwiic_cap1203
 
 
-def run_example():
-    print("\nQwiic CAP1203 Example 1 - Basic Readings\n")
-    my_device = qwiic_cap1203.QwiicCAP1203()
+print("\nQwiic CAP1203 Example 1 - Basic Readings\n")
+my_device = qwiic_cap1203.QwiicCAP1203()
 
-    if not my_device.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_device.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_device.begin()
+my_device.begin()
 
-    while True:
-        if my_device.is_left_touched():
-            print("Left")
-        if my_device.is_middle_touched():
-            print("Middle")
-        if my_device.is_right_touched():
-            print("Right")
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    if my_device.is_left_touched():
+        print("Left")
+    if my_device.is_middle_touched():
+        print("Middle")
+    if my_device.is_right_touched():
+        print("Right")
 ```
 
 ## Documentation

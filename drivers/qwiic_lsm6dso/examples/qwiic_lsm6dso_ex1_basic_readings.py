@@ -37,58 +37,51 @@ import qwiic_lsm6dso
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic LSM6DSO Example 1 - Basic Readings\n")
 
-	# Create instance of device
-	my_imu = qwiic_lsm6dso.QwiicLSM6DSO()
+print("\nQwiic LSM6DSO Example 1 - Basic Readings\n")
 
-	# Check if it's connected
-	if not my_imu.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_imu = qwiic_lsm6dso.QwiicLSM6DSO()
 
-	# Initialize the device
-	my_imu.begin()
+# Check if it's connected
+if not my_imu.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Loop forever while printing data
-	while True:
-		# There are a few ways to read sensor data, some are faster than others.
-		# Uncomment the section you want to use below.
+# Initialize the device
+my_imu.begin()
 
-		# You can read each axis individually
-		# acc_x = my_imu.read_float_accel_x()
-		# acc_y = my_imu.read_float_accel_y()
-		# acc_z = my_imu.read_float_accel_z()
-		# gyr_x = my_imu.read_float_gyro_x()
-		# gyr_y = my_imu.read_float_gyro_y()
-		# gyr_z = my_imu.read_float_gyro_z()
+# Loop forever while printing data
+while True:
+	# There are a few ways to read sensor data, some are faster than others.
+	# Uncomment the section you want to use below.
 
-		# Or you can read all 3 axes of each sensor in one call for faster reads
-		# acc_x, acc_y, acc_z = my_imu.read_float_accel_all()
-		# gyr_x, gyr_y, gyr_z = my_imu.read_float_gyro_all()
+	# You can read each axis individually
+	# acc_x = my_imu.read_float_accel_x()
+	# acc_y = my_imu.read_float_accel_y()
+	# acc_z = my_imu.read_float_accel_z()
+	# gyr_x = my_imu.read_float_gyro_x()
+	# gyr_y = my_imu.read_float_gyro_y()
+	# gyr_z = my_imu.read_float_gyro_z()
 
-		# Or you can read all 6 axes in a single call for the fastest read speed
-		acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z = my_imu.read_float_accel_gyro_all()
-		
-		# Now print the results!
-		print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (acc_x, acc_y, acc_z))
-		print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyr_x, gyr_y, gyr_z))
+	# Or you can read all 3 axes of each sensor in one call for faster reads
+	# acc_x, acc_y, acc_z = my_imu.read_float_accel_all()
+	# gyr_x, gyr_y, gyr_z = my_imu.read_float_gyro_all()
 
-		# You can also read the temperature of the IMU
-		temperature = my_imu.read_temp_c()
-		print("Temperature:   %.2f C" % temperature)
+	# Or you can read all 6 axes in a single call for the fastest read speed
+	acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z = my_imu.read_float_accel_gyro_all()
 
-		# Add some space between readings
-		print()
+	# Now print the results!
+	print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (acc_x, acc_y, acc_z))
+	print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyr_x, gyr_y, gyr_z))
 
-		# Wait a second and repeat
-		qwiic_i2c.delay_ms(1000)
+	# You can also read the temperature of the IMU
+	temperature = my_imu.read_temp_c()
+	print("Temperature:   %.2f C" % temperature)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+	# Add some space between readings
+	print()
+
+	# Wait a second and repeat
+	qwiic_i2c.delay_ms(1000)

@@ -37,68 +37,61 @@ import qwiic_mmc5983ma
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic MMC5983MA Example 2 - Calibration\n")
 
-	# Create instance of device
-	my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
+print("\nQwiic MMC5983MA Example 2 - Calibration\n")
 
-	# Check if it's connected
-	if not my_mag.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_mag = qwiic_mmc5983ma.QwiicMMC5983MA()
 
-	# Initialize the device
-	my_mag.begin()
+# Check if it's connected
+if not my_mag.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print("During this example, it is suggest to expose the sensor to a 'strong' magnet.")
-	print("This will best demonstrate the benefit of calibration, because residual")
-	print("magnetization can persist in the MMC5983MA, even through power cycles.")
-	print()
-	print("Beginning in 10 seconds...")
-	qwiic_i2c.delay_ms(10000)
+# Initialize the device
+my_mag.begin()
 
-	# Loop forever
-	while True:
-		# Loop for 10 seconds
-		t0 = qwiic_i2c.ticks_ms()
-		while qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), t0) < 10000:
-			# Read each axis one by one, or all together
-			# x = my_mag.get_measurement_x_gauss()
-			# y = my_mag.get_measurement_y_gauss()
-			# z = my_mag.get_measurement_z_gauss()
-			x, y, z = my_mag.get_measurement_xyz_gauss()
+print("During this example, it is suggest to expose the sensor to a 'strong' magnet.")
+print("This will best demonstrate the benefit of calibration, because residual")
+print("magnetization can persist in the MMC5983MA, even through power cycles.")
+print()
+print("Beginning in 10 seconds...")
+qwiic_i2c.delay_ms(10000)
 
-			# Print them out
-			print("X: %f" % x)
-			print("Y: %f" % y)
-			print("Z: %f" % z)
+# Loop forever
+while True:
+	# Loop for 10 seconds
+	t0 = qwiic_i2c.ticks_ms()
+	while qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), t0) < 10000:
+		# Read each axis one by one, or all together
+		# x = my_mag.get_measurement_x_gauss()
+		# y = my_mag.get_measurement_y_gauss()
+		# z = my_mag.get_measurement_z_gauss()
+		x, y, z = my_mag.get_measurement_xyz_gauss()
 
-			print("Re-calibrating in", (10000 - qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), t0)) // 1000, "seconds...")
-			
-			# Extra space to keep numbers separate
-			print()
+		# Print them out
+		print("X: %f" % x)
+		print("Y: %f" % y)
+		print("Z: %f" % z)
 
-			# Delay for a moment
-			qwiic_i2c.delay_ms(100)
-		
-		# Time to calibrate! If the sensor was exposed to a strong magnetic
-		# field, a residual magnetization can persist even through power cycles.
-		# The MMC5983MA can reset this magnetization by calling the SET and
-		# RESET operations, which can also be used to compute the offset of each
-		# axis. Calling calibrate_offsets() does all of this.
-		# Note - the sensor is automatically calibrated when begin() is called.
-		my_mag.calibrate_offsets()
+		print("Re-calibrating in", (10000 - qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), t0)) // 1000, "seconds...")
 
-		# Print calibration offsets and wait 5 seconds for user to read
-		print("Calibration complete! New offsets:")
-		print(my_mag.get_offsets())
-		qwiic_i2c.delay_ms(5000)
+		# Extra space to keep numbers separate
+		print()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+		# Delay for a moment
+		qwiic_i2c.delay_ms(100)
+
+	# Time to calibrate! If the sensor was exposed to a strong magnetic
+	# field, a residual magnetization can persist even through power cycles.
+	# The MMC5983MA can reset this magnetization by calling the SET and
+	# RESET operations, which can also be used to compute the offset of each
+	# axis. Calling calibrate_offsets() does all of this.
+	# Note - the sensor is automatically calibrated when begin() is called.
+	my_mag.calibrate_offsets()
+
+	# Print calibration offsets and wait 5 seconds for user to read
+	print("Calibration complete! New offsets:")
+	print(my_mag.get_offsets())
+	qwiic_i2c.delay_ms(5000)

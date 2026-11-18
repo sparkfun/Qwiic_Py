@@ -94,36 +94,27 @@ import qwiic_serlcd
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun Qwiic SerLCD Example 1\n")
-    my_lcd = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD Example 1\n")
+my_lcd = qwiic_serlcd.QwiicSerLCD()
 
-    if not my_lcd.is_connected():
-        print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_lcd.is_connected():
+    print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_lcd.set_backlight(255, 255, 255)  # Set backlight to bright white
-    my_lcd.set_contrast(5)  # Set contrast. Lower to 0 for higher contrast.
-    my_lcd.clear_screen()  # Clear the screen; this also moves the cursor home
+my_lcd.set_backlight(255, 255, 255)  # Set backlight to bright white
+my_lcd.set_contrast(5)  # Set contrast. Lower to 0 for higher contrast.
+my_lcd.clear_screen()  # Clear the screen; this also moves the cursor home
 
-    qwiic_i2c.delay_ms(1000)  # Give a second for system messages to complete
+qwiic_i2c.delay_ms(1000)  # Give a second for system messages to complete
 
-    my_lcd.print("Hello World!")
-    counter = 0
-    while True:
-        print("counter: %d" % counter)
-        my_lcd.set_cursor(0, 1)
-        my_lcd.print(str(counter))
-        counter = counter + 1
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+my_lcd.print("Hello World!")
+counter = 0
+while True:
+    print("counter: %d" % counter)
+    my_lcd.set_cursor(0, 1)
+    my_lcd.print(str(counter))
+    counter = counter + 1
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

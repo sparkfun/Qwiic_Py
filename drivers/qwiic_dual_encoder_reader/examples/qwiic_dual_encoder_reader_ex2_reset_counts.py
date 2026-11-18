@@ -43,34 +43,24 @@ import qwiic_dual_encoder_reader
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic Dual Encoder Reader Example 2\n")
-	my_encoders = qwiic_dual_encoder_reader.QwiicDualEncoderReader()
+print("\nSparkFun Qwiic Dual Encoder Reader Example 2\n")
+my_encoders = qwiic_dual_encoder_reader.QwiicDualEncoderReader()
 
-	if my_encoders.is_connected() == False:
-		print("The Qwiic Dual Encoder Reader device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if my_encoders.is_connected() == False:
+	print("The Qwiic Dual Encoder Reader device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	my_encoders.begin()
+my_encoders.begin()
 
-	while True:
-		for x in range(0, 10): # keep polling counts for ~3 seconds, allowing the user to rotate
-			print("Count1: %d, Count2: %s" % (my_encoders.get_count1(), \
-			my_encoders.get_count2(), \
-			))
+while True:
+	for x in range(0, 10): # keep polling counts for ~3 seconds, allowing the user to rotate
+		print("Count1: %d, Count2: %s" % (my_encoders.get_count1(), \
+		my_encoders.get_count2(), \
+		))
 
-			qwiic_i2c.delay_ms(300)
-			
-		my_encoders.set_count1(0) # use set count to "zero out" the counts
-		my_encoders.set_count2(0)
+		qwiic_i2c.delay_ms(300)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 2")
-		sys.exit(0)
-
-
+	my_encoders.set_count1(0) # use set count to "zero out" the counts
+	my_encoders.set_count2(0)

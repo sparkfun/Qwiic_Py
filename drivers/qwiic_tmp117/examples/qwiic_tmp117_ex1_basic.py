@@ -39,33 +39,26 @@ import qwiic_tmp117
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic TMP117 Example 1 - Basic Readings\n")
 
-	# Create instance of device
-	myTMP117 = qwiic_tmp117.QwiicTMP117()
+print("\nQwiic TMP117 Example 1 - Basic Readings\n")
 
-	# Check if it's connected
-	if myTMP117.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myTMP117 = qwiic_tmp117.QwiicTMP117()
 
-	# Initialize the device
-	myTMP117.begin()
+# Check if it's connected
+if myTMP117.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		if myTMP117.data_ready():
-			tempC = myTMP117.read_temp_c()
-			tempF = myTMP117.read_temp_f()
-			print("Temperature in Celsius:", tempC)
-			print("Temperature in Fahrenheit:", tempF)
-		
-		qwiic_i2c.delay_ms(500)
+# Initialize the device
+myTMP117.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if myTMP117.data_ready():
+		tempC = myTMP117.read_temp_c()
+		tempF = myTMP117.read_temp_f()
+		print("Temperature in Celsius:", tempC)
+		print("Temperature in Fahrenheit:", tempF)
+
+	qwiic_i2c.delay_ms(500)

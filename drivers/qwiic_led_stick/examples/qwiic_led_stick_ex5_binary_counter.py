@@ -66,31 +66,23 @@ def binary_led_display(led_stick, count, led_length):
 def binary_serial_display(count, bit_length):
     print(str(count) + "\t" + str(bin(count)))
 
-def run_example():
 
-    print("\nSparkFun Qwiic LED Stick Example 5")
-    my_stick = qwiic_led_stick.QwiicLEDStick()
+print("\nSparkFun Qwiic LED Stick Example 5")
+my_stick = qwiic_led_stick.QwiicLEDStick()
 
-    if my_stick.begin() == False:
-        print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    print("\nLED Stick ready!")
-    
-    # Reset the state of LEDs
-    my_stick.led_off()
+if my_stick.begin() == False:
+    print("\nThe Qwiic LED Stick isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+print("\nLED Stick ready!")
 
-    while True:
-        # This loop counts from 0 to 1023 and displays the binary over the 
-        # serial port and the LED stick
-        for i in range(0, 1024):
-            binary_led_display(my_stick, i, 10)
-            binary_serial_display(i, 10)
-            qwiic_i2c.delay_ms(1000)
-    
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 5")
-        sys.exit(0)
+# Reset the state of LEDs
+my_stick.led_off()
+
+while True:
+    # This loop counts from 0 to 1023 and displays the binary over the 
+    # serial port and the LED stick
+    for i in range(0, 1024):
+        binary_led_display(my_stick, i, 10)
+        binary_serial_display(i, 10)
+        qwiic_i2c.delay_ms(1000)

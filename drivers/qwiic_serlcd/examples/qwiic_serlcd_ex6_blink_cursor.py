@@ -50,40 +50,30 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 6\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 6\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.clear_screen()
-	myLCD.cursor() # Turn on the underline cursor
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.clear_screen()
+myLCD.cursor() # Turn on the underline cursor
 
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
-	myLCD.print("Hello World!")
-	
-	while True:
-		# turn off the blinking cursor
-		print("Cursor blinking OFF")
-		myLCD.no_blink()
-		qwiic_i2c.delay_ms(5000)
-		
-		# turn on the blinking cursor
-		print("Cursor blinking ON")
-		myLCD.blink()
-		qwiic_i2c.delay_ms(5000)
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+myLCD.print("Hello World!")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 6")
-		sys.exit(0)
+while True:
+	# turn off the blinking cursor
+	print("Cursor blinking OFF")
+	myLCD.no_blink()
+	qwiic_i2c.delay_ms(5000)
 
-
+	# turn on the blinking cursor
+	print("Cursor blinking ON")
+	myLCD.blink()
+	qwiic_i2c.delay_ms(5000)

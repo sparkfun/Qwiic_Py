@@ -92,35 +92,26 @@ import qwiic_i2c
 import qwiic_otos
 
 
-def run_example():
-    print("\nQwiic OTOS Example 1 - Basic Readings\n")
-    my_otos = qwiic_otos.QwiicOTOS()
+print("\nQwiic OTOS Example 1 - Basic Readings\n")
+my_otos = qwiic_otos.QwiicOTOS()
 
-    if not my_otos.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_otos.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_otos.begin()
+my_otos.begin()
 
-    print("Ensure the OTOS is flat and stationary during calibration!")
-    qwiic_i2c.delay_ms(5000)
-    my_otos.calibrate_imu()
-    my_otos.reset_tracking()
+print("Ensure the OTOS is flat and stationary during calibration!")
+qwiic_i2c.delay_ms(5000)
+my_otos.calibrate_imu()
+my_otos.reset_tracking()
 
-    while True:
-        my_position = my_otos.get_position()
-        print("X (Inches): {}".format(my_position.x))
-        print("Y (Inches): {}".format(my_position.y))
-        print("Heading (Degrees): {}\n".format(my_position.h))
-        qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    my_position = my_otos.get_position()
+    print("X (Inches): {}".format(my_position.x))
+    print("Y (Inches): {}".format(my_position.y))
+    print("Heading (Degrees): {}\n".format(my_position.h))
+    qwiic_i2c.delay_ms(500)
 ```
 
 ## Documentation

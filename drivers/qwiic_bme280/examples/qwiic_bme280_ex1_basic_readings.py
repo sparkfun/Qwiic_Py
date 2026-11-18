@@ -43,37 +43,26 @@ import qwiic_bme280
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun BME280 Sensor  Example 1\n")
-	mySensor = qwiic_bme280.QwiicBME280()
+print("\nSparkFun BME280 Sensor  Example 1\n")
+mySensor = qwiic_bme280.QwiicBME280()
 
-	if not mySensor.is_connected():
-		print("The Qwiic BME280 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not mySensor.is_connected():
+	print("The Qwiic BME280 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	mySensor.begin()
+mySensor.begin()
 
-	while True:
-		print("Humidity:\t%.3f" % mySensor.read_humidity())
+while True:
+	print("Humidity:\t%.3f" % mySensor.read_humidity())
 
-		print("Pressure:\t%.3f" % mySensor.read_pressure())	
+	print("Pressure:\t%.3f" % mySensor.read_pressure())	
 
-		print("Altitude:\t%.3f" % mySensor.get_altitude_feet())
+	print("Altitude:\t%.3f" % mySensor.get_altitude_feet())
 
-		print("Temperature:\t%.2f" % mySensor.get_temperature_fahrenheit())		
+	print("Temperature:\t%.2f" % mySensor.get_temperature_fahrenheit())		
 
-		print("")
-		
-		qwiic_i2c.delay_ms(1000)
+	print("")
 
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(1000)

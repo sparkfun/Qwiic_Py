@@ -48,59 +48,51 @@ import qwiic_adxl313
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun ADXL313 Example 4 - Low power mode ON with 12.5Hz bandwidth.\n")
-	my_adxl = qwiic_adxl313.QwiicADXL313()
+print("\nSparkFun ADXL313 Example 4 - Low power mode ON with 12.5Hz bandwidth.\n")
+my_adxl = qwiic_adxl313.QwiicADXL313()
 
-	if my_adxl.is_connected() == False:
-		print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if my_adxl.is_connected() == False:
+	print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("Device connected successfully.")        
+
+my_adxl.standby()	# Must be in standby before changing settings.
+					# This is here just in case we already had sensor powered and/or
+					# configured from a previous setup.
+
+my_adxl.low_power_on()
+#also try:
+#my_adxl.set_low_power(True)
+
+my_adxl.set_bandwidth(my_adxl.ADXL313_BW_12_5)
+#also try:
+#my_adxl.set_bandwidth(my_adxl.ADXL313_BW_12_5)
+
+#12.5Hz is the best power savings.
+#Other options possible are the following.
+#Note, bandwidths not listed below do not cause power savings.
+#ADXL313_BW_200		    (115uA in low power)
+#ADXL313_BW_100		    (82uA in low power)
+#ADXL313_BW_50		    (64uA in low power)
+#ADXL313_BW_25		    (57uA in low power)
+#ADXL313_BW_12_5	    (50uA in low power)
+#ADXL313_BW_6_25		  (43uA in low power)
+
+my_adxl.measure_mode_on()
+
+while True:
+	my_adxl.update_int_source_statuses(); # this will update all INTSOURCE statuses.
+
+	if my_adxl.ADXL313_INTSOURCE_DATAREADY:
+		my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
+		print(\
+		 '{: 06d}'.format(my_adxl.x)\
+		, '\t', '{: 06d}'.format(my_adxl.y)\
+		, '\t', '{: 06d}'.format(my_adxl.z)\
+		)
 	else:
-		print("Device connected successfully.")        
-  
-	my_adxl.standby()	# Must be in standby before changing settings.
-						# This is here just in case we already had sensor powered and/or
-						# configured from a previous setup.
-
-	my_adxl.low_power_on()
-	#also try:
-	#my_adxl.set_low_power(True)
-
-	my_adxl.set_bandwidth(my_adxl.ADXL313_BW_12_5)
-	#also try:
-	#my_adxl.set_bandwidth(my_adxl.ADXL313_BW_12_5)
-	
-	#12.5Hz is the best power savings.
-	#Other options possible are the following.
-	#Note, bandwidths not listed below do not cause power savings.
-	#ADXL313_BW_200		    (115uA in low power)
-	#ADXL313_BW_100		    (82uA in low power)
-	#ADXL313_BW_50		    (64uA in low power)
-	#ADXL313_BW_25		    (57uA in low power)
-	#ADXL313_BW_12_5	    (50uA in low power)
-	#ADXL313_BW_6_25		  (43uA in low power)
-
-	my_adxl.measure_mode_on()
-
-	while True:
-		my_adxl.update_int_source_statuses(); # this will update all INTSOURCE statuses.
-
-		if my_adxl.ADXL313_INTSOURCE_DATAREADY:
-			my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
-			print(\
-			 '{: 06d}'.format(my_adxl.x)\
-			, '\t', '{: 06d}'.format(my_adxl.y)\
-			, '\t', '{: 06d}'.format(my_adxl.z)\
-			)
-		else:
-			print("Waiting for data.")
-		qwiic_i2c.delay_ms(80)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 4")
-		sys.exit(0)
+		print("Waiting for data.")
+	qwiic_i2c.delay_ms(80)

@@ -92,31 +92,22 @@ import qwiic_rv8803
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic RV8803 Example 1 - Set Time\n")
-    my_rtc = qwiic_rv8803.QwiicRV8803()
+print("\nQwiic RV8803 Example 1 - Set Time\n")
+my_rtc = qwiic_rv8803.QwiicRV8803()
 
-    if not my_rtc.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_rtc.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_rtc.begin()
+my_rtc.begin()
 
-    # seconds, minutes, hours, weekday, date, month, year
-    my_rtc.set_time(2, 47, 14, my_rtc.TUESDAY, 2, 3, 2020)
+# seconds, minutes, hours, weekday, date, month, year
+my_rtc.set_time(2, 47, 14, my_rtc.TUESDAY, 2, 3, 2020)
 
-    while True:
-        my_rtc.update_time()
-        print("Current Time:", my_rtc.string_date_usa(), my_rtc.string_time())
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    my_rtc.update_time()
+    print("Current Time:", my_rtc.string_date_usa(), my_rtc.string_time())
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

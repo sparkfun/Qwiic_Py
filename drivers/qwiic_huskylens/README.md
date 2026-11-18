@@ -92,30 +92,21 @@ import qwiic_huskylens
 import qwiic_i2c
 
 
-def run_example():
-    print("\nQwiic HuskyLens Example 1 - Basic Readings\n")
-    my_husky_lens = qwiic_huskylens.QwiicHuskyLens()
+print("\nQwiic HuskyLens Example 1 - Basic Readings\n")
+my_husky_lens = qwiic_huskylens.QwiicHuskyLens()
 
-    if not my_husky_lens.begin():
-        print("Device not connected, please check your connection", file=sys.stderr)
-        return
+if not my_husky_lens.begin():
+    print("Device not connected, please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-        qwiic_i2c.delay_ms(1000)
+while True:
+    qwiic_i2c.delay_ms(1000)
 
-        for obj in my_husky_lens.get_objects_of_interest():
-            print("Object ID %d at (%d, %d), %d x %d" % (obj.id, obj.x_center, obj.y_center, obj.width, obj.height))
+    for obj in my_husky_lens.get_objects_of_interest():
+        print("Object ID %d at (%d, %d), %d x %d" % (obj.id, obj.x_center, obj.y_center, obj.width, obj.height))
 
-        for line in my_husky_lens.get_lines_of_interest():
-            print("Line ID %d from (%d, %d) to (%d, %d)" % (line.id, line.x_origin, line.y_origin, line.x_target, line.y_target))
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    for line in my_husky_lens.get_lines_of_interest():
+        print("Line ID %d from (%d, %d) to (%d, %d)" % (line.id, line.x_origin, line.y_origin, line.x_target, line.y_target))
 ```
 
 ## Documentation

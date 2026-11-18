@@ -47,36 +47,28 @@ brightness = 250    # The maximum brightness of the pulsing LED. Can be between 
 cycle_time = 1000    # The total time for the pulse to take. Set to a bigger number for a slower pulse or a smaller number for a faster pulse
 off_time = 200       # The total time to stay off between pulses. Set to 0 to be pulsing continuously.
 
-def run_example():
 
-    print("\nSparkFun Qwiic Button Example 3")
-    my_button = qwiic_button.QwiicButton()
+print("\nSparkFun Qwiic Button Example 3")
+my_button = qwiic_button.QwiicButton()
 
-    if my_button.begin() == False:
-        print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    
-    print("\nButton ready!")
+if my_button.begin() == False:
+    print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    my_button.led_off()
+print("\nButton ready!")
 
-    while True:
-        
-        if my_button.is_button_pressed() == True:
+my_button.led_off()
 
-            print("The button is pressed!")
-            my_button.led_config(brightness, cycle_time, off_time)
-        
-        else:
-            print("The button is not pressed.")
-            my_button.led_off()
-        
-        qwiic_i2c.delay_ms(100)    # Let's not hammer too hard on the I2C bus
+while True:
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 3")
-        sys.exit(0)
+    if my_button.is_button_pressed() == True:
+
+        print("The button is pressed!")
+        my_button.led_config(brightness, cycle_time, off_time)
+
+    else:
+        print("The button is not pressed.")
+        my_button.led_off()
+
+    qwiic_i2c.delay_ms(100)    # Let's not hammer too hard on the I2C bus

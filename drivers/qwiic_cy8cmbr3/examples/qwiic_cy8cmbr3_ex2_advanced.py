@@ -38,68 +38,59 @@ import qwiic_cy8cmbr3
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic Template Example 2 - Advanced\n")
 
-	# Create instance of device
-	mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
+print("\nQwiic Template Example 2 - Advanced\n")
 
-	# Check if it's connected
-	if mySoilSensor.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+mySoilSensor = qwiic_cy8cmbr3.QwiicCY8CMBR3()
 
-	# Initialize the device
-	mySoilSensor.begin()
+# Check if it's connected
+if mySoilSensor.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Sensitivity values (counts per pF)
-    # CS_SENSITIVITY_500_COUNTS_PER_PF = 0  # 50 counts/0.1pF
-    # CS_SENSITIVITY_250_COUNTS_PER_PF = 1  # 50 counts/0.2pF
-    # CS_SENSITIVITY_167_COUNTS_PER_PF = 2  # 50 counts/0.3pF
-    # CS_SENSITIVITY_125_COUNTS_PER_PF = 3  # 50 counts/0.4pF
-	mySoilSensor.set_sensitivity_cs0(mySoilSensor.CS_SENSITIVITY_500_COUNTS_PER_PF)
+# Initialize the device
+mySoilSensor.begin()
 
-	# Refresh Intervals
-	# See qwiic_cy8cmbr3.py for all options
-	mySoilSensor.set_refresh_interval(mySoilSensor.REFRESH_INTERVAL_100MS)
+# Sensitivity values (counts per pF)
+# CS_SENSITIVITY_500_COUNTS_PER_PF = 0  # 50 counts/0.1pF
+# CS_SENSITIVITY_250_COUNTS_PER_PF = 1  # 50 counts/0.2pF
+# CS_SENSITIVITY_167_COUNTS_PER_PF = 2  # 50 counts/0.3pF
+# CS_SENSITIVITY_125_COUNTS_PER_PF = 3  # 50 counts/0.4pF
+mySoilSensor.set_sensitivity_cs0(mySoilSensor.CS_SENSITIVITY_500_COUNTS_PER_PF)
 
-	mySoilSensor.save_config()
+# Refresh Intervals
+# See qwiic_cy8cmbr3.py for all options
+mySoilSensor.set_refresh_interval(mySoilSensor.REFRESH_INTERVAL_100MS)
 
-	mySoilSensor.reset()
+mySoilSensor.save_config()
 
-	# Infinite loop reading data
-	while True:
-		# Depending on your application, you may want to tune sensitity and refresh interval
-		# and you may find any of the following different ways of reading the capacitance counts
-		# most useful (balancing accuracy, range, and resolution).
+mySoilSensor.reset()
 
-		# Read and print the soil capacitance
-		capacitance = mySoilSensor.get_capacitance_pf()
-		print("Soil Capacitance: " + str(capacitance) + " pF")
-		# Sleep for a second to avoid spamming the output
-		
-		# Raw count data
-		raw_counts = mySoilSensor.get_raw_count()
-		print("Soil Raw Count: " + str(raw_counts) + " counts")
+# Infinite loop reading data
+while True:
+	# Depending on your application, you may want to tune sensitity and refresh interval
+	# and you may find any of the following different ways of reading the capacitance counts
+	# most useful (balancing accuracy, range, and resolution).
 
-		# Baseline counts
-		base_counts = mySoilSensor.get_baseline_count()
-		print("Soil Baseline Count: " + str(base_counts) + " counts")
+	# Read and print the soil capacitance
+	capacitance = mySoilSensor.get_capacitance_pf()
+	print("Soil Capacitance: " + str(capacitance) + " pF")
+	# Sleep for a second to avoid spamming the output
 
-		# Delta counts
-		delta_counts = mySoilSensor.get_diff_count()
-		print("Soil Delta Count: " + str(delta_counts) + " counts")
-		
-		print("\n--------------------------------\n")
+	# Raw count data
+	raw_counts = mySoilSensor.get_raw_count()
+	print("Soil Raw Count: " + str(raw_counts) + " counts")
 
-		qwiic_i2c.delay_ms(1000)
+	# Baseline counts
+	base_counts = mySoilSensor.get_baseline_count()
+	print("Soil Baseline Count: " + str(base_counts) + " counts")
 
+	# Delta counts
+	delta_counts = mySoilSensor.get_diff_count()
+	print("Soil Delta Count: " + str(delta_counts) + " counts")
 
+	print("\n--------------------------------\n")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	qwiic_i2c.delay_ms(1000)

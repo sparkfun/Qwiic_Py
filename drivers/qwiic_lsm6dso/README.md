@@ -92,30 +92,21 @@ import qwiic_i2c
 import qwiic_lsm6dso
 
 
-def run_example():
-    print("\nQwiic LSM6DSO Example 1 - Basic Readings\n")
-    my_imu = qwiic_lsm6dso.QwiicLSM6DSO()
+print("\nQwiic LSM6DSO Example 1 - Basic Readings\n")
+my_imu = qwiic_lsm6dso.QwiicLSM6DSO()
 
-    if not my_imu.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_imu.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    my_imu.begin()
+my_imu.begin()
 
-    while True:
-        acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z = my_imu.read_float_accel_gyro_all()
-        print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (acc_x, acc_y, acc_z))
-        print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyr_x, gyr_y, gyr_z))
-        print("Temperature:   %.2f C\n" % my_imu.read_temp_c())
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+while True:
+    acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z = my_imu.read_float_accel_gyro_all()
+    print("Accelerometer: X:%.2f, Y:%.2f, Z:%.2f g" % (acc_x, acc_y, acc_z))
+    print("Gyroscope:     X:%.2f, Y:%.2f, Z:%.2f dps" % (gyr_x, gyr_y, gyr_z))
+    print("Temperature:   %.2f C\n" % my_imu.read_temp_c())
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

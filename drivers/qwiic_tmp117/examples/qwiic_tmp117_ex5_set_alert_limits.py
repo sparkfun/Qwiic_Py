@@ -46,65 +46,58 @@ def alert_mode_to_string(alert_mode):
 	elif alert_mode == qwiic_tmp117.QwiicTMP117.THERM_MODE:
 		return "Therm Mode"
 
-def run_example():
-	print("\nQwiic TMP117 Example 5 - Set Alert Mode Temperature Limits\n")
 
-	# Create instance of device
-	myTMP117 = qwiic_tmp117.QwiicTMP117()
+print("\nQwiic TMP117 Example 5 - Set Alert Mode Temperature Limits\n")
 
-	# Check if it's connected
-	if myTMP117.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myTMP117 = qwiic_tmp117.QwiicTMP117()
 
-	# Initialize the device
-	myTMP117.begin()
+# Check if it's connected
+if myTMP117.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	print("Current Alert Function Mode:", alert_mode_to_string(myTMP117.get_alert_function_mode()))
-	print("Current Low Temperature Limit:", myTMP117.get_low_limit())
-	print("Current High Temperature Limit:", myTMP117.get_high_limit())
+# Initialize the device
+myTMP117.begin()
 
-	while True:
-		print("\n\nEnter a number for one of the options below: ")
-		print("0: Set Alert Function Mode")
-		print("1: Set Low Limit")
-		print("2: Set High Limit")
-		print("Enter a number for one of the options above (0-2): ")
-		option = int(input())
-		
-		if option == 0:
-			print("Enter 0 for Alert Mode or 1 for Therm Mode: ")
-			alertMode = int(input())
-			
-			if alertMode not in [0, 1]:
-				print("Invalid option. Please enter 0 or 1.")
-				continue
+print("Current Alert Function Mode:", alert_mode_to_string(myTMP117.get_alert_function_mode()))
+print("Current Low Temperature Limit:", myTMP117.get_low_limit())
+print("Current High Temperature Limit:", myTMP117.get_high_limit())
 
-			myTMP117.set_alert_function_mode(alertMode)
-			print("Alert Function Mode set to:", alert_mode_to_string(myTMP117.get_alert_function_mode()))
-		
-		if option == 1:
-			print("Enter the low temperature limit in Celsius (between -256 and +255.98): ")
-			lowLimit = float(input())
-			if lowLimit < -256 or lowLimit > 255.98:
-				print("Invalid temperature. Please enter a temperature between -256 and +255.98.")
-				continue
-			myTMP117.set_low_limit(lowLimit)
-			print("Low Temperature Limit set to:", myTMP117.get_low_limit())
+while True:
+	print("\n\nEnter a number for one of the options below: ")
+	print("0: Set Alert Function Mode")
+	print("1: Set Low Limit")
+	print("2: Set High Limit")
+	print("Enter a number for one of the options above (0-2): ")
+	option = int(input())
 
-		if option == 2:
-			print("Enter the high temperature limit in Celsius (between -256 and +255.98): ")
-			highLimit = float(input())
-			if highLimit < -256 or highLimit > 255.98:
-				print("Invalid temperature. Please enter a temperature between -256 and +255.98.")
-				continue
-			myTMP117.set_high_limit(highLimit)
-			print("High Temperature Limit set to:", myTMP117.get_high_limit())
+	if option == 0:
+		print("Enter 0 for Alert Mode or 1 for Therm Mode: ")
+		alertMode = int(input())
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+		if alertMode not in [0, 1]:
+			print("Invalid option. Please enter 0 or 1.")
+			continue
+
+		myTMP117.set_alert_function_mode(alertMode)
+		print("Alert Function Mode set to:", alert_mode_to_string(myTMP117.get_alert_function_mode()))
+
+	if option == 1:
+		print("Enter the low temperature limit in Celsius (between -256 and +255.98): ")
+		lowLimit = float(input())
+		if lowLimit < -256 or lowLimit > 255.98:
+			print("Invalid temperature. Please enter a temperature between -256 and +255.98.")
+			continue
+		myTMP117.set_low_limit(lowLimit)
+		print("Low Temperature Limit set to:", myTMP117.get_low_limit())
+
+	if option == 2:
+		print("Enter the high temperature limit in Celsius (between -256 and +255.98): ")
+		highLimit = float(input())
+		if highLimit < -256 or highLimit > 255.98:
+			print("Invalid temperature. Please enter a temperature between -256 and +255.98.")
+			continue
+		myTMP117.set_high_limit(highLimit)
+		print("High Temperature Limit set to:", myTMP117.get_high_limit())

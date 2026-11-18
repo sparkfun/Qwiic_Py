@@ -43,59 +43,53 @@ import qwiic_otos
 import sys
 import qwiic_i2c
 
-def run_example():
-    print("\nQwiic OTOS Example 1 - Basic Readings\n")
-
-    # Create instance of device
-    my_otos = qwiic_otos.QwiicOTOS()
-
-    # Check if it's connected
-    if not my_otos.is_connected():
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-
-    # Initialize the device
-    my_otos.begin()
-
-    print("Ensure the OTOS is flat and stationary during calibration!")
-    for i in range(5, 0, -1):
-        print("Calibrating in %d seconds..." % i)
-        qwiic_i2c.delay_ms(1000)
-
-    print("Calibrating IMU...")
-
-    # Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    my_otos.calibrate_imu()
-
-    # Reset the tracking algorithm - this resets the position to the origin,
-    # but can also be used to recover from some rare tracking errors
-    my_otos.reset_tracking()
-
-    # Main loop
-    while True:
-        # Get the latest position, which includes the x and y coordinates, plus
-        # the heading angle
-        my_position = my_otos.get_position()
-
-        # Print measurement
-        print()
-        print("Position:")
-        print("X (Inches): {}".format(my_position.x))
-        print("Y (Inches): {}".format(my_position.y))
-        print("Heading (Degrees): {}".format(my_position.h))
-
-        # Wait a bit so we don't spam the serial port
-        qwiic_i2c.delay_ms(500)
 
         # Alternatively, you can comment out the print and delay code above, and
         # instead use the following code to rapidly refresh the data
         # print("{}\t{}\t{}".format(my_position.x, my_position.y, my_position.h))
         # time.sleep(0.01)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+
+print("\nQwiic OTOS Example 1 - Basic Readings\n")
+
+# Create instance of device
+my_otos = qwiic_otos.QwiicOTOS()
+
+# Check if it's connected
+if not my_otos.is_connected():
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
+
+# Initialize the device
+my_otos.begin()
+
+print("Ensure the OTOS is flat and stationary during calibration!")
+for i in range(5, 0, -1):
+    print("Calibrating in %d seconds..." % i)
+    qwiic_i2c.delay_ms(1000)
+
+print("Calibrating IMU...")
+
+# Calibrate the IMU, which removes the accelerometer and gyroscope offsets
+my_otos.calibrate_imu()
+
+# Reset the tracking algorithm - this resets the position to the origin,
+# but can also be used to recover from some rare tracking errors
+my_otos.reset_tracking()
+
+# Main loop
+while True:
+    # Get the latest position, which includes the x and y coordinates, plus
+    # the heading angle
+    my_position = my_otos.get_position()
+
+    # Print measurement
+    print()
+    print("Position:")
+    print("X (Inches): {}".format(my_position.x))
+    print("Y (Inches): {}".format(my_position.y))
+    print("Heading (Degrees): {}".format(my_position.h))
+
+    # Wait a bit so we don't spam the serial port
+    qwiic_i2c.delay_ms(500)

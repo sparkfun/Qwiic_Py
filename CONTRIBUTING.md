@@ -48,7 +48,7 @@ These are checked by `tools/check_driver.py`.
 9. **No side effects:** no `print()` and no bare `except:` in drivers. Return values, or raise `OSError` / `ValueError`.
 10. **Portable subset:** standard library limited to `struct`, `math` (basic functions; use `math.log(x) / math.log(10)` rather than `math.log10`), `sys` and `micropython.const` with a CPython fallback. No `os`, `typing`, `enum`, `dataclasses`, `subprocess`, `from __future__` or relative imports. Drivers that genuinely need Linux (serial, SPI) say so with `[tool.qwiic] platforms = ["cpython"]`.
 11. **Single module:** one flat module per driver. A package (`qwiic_<chip>/`) only when the driver ships data files, such as fonts or firmware.
-12. **Examples:** examples use only the public API, wait with `qwiic_i2c.delay_ms()`, and are named `qwiic_<chip>_ex<N>_<description>.py`. Most should run unchanged on CPython, MicroPython and CircuitPython. An example may need one platform (for example `RPi.GPIO` on a Raspberry Pi HAT, or matplotlib for plotting) if its header comment and `examples/README.md` say so. The driver itself must still run on every platform.
+12. **Examples:** examples are plain scripts that read top to bottom: no `run_example()` function and no `if __name__ == "__main__"` guard, so they can be pasted into a REPL or saved as `code.py`/`main.py`. When the device isn't found they print a message and call `sys.exit(1)`. They use only the public API, wait with `qwiic_i2c.delay_ms()`, and are named `qwiic_<chip>_ex<N>_<description>.py`. Most should run unchanged on CPython, MicroPython and CircuitPython. An example may need one platform (for example `RPi.GPIO` on a Raspberry Pi HAT, or matplotlib for plotting) if its header comment and `examples/README.md` say so. The driver itself must still run on every platform.
 
 ## Tools
 
@@ -113,6 +113,7 @@ The changes reach users at different times:
     - Rename them per convention 12.
     - Update them to the new API.
     - Replace `import time` with `qwiic_i2c` delays.
+    - Make them plain scripts: move the body of `run_example()` to the top level and remove the `__main__` guard.
     - Rewrite `examples/README.md` with the new file and method names. Don't use Doxygen deep links, because their anchors change with every build.
 6. **Packaging:** run `tools/make_pyproject.py` with the driver's existing PyPI name, then `tools/gen_package_json.py`. Delete `setup.py`, `setup.cfg` and `requirements.txt`.
 7. **README:** follow `drivers/qwiic_bme280/README.md`: v3 install commands, the quickstart updated to the new API, and a **Migrating from 2.x** table listing every renamed or removed public name.

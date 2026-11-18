@@ -92,36 +92,27 @@ import qwiic_i2c
 import qwiic_scd4x
 
 
-def run_example():
-    print("\nQwiic SCD4x Example 1 - Basic Readings\n")
-    my_scd4x = qwiic_scd4x.QwiicSCD4x()
+print("\nQwiic SCD4x Example 1 - Basic Readings\n")
+my_scd4x = qwiic_scd4x.QwiicSCD4x()
 
-    if not my_scd4x.is_connected():
-        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_scd4x.is_connected():
+    print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    if not my_scd4x.begin():
-        print("Error while initializing device", file=sys.stderr)
-        return
+if not my_scd4x.begin():
+    print("Error while initializing device", file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-        # read_measurement() returns False until new data is available
-        if my_scd4x.read_measurement():
-            print("\nCO2(ppm):", my_scd4x.get_co2())
-            print("Temperature(C):", my_scd4x.get_temperature())
-            print("Humidity(%RH):", my_scd4x.get_humidity())
-        else:
-            print(".", end="")
+while True:
+    # read_measurement() returns False until new data is available
+    if my_scd4x.read_measurement():
+        print("\nCO2(ppm):", my_scd4x.get_co2())
+        print("Temperature(C):", my_scd4x.get_temperature())
+        print("Humidity(%RH):", my_scd4x.get_humidity())
+    else:
+        print(".", end="")
 
-        qwiic_i2c.delay_ms(500)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    qwiic_i2c.delay_ms(500)
 ```
 
 ## Documentation

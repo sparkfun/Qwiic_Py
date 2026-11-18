@@ -89,32 +89,23 @@ import sys
 import qwiic_eeprom
 
 
-def run_example():
-    print("\nSparkFun Qwiic EEPROM, Example 1\n")
-    my_eeprom = qwiic_eeprom.QwiicEEPROM()
+print("\nSparkFun Qwiic EEPROM, Example 1\n")
+my_eeprom = qwiic_eeprom.QwiicEEPROM()
 
-    if not my_eeprom.begin():
-        print("The Qwiic EEPROM isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_eeprom.begin():
+    print("The Qwiic EEPROM isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    print("Mem size in bytes: " + str(my_eeprom.length()))
+print("Mem size in bytes: " + str(my_eeprom.length()))
 
-    my_eeprom.write_byte(300, 200)
-    print("I read: " + str(my_eeprom.read_byte(300)))       # 200
+my_eeprom.write_byte(300, 200)
+print("I read: " + str(my_eeprom.read_byte(300)))       # 200
 
-    my_eeprom.write_int(10, -366)
-    print("I read: " + str(my_eeprom.read_int(10)))         # -366
+my_eeprom.write_int(10, -366)
+print("I read: " + str(my_eeprom.read_int(10)))         # -366
 
-    my_eeprom.write_float(9, -7.35)
-    print("I read: " + str(round(my_eeprom.read_float(9), 2)))  # -7.35
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example 1")
-        sys.exit(0)
+my_eeprom.write_float(9, -7.35)
+print("I read: " + str(round(my_eeprom.read_float(9), 2)))  # -7.35
 ```
 
 ## Documentation

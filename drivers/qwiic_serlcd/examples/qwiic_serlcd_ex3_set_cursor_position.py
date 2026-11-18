@@ -51,51 +51,40 @@ import sys
 import random
 
 
-def run_example():
+print("\nSparkFun Qwiic SerLCD   Example 3\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	print("\nSparkFun Qwiic SerLCD   Example 3\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.clear_screen()
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.clear_screen()
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+# These constants won't change. But you can change the size of
+# your LCD using them:
+numRows = 2
+# numRows = 4
+numCols = 16
+# numCols = 20
 
-	# These constants won't change. But you can change the size of
-	# your LCD using them:
-	numRows = 2
-	# numRows = 4
-	numCols = 16
-	# numCols = 20
+thisLetter = "a"
 
-	thisLetter = "a"
-	
-	while True:
-		randomColumn = random.randint(0, numCols)
-		randomRow = random.randint(0, numRows)
+while True:
+	randomColumn = random.randint(0, numCols)
+	randomRow = random.randint(0, numRows)
 
-		# set the cursor position:
-		myLCD.set_cursor(randomColumn, randomRow)
+	# set the cursor position:
+	myLCD.set_cursor(randomColumn, randomRow)
 
-		# print the letter:
-		myLCD.print(thisLetter) # print to screen
-		qwiic_i2c.delay_ms(200)
+	# print the letter:
+	myLCD.print(thisLetter) # print to screen
+	qwiic_i2c.delay_ms(200)
 
-		thisLetter = chr(ord(thisLetter) + 1)
-		if thisLetter > "z":
-			thisLetter = "a" # Wrap the variable
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 3")
-		sys.exit(0)
-
-
+	thisLetter = chr(ord(thisLetter) + 1)
+	if thisLetter > "z":
+		thisLetter = "a" # Wrap the variable

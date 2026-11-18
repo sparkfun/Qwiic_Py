@@ -107,31 +107,22 @@ import qwiic_ccs811
 import qwiic_i2c
 
 
-def run_example():
-    print("\nSparkFun CCS811 Sensor Basic Example\n")
-    my_sensor = qwiic_ccs811.QwiicCCS811()
+print("\nSparkFun CCS811 Sensor Basic Example\n")
+my_sensor = qwiic_ccs811.QwiicCCS811()
 
-    if not my_sensor.is_connected():
-        print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", file=sys.stderr)
-        return
+if not my_sensor.is_connected():
+    print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    if not my_sensor.begin():
-        print("Unable to initialize the CCS811. Please check your connection", file=sys.stderr)
-        return
+if not my_sensor.begin():
+    print("Unable to initialize the CCS811. Please check your connection", file=sys.stderr)
+    sys.exit(1)
 
-    while True:
-        my_sensor.read_algorithm_results()
-        print("CO2:\t%.3f" % my_sensor.get_co2())
-        print("tVOC:\t%.3f\n" % my_sensor.get_tvoc())
-        qwiic_i2c.delay_ms(1000)
-
-
-if __name__ == "__main__":
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Basic Example")
-        sys.exit(0)
+while True:
+    my_sensor.read_algorithm_results()
+    print("CO2:\t%.3f" % my_sensor.get_co2())
+    print("tVOC:\t%.3f\n" % my_sensor.get_tvoc())
+    qwiic_i2c.delay_ms(1000)
 ```
 
 ## Documentation

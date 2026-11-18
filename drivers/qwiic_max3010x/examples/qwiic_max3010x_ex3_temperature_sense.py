@@ -51,43 +51,34 @@
 import qwiic_max3010x
 import sys
 
-def run_example():
 
-	print("\nSparkFun MAX3010x Photodetector - Example 3\n")
-	sensor = qwiic_max3010x.QwiicMAX3010x()
+print("\nSparkFun MAX3010x Photodetector - Example 3\n")
+sensor = qwiic_max3010x.QwiicMAX3010x()
 
-	if not sensor.begin():
-		print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("The Qwiic MAX3010x is connected.")
+if not sensor.begin():
+	print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("The Qwiic MAX3010x is connected.")
 
-  	# Setup Sensor
-    # The LEDs are very low power and won't affect the temp reading much but
-    # we will call setup() with LEDs off, to avoid any local heating (led_mode = 0)
+# Setup Sensor
+# The LEDs are very low power and won't affect the temp reading much but
+# we will call setup() with LEDs off, to avoid any local heating (led_mode = 0)
 
-	sensor.setup(led_mode = 0)
-	print("Setup complete.")        
+sensor.setup(led_mode = 0)
+print("Setup complete.")        
 
-	sensor.enable_dietemprdy() # Enable the temp ready interrupt. This is required.
+sensor.enable_dietemprdy() # Enable the temp ready interrupt. This is required.
 
-	while True:
-			temperature = sensor.read_temperature()
-			temperature_f = sensor.read_temperature_f()
+while True:
+		temperature = sensor.read_temperature()
+		temperature_f = sensor.read_temperature_f()
 
-			temperature = round(temperature, 2)
-			temperature_f = round(temperature_f, 2)
+		temperature = round(temperature, 2)
+		temperature_f = round(temperature_f, 2)
 
-			print(\
-			 'temperatureC[', temperature , '] \t',\
+		print(\
+		 'temperatureC[', temperature , '] \t',\
              'temperature_f[', temperature_f , ']',\
-			)
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 3")
-		sys.exit(0)
+		)

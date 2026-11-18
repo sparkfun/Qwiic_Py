@@ -43,72 +43,65 @@ import qwiic_otos
 import sys
 import qwiic_i2c
 
-def run_example():
-    print("\nQwiic OTOS Example 5 - Velocity and Acceleration\n")
 
-    # Create instance of device
-    my_otos = qwiic_otos.QwiicOTOS()
+print("\nQwiic OTOS Example 5 - Velocity and Acceleration\n")
 
-    # Check if it's connected
-    if not my_otos.is_connected():
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+# Create instance of device
+my_otos = qwiic_otos.QwiicOTOS()
 
-    # Initialize the device
-    my_otos.begin()
+# Check if it's connected
+if not my_otos.is_connected():
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    print("Ensure the OTOS is flat and stationary during calibration!")
-    for i in range(5, 0, -1):
-        print("Calibrating in %d seconds..." % i)
-        qwiic_i2c.delay_ms(1000)
+# Initialize the device
+my_otos.begin()
 
-    print("Calibrating IMU...")
+print("Ensure the OTOS is flat and stationary during calibration!")
+for i in range(5, 0, -1):
+    print("Calibrating in %d seconds..." % i)
+    qwiic_i2c.delay_ms(1000)
 
-    # Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    my_otos.calibrate_imu()
+print("Calibrating IMU...")
 
-    # Reset the tracking algorithm - this resets the position to the origin,
-    # but can also be used to recover from some rare tracking errors
-    my_otos.reset_tracking()
+# Calibrate the IMU, which removes the accelerometer and gyroscope offsets
+my_otos.calibrate_imu()
 
-    # Main loop
-    while True:
-        # These values can be read individually like so:
-        pos = my_otos.get_position()
-        vel = my_otos.get_velocity()
-        acc = my_otos.get_acceleration()
+# Reset the tracking algorithm - this resets the position to the origin,
+# but can also be used to recover from some rare tracking errors
+my_otos.reset_tracking()
 
-        # Or burst read them all at once with the following:
-        # (pos, vel, acc) = my_otos.get_pos_vel_acc()
+# Main loop
+while True:
+    # These values can be read individually like so:
+    pos = my_otos.get_position()
+    vel = my_otos.get_velocity()
+    acc = my_otos.get_acceleration()
 
-        # Print position
-        print()
-        print("Position:")
-        print("X (Inches): {}".format(pos.x))
-        print("Y (Inches): {}".format(pos.y))
-        print("Heading (Degrees): {}".format(pos.h))
-        
-        # Print velocity
-        print()
-        print("Velocity:")
-        print("X (Inches/sec): {}".format(vel.x))
-        print("Y (Inches/sec): {}".format(vel.y))
-        print("Heading (Degrees/sec): {}".format(vel.h))
-        
-        # Print acceleration
-        print()
-        print("Acceleration:")
-        print("X (Inches/sec^2): {}".format(acc.x))
-        print("Y (Inches/sec^2): {}".format(acc.y))
-        print("Heading (Degrees/sec^2): {}".format(acc.h))
+    # Or burst read them all at once with the following:
+    # (pos, vel, acc) = my_otos.get_pos_vel_acc()
 
-        # Wait a bit so we don't spam the serial port
-        qwiic_i2c.delay_ms(500)
+    # Print position
+    print()
+    print("Position:")
+    print("X (Inches): {}".format(pos.x))
+    print("Y (Inches): {}".format(pos.y))
+    print("Heading (Degrees): {}".format(pos.h))
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    # Print velocity
+    print()
+    print("Velocity:")
+    print("X (Inches/sec): {}".format(vel.x))
+    print("Y (Inches/sec): {}".format(vel.y))
+    print("Heading (Degrees/sec): {}".format(vel.h))
+
+    # Print acceleration
+    print()
+    print("Acceleration:")
+    print("X (Inches/sec^2): {}".format(acc.x))
+    print("Y (Inches/sec^2): {}".format(acc.y))
+    print("Heading (Degrees/sec^2): {}".format(acc.h))
+
+    # Wait a bit so we don't spam the serial port
+    qwiic_i2c.delay_ms(500)

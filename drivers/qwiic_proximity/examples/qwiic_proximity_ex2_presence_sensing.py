@@ -43,57 +43,46 @@ import qwiic_proximity
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Proximity Sensor VCN4040 Example 2\n")
-	oProx = qwiic_proximity.QwiicProximity()
+print("\nSparkFun Proximity Sensor VCN4040 Example 2\n")
+oProx = qwiic_proximity.QwiicProximity()
 
-	if not oProx.is_connected():
-		print("The Qwiic Proximity device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not oProx.is_connected():
+	print("The Qwiic Proximity device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# begin Setup
-	oProx.begin()
+# begin Setup
+oProx.begin()
 
-	oProx.set_led_current(200)
-	oProx.set_prox_integration_time(8) # 1 to 8 is valid
+oProx.set_led_current(200)
+oProx.set_prox_integration_time(8) # 1 to 8 is valid
 
-  	# Take 8 readings and average them
-	startingProxValue=0
-	for x in range(8):
-		startingProxValue += oProx.get_proximity()
+# Take 8 readings and average them
+startingProxValue=0
+for x in range(8):
+	startingProxValue += oProx.get_proximity()
 
-	startingProxValue /= 8
+startingProxValue /= 8
 
-	deltaNeeded = startingProxValue * 0.05 # Look for %5 change
-	if deltaNeeded < 5:
-		deltaNeeded = 5   # set a min value
+deltaNeeded = startingProxValue * 0.05 # Look for %5 change
+if deltaNeeded < 5:
+	deltaNeeded = 5   # set a min value
 
-	# Begin operation loop
-	nothingThere = True
+# Begin operation loop
+nothingThere = True
 
-	while True:
-		proxValue = oProx.get_proximity()
-		print("Proximity Value: %d" % proxValue)
+while True:
+	proxValue = oProx.get_proximity()
+	print("Proximity Value: %d" % proxValue)
 
-		if proxValue > startingProxValue + deltaNeeded:
-			nothingThere = False
-			print("\tSomething is there!")
+	if proxValue > startingProxValue + deltaNeeded:
+		nothingThere = False
+		print("\tSomething is there!")
 
-		elif not nothingThere:
-			print("\tI don't see anything")
+	elif not nothingThere:
+		print("\tI don't see anything")
 
-			nothingThere=True
+		nothingThere=True
 
-		qwiic_i2c.delay_ms(400)
-
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)
-
-
+	qwiic_i2c.delay_ms(400)

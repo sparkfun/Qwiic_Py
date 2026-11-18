@@ -35,36 +35,28 @@
 
 import qwiic_mcp4725
 import sys
-def run_example():
-	print("\nQwiic Template Example 3 - Write EEPROM\n")
 
-	# Create instance of device
-	my_dac = qwiic_mcp4725.QwiicMCP4725()
 
-	# Check if it's connected
-	if not my_dac.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+print("\nQwiic Template Example 3 - Write EEPROM\n")
 
-	# Initialize the device
-	my_dac.begin()
-	
-	# The MCP4725 has an EEROM that can store a single 12-bit DAC value as well 
-	# as two configuration bits for the power down mode. The DAC will output this 
-	# value on reset or power-cycle. 
-	print("Writing 2048 to DAC EEPROM")
-	my_dac.write_dac_eeprom(2048); # ~1.65 V if VDD = 3.3V
+# Create instance of device
+my_dac = qwiic_mcp4725.QwiicMCP4725()
 
-	# Now, you can unplug the DAC from your controller and plug it back in, 
-	# and you will see that the value we wrote persists even after a power-cycle.
-	print("Value written to EEPROM, value should persist after power-cycle")
+# Check if it's connected
+if not my_dac.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	return
-	
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+# Initialize the device
+my_dac.begin()
+
+# The MCP4725 has an EEROM that can store a single 12-bit DAC value as well 
+# as two configuration bits for the power down mode. The DAC will output this 
+# value on reset or power-cycle. 
+print("Writing 2048 to DAC EEPROM")
+my_dac.write_dac_eeprom(2048); # ~1.65 V if VDD = 3.3V
+
+# Now, you can unplug the DAC from your controller and plug it back in, 
+# and you will see that the value we wrote persists even after a power-cycle.
+print("Value written to EEPROM, value should persist after power-cycle")

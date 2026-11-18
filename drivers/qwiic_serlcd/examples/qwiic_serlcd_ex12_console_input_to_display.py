@@ -48,40 +48,30 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 12\n")
-	print("\nType CTRL+C to end.\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 12\n")
+print("\nType CTRL+C to end.\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.begin() # call this for default settings
-	myLCD.left_to_right()
-	myLCD.no_cursor()
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.begin() # call this for default settings
+myLCD.left_to_right()
+myLCD.no_cursor()
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-	while True:
-		
-		# promt the user to input some text
-		user_input = input("Please type something to display on the LCD: ")
-		
-		myLCD.clear_screen() # clear the screen
+while True:
 
-		myLCD.print(user_input) # print what the user just typed in
-		
-		qwiic_i2c.delay_ms(500) # wait a second
+	# promt the user to input some text
+	user_input = input("Please type something to display on the LCD: ")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 12")
-		sys.exit(0)
+	myLCD.clear_screen() # clear the screen
 
+	myLCD.print(user_input) # print what the user just typed in
 
+	qwiic_i2c.delay_ms(500) # wait a second

@@ -46,63 +46,54 @@ import sys
 my_relays = qwiic_relay.QwiicRelay(qwiic_relay.DUAL_SOLID_STATE_RELAY_DEFAULT_ADDR)
 # my_relays = qwiic_relay.QwiicRelay(qwiic_relay.DUAL_SOLID_STATE_RELAY_JUMPER_CLOSE_ADDR)
 
-def run_example():
 
-    print("\nSparkFun Qwiic Relay Example 2 - Dual\n")
+print("\nSparkFun Qwiic Relay Example 2 - Dual\n")
 
-    if not my_relays.begin():
-        print("The Qwiic Relay isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
-    
-    # Turn on relay one
-    my_relays.set_relay_on(1)
+if not my_relays.begin():
+    print("The Qwiic Relay isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    # Print the status of all relays
-    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
-    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
-    print()
+# Turn on relay one
+my_relays.set_relay_on(1)
 
-    # Wait a moment
-    qwiic_i2c.delay_ms(1000)
+# Print the status of all relays
+print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+print()
 
-    # Turn on relay two
-    my_relays.set_relay_on(2)
+# Wait a moment
+qwiic_i2c.delay_ms(1000)
 
-    # Print the status of all relays
-    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
-    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
-    print()
+# Turn on relay two
+my_relays.set_relay_on(2)
 
-    # Wait a moment
-    qwiic_i2c.delay_ms(1000)
-    
-    # Turn off relay one
-    my_relays.set_relay_off(1)
+# Print the status of all relays
+print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+print()
 
-    # Print the status of all relays
-    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
-    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
-    print()
+# Wait a moment
+qwiic_i2c.delay_ms(1000)
 
-    # Wait a moment
-    qwiic_i2c.delay_ms(1000)
-    
-    # Turn off relay two
-    my_relays.set_relay_off(2)
+# Turn off relay one
+my_relays.set_relay_off(1)
 
-    # Print the status of all relays
-    print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
-    print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
-    print()
+# Print the status of all relays
+print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+print()
 
-    # Wait a moment
-    qwiic_i2c.delay_ms(1000)
-    
+# Wait a moment
+qwiic_i2c.delay_ms(1000)
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example 2")
-        sys.exit(0)
+# Turn off relay two
+my_relays.set_relay_off(2)
+
+# Print the status of all relays
+print("Relay 1 state: " + str(my_relays.get_relay_state(1)))
+print("Relay 2 state: " + str(my_relays.get_relay_state(2)))
+print()
+
+# Wait a moment
+qwiic_i2c.delay_ms(1000)

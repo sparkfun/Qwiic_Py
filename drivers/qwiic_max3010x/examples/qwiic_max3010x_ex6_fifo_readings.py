@@ -53,55 +53,46 @@ import qwiic_i2c
 import sys
 
 
-def run_example():
+print("\nSparkFun MAX3010x Photodetector - Example 6\n")
+sensor = qwiic_max3010x.QwiicMAX3010x()
 
-	print("\nSparkFun MAX3010x Photodetector - Example 6\n")
-	sensor = qwiic_max3010x.QwiicMAX3010x()
+if not sensor.begin():
+	print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("The Qwiic MAX3010x is connected.")
 
-	if not sensor.begin():
-		print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("The Qwiic MAX3010x is connected.")
+# Setup to sense up to 18 inches, max LED brightness
+led_brightness = 0xFF # Options: 0=Off to 255=50mA
+sample_average = 4 # Options: 1, 2, 4, 8, 16, 32
+led_mode = 2 # Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
+sample_rate = 400 # Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
+pulse_width = 411 # Options: 69, 118, 215, 411
+adc_range = 2048 # Options: 2048, 4096, 8192, 16384
 
-  	# Setup to sense up to 18 inches, max LED brightness
-	led_brightness = 0xFF # Options: 0=Off to 255=50mA
-	sample_average = 4 # Options: 1, 2, 4, 8, 16, 32
-	led_mode = 2 # Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
-	sample_rate = 400 # Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
-	pulse_width = 411 # Options: 69, 118, 215, 411
-	adc_range = 2048 # Options: 2048, 4096, 8192, 16384
+sensor.setup(led_brightness, sample_average, led_mode, sample_rate, pulse_width, adc_range)
+print("Setup complete.")       
 
-	sensor.setup(led_brightness, sample_average, led_mode, sample_rate, pulse_width, adc_range)
-	print("Setup complete.")       
-  
-	start_time = qwiic_i2c.ticks_ms() # Used to calculate measurement rate
-	samples_taken = 0 # Counter for calculating the hz or read rate
+start_time = qwiic_i2c.ticks_ms() # Used to calculate measurement rate
+samples_taken = 0 # Counter for calculating the hz or read rate
 
-	while True:
+while True:
 
-		sensor.check() # Check the sensor, read up to 3 samples
+	sensor.check() # Check the sensor, read up to 3 samples
 
-		while (sensor.available() > 0): # do we have new data?
+	while (sensor.available() > 0): # do we have new data?
 
-			samples_taken += 1
+		samples_taken += 1
 
-			hertz = samples_taken / (qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), start_time) / 1000)
-			hertz = round(hertz, 2)
+		hertz = samples_taken / (qwiic_i2c.ticks_diff(qwiic_i2c.ticks_ms(), start_time) / 1000)
+		hertz = round(hertz, 2)
 
-			print(\
-			'R[', sensor.get_fifo_red() , '] \t'\
+		print(\
+		'R[', sensor.get_fifo_red() , '] \t'\
 			'IR[', sensor.get_fifo_ir() , '] \t'\
 			'G[', sensor.get_fifo_green() , '] \t'\
 			'hz[', hertz , ']'\
-			)
-			
-			sensor.next_sample() # We're finished with this sample so move to next sample
+		)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 6")
-		sys.exit(0)
+		sensor.next_sample() # We're finished with this sample so move to next sample

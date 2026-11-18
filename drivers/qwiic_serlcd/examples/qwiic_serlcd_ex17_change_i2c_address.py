@@ -71,45 +71,35 @@ import sys
 old_address = 0x72 # default
 new_address = 0x71 # must be within 0x07 to 0x78, DEFAULT: 0x72
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 17\n")
-	print("\nType CTRL+C to end.\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD(address=old_address)
+print("\nSparkFun Qwiic SerLCD   Example 17\n")
+print("\nType CTRL+C to end.\n")
+myLCD = qwiic_serlcd.QwiicSerLCD(address=old_address)
 
-	print("Attemping to connect to %s..." % hex(myLCD.address))
+print("Attemping to connect to %s..." % hex(myLCD.address))
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("Connected!")
-		myLCD.set_backlight(255, 255, 255) # bright white
-		myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
-		myLCD.begin() # call this for default settings (no
-		myLCD.left_to_right()
-		myLCD.no_cursor()
-		qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("Connected!")
+	myLCD.set_backlight(255, 255, 255) # bright white
+	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+	myLCD.begin() # call this for default settings (no
+	myLCD.left_to_right()
+	myLCD.no_cursor()
+	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
+	myLCD.clear_screen()
+
+	myLCD.set_address(new_address) # note this updates class member myLCD.address to the new_address
+
+	if myLCD.is_connected():
+		print("Address changed to %s successfully!" % hex(myLCD.address))
 		myLCD.clear_screen()
-
-		myLCD.set_address(new_address) # note this updates class member myLCD.address to the new_address
-		
-		if myLCD.is_connected():
-			print("Address changed to %s successfully!" % hex(myLCD.address))
-			myLCD.clear_screen()
-			myLCD.print("My new add: %s" % hex(myLCD.address))
-		else:
-			print("Address change failed :(")
-	while True:
-		qwiic_i2c.delay_ms(1000) # do nothing
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 17")
-		sys.exit(0)
-
-
+		myLCD.print("My new add: %s" % hex(myLCD.address))
+	else:
+		print("Address change failed :(")
+while True:
+	qwiic_i2c.delay_ms(1000) # do nothing

@@ -48,66 +48,56 @@ import qwiic_adxl313
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun ADXL313 Example 3 - Setup Autosleep and then only print values when it's awake.\n")
-	my_adxl = qwiic_adxl313.QwiicADXL313()
+print("\nSparkFun ADXL313 Example 3 - Setup Autosleep and then only print values when it's awake.\n")
+my_adxl = qwiic_adxl313.QwiicADXL313()
 
-	if my_adxl.is_connected() == False:
-		print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if my_adxl.is_connected() == False:
+	print("The Qwiic ADXL313 device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
+else:
+	print("Device connected successfully.")        
+
+my_adxl.standby()	# Must be in standby before changing settings.
+					# This is here just in case we already had sensor powered and/or
+					# configured from a previous setup.
+
+my_adxl.set_range(my_adxl.ADXL313_RANGE_4_G)
+
+# setup activity sensing options
+my_adxl.set_activity_x(True)		# enable x-axis participation in detecting activity
+my_adxl.set_activity_y(False)		# disable y-axis participation in detecting activity
+my_adxl.set_activity_z(False)		# disable z-axis participation in detecting activity
+my_adxl.set_activity_threshold(10)	# 0-255 (62.5mg/LSB)
+
+# setup inactivity sensing options
+my_adxl.set_inactivity_x(True)			# enable x-axis participation in detecting inactivity
+my_adxl.set_inactivity_y(False)		# disable y-axis participation in detecting inactivity
+my_adxl.set_inactivity_z(False)		# disable z-axis participation in detecting inactivity
+my_adxl.set_inactivity_threshold(10)	# 0-255 (62.5mg/LSB)
+my_adxl.set_time_inactivity(5)			# 0-255 (1sec/LSB)
+
+my_adxl.activity_int(1)
+my_adxl.inactivity_int(1)
+
+my_adxl.autosleep_on()
+
+my_adxl.measure_mode_on()
+
+while True:
+	my_adxl.update_int_source_statuses(); # this will update all INTSOURCE statuses.
+
+	if my_adxl.ADXL313_INTSOURCE_INACTIVITY:
+		print("Inactivity detected.")
+		qwiic_i2c.delay_ms(1000)
+	if my_adxl.ADXL313_INTSOURCE_DATAREADY:
+		my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
+		print(\
+		 '{: 06d}'.format(my_adxl.x)\
+		, '\t', '{: 06d}'.format(my_adxl.y)\
+		, '\t', '{: 06d}'.format(my_adxl.z)\
+		)
 	else:
-		print("Device connected successfully.")        
-  
-	my_adxl.standby()	# Must be in standby before changing settings.
-						# This is here just in case we already had sensor powered and/or
-						# configured from a previous setup.
-
-	my_adxl.set_range(my_adxl.ADXL313_RANGE_4_G)
-
-	# setup activity sensing options
-	my_adxl.set_activity_x(True)		# enable x-axis participation in detecting activity
-	my_adxl.set_activity_y(False)		# disable y-axis participation in detecting activity
-	my_adxl.set_activity_z(False)		# disable z-axis participation in detecting activity
-	my_adxl.set_activity_threshold(10)	# 0-255 (62.5mg/LSB)
-
-	# setup inactivity sensing options
-	my_adxl.set_inactivity_x(True)			# enable x-axis participation in detecting inactivity
-	my_adxl.set_inactivity_y(False)		# disable y-axis participation in detecting inactivity
-	my_adxl.set_inactivity_z(False)		# disable z-axis participation in detecting inactivity
-	my_adxl.set_inactivity_threshold(10)	# 0-255 (62.5mg/LSB)
-	my_adxl.set_time_inactivity(5)			# 0-255 (1sec/LSB)
-
-	my_adxl.activity_int(1)
-	my_adxl.inactivity_int(1)
-
-	my_adxl.autosleep_on()
-	
-	my_adxl.measure_mode_on()
-
-	while True:
-		my_adxl.update_int_source_statuses(); # this will update all INTSOURCE statuses.
-		
-		if my_adxl.ADXL313_INTSOURCE_INACTIVITY:
-			print("Inactivity detected.")
-			qwiic_i2c.delay_ms(1000)
-		if my_adxl.ADXL313_INTSOURCE_DATAREADY:
-			my_adxl.read_accel() # read all axis from sensor, note this also updates all instance variables
-			print(\
-			 '{: 06d}'.format(my_adxl.x)\
-			, '\t', '{: 06d}'.format(my_adxl.y)\
-			, '\t', '{: 06d}'.format(my_adxl.z)\
-			)
-		else:
-			print("Device is asleep (data_ready is reading false)")
-		qwiic_i2c.delay_ms(50)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example 3")
-		sys.exit(0)
-
-
+		print("Device is asleep (data_ready is reading false)")
+	qwiic_i2c.delay_ms(50)

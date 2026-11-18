@@ -39,69 +39,62 @@ import qwiic_scd4x
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic SCD4x Example 6 - Signal Compensation\n")
 
-	# Create instance of device
-	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
+print("\nQwiic SCD4x Example 6 - Signal Compensation\n")
 
-	# Check if it's connected
-	if not mySCD4x.is_connected():
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+# Create instance of device
+mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
-	# Initialize the device
-	if not mySCD4x.begin():
-		print("Error while initializing device", file=sys.stderr)
-		return
-	
-	# We need to stop periodic measurements before we can change the sensor signal compensation settings
-	mySCD4x.stop_periodic_measurement()
-	print("Periodic measurements stopped")
+# Check if it's connected
+if not mySCD4x.is_connected():
+	print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	# Now we can change the sensor settings.
-	# There are three signal compensation commands we can use: set_temperature_offset; set_sensor_altitude; and set_ambient_pressure
-	print("Temperature offset is currently: ", mySCD4x.get_temperature_offset())
-	mySCD4x.set_temperature_offset(5) # Set the temperature offset to 5C
-	print("Temperature offset is now: ", mySCD4x.get_temperature_offset())
-	
-	print("Sensor altitude is currently: ", mySCD4x.get_sensor_altitude())
-	mySCD4x.set_sensor_altitude(1000) # Set the sensor altitude to 1000 meters
-	print("Sensor altitude is now: ", mySCD4x.get_sensor_altitude())
+# Initialize the device
+if not mySCD4x.begin():
+	print("Error while initializing device", file=sys.stderr)
+	sys.exit(1)
 
-	# There is no get_ambient_pressure command
-	if mySCD4x.set_ambient_pressure(98700):
-		print("Ambient pressure set")
+# We need to stop periodic measurements before we can change the sensor signal compensation settings
+mySCD4x.stop_periodic_measurement()
+print("Periodic measurements stopped")
 
-	# The signal compensation settings are stored in RAM by default and will reset if reinit() is called
-  	# or if the power is cycled. To store the settings in EEPROM we can call:
-	# mySCD4x.persist_settings() # Uncomment this line to store the sensor settings in EEPROM
+# Now we can change the sensor settings.
+# There are three signal compensation commands we can use: set_temperature_offset; set_sensor_altitude; and set_ambient_pressure
+print("Temperature offset is currently: ", mySCD4x.get_temperature_offset())
+mySCD4x.set_temperature_offset(5) # Set the temperature offset to 5C
+print("Temperature offset is now: ", mySCD4x.get_temperature_offset())
 
-	# Just for giggles, while the periodic measurements are stopped, let's read the sensor serial number
-	serial_number = mySCD4x.get_serial_number()
-	if serial_number is None:
-		print("Error while reading serial number", file=sys.stderr)
-		return
-	
-	print("The sensor's serial number is:", "0x" + serial_number)
+print("Sensor altitude is currently: ", mySCD4x.get_sensor_altitude())
+mySCD4x.set_sensor_altitude(1000) # Set the sensor altitude to 1000 meters
+print("Sensor altitude is now: ", mySCD4x.get_sensor_altitude())
 
-	# Finally, we need to restart periodic measurements
-	mySCD4x.start_periodic_measurement()
-	print("Periodic measurements restarted")
+# There is no get_ambient_pressure command
+if mySCD4x.set_ambient_pressure(98700):
+	print("Ambient pressure set")
 
-	while True:
-		if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
-			print("\nCO2(ppm):", mySCD4x.get_co2())
-			print("Temperature(C):", mySCD4x.get_temperature())
-			print("Humidity(%RH):", mySCD4x.get_humidity())
-		else:
-			print(".", end="")
-		
-		qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 second
+# The signal compensation settings are stored in RAM by default and will reset if reinit() is called
+# or if the power is cycled. To store the settings in EEPROM we can call:
+# mySCD4x.persist_settings() # Uncomment this line to store the sensor settings in EEPROM
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# Just for giggles, while the periodic measurements are stopped, let's read the sensor serial number
+serial_number = mySCD4x.get_serial_number()
+if serial_number is None:
+	print("Error while reading serial number", file=sys.stderr)
+	sys.exit(1)
+
+print("The sensor's serial number is:", "0x" + serial_number)
+
+# Finally, we need to restart periodic measurements
+mySCD4x.start_periodic_measurement()
+print("Periodic measurements restarted")
+
+while True:
+	if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
+		print("\nCO2(ppm):", mySCD4x.get_co2())
+		print("Temperature(C):", mySCD4x.get_temperature())
+		print("Humidity(%RH):", mySCD4x.get_humidity())
+	else:
+		print(".", end="")
+
+	qwiic_i2c.delay_ms(500) # Only check for new data every 0.5 second

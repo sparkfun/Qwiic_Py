@@ -109,37 +109,28 @@ def draw_cube(oled):
     oled.line(p2x[3],p2y[3],p2x[7],p2y[7])
     oled.display()
 
-def run_example():
-    #  Before you can start using the OLED, call begin() to init
-    #  all of the pins and configure the OLED.
 
-    print("\nSparkFun OLED Cube Example\n")
-    myOLED = userOLED
+#  Before you can start using the OLED, call begin() to init
+#  all of the pins and configure the OLED.
 
-    if not myOLED.is_connected():
-        print("The Qwiic OLED device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+print("\nSparkFun OLED Cube Example\n")
+myOLED = userOLED
 
-    myOLED.begin()
-    #  clear(ALL) will clear out the OLED's graphic memory.
-    #  clear(PAGE) will clear the Arduino's display buffer.
-    myOLED.clear(myOLED.ALL)  #  Clear the display's memory (gets rid of artifacts)
-    #  To actually draw anything on the display, you must call the
-    #  display() function.
-    myOLED.display()
+if not myOLED.is_connected():
+    print("The Qwiic OLED device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-
-    while True:
-
-        draw_cube(myOLED)
-        qwiic_i2c.delay_ms(10)
+myOLED.begin()
+#  clear(ALL) will clear out the OLED's graphic memory.
+#  clear(PAGE) will clear the Arduino's display buffer.
+myOLED.clear(myOLED.ALL)  #  Clear the display's memory (gets rid of artifacts)
+#  To actually draw anything on the display, you must call the
+#  display() function.
+myOLED.display()
 
 
+while True:
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding OLED Cube Example")
-        sys.exit(0)
+    draw_cube(myOLED)
+    qwiic_i2c.delay_ms(10)

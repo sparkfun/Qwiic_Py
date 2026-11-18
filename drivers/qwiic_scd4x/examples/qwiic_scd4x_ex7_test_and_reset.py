@@ -37,44 +37,37 @@
 import qwiic_scd4x
 import sys
 
-def run_example():
-	print("\nQwiic SCD4x Example 7 - Self Test and Factory Reset\n")
 
-	# Create instance of device
-	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
+print("\nQwiic SCD4x Example 7 - Self Test and Factory Reset\n")
 
-	# Check if it's connected
-	if not mySCD4x.is_connected():
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+# Create instance of device
+mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
-	# Initialize the device
-	if not mySCD4x.begin():
-		print("Error while initializing device", file=sys.stderr)
-		return
-	
-	# We need to stop periodic measurements before we can change the sensor signal compensation settings
-	mySCD4x.stop_periodic_measurement()
-	print("Periodic measurements stopped")
+# Check if it's connected
+if not mySCD4x.is_connected():
+	print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+	sys.exit(1)
 
-	# Now we can run the self test:
-	print("Starting the self-test. This will take 10 seconds to complete...")
-	if mySCD4x.perform_self_test():
-		print("Self-test passed!")
-	else:
-		print("Self-test failed!", file=sys.stderr)
-		return
-	
-	# We can do a factory reset if we want to completely reset the sensor
-	if mySCD4x.perform_factory_reset():
-		print("Factory reset completed!")
-	else:
-		print("Factory reset failed!", file=sys.stderr)
-		return
+# Initialize the device
+if not mySCD4x.begin():
+	print("Error while initializing device", file=sys.stderr)
+	sys.exit(1)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+# We need to stop periodic measurements before we can change the sensor signal compensation settings
+mySCD4x.stop_periodic_measurement()
+print("Periodic measurements stopped")
+
+# Now we can run the self test:
+print("Starting the self-test. This will take 10 seconds to complete...")
+if mySCD4x.perform_self_test():
+	print("Self-test passed!")
+else:
+	print("Self-test failed!", file=sys.stderr)
+	sys.exit(1)
+
+# We can do a factory reset if we want to completely reset the sensor
+if mySCD4x.perform_factory_reset():
+	print("Factory reset completed!")
+else:
+	print("Factory reset failed!", file=sys.stderr)
+	sys.exit(1)

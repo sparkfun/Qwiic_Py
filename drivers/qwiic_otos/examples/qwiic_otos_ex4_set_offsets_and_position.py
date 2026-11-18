@@ -45,75 +45,68 @@ import qwiic_otos
 import sys
 import qwiic_i2c
 
-def run_example():
-    print("\nQwiic OTOS Example 4 - Set Offsets and Position\n")
 
-    # Create instance of device
-    my_otos = qwiic_otos.QwiicOTOS()
+print("\nQwiic OTOS Example 4 - Set Offsets and Position\n")
 
-    # Check if it's connected
-    if not my_otos.is_connected():
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+# Create instance of device
+my_otos = qwiic_otos.QwiicOTOS()
 
-    # Initialize the device
-    my_otos.begin()
+# Check if it's connected
+if not my_otos.is_connected():
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    print("Ensure the OTOS is flat and stationary during calibration!")
-    for i in range(5, 0, -1):
-        print("Calibrating in %d seconds..." % i)
-        qwiic_i2c.delay_ms(1000)
+# Initialize the device
+my_otos.begin()
 
-    print("Calibrating IMU...")
+print("Ensure the OTOS is flat and stationary during calibration!")
+for i in range(5, 0, -1):
+    print("Calibrating in %d seconds..." % i)
+    qwiic_i2c.delay_ms(1000)
 
-    # Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    my_otos.calibrate_imu()
+print("Calibrating IMU...")
 
-    # Assuming you've mounted your sensor to a robot and it's not centered,
-    # you can specify the offset for the sensor relative to the center of the
-    # robot. The units default to inches and degrees, but if you want to use
-    # different units, specify them before setting the offset! Note that as of
-    # firmware version 1.0, these values will be lost after a power cycle, so
-    # you will need to set them each time you power up the sensor. For example,
-    # if the sensor is mounted 5 inches to the left (negative X) and 10 inches
-    # forward (positive Y) of the center of the robot, and mounted 90 degrees
-    # clockwise (negative rotation) from the robot's orientation, the offset
-    # would be {-5, 10, -90}. These can be any value, even the angle can be
-    # tweaked slightly to compensate for imperfect mounting (eg. 1.3 degrees).
-    offset = qwiic_otos.Pose2D(-5, 10, -90)
-    my_otos.set_offset(offset)
+# Calibrate the IMU, which removes the accelerometer and gyroscope offsets
+my_otos.calibrate_imu()
 
-    # Reset the tracking algorithm - this resets the position to the origin,
-    # but can also be used to recover from some rare tracking errors
-    my_otos.reset_tracking()
+# Assuming you've mounted your sensor to a robot and it's not centered,
+# you can specify the offset for the sensor relative to the center of the
+# robot. The units default to inches and degrees, but if you want to use
+# different units, specify them before setting the offset! Note that as of
+# firmware version 1.0, these values will be lost after a power cycle, so
+# you will need to set them each time you power up the sensor. For example,
+# if the sensor is mounted 5 inches to the left (negative X) and 10 inches
+# forward (positive Y) of the center of the robot, and mounted 90 degrees
+# clockwise (negative rotation) from the robot's orientation, the offset
+# would be {-5, 10, -90}. These can be any value, even the angle can be
+# tweaked slightly to compensate for imperfect mounting (eg. 1.3 degrees).
+offset = qwiic_otos.Pose2D(-5, 10, -90)
+my_otos.set_offset(offset)
 
-    # After resetting the tracking, the OTOS will report that the robot is at
-    # the origin. If your robot does not start at the origin, or you have
-    # another source of location information (eg. vision odometry), you can set
-    # the OTOS location to match and it will continue to track from there.
-    current_position = qwiic_otos.Pose2D(0, 0, 0)
-    my_otos.set_position(current_position)
+# Reset the tracking algorithm - this resets the position to the origin,
+# but can also be used to recover from some rare tracking errors
+my_otos.reset_tracking()
 
-    # Main loop
-    while True:
-        # Get the latest position, which includes the x and y coordinates, plus
-        # the heading angle
-        my_position = my_otos.get_position()
+# After resetting the tracking, the OTOS will report that the robot is at
+# the origin. If your robot does not start at the origin, or you have
+# another source of location information (eg. vision odometry), you can set
+# the OTOS location to match and it will continue to track from there.
+current_position = qwiic_otos.Pose2D(0, 0, 0)
+my_otos.set_position(current_position)
 
-        # Print measurement
-        print()
-        print("Position:")
-        print("X (Inches): {}".format(my_position.x))
-        print("Y (Inches): {}".format(my_position.y))
-        print("Heading (Degrees): {}".format(my_position.h))
+# Main loop
+while True:
+    # Get the latest position, which includes the x and y coordinates, plus
+    # the heading angle
+    my_position = my_otos.get_position()
 
-        # Wait a bit so we don't spam the serial port
-        qwiic_i2c.delay_ms(500)
+    # Print measurement
+    print()
+    print("Position:")
+    print("X (Inches): {}".format(my_position.x))
+    print("Y (Inches): {}".format(my_position.y))
+    print("Heading (Degrees): {}".format(my_position.h))
 
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit):
-        print("\nEnding Example")
-        sys.exit(0)
+    # Wait a bit so we don't spam the serial port
+    qwiic_i2c.delay_ms(500)

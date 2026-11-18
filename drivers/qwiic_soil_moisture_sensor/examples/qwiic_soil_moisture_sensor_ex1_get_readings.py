@@ -43,30 +43,22 @@ import qwiic_soil_moisture_sensor
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic Soil Moisture Sensor Example 1\n")
-	mySoilSensor = qwiic_soil_moisture_sensor.QwiicSoilMoistureSensor()
+print("\nSparkFun Qwiic Soil Moisture Sensor Example 1\n")
+mySoilSensor = qwiic_soil_moisture_sensor.QwiicSoilMoistureSensor()
 
-	if not mySoilSensor.is_connected():
-		print("The Qwiic Soil Moisture Sensor device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not mySoilSensor.is_connected():
+	print("The Qwiic Soil Moisture Sensor device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	mySoilSensor.begin()
+mySoilSensor.begin()
 
-	print("Initialized.")
+print("Initialized.")
 
-	while True:
-		print(mySoilSensor.read_moisture_level())
-		mySoilSensor.led_on()
-		qwiic_i2c.delay_ms(1000)
-		mySoilSensor.led_off()
-		qwiic_i2c.delay_ms(1000)
-
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+while True:
+	print(mySoilSensor.read_moisture_level())
+	mySoilSensor.led_on()
+	qwiic_i2c.delay_ms(1000)
+	mySoilSensor.led_off()
+	qwiic_i2c.delay_ms(1000)

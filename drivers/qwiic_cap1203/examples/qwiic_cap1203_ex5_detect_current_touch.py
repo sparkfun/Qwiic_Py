@@ -36,41 +36,34 @@
 import qwiic_cap1203
 import sys
 
-def run_example():
-	print("\nQwiic CAP1203 Example 5 - Detect Current Touch\n")
 
-	# Create instance of device
-	my_device = qwiic_cap1203.QwiicCAP1203()
+print("\nQwiic CAP1203 Example 5 - Detect Current Touch\n")
 
-	# Check if it's connected
-	if my_device.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_device = qwiic_cap1203.QwiicCAP1203()
 
-	# Initialize the device
-	my_device.begin()
+# Check if it's connected
+if my_device.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	while True:
-		if my_device.is_left_touched():
-			print("Left")
-			while my_device.is_left_touched():
-				# Wait until user removes finger
-				pass
-		if my_device.is_middle_touched():
-			print("Middle")
-			while my_device.is_middle_touched():
-				# Wait until user removes finger
-				pass
-		if my_device.is_right_touched():
-			print("Right")
-			while my_device.is_right_touched():
-				# Wait until user removes finger
-				pass
+# Initialize the device
+my_device.begin()
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit):
-		print("\nEnding Example")
-		sys.exit(0)
+while True:
+	if my_device.is_left_touched():
+		print("Left")
+		while my_device.is_left_touched():
+			# Wait until user removes finger
+			pass
+	if my_device.is_middle_touched():
+		print("Middle")
+		while my_device.is_middle_touched():
+			# Wait until user removes finger
+			pass
+	if my_device.is_right_touched():
+		print("Right")
+		while my_device.is_right_touched():
+			# Wait until user removes finger
+			pass

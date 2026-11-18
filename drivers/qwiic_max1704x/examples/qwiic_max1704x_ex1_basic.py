@@ -39,57 +39,50 @@ import qwiic_max1704x
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic MAX1704X Example 1 - Simple\n")
 
-	# Create instance of device
-	myLipo = qwiic_max1704x.QwiicMAX1704X() # defaults to the MAX17043 device
+print("\nQwiic MAX1704X Example 1 - Simple\n")
 
-	# Comment out above line and comment out below line if not using MAX17043. 
-	# You can pass any of the following device types: 
-	#	DEVICE_TYPE_MAX17043,
-	# 	DEVICE_TYPE_MAX17044, 
-	# 	DEVICE_TYPE_MAX17048, 
-	# 	DEVICE_TYPE_MAX17049
-	#
-	# myLipo = qwiic_max1704x.QwiicMAX1704X(device_type=qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
+# Create instance of device
+myLipo = qwiic_max1704x.QwiicMAX1704X() # defaults to the MAX17043 device
 
-	# Check if it's connected
-	if myLipo.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Comment out above line and comment out below line if not using MAX17043. 
+# You can pass any of the following device types: 
+#	DEVICE_TYPE_MAX17043,
+# 	DEVICE_TYPE_MAX17044, 
+# 	DEVICE_TYPE_MAX17048, 
+# 	DEVICE_TYPE_MAX17049
+#
+# myLipo = qwiic_max1704x.QwiicMAX1704X(device_type=qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048)
 
-	# Initialize the device
-	myLipo.begin()
+# Check if it's connected
+if myLipo.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLipo.quick_start()
+# Initialize the device
+myLipo.begin()
 
-	# We can set an interrupt to alert when the battery SoC gets too low.
-	# We can alert at anywhere between 1% - 32%:
-	myLipo.set_threshold(20)
+myLipo.quick_start()
 
-	while True:
-		# get_voltage() returns a voltage value (e.g. 3.93)
-		voltage = myLipo.get_voltage()
-		print("Voltage: %.2fV" % voltage)
+# We can set an interrupt to alert when the battery SoC gets too low.
+# We can alert at anywhere between 1% - 32%:
+myLipo.set_threshold(20)
 
-		# get_soc() returns the estimated state of charge (e.g. 79%)
-		soc = myLipo.get_soc()
-		print("State of Charge: %.2f%%" % soc)
+while True:
+	# get_voltage() returns a voltage value (e.g. 3.93)
+	voltage = myLipo.get_voltage()
+	print("Voltage: %.2fV" % voltage)
 
-		# get_alert() returns True if the battery SoC is below the threshold
-		if myLipo.get_alert():
-			print("Battery SoC is below threshold!")
-		else:
-			print("Battery SoC is above threshold.")
+	# get_soc() returns the estimated state of charge (e.g. 79%)
+	soc = myLipo.get_soc()
+	print("State of Charge: %.2f%%" % soc)
 
-		# Delay so as to not spam prints
-		qwiic_i2c.delay_ms(500)
+	# get_alert() returns True if the battery SoC is below the threshold
+	if myLipo.get_alert():
+		print("Battery SoC is below threshold!")
+	else:
+		print("Battery SoC is above threshold.")
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	# Delay so as to not spam prints
+	qwiic_i2c.delay_ms(500)

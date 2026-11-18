@@ -50,77 +50,67 @@ import qwiic_serlcd
 import qwiic_i2c
 import sys
 
-def run_example():
 
-	print("\nSparkFun Qwiic SerLCD   Example 2\n")
-	myLCD = qwiic_serlcd.QwiicSerLCD()
+print("\nSparkFun Qwiic SerLCD   Example 2\n")
+myLCD = qwiic_serlcd.QwiicSerLCD()
 
-	if not myLCD.is_connected():
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+if not myLCD.is_connected():
+	print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
-	myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
+myLCD.set_backlight(255, 255, 255) # Set backlight to bright white
+myLCD.set_contrast(5) # set contrast. Lower to 0 for higher contrast.
 
-	qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
-	
-	while True:
-		myLCD.set_backlight(0, 0, 0) # black is off
-		myLCD.clear_screen() # Clear the display - this moves the cursor to home position as well
-		myLCD.print("Black (off)")
-		qwiic_i2c.delay_ms(5000)
+qwiic_i2c.delay_ms(1000) # give a sec for system messages to complete
 
-		myLCD.set_backlight(255, 0, 0) # bright red
-		myLCD.clear_screen()
-		myLCD.print("Red")
-		qwiic_i2c.delay_ms(5000)
+while True:
+	myLCD.set_backlight(0, 0, 0) # black is off
+	myLCD.clear_screen() # Clear the display - this moves the cursor to home position as well
+	myLCD.print("Black (off)")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(0xFF, 0x8C, 0x00) # orange
-		myLCD.clear_screen()
-		myLCD.print("Orange")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(255, 0, 0) # bright red
+	myLCD.clear_screen()
+	myLCD.print("Red")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(255, 255, 0) # bright yellow
-		myLCD.clear_screen()
-		myLCD.print("Yellow")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(0xFF, 0x8C, 0x00) # orange
+	myLCD.clear_screen()
+	myLCD.print("Orange")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(0, 255, 0) # bright green
-		myLCD.clear_screen()
-		myLCD.print("Green")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(255, 255, 0) # bright yellow
+	myLCD.clear_screen()
+	myLCD.print("Yellow")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(0, 0, 255) # bright blue
-		myLCD.clear_screen()
-		myLCD.print("Blue")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(0, 255, 0) # bright green
+	myLCD.clear_screen()
+	myLCD.print("Green")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(0x4B, 0x00, 0x82) # indigo, a kind of dark purplish blue
-		myLCD.clear_screen()
-		myLCD.print("Indigo")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(0, 0, 255) # bright blue
+	myLCD.clear_screen()
+	myLCD.print("Blue")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(0xA0, 0x20, 0xF0) # violet
-		myLCD.clear_screen()
-		myLCD.print("Violet")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(0x4B, 0x00, 0x82) # indigo, a kind of dark purplish blue
+	myLCD.clear_screen()
+	myLCD.print("Indigo")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(0x80, 0x80, 0x80) # grey
-		myLCD.clear_screen()
-		myLCD.print("Grey")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(0xA0, 0x20, 0xF0) # violet
+	myLCD.clear_screen()
+	myLCD.print("Violet")
+	qwiic_i2c.delay_ms(5000)
 
-		myLCD.set_backlight(255, 255, 255) # bright white
-		myLCD.clear_screen()
-		myLCD.print("White")
-		qwiic_i2c.delay_ms(5000)
+	myLCD.set_backlight(0x80, 0x80, 0x80) # grey
+	myLCD.clear_screen()
+	myLCD.print("Grey")
+	qwiic_i2c.delay_ms(5000)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)
-
-
+	myLCD.set_backlight(255, 255, 255) # bright white
+	myLCD.clear_screen()
+	myLCD.print("White")
+	qwiic_i2c.delay_ms(5000)

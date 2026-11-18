@@ -36,31 +36,22 @@
 import qwiic_as7265x
 import sys
 
-def run_example():
-    print("\nQwiic Spectral Triad Example 6 - Read Temperature\n")
 
-    # Create instance of device
-    myAS7265x = qwiic_as7265x.QwiicAS7265x()
+print("\nQwiic Spectral Triad Example 6 - Read Temperature\n")
 
-    # Check if it's connected
-    if myAS7265x.is_connected() == False:
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
-        return
+# Create instance of device
+myAS7265x = qwiic_as7265x.QwiicAS7265x()
 
-    # Initialize the device
-    if myAS7265x.begin() == False:
-        print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
-        return
+# Check if it's connected
+if myAS7265x.is_connected() == False:
+    print("The device isn't connected to the system. Please check your connection", \
+        file=sys.stderr)
+    sys.exit(1)
 
-    print("Main IC temp:", myAS7265x.get_temperature()) # returns temp of master IC
-    print("Average IC temp:", myAS7265x.get_temperature_average()) # returns average temp of all 3 ICs
+# Initialize the device
+if myAS7265x.begin() == False:
+    print("Unable to initialize the AS7265x. Please check your connection", file = sys.stderr)
+    sys.exit(1)
 
-    return
-
-if __name__ == '__main__':
-    try:
-        run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
-        print("\nEnding Example")
-        sys.exit(0)
+print("Main IC temp:", myAS7265x.get_temperature()) # returns temp of master IC
+print("Average IC temp:", myAS7265x.get_temperature_average()) # returns average temp of all 3 ICs

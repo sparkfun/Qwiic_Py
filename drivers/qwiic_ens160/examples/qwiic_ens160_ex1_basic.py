@@ -37,55 +37,47 @@ import qwiic_ens160
 import sys
 import qwiic_i2c
 
-def run_example():
-	# TODO Replace template and title
-	print("\nQwiic ENS160 Example 1 - Basic\n")
 
-	# Create instance of device
-	myEns = qwiic_ens160.QwiicENS160()
+# TODO Replace template and title
+print("\nQwiic ENS160 Example 1 - Basic\n")
 
-	# Check if it's connected
-	if not myEns.is_connected():
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+myEns = qwiic_ens160.QwiicENS160()
 
-	# Initialize the device
-	myEns.begin()
+# Check if it's connected
+if not myEns.is_connected():
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Reset the indoor air quality sensor's settings.
-	myEns.set_operating_mode(myEns.OP_MODE_RESET)
+# Initialize the device
+myEns.begin()
 
-	qwiic_i2c.delay_ms(100)
+# Reset the indoor air quality sensor's settings.
+myEns.set_operating_mode(myEns.OP_MODE_RESET)
 
-	# Set to standard operation
-	# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
-	myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
-	
-	# There are four values here: 
-	# 0 - Operating ok: Standard Operation
-	# 1 - Warm-up: occurs for 3 minutes after power-on.
-	# 2 - Initial Start-up: Occurs for the first hour of operation.
-	# 	  and only once in sensor's lifetime.
-	# 3 - No Valid Output
+qwiic_i2c.delay_ms(100)
 
-	ens_status = myEns.get_flags()
-	print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", ens_status)
-	
-	while True:
-		if myEns.check_data_status():
-			print("Air Quality Index (1-5) : ", myEns.get_aqi())
-			print("Total Volatile Organic Compounds (ppb): ", myEns.get_tvoc())
-			print("CO2 concentration (ppm): ", myEns.get_eco2())
-			print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", myEns.get_flags())
-			print("\n------------------------\n")
-		
-		qwiic_i2c.delay_ms(200)
+# Set to standard operation
+# Others include OP_MODE_DEEP_SLEEP and OP_MODE_IDLE
+myEns.set_operating_mode(myEns.OP_MODE_STANDARD)
 
+# There are four values here: 
+# 0 - Operating ok: Standard Operation
+# 1 - Warm-up: occurs for 3 minutes after power-on.
+# 2 - Initial Start-up: Occurs for the first hour of operation.
+# 	  and only once in sensor's lifetime.
+# 3 - No Valid Output
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+ens_status = myEns.get_flags()
+print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", ens_status)
+
+while True:
+	if myEns.check_data_status():
+		print("Air Quality Index (1-5) : ", myEns.get_aqi())
+		print("Total Volatile Organic Compounds (ppb): ", myEns.get_tvoc())
+		print("CO2 concentration (ppm): ", myEns.get_eco2())
+		print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ", myEns.get_flags())
+		print("\n------------------------\n")
+
+	qwiic_i2c.delay_ms(200)

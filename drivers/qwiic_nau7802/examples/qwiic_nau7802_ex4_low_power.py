@@ -37,50 +37,43 @@ import qwiic_nau7802
 import sys
 import qwiic_i2c
 
-def run_example():
-	print("\nQwiic NAU7802 Example 4 - Low Power\n")
 
-	# Create instance of device
-	my_scale = qwiic_nau7802.QwiicNAU7802()
+print("\nQwiic NAU7802 Example 4 - Low Power\n")
 
-	# Check if it's connected
-	if my_scale.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+# Create instance of device
+my_scale = qwiic_nau7802.QwiicNAU7802()
 
-	# Initialize the device
-	my_scale.begin()
+# Check if it's connected
+if my_scale.is_connected() == False:
+	print("The device isn't connected to the system. Please check your connection", \
+		file=sys.stderr)
+	sys.exit(1)
 
-	# Loop forever
-	while True:
-		# Tell NAU7802 to power down, current consumption is ~200nA
-		my_scale.power_down()
+# Initialize the device
+my_scale.begin()
 
-		# Wait a little bit while in low power mode
-		qwiic_i2c.delay_ms(1000)
+# Loop forever
+while True:
+	# Tell NAU7802 to power down, current consumption is ~200nA
+	my_scale.power_down()
 
-		# Power up again
-		my_scale.power_up()
+	# Wait a little bit while in low power mode
+	qwiic_i2c.delay_ms(1000)
 
-		# Wait for new reading to become available, and time how long it takes
-		start_time = qwiic_i2c.ticks_ms()
-		while my_scale.available() == False:
-			qwiic_i2c.delay_ms(1)
-		
-		# Measurement finished, stop the timer!
-		finish_time = qwiic_i2c.ticks_ms()
-		
-		# Print data
-		print("Start up time (ms):", qwiic_i2c.ticks_diff(finish_time, start_time))
-		print("Reading:", my_scale.get_reading())
+	# Power up again
+	my_scale.power_up()
 
-		# Give some space between prints
-		print()
+	# Wait for new reading to become available, and time how long it takes
+	start_time = qwiic_i2c.ticks_ms()
+	while my_scale.available() == False:
+		qwiic_i2c.delay_ms(1)
 
-if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+	# Measurement finished, stop the timer!
+	finish_time = qwiic_i2c.ticks_ms()
+
+	# Print data
+	print("Start up time (ms):", qwiic_i2c.ticks_diff(finish_time, start_time))
+	print("Reading:", my_scale.get_reading())
+
+	# Give some space between prints
+	print()
