@@ -1,0 +1,13 @@
+{
+    "urls": [
+        ["qwiic_otos_examples/qwiic_otos_ex1_basic_readings.py", "qwiic_otos_ex1_basic_readings.py"],
+        ["qwiic_otos_examples/qwiic_otos_ex2_set_units.py", "qwiic_otos_ex2_set_units.py"],
+        ["qwiic_otos_examples/qwiic_otos_ex3_calibration.py", "qwiic_otos_ex3_calibration.py"],
+        ["qwiic_otos_examples/qwiic_otos_ex4_set_offsets_and_position.py", "qwiic_otos_ex4_set_offsets_and_position.py"],
+        ["qwiic_otos_examples/qwiic_otos_ex5_velocity_and_acceleration.py", "qwiic_otos_ex5_velocity_and_acceleration.py"],
+        ["qwiic_otos_examples/qwiic_otos_ex6_standard_deviation.py", "qwiic_otos_ex6_standard_deviation.py"],
+        ["qwiic_otos_examples/qwiic_otos_ex7_get_version.py", "qwiic_otos_ex7_get_version.py"],
+        ["qwiic_otos_examples/qwiic_otos_ex8_self_test.py", "qwiic_otos_ex8_self_test.py"]
+    ],
+    "version": "3.0.0"
+}

@@ -1,155 +1,149 @@
-Top_pHAT_Button_Py
-==================
-<p align="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
-   <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
-</p>
-<p align="center">
-	<a href="https://pypi.org/project/sparkfun-top-phat-button/" alt="Package">
-		<img src="https://img.shields.io/pypi/pyversions/sparkfun-top-phat-button.svg" /></a>
-	<a href="https://github.com/sparkfun/Top_pHAT_Button_Py/issues" alt="Issues">
-		<img src="https://img.shields.io/github/issues/sparkfun/Top_pHAT_Button_Py.svg" /></a>
-	<a href="https://sparkfun-top-phat-button.readthedocs.io/en/latest/?" alt="Documentation">
-		<img src="https://readthedocs.org/projects/sparkfun-top-phat-button/badge/?version=latest&style=flat" /></a>
-	<a href="https://github.com/sparkfun/Top_pHAT_Button_Py/blob/master/LICENSE" alt="License">
-		<img src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-	<a href="https://twitter.com/intent/follow?screen_name=sparkfun">
-        	<img src="https://img.shields.io/twitter/follow/sparkfun.svg?style=social&logo=twitter"
-           	 alt="follow on Twitter"></a>
-	
-</p>
+# SparkFun Top pHAT Button - Python Package
 
-<img src="https://cdn.sparkfun.com/assets/parts/1/5/0/0/3/16301-SparkFun_Top_pHAT_for_Raspberry_Pi-01.jpg"  align="right" width=300 alt="SparkFun Top pHAT">
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-top-phat-button)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/top_phat_button/)
 
-Python module for the buttons aboard the [SparkFun Top pHAT](https://www.sparkfun.com/products/16301)
+The SparkFun Top pHAT for Raspberry Pi has a 5-way joystick and A and B buttons, read by an ATtiny84 button controller on its I2C bus. Its firmware is in the [SparkFun Top pHAT repository](https://github.com/sparkfun/Top_pHat).
 
-This package can be used in conjunction with the overall [SparkFun qwiic Python Package](https://github.com/sparkfun/Qwiic_Py)
-
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+This package is the Python driver for the Top pHAT buttons. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
 ## Contents
 
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Dependencies](#dependencies)
 * [Installation](#installation)
-* [Documentation](#documentation)
 * [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
-Supported Platforms
---------------------
-The Top pHAT Button Python package current supports the following platforms:
-* [Raspberry Pi](https://www.sparkfun.com/search/results?term=raspberry+pi)
+## About the Package
 
-Dependencies 
----------------
-This driver package depends on the qwiic I2C driver: 
-[Qwiic_I2C_Py](https://github.com/sparkfun/Qwiic_I2C_Py)
+This package reads which buttons are pressed and which have been clicked (pressed and released), and turns the pressed and clicked interrupts on and off. Each feature is demonstrated in the [examples](examples/README.md).
 
-Documentation
--------------
-The SparkFun Top pHAT Button module documentation is hosted at [ReadTheDocs](https://sparkfun-top-phat-button.readthedocs.io/en/latest/?)
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
-Installation
--------------
+### Supported SparkFun Products
 
-### PyPi Installation
-This repository is hosted on PyPi as the [sparkfun-top-phat-button](https://pypi.org/project/sparkfun-top-phat-button/) package. On systems that support PyPi installation via pip, this library is installed using the following commands
+* [SparkFun Top pHAT for Raspberry Pi](https://www.sparkfun.com/products/16301)
 
-For all users (note: the user must have sudo privileges):
+## Supported Platforms
+
+| Python | Platform | Boards |
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+
+> [!NOTE]
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
+
+## Installation
+
+### CPython (pip)
+
 ```sh
-sudo pip install sparkfun-top-phat-button
-```
-For the current user:
-
-```sh
-pip install sparkfun-top-phat-button
-```
-
-### Local Installation
-To install, make sure the setuptools package is installed on the system.
-
-Direct installation at the command line:
-```sh
-python setup.py install
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-top-phat-button
 ```
 
-To build a package for use with pip:
+Run any example or script that does `import top_phat_button` with `~/sparkfun_venv/bin/python3 example_script.py`.
+
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-python setup.py sdist
- ```
-A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
-```sh
-cd dist
-pip install sparkfun_top_phat_button-<version>.tar.gz
-  
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/top_phat_button
 ```
-Example Use
- ---------------
-See the examples directory for more detailed use examples.
+
+To install the examples too:
+
+```sh
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/top_phat_button/examples
+```
+
+Add `@top_phat_button-<version>` to either command to install a specific release.
+
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
+```sh
+circup bundle-add sparkfun/Qwiic_Py
+circup install top_phat_button
+```
+
+To copy an example to the board:
+
+```sh
+circup example top_phat_button/top_phat_button_ex1_polling
+```
+
+## Example Use
+
+Below is a quickstart program that prints when the A or center button is pressed or released. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-from __future__ import print_function
-import top_phat_button
-import time
 import sys
+import top_phat_button
+import qwiic_i2c
 
-myButtons = top_phat_button.ToppHATButton()
 
-def runExample():
+def run_example():
+    print("\nSparkFun Top pHAT Button Example 1\n")
+    my_buttons = top_phat_button.TopPHATButton()
 
-    print("\nSparkFun Top pHAT Button  Example 1\n")
-
-    if myButtons.is_connected() == False:
-        print("The Top pHAT Button device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
+    if not my_buttons.is_connected():
+        print("The Top pHAT Button device isn't connected to the system. Please check your connection", file=sys.stderr)
         return
-    
-    myButtons.pressed_interrupt_enable = False
-    myButtons.clicked_interrupt_enable = False
-    
+
+    my_buttons.set_pressed_interrupt(False)
+    my_buttons.set_clicked_interrupt(False)
+
     while True:
-        myButtons.button_pressed #These functions must be called to update button variables to their latest setting
-        myButtons.button_clicked #These functions must be called to update button variables to their latest setting  
-        if myButtons.a_pressed == True:
+        # Update the button variables (a_pressed, a_clicked, ...)
+        my_buttons.get_button_pressed()
+        my_buttons.get_button_clicked()
+        if my_buttons.a_pressed:
             print("A Pressed")
-        if myButtons.a_clicked == True:
+        if my_buttons.a_clicked:
             print("A Released")
-        if myButtons.b_pressed == True:
-            print("B Pressed")
-        if myButtons.b_clicked == True:
-            print("B Released")
-        if myButtons.up_pressed == True:
-            print("Up Pressed")
-        if myButtons.up_clicked == True:
-            print("Up Released")
-        if myButtons.down_pressed == True:
-            print("Down Pressed")
-        if myButtons.down_clicked == True:
-            print("Down Released")
-        if myButtons.left_pressed == True:
-            print("Left Pressed")
-        if myButtons.left_clicked == True:
-            print("Left Released")
-        if myButtons.right_pressed == True:
-            print("Right Pressed")
-        if myButtons.right_clicked == True:
-            print("Right Released")
-        if myButtons.center_pressed == True:
+        if my_buttons.center_pressed:
             print("Center Pressed")
-        if myButtons.center_clicked == True:
+        if my_buttons.center_clicked:
             print("Center Released")
-    
-        time.sleep(.1)
+        qwiic_i2c.delay_ms(100)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example 1")
         sys.exit(0)
-
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/top_phat_button](https://docs.sparkfun.com/Qwiic_Py/top_phat_button/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`. Version 2.x of this driver ran only on Linux; version 3 also runs on MicroPython and CircuitPython.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `ToppHATButton` | `TopPHATButton` |
+| `buttons.connected` | `buttons.is_connected()` |
+| `buttons.button_pressed`, `buttons.button_clicked` | `buttons.get_button_pressed()`, `buttons.get_button_clicked()` |
+| `buttons.version` | `buttons.get_version()` |
+| `buttons.pressed_interrupt_enable` (get / set) | `buttons.get_pressed_interrupt()`, `buttons.set_pressed_interrupt(enable)` |
+| `buttons.clicked_interrupt_enable` (get / set) | `buttons.get_clicked_interrupt()`, `buttons.set_clicked_interrupt(enable)` |
+| `top_phat_button.BUTTON_CHANGE_ADDREESS` | `top_phat_button.BUTTON_CHANGE_ADDRESS` |
+| `get_version()` returned minor.major | `get_version()` returns major.minor |
+| `set_pressed_interrupt()`, `set_clicked_interrupt()` also cleared the low byte of the debounce time | they write only the interrupt register |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

@@ -1,42 +1,66 @@
-name: Release Actions
+# Publishes one package to PyPI when its tag is pushed.
+#
+# Tags are <driver>-<version> (for example qwiic_bme280-3.0.1),
+# qwiic_i2c-<version> for the bus layer, or qwiic-<version> for the
+# sparkfun-qwiic meta-package. The version must match
+# the package's pyproject.toml.
+#
+# Uses PyPI trusted publishing: each PyPI project needs a trusted publisher for
+# this repository, this workflow (release.yml) and the "pypi" environment.
+name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags: ["*-[0-9]+.[0-9]+.[0-9]+*"]
+
+permissions:
+  contents: read
 
 jobs:
-  upload-release-assets:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - name: Translate Repo Name For Build Tools filename_prefix
-      id: repo-name
-      run: |
-        echo "repo-name=$(
-        echo ${{ github.repository }} |
-        awk -F '\/' '{ print tolower($2) }' |
-        tr '_' '-'
-        )" >> $GITHUB_OUTPUT
-    - name: Set up Python 3
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.x
-    - name: Versions
-      run: |
-        python3 --version
-    - uses: actions/checkout@v3
-      with:
-        submodules: true
-    - name: Fetch correct submodule shas
-      run: git submodule foreach 'git fetch --tags --depth 1 origin $sha1 && git checkout -q $sha1'
-    - name: Install deps
-      run: |
-        sudo apt-get install -y gettext gawk
-        pip install -r requirements.txt
-    - name: Build assets
-      run: circuitpython-build-bundles --filename_prefix ${{ steps.repo-name.outputs.repo-name }} --library_location qwiic/drivers --library_depth 1 --package_folder_prefix "Qwiic, qwiic, Pi"
-    - name: Upload Release Assets
-      uses: shogo82148/actions-upload-release-asset@v1
-      with:
-        asset_path: "bundles/*"
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        upload_url: ${{ github.event.release.upload_url }}
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Find the package for this tag
+        id: package
+        run: |
+          tag="$GITHUB_REF_NAME"
+          name="${tag%-*}"
+          version="${tag##*-}"
+          case "$name" in
+            qwiic|qwiic_i2c) dir="$name" ;;
+            *) dir="drivers/$name" ;;
+          esac
+          if [ ! -f "$dir/pyproject.toml" ]; then
+            echo "::error::No package for tag $tag ($dir/pyproject.toml not found)"; exit 1
+          fi
+          actual=$(python -c "import tomllib; print(tomllib.load(open('$dir/pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$actual" != "$version" ]; then
+            echo "::error::Tag says $version but $dir/pyproject.toml says $actual"; exit 1
+          fi
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+      - run: pip install build mpy-cross
+      - name: Check the package before publishing
+        if: steps.package.outputs.dir != 'qwiic'
+        run: python tools/check_driver.py "$(basename '${{ steps.package.outputs.dir }}')"
+      - run: python -m build --sdist --wheel --outdir dist "${{ steps.package.outputs.dir }}"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_tmp102_examples/qwiic_tmp102_ex1_get_temperature.py", "qwiic_tmp102_ex1_get_temperature.py"],
+        ["qwiic_tmp102_examples/qwiic_tmp102_ex2_one_shot_temperature_reading.py", "qwiic_tmp102_ex2_one_shot_temperature_reading.py"]
+    ],
+    "version": "3.0.0"
+}

@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_soil_moisture_sensor.py", "github:sparkfun/Qwiic_Soil_Moisture_Sensor_Py/qwiic_soil_moisture_sensor.py"]
+        ["qwiic_soil_moisture_sensor.py", "qwiic_soil_moisture_sensor.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "0.1.0"
+    "version": "3.0.0"
 }

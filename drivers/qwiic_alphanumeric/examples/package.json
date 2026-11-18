@@ -1,0 +1,14 @@
+{
+    "urls": [
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex1_print_string.py", "qwiic_alphanumeric_ex1_print_string.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex2_turn_on_one_segment.py", "qwiic_alphanumeric_ex2_turn_on_one_segment.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex3_print_char.py", "qwiic_alphanumeric_ex3_print_char.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex4_set_brightness.py", "qwiic_alphanumeric_ex4_set_brightness.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex5_set_blink_rate.py", "qwiic_alphanumeric_ex5_set_blink_rate.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex6_colon_and_decimal.py", "qwiic_alphanumeric_ex6_colon_and_decimal.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex7_unknown_char.py", "qwiic_alphanumeric_ex7_unknown_char.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex8_multi_display.py", "qwiic_alphanumeric_ex8_multi_display.py"],
+        ["qwiic_alphanumeric_examples/qwiic_alphanumeric_ex9_scrolling_string.py", "qwiic_alphanumeric_ex9_scrolling_string.py"]
+    ],
+    "version": "3.0.0"
+}

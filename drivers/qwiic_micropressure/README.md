@@ -1,150 +1,139 @@
-![Qwiic MICROPRESSURE - Python Package](docs/images/gh-banner.png "qwiic MICROPRESSURE Python Package")
+![Qwiic MicroPressure Python Package](docs/images/gh-banner.png "Qwiic MicroPressure Python Package")
 
-# SparkFun Qwiic Micropressure - Python Package
+# SparkFun Qwiic MicroPressure - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_micropressure)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_micropressure_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_micropressure_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_micropressure_py/classqwiic__micropressure_1_1_qwiic_micro_pressure.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-micropressure)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_micropressure/)
 
-The SparkFun Qwiic Pressure Sensing MICROPRESSURE Module provides a simple and cost effective solution for adding Pressure Sensing capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic MicroPressure Sensor provides a simple and cost effective solution for adding pressure sensing capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic MICROPRESSURE. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the MicroPressure sensor. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_micropressure_py/classqwiic__micropressure_1_1_qwiic_micro_pressure.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the micropressure sensor via a single Qwiic cable. This includes reading pressure in Pa, reading pressure in Torr, reading pressure in Atm and more. The capabilities of the MICROPRESSURE are each demonstrated in the included examples.
+This package reads pressure from the MicroPressure sensor over a single Qwiic cable, in PSI, Pa, kPa, Torr, inHg, atm or bar. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Qwiic MicroPressure Sensor](https://www.sparkfun.com/products/16476)
 
-* [SparkFun Micropressure Sensor](https://www.sparkfun.com/products/16476)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-micropressure
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_micropressure` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-micropressure
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_micropressure` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_micropressure_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_micropressure
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_micropressure_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_micropressure/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_micropressure-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_micropressure
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_micropressure
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_micropressure\qwiic_micropressure_ex1_basic
+circup example qwiic_micropressure/qwiic_micropressure_ex1_basic
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the MICROPRESSURE.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_micropressure_py/blob/master/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints the pressure in several units. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_micropressure
 import sys
-import time
+import qwiic_micropressure
+import qwiic_i2c
 
-def runExample():
-	print("\nQwiic MicroPressure Example 1 - Basic Readings\n")
 
-	myMicroPressure = qwiic_micropressure.QwiicMicroPressure()
+def run_example():
+    print("\nQwiic MicroPressure Example 1 - Basic Readings\n")
+    my_micro_pressure = qwiic_micropressure.QwiicMicroPressure()
 
-	if myMicroPressure.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not my_micro_pressure.is_connected():
+        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	myMicroPressure.begin()
+    my_micro_pressure.begin()
 
-	while True:
+    while True:
+        print("Pressure(PSI): ", my_micro_pressure.read_pressure())
+        print("Pressure(Pa): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_PA))
+        print("Pressure(Bar): ", my_micro_pressure.read_pressure(my_micro_pressure.PRESSURE_BAR))
+        qwiic_i2c.delay_ms(500)
 
-		print("Pressure(PSI): ", myMicroPressure.read_pressure())
-		print("Pressure(Pa): ", myMicroPressure.read_pressure(myMicroPressure.kPressurePa))
-		print("Pressure(kPa): ", myMicroPressure.read_pressure(myMicroPressure.kPressureKpa))
-		print("Pressure(Torr): ", myMicroPressure.read_pressure(myMicroPressure.kPressureTorr))
-		print("Pressure(InHg): ", myMicroPressure.read_pressure(myMicroPressure.kPressureInHg))
-		print("Pressure(Atm): ", myMicroPressure.read_pressure(myMicroPressure.kPressureAtm))
-		print("Pressure(Bar): ", myMicroPressure.read_pressure(myMicroPressure.kPressureBar))
 
-		time.sleep(0.500)
-
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_micropressure](https://docs.sparkfun.com/Qwiic_Py/qwiic_micropressure/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `sensor.connected` | `sensor.is_connected()` |
+| `kPressurePsi`, `kPressurePa`, `kPressureKpa`, `kPressureTorr` | `PRESSURE_PSI`, `PRESSURE_PA`, `PRESSURE_KPA`, `PRESSURE_TORR` |
+| `kPressureInHg`, `kPressureAtm`, `kPressureBar` | `PRESSURE_INHG`, `PRESSURE_ATM`, `PRESSURE_BAR` |
+| `kReadPressureCommandReg`, `kReadPressureCommandData` | `READ_PRESSURE_COMMAND_REG`, `READ_PRESSURE_COMMAND_DATA` |
+| `kMathSatMask`, `kMemoryIntegrityMask`, `kBusyMask`, `kPowerIndicationMask` | `MATH_SAT_MASK`, `MEMORY_INTEGRITY_MASK`, `BUSY_MASK`, `POWER_INDICATION_MASK` |
+| `kOutputMin`, `kOutputMax`, `kMinPSI`, `kMaxPSI` | `OUTPUT_MIN`, `OUTPUT_MAX`, `MIN_PSI`, `MAX_PSI` |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

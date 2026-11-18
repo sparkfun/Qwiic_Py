@@ -1,49 +1,31 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "sparkfun_qwiic_serlcd"
-version = "2.0.0"
-description = "SparkFun Electronics Qwiic SerLCD"
-readme = "DESCRIPTION.rst"
-
-authors = [{name="Sparkfun Electronics", email="info@sparkfun.com"}]
-dependencies = ["sparkfun_qwiic_i2c"]
-
-classifiers=[
-    # How mature is this project? Common values are
-    #   3 - Alpha
-    #   4 - Beta
-    #   5 - Production/Stable
+name = "sparkfun-qwiic-serlcd"
+version = "3.0.0"
+description = "SparkFun Qwiic SerLCD (16x2 and 20x4 RGB serial LCD) driver"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [{name = "SparkFun Electronics", email = "info@sparkfun.com"}]
+dependencies = ["sparkfun-qwiic-i2c>=3.0,<4"]
+keywords = ["electronics", "maker", "qwiic", "serlcd", "lcd"]
+classifiers = [
     "Development Status :: 5 - Production/Stable",
-
-    # Indicate who your project is intended for
     "Intended Audience :: Developers",
-    "Topic :: Software Development :: Build Tools",
-
-    # Pick your license as you wish (should match "license" above)
-    "License :: OSI Approved :: MIT License",
-
-    # Specify the Python versions you support here. In particular, ensure
-    # that you indicate whether you support Python 2, Python 3 or both.
-    "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: MicroPython",
-    # NOTE: CircuitPython is also supported, but no classifier exists for it
+    "Topic :: System :: Hardware",
 ]
 
-keywords = ["electronics, maker"]
-
 [project.urls]
-homepage = "https://www.sparkfun.com/products/16396"
+Homepage = "https://www.sparkfun.com/qwiic"
+Documentation = "https://docs.sparkfun.com/Qwiic_Py/qwiic_serlcd/"
+Source = "https://github.com/sparkfun/Qwiic_Py/tree/main/drivers/qwiic_serlcd"
+Issues = "https://github.com/sparkfun/Qwiic_Py/issues"
 
 [tool.setuptools]
 py-modules = ["qwiic_serlcd"]

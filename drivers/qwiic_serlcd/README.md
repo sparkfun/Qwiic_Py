@@ -1,164 +1,174 @@
-![Qwiic SerLCD Python Package](docs/images/gh-banner-py-qwiic-serlcd.png "qwiic SerLCD Python Package" )
+![Qwiic SerLCD Python Package](docs/images/gh-banner-py-qwiic-serlcd.png "Qwiic SerLCD Python Package")
 
 # SparkFun Qwiic SerLCD - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_serlcd)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/Qwiic_SerLCD_Py)
-![License](https://img.shields.io/github/license/sparkfun/Qwiic_SerLCD_Py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_serlcd_py/classqwiic__serlcd_1_1_qwiic_serlcd.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-serlcd)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_serlcd/)
 
 The line of SparkFun Qwiic SerLCD products provide a simple and cost effective solution for adding a "text based" LCD display to your project. Implementing a SparkFun Qwiic interface, a SerLCD is rapidly added to any board that is part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic SerLCD series of products. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the SparkFun SerLCD displays. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Getting Started](#getting-started)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_serlcd_py/classqwiic__serlcd_1_1_qwiic_serlcd.html)
-* [Examples](#examples)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access all of the features of these LCD products via a single Qwiic cable. This includes writing text to the screen, adjusting backlight levels (color), customizing splash screen and much much more. They come pre-programmed with the fully open-sourced [OpenLCD firmware](https://github.com/sparkfun/OpenLCD). All of the capabilities of these LCD screens are each demonstrated in the included examples.
+This package writes text to the screen, adjusts the backlight color, sets the contrast, makes custom characters, customizes the splash screen and more, over a single Qwiic cable. The displays come pre-programmed with the open-source [OpenLCD firmware](https://github.com/sparkfun/OpenLCD). Each feature is demonstrated in the [examples](examples/README.md).
 
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun 16x2 SerLCD - RGB Backlight (Qwiic)](https://www.sparkfun.com/products/16396)
+* [SparkFun 16x2 SerLCD - RGB Text (Qwiic)](https://www.sparkfun.com/products/16397)
+* [SparkFun 20x4 SerLCD - RGB Backlight (Qwiic)](https://www.sparkfun.com/products/16398)
 
-* [SparkFun SerLCD 16x2 - RGB Backlight (QWIIC)](https://www.sparkfun.com/products/16396)
-* [SparkFun SerLCD 16x2 - RGB Text (QWIIC)](https://www.sparkfun.com/products/16397)
-* [SparkFun SerLCD 20x4 - RGB Backlight (QWIIC)](https://www.sparkfun.com/products/16398)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun RP2040 Thing+](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html), [SparkFun RP2350 Thing+](https://www.sparkfun.com/sparkfun-thing-plus-rp2350.html), [SparkFun ESP32 Thing+](https://www.sparkfun.com/sparkfun-thing-plus-esp32-wroom-usb-c.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun RP2040 Thing+](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html), [SparkFun RP2350 Thing+](https://www.sparkfun.com/sparkfun-thing-plus-rp2350.html), [SparkFun ESP32 Thing+](https://www.sparkfun.com/sparkfun-thing-plus-esp32-wroom-usb-c.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". Note - the below instructions outline installation an Linux-based (Raspberry Pi) system.
-
-#### PyPi Installation
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-serlcd
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_serlcd` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-serlcd
 ```
 
-#### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_serlcd` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_serlcd_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_serlcd
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mprmeote mip install github:sparkfun/qwiic_serlcd_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_serlcd/examples
 ```
 
-#### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_serlcd-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_serlcd
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
+To copy an example to the board:
+
 ```sh
-circup install --py qwiic_serlcd
+circup example qwiic_serlcd/qwiic_serlcd_ex1_hello_world
 ```
 
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUP on Windows. Linux and Mac will have different path seperators (i.e. "/" vs. "\"). See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
-```sh
-circup example qwiic_serlcd\ex1_qwiic_serlcd_hello_world
-circup example qwiic_serlcd\ex2_qwiic_serlcd_backlight
-circup example qwiic_serlcd\ex3_qwiic_serlcd_set_cursor_position
-circup example qwiic_serlcd\ex4_qwiic_serlcd_move_cursor
-circup example qwiic_serlcd\ex5_qwiic_serlcd_enable_cursor
-circup example qwiic_serlcd\ex6_qwiic_serlcd_blink_cursor
-circup example qwiic_serlcd\ex7_qwiic_serlcd_scroll
-circup example qwiic_serlcd\ex8_qwiic_serlcd_autoscroll_with_text
-circup example qwiic_serlcd\ex9_qwiic_serlcd_custom_character
-circup example qwiic_serlcd\ex10_qwiic_serlcd_turn_off_display
-circup example qwiic_serlcd\ex11_qwiic_serlcd_text_direction
-circup example qwiic_serlcd\ex12_qwiic_serlcd_console_input_to_display
-circup example qwiic_serlcd\ex13_qwiic_serlcd_fast_backlight
-circup example qwiic_serlcd\ex14_qwiic_serlcd_show_firmware_version
-circup example qwiic_serlcd\ex15_qwiic_serlcd_message_enable
-circup example qwiic_serlcd\ex16_qwiic_serlcd_set_splash
-circup example qwiic_serlcd\ex17_qwiic_serlcd_change_i2c_address.py
-```
+## Example Use
 
-## Examples
-Below is a quickstart program to print "Hello World!" to the Serial LCD.
-
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_serlcd_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints "Hello World!" and a counter. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-from __future__ import print_function
-import qwiic_serlcd
-import time
 import sys
+import qwiic_serlcd
+import qwiic_i2c
 
-def runExample():
 
-	print("\nSparkFun Qwiic SerLCD   Example 1\n")
-	myLCD = qwiic_serlcd.QwiicSerlcd()
+def run_example():
+    print("\nSparkFun Qwiic SerLCD Example 1\n")
+    my_lcd = qwiic_serlcd.QwiicSerLCD()
 
-	if myLCD.connected == False:
-		print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not my_lcd.is_connected():
+        print("The Qwiic SerLCD device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	myLCD.setBacklight(255, 255, 255) # Set backlight to bright white
-	myLCD.setContrast(5) # set contrast. Lower to 0 for higher contrast.
-	myLCD.clearScreen() # clear the screen - this moves the cursor to the home position as well
+    my_lcd.set_backlight(255, 255, 255)  # Set backlight to bright white
+    my_lcd.set_contrast(5)  # Set contrast. Lower to 0 for higher contrast.
+    my_lcd.clear_screen()  # Clear the screen; this also moves the cursor home
 
-	time.sleep(1) # give a sec for system messages to complete
-	
-	myLCD.print("Hello World!")
-	counter = 0
-	while True:
-		print("counter: %d" % counter)
-		myLCD.setCursor(0,1)
-		myLCD.print(str(counter))
-		counter = counter + 1
-		time.sleep(1)
+    qwiic_i2c.delay_ms(1000)  # Give a second for system messages to complete
 
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+    my_lcd.print("Hello World!")
+    counter = 0
+    while True:
+        print("counter: %d" % counter)
+        my_lcd.set_cursor(0, 1)
+        my_lcd.print(str(counter))
+        counter = counter + 1
+        qwiic_i2c.delay_ms(1000)
+
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
 
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_serlcd](https://docs.sparkfun.com/Qwiic_Py/qwiic_serlcd/).
+
+## Migrating from 2.x
+
+Version 3 follows PEP 8 names throughout (the 2.x methods were camelCase) and has no properties, so it also runs on MicroPython builds without `property()`. Methods that were already lowercase (`begin()`, `print()`, `home()`, `command()`, `cursor()`, `blink()`, `autoscroll()`, `display()`) keep their names.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `QwiicSerlcd` | `QwiicSerLCD` |
+| `lcd.connected` | `lcd.is_connected()` |
+| `clearScreen()` | `clear_screen()` |
+| `setCursor()` | `set_cursor()` |
+| `setContrast()` | `set_contrast()` |
+| `setBacklight()` | `set_backlight()` |
+| `specialCommand()` | `special_command()` |
+| `moveCursorLeft()` | `move_cursor_left()` |
+| `moveCursorRight()` | `move_cursor_right()` |
+| `noCursor()` | `no_cursor()` |
+| `noBlink()` | `no_blink()` |
+| `scrollDisplayLeft()` | `scroll_display_left()` |
+| `scrollDisplayRight()` | `scroll_display_right()` |
+| `noAutoscroll()` | `no_autoscroll()` |
+| `leftToRight()` | `left_to_right()` |
+| `rightToLeft()` | `right_to_left()` |
+| `createChar()` | `create_char()` |
+| `writeChar()` | `write_char()` |
+| `noDisplay()` | `no_display()` |
+| `setFastBacklight()` | `set_fast_backlight()` |
+| `enableSystemMessages()` | `enable_system_messages()` |
+| `disableSystemMessages()` | `disable_system_messages()` |
+| `enableSplash()` | `enable_splash()` |
+| `disableSplash()` | `disable_splash()` |
+| `saveSplash()` | `save_splash()` |
+| `setAddress()` | `set_address()` |
+| `begin()` returned the combined result of writes that always returned `None` | `begin()` returns `False` if the display doesn't answer, otherwise `True` |
+| `print()`, `set_cursor()`, `set_backlight()` and the other commands were documented to return a `bool` but returned `None` or `True` | They return nothing; a bus error raises `OSError` |
+| `is_connected()` checked the default bus, not the one passed to the constructor | It checks the object's own bus |
+| `set_backlight()` sent an extra command byte, which could delete a character on the display | Fixed |
+| `autoscroll()`, `no_autoscroll()`, `left_to_right()`, `right_to_left()` changed the cursor and blink settings | They change only the entry mode, as in the Arduino library |
+| Commands could be sent back to back | The driver keeps at least 10 ms between transmissions to the display |
+
+<p align="center">
+<img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
+</p>

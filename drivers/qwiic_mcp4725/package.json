@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_mcp4725.py", "github:sparkfun/Qwiic_MCP4725_Py/qwiic_mcp4725.py"]
+        ["qwiic_mcp4725.py", "qwiic_mcp4725.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "2.0.0"
+    "version": "3.0.0"
 }

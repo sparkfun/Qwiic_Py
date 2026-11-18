@@ -1,0 +1,15 @@
+{
+    "urls": [
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex1_set_time.py", "qwiic_rv8803_ex1_set_time.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex2_print_time.py", "qwiic_rv8803_ex2_print_time.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex3_set_hundredths.py", "qwiic_rv8803_ex3_set_hundredths.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex4a_alarm_interrupt.py", "qwiic_rv8803_ex4a_alarm_interrupt.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex4b_countdown_interrupt.py", "qwiic_rv8803_ex4b_countdown_interrupt.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex4c_periodic_interrupt.py", "qwiic_rv8803_ex4c_periodic_interrupt.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex5_timestamp.py", "qwiic_rv8803_ex5_timestamp.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex6_fine_tuning.py", "qwiic_rv8803_ex6_fine_tuning.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex7_print_epoch.py", "qwiic_rv8803_ex7_print_epoch.py"],
+        ["qwiic_rv8803_examples/qwiic_rv8803_ex8_set_epoch.py", "qwiic_rv8803_ex8_set_epoch.py"]
+    ],
+    "version": "3.0.0"
+}

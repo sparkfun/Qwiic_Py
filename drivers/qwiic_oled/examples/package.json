@@ -1,0 +1,10 @@
+{
+    "urls": [
+        ["qwiic_oled_examples/qwiic_oled_ex1_splash_screen.py", "qwiic_oled_ex1_splash_screen.py"],
+        ["qwiic_oled_examples/qwiic_oled_ex2_hello_world.py", "qwiic_oled_ex2_hello_world.py"],
+        ["qwiic_oled_examples/qwiic_oled_ex3_demo.py", "qwiic_oled_ex3_demo.py"],
+        ["qwiic_oled_examples/qwiic_oled_ex4_cube.py", "qwiic_oled_ex4_cube.py"],
+        ["qwiic_oled_examples/qwiic_oled_ex5_micro_bitmap.py", "qwiic_oled_ex5_micro_bitmap.py"]
+    ],
+    "version": "3.0.0"
+}

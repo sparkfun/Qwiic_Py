@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_joystick.py", "github:sparkfun/Qwiic_Joystick_Py/qwiic_joystick.py"]
+        ["qwiic_joystick.py", "qwiic_joystick.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "2.0.0"
+    "version": "3.0.0"
 }

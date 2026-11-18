@@ -1,168 +1,120 @@
-Qwiic_Ublox_Gps_Py
-----
+# SparkFun u-blox GPS - Python Package
 
-<p align="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
-   <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
-</p>
-<p align="center">
-	<a href="https://pypi.org/project/sparkfun-ublox-gps/" alt="Package">
-		<img src="https://img.shields.io/pypi/pyversions/sparkfun_ublox_gps.svg" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_Ublox_Gps_Py/issues" alt="Issues">
-		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_Ublox_Gps_Py.svg" /></a>
-	<a href="https://qwiic-ublox-gps-py.readthedocs.io/en/latest/index.html" alt="Documentation">
-		<img src="https://readthedocs.org/projects/qwiic-ublox-gps-py/badge/?version=latest&style=flat" /></a>
-	<a href="https://twitter.com/intent/follow?screen_name=sparkfun">
-        	<img src="https://img.shields.io/twitter/follow/sparkfun.svg?style=social&logo=twitter"
-           	 alt="follow on Twitter"></a>
-</p>
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-ublox-gps)
+![License](https://img.shields.io/badge/license-GPL--3.0-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/ublox_gps/)
 
-<table class="table table-hover table-striped table-bordered">
-  <tr align="center">
-   <td><a href="https://www.sparkfun.com/products/15136"><img src="https://cdn.sparkfun.com//assets/parts/1/3/5/1/4/15136-SparkFun_GPS-RTK2_Board_-_ZED-F9P__Qwiic_-03.jpg"></a></td>
-   <td><a href="https://www.sparkfun.com/products/15005"><img src="https://cdn.sparkfun.com//assets/parts/1/3/3/2/0/15005-SparkFun_GPS-RTK__Qwiic__-_NEO-M8P-2-00.jpg"></a></td>
-   <td><a href="https://www.sparkfun.com/products/15193"><img src="https://cdn.sparkfun.com//assets/parts/1/3/6/1/4/15193-SparkFun_GPS_Breakout_-_U.FL__ZOE-M8__Qwiic_-01.jpg"></a></td>
-   <td><a href="https://www.sparkfun.com/products/15210"><img src="https://cdn.sparkfun.com//assets/parts/1/3/6/4/8/15210-SparkFun_GPS_Breakout_-_Chip_Antenna__SAM-M8Q__Qwiic_-01.jpg"></a></td>
-  </tr>
-  <tr align="center">
-    <td><a href="https://www.sparkfun.com/products/15136">SparkFun GPS-RTK2 - ZED-F9P (GPS-15136)</a></td>
-    <td><a href="https://www.sparkfun.com/products/15005">SparkFun GPS-RTK - NEO-M8P-2 (GPS-15005)</a></td>
-    <td><a href="https://www.sparkfun.com/products/15193">SparkFun ZOE-M8Q Breakout (GPS-15193)</a></td>
-    <td><a href="https://www.sparkfun.com/products/15210">SparkFun SAM-M8Q Breakout (GPS-15210)</a></td>
-  </tr>
-  <tr align="center">
-   <td><a href="https://www.sparkfun.com/products/22693"><img src="https://cdn.sparkfun.com/assets/parts/2/2/8/5/2/22693-_GPS_SparkFun_RTK_Dead_Reckoning_Breakout_ZED-F9R-_01.jpg"></a></td>
-   <td><a href="https://www.sparkfun.com/products/21305"><img src="https://cdn.sparkfun.com/assets/parts/2/1/0/9/6/21305-GPS-RTK-Dead-Reckoning-pHAT-Feature.jpg"></a></td>
-   <td><a href="https://www.sparkfun.com/products/15733"><img src="https://cdn.sparkfun.com/assets/parts/1/4/2/9/3/15712-SparkFun_GPS_Breakout_-_NEO-M9N__U.FL__Qwiic_-01.jpg"></a></td>
-  </tr>
-  <tr align="center">
-    <td><a href="https://www.sparkfun.com/products/22693">SparkFun GPS-RTK Dead Reckoning - ZED-F9R (GPS-22693)</a></td>
-    <td><a href="https://www.sparkfun.com/products/21305">SparkFun GPS-RTK Dead Reckoning Phat- ZED-F9R (GPS-16475)</a></td>
-    <td><a href="https://www.sparkfun.com/products/15733">SparkFun GPS Dead Reckoning - NEO-M9N (GPS-15733)</a></td>
-</table>
+SparkFun's u-blox GPS boards give your project position, time, high-precision RTK and dead reckoning. This package talks to them over a serial port (UART or USB) or SPI and parses the UBX protocol, using the parsing capabilities of [ubxtranslator](https://github.com/dalymople/ubxtranslator) by [dalymople](https://github.com/dalymople).
 
-This is a Python module for the SparkFun GPS products based on u-blox GPS modules.
-	
-This package is included in the overall [SparkFun qwiic Python Package](https://github.com/sparkfun/Qwiic_Py). While the module itself does not use I<sup>2</sup>C, it may none the less join the ranks when the Raspberry Pi has better support for clock stretching. None the less, a Qwiic connector has been included onboard so the GPS module can be used with our along side SparkFun's Qwiic products.
+This package is the Python driver for u-blox GPS modules. It runs on CPython on Linux (it needs `pyserial`, and `spidev` for SPI); I2C is not supported. It is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
 ## Contents
+
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Dependencies](#dependencies)
 * [Installation](#installation)
-* [Documentation](#documentation)
 * [Example Use](#example-use)
+* [Documentation](#documentation)
+* [License](#license)
+* [Migrating from 2.x](#migrating-from-2x)
 
-Supported Platforms
---------------------
-The u-blox gps Python package currently supports the following platforms:
-* [Raspberry Pi](https://www.sparkfun.com/search/results?term=raspberry+pi)
+## About the Package
 
-<!-- Platforms to be tested
-* [NVidia Jetson Nano](https://www.sparkfun.com/products/15297)
-* [Google Coral Development Board](https://www.sparkfun.com/products/15318)
--->
+A background thread reads the port, collects UBX packets and NMEA sentences, and the methods poll the module for a message and return it as a named tuple scaled to real units: position and heading (`geo_coords()`, `hp_geo_coords()`), time (`date_time()`), dilution of precision (`get_dop()`), satellites, vehicle attitude and sensor fusion (`veh_attitude()`, `esf_*()`), raw measurements (`rawx_measurements()`), module information (`module_software_version()`, ...) and configuration (`ubx_get_val()`, `ubx_set_val()`, `set_auto_msg()`). `stream_nmea()` returns the NMEA sentences. Each feature is demonstrated in the [examples](examples/README.md).
 
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
-Documentation
--------------
-The SparkFun u-blox gps module documentation is hosted at [ReadTheDocs](https://qwiic-ublox-gps-py.readthedocs.io/en/latest/index.html)
+### Supported SparkFun Products
 
-Installation
--------------
+* [SparkFun GPS-RTK2 - ZED-F9P (GPS-15136)](https://www.sparkfun.com/products/15136)
+* [SparkFun GPS-RTK - NEO-M8P-2 (GPS-15005)](https://www.sparkfun.com/products/15005)
+* [SparkFun ZOE-M8Q Breakout (GPS-15193)](https://www.sparkfun.com/products/15193)
+* [SparkFun SAM-M8Q Breakout (GPS-15210)](https://www.sparkfun.com/products/15210)
+* [SparkFun GPS-RTK Dead Reckoning - ZED-F9R (GPS-22693)](https://www.sparkfun.com/products/22693)
+* [SparkFun GPS-RTK Dead Reckoning pHAT - ZED-F9R (GPS-21305)](https://www.sparkfun.com/products/21305)
+* [SparkFun GPS Dead Reckoning - NEO-M9N (GPS-15733)](https://www.sparkfun.com/products/15733)
 
-### PyPi Installation
-This repository is hosted on PyPi as the [sparkfun-ublox_gps](https://pypi.org/project/) package. On systems that support PyPi installation via pip, this library is installed using the following commands
+## Supported Platforms
 
-For all users (note: the user must have sudo privileges):
+| Python | Platform | Boards |
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) |
+
+> [!NOTE]
+> This package uses a serial port or SPI, so it is not available for MicroPython or CircuitPython.
+
+## Installation
+
+### CPython (pip)
+
 ```sh
-sudo pip install sparkfun-ublox-gps
-```
-For the current user:
-
-```sh
-sudo pip install sparkfun-ublox-gps
-```
-
-### Local Installation
-To install, make sure the setuptools package is installed on the system.
-
-Direct installation at the command line:
-```sh
-python setup.py install
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-ublox-gps
 ```
 
-To build a package for use with pip:
-```sh
-python setup.py sdist
- ```
-A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
-```sh
-cd dist
-pip install sparkfun_ublox_gps-<version>.tar.gz
-  
-```
-Example Use
----------------
+This also installs `pyserial`, and `spidev` on Linux. Run any example or script that does `import ublox_gps` with `~/sparkfun_venv/bin/python3 example_script.py`.
+
+On a Raspberry Pi, enable the serial port (or SPI) with `sudo raspi-config` under **Interface Options**.
+
+## Example Use
+
+Below is a quickstart program that prints the longitude and latitude. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-from ublox_gps import UbloxGps
 import serial
-# Can also use SPI here - import spidev
-# I2C is not supported
+from ublox_gps import UbloxGPS
+# SPI also works: pass a spidev.SpiDev() instead. I2C is not supported.
 
-port = serial.Serial('/dev/serial0', baudrate=38400, timeout=1)
-gps = UbloxGps(port)
+port = serial.Serial("/dev/serial0", baudrate=38400, timeout=1)
+gps = UbloxGPS(port)
+
 
 def run():
-  
-  try: 
-    print("Listenting for UBX Messages.")
-    while True:
-      try: 
-        coords = gps.geo_coords()
-        print(coords.lon, coords.lat)
-      except (ValueError, IOError) as err:
-        print(err)
-  
-  finally:
-    port.close()
-
-if __name__ == '__main__':
-  run()
- ```
-
-### Examples Directory
----
-* geo_coords_ex1.py 
-	* Simple example showing how to get and print out latitude, longitude, and
-		heading. 
-* gps_time_ex2.py 
-	* Simple example showing how to UTC time and how to check its' validity.
-* dead_reckoning_ex3.py 
-	* Simple example showing how to use dead reckoning on dead reckoning modules.
-		Make sure to take a look at our [hookup guide](https://learn.sparkfun.com/tutorials/sparkfun-gps-rtk-dead-reckoning-zed-f9r-hookup-guide) for a detailed explanation on
-		where to attach the module and how to calibrate it. 
-* stream_nmea_gps_ex4.py 
-	* Simple example showing how to stream NMEA data from Ublox Modules.
-* modifying_configuration_settings_ex5.py 
-	* Simple example showing how change the configuration settings for the Ublox
-		Module. 
-* using_spi_ex6.py 
-	* Simple example showing how to use SPI. 
-		Module. 
-
-### Attribution
----
-This code is dependent on the work by [daylomople](https://github.com/dalymople) and the awesome parsing capabilities of [ubxtranslator](https://github.com/dalymople/ubxtranslator). 
-
-### To Do
----
-* [ ] Some bugs associated with SPI writes.
-* [ ] Add more Classes and Messages to `sparkfun_predefines.py` so that a
-	greater variety of messages can be parsed. 
-* [ ] Fix bug when getting configuration settings. 
+    try:
+        print("Listening for UBX Messages.")
+        while True:
+            try:
+                coords = gps.geo_coords()
+                print(coords.lon, coords.lat)
+            except (ValueError, IOError) as err:
+                print(err)
+    finally:
+        port.close()
 
 
+if __name__ == "__main__":
+    run()
+```
 
+## Documentation
 
+The API reference is at [docs.sparkfun.com/Qwiic_Py/ublox_gps](https://docs.sparkfun.com/Qwiic_Py/ublox_gps/).
+
+## License
+
+GPL-3.0-or-later (unlike the other Qwiic drivers, which are MIT). See [LICENSE](LICENSE).
+
+## Migrating from 2.x
+
+Version 3 renames the classes to PEP 8 names and has no properties.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `UbloxGps` | `UbloxGPS` |
+| `sfeSpiWrapper` (module `ublox_gps.sfeSpiWrapper`) | `SPIWrapper` (module `ublox_gps.spi_wrapper`, also `ublox_gps.SPIWrapper`) |
+| `gps.get_DOP()` | `gps.get_dop()` |
+| `UbloxGps.device_name`, `UbloxGps.available_addresses` (`0x42`) | removed: the driver doesn't use I2C, so it isn't listed as a Qwiic I2C device |
+| `core.*.repeated_block`, `core.*.fmt` (properties) | `is_repeated_block()`, `get_fmt()` |
+| `Message.id_`, `Cls.id_` (properties) | `get_id()` |
+| `Parser.receive_from(stream, skippreamble, ignoreunsupported)` | `receive_from(stream, skip_preamble, ignore_unsupported)` |
+| `UbloxGps(spidev_port)` failed (`sfeSpiWrapper` module called as a class) | `UbloxGPS(spidev_port)` wraps the port in `SPIWrapper` |
+| `UbloxGps()` opened `/dev/serial0/` (trailing slash, always failed) | `UbloxGPS()` opens `/dev/serial0` |
+| `import ublox_gps` needed `spidev` | `spidev` is needed only for SPI, and is a Linux-only dependency |
+| `veh_attitude().accRoll` was not scaled | scaled to degrees like `accPitch` and `accHeading` |
+| `R8` fields raised `NameError` (`double`) | parsed as `float` |
+| - | new `rawx_measurements()` (UBX-RXM-RAWX) |
+| `test_script.py` (called a missing `ublox_debug()`) | removed; see the examples |
+
+<p align="center">
+<img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
+</p>

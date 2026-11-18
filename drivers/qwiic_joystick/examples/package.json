@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_joystick_examples/qwiic_joystick_ex1_basic_reading.py", "qwiic_joystick_ex1_basic_reading.py"],
+        ["qwiic_joystick_examples/qwiic_joystick_ex2_directions.py", "qwiic_joystick_ex2_directions.py"]
+    ],
+    "version": "3.0.0"
+}

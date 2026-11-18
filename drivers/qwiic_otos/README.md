@@ -1,168 +1,195 @@
-![Qwiic OTOS - Python Package](docs/images/gh-banner.png "qwiic OTOS Python Package")
+![Qwiic OTOS Python Package](docs/images/gh-banner.png "Qwiic OTOS Python Package")
 
 # SparkFun Qwiic OTOS - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_otos)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_otos_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_otos_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-otos)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_otos/)
 
-The SparkFun Qwiic Opitical Tracking Odometry Sensor OTOS Module provides a simple and cost effective solution for adding Opitical Tracking Odometry Sensor capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic Optical Tracking Odometry Sensor (OTOS) provides a simple and cost effective solution for adding optical odometry to your robot. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic OTOS. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the OTOS. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the OTOS via a single Qwiic cable. This includes odometry tracking, reading velocity and acceleration, performing calibration and more. The capabilities of the OTOS are each demonstrated in the included examples.
+This package reads the tracked position, velocity and acceleration (and their standard deviations) from the OTOS over a single Qwiic cable, and handles IMU calibration, linear and angular scalars, sensor offsets and units. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Optical Tracking Odometry Sensor - PAA5160E1 (Qwiic)](https://www.sparkfun.com/products/24904)
 
-* [SparkFun Opitical Tracking Odometry Sensor Sensor - OTOS](https://www.sparkfun.com/products/24904)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-otos
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_otos` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-otos
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_otos` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_otos_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_otos
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_otos_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_otos/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_otos-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_otos
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_otos
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_otos\qwiic_otos_ex1_basic_readings
-circup example qwiic_otos\qwiic_otos_ex2_set_units
-circup example qwiic_otos\qwiic_otos_ex3_calibration
-circup example qwiic_otos\qwiic_otos_ex4_set_offsets_and_position
-circup example qwiic_otos\qwiic_otos_ex5_velocity_and_acceleration
-circup example qwiic_otos\qwiic_otos_ex6_standard_deviation
-circup example qwiic_otos\qwiic_otos_ex7_get_version
-circup example qwiic_otos\qwiic_otos_ex8_self_test
+circup example qwiic_otos/qwiic_otos_ex1_basic_readings
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the OTOS.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_otos_py/blob/master/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that calibrates the IMU and prints the tracked position. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_otos
 import sys
-import time
+import qwiic_i2c
+import qwiic_otos
 
-def runExample():
+
+def run_example():
     print("\nQwiic OTOS Example 1 - Basic Readings\n")
+    my_otos = qwiic_otos.QwiicOTOS()
 
-    myOtos = qwiic_otos.QwiicOTOS()
-
-    if myOtos.is_connected() == False:
-        print("The device isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
+    if not my_otos.is_connected():
+        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
         return
 
-    myOtos.begin()
+    my_otos.begin()
 
     print("Ensure the OTOS is flat and stationary during calibration!")
-    for i in range(5, 0, -1):
-        print("Calibrating in %d seconds..." % i)
-        time.sleep(1)
-
-    print("Calibrating IMU...")
-
-    myOtos.calibrateImu()
-
-    myOtos.resetTracking()
+    qwiic_i2c.delay_ms(5000)
+    my_otos.calibrate_imu()
+    my_otos.reset_tracking()
 
     while True:
-        myPosition = myOtos.getPosition()
-
-        print()
-        print("Position:")
-        print("X (Inches): {}".format(myPosition.x))
-        print("Y (Inches): {}".format(myPosition.y))
-        print("Heading (Degrees): {}".format(myPosition.h))
-
-        time.sleep(0.5)
+        my_position = my_otos.get_position()
+        print("X (Inches): {}".format(my_position.x))
+        print("Y (Inches): {}".format(my_position.y))
+        print("Heading (Degrees): {}\n".format(my_position.h))
+        qwiic_i2c.delay_ms(500)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example")
         sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_otos](https://docs.sparkfun.com/Qwiic_Py/qwiic_otos/).
+
+## Migrating from 2.x
+
+Version 3 uses snake_case method names and has no properties, so it also runs on MicroPython builds without `property()`. `Pose2D` is unchanged; the class constants are now UPPER_CASE.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `otos.connected` | `otos.is_connected()` |
+| k-prefixed / mixed-case constants | UPPER_CASE (see [Renamed constants](#renamed-constants)) |
+| `calibrateImu(numSamples, waitUntilDone)` | `calibrate_imu(num_samples, wait_until_done)` |
+| `getAcceleration()` | `get_acceleration()` |
+| `getAccelerationStdDev()` | `get_acceleration_std_dev()` |
+| `getAngularScalar()` | `get_angular_scalar()` |
+| `getAngularUnit()` | `get_angular_unit()` |
+| `getImuCalibrationProgress()` | `get_imu_calibration_progress()` |
+| `getLinearScalar()` | `get_linear_scalar()` |
+| `getLinearUnit()` | `get_linear_unit()` |
+| `getOffset()` | `get_offset()` |
+| `getPosVelAcc()` | `get_pos_vel_acc()` |
+| `getPosVelAccAndStdDev()` | `get_pos_vel_acc_and_std_dev()` |
+| `getPosVelAccStdDev()` | `get_pos_vel_acc_std_dev()` |
+| `getPosition()` | `get_position()` |
+| `getPositionStdDev()` | `get_position_std_dev()` |
+| `getSignalProcessConfig()` | `get_signal_process_config()` |
+| `getStatus()` | `get_status()` |
+| `getVelocity()` | `get_velocity()` |
+| `getVelocityStdDev()` | `get_velocity_std_dev()` |
+| `getVersionInfo()` | `get_version_info()` |
+| `resetTracking()` | `reset_tracking()` |
+| `selfTest()` | `self_test()` |
+| `setAngularScalar(scalar)` | `set_angular_scalar(scalar)` |
+| `setAngularUnit(unit)` | `set_angular_unit(unit)` |
+| `setLinearScalar(scalar)` | `set_linear_scalar(scalar)` |
+| `setLinearUnit(unit)` | `set_linear_unit(unit)` |
+| `setOffset(pose)` | `set_offset(pose)` |
+| `setPosition(pose)` | `set_position(pose)` |
+| `setSignalProcessConfig(config)` | `set_signal_process_config(config)` |
+| `setLinearScalar()`, `setAngularScalar()` returned `None` and passed a negative value to the I2C write for scalars below 1.0 | Return `True` (or `False` if out of range) and write the value as a two's complement byte, as the Arduino library does |
+
+### Renamed constants
+
+The leading `k` is dropped and the names are upper-cased with `_` between words; the values are unchanged.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `kProductId` | `PRODUCT_ID` |
+| `kMinScalar` | `MIN_SCALAR` |
+| `kMaxScalar` | `MAX_SCALAR` |
+| `kLinearUnitMeters`, `kLinearUnitInches` | `LINEAR_UNIT_METERS`, `LINEAR_UNIT_INCHES` |
+| `kAngularUnitRadians`, `kAngularUnitDegrees` | `ANGULAR_UNIT_RADIANS`, `ANGULAR_UNIT_DEGREES` |
+| `kRegProductId`, `kRegHwVersion`, `kRegFwVersion`, `kRegScalarLinear`, `kRegScalarAngular` | `REG_PRODUCT_ID`, `REG_HW_VERSION`, `REG_FW_VERSION`, `REG_SCALAR_LINEAR`, `REG_SCALAR_ANGULAR` |
+| `kRegImuCalib`, `kRegReset`, `kRegSignalProcess`, `kRegSelfTest`, `kRegStatus` | `REG_IMU_CALIB`, `REG_RESET`, `REG_SIGNAL_PROCESS`, `REG_SELF_TEST`, `REG_STATUS` |
+| `kRegOffXL`, `kRegOffXH`, `kRegOffYL`, `kRegOffYH`, `kRegOffHL`, `kRegOffHH` | `REG_OFF_XL`, `REG_OFF_XH`, `REG_OFF_YL`, `REG_OFF_YH`, `REG_OFF_HL`, `REG_OFF_HH` |
+| `kRegPosXL`, `kRegPosXH`, `kRegPosYL`, `kRegPosYH`, `kRegPosHL`, `kRegPosHH` | `REG_POS_XL`, `REG_POS_XH`, `REG_POS_YL`, `REG_POS_YH`, `REG_POS_HL`, `REG_POS_HH` |
+| `kRegVelXL`, `kRegVelXH`, `kRegVelYL`, `kRegVelYH`, `kRegVelHL`, `kRegVelHH` | `REG_VEL_XL`, `REG_VEL_XH`, `REG_VEL_YL`, `REG_VEL_YH`, `REG_VEL_HL`, `REG_VEL_HH` |
+| `kRegAccXL`, `kRegAccXH`, `kRegAccYL`, `kRegAccYH`, `kRegAccHL`, `kRegAccHH` | `REG_ACC_XL`, `REG_ACC_XH`, `REG_ACC_YL`, `REG_ACC_YH`, `REG_ACC_HL`, `REG_ACC_HH` |
+| `kRegPosStdXL`, `kRegPosStdXH`, `kRegPosStdYL`, `kRegPosStdYH`, `kRegPosStdHL`, `kRegPosStdHH` | `REG_POS_STD_XL`, `REG_POS_STD_XH`, `REG_POS_STD_YL`, `REG_POS_STD_YH`, `REG_POS_STD_HL`, `REG_POS_STD_HH` |
+| `kRegVelStdXL`, `kRegVelStdXH`, `kRegVelStdYL`, `kRegVelStdYH`, `kRegVelStdHL`, `kRegVelStdHH` | `REG_VEL_STD_XL`, `REG_VEL_STD_XH`, `REG_VEL_STD_YL`, `REG_VEL_STD_YH`, `REG_VEL_STD_HL`, `REG_VEL_STD_HH` |
+| `kRegAccStdXL`, `kRegAccStdXH`, `kRegAccStdYL`, `kRegAccStdYH`, `kRegAccStdHL`, `kRegAccStdHH` | `REG_ACC_STD_XL`, `REG_ACC_STD_XH`, `REG_ACC_STD_YL`, `REG_ACC_STD_YH`, `REG_ACC_STD_HL`, `REG_ACC_STD_HH` |
+| `kMeterToInch`, `kInchToMeter`, `kRadianToDegree`, `kDegreeToRadian` | `METER_TO_INCH`, `INCH_TO_METER`, `RADIAN_TO_DEGREE`, `DEGREE_TO_RADIAN` |
+| `kMeterToInt16`, `kInt16ToMeter`, `kMpsToInt16`, `kInt16ToMps` | `METER_TO_INT16`, `INT16_TO_METER`, `MPS_TO_INT16`, `INT16_TO_MPS` |
+| `kMpssToInt16`, `kInt16ToMpss`, `kRadToInt16`, `kInt16ToRad` | `MPSS_TO_INT16`, `INT16_TO_MPSS`, `RAD_TO_INT16`, `INT16_TO_RAD` |
+| `kRpsToInt16`, `kInt16ToRps`, `kRpssToInt16`, `kInt16ToRpss` | `RPS_TO_INT16`, `INT16_TO_RPS`, `RPSS_TO_INT16`, `INT16_TO_RPSS` |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

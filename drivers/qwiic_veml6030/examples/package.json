@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["qwiic_veml6030_examples/qwiic_veml6030_ex1_basic_readings.py", "qwiic_veml6030_ex1_basic_readings.py"],
+        ["qwiic_veml6030_examples/qwiic_veml6030_ex2_settings.py", "qwiic_veml6030_ex2_settings.py"],
+        ["qwiic_veml6030_examples/qwiic_veml6030_ex3_threshold_interrupts.py", "qwiic_veml6030_ex3_threshold_interrupts.py"],
+        ["qwiic_veml6030_examples/qwiic_veml6030_ex4_power_saving.py", "qwiic_veml6030_ex4_power_saving.py"]
+    ],
+    "version": "3.0.0"
+}

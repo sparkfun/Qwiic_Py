@@ -1,37 +1,64 @@
-# Sparkfun GPIO Examples Reference
-Below is a brief summary of each of the example programs included in this repository. To report a bug in any of these examples or to request a new feature or example [submit an issue in our GitHub issues.](https://github.com/sparkfun/qwiic_gpio_py/issues). 
+# SparkFun Qwiic GPIO Examples Reference
+Below is a brief summary of each of the example programs included in this repository. To report a bug in any of these examples or to request a new feature or example [submit an issue in our GitHub issues.](https://github.com/sparkfun/Qwiic_Py/issues).
 
-NOTE: Any numbering of examples is to retain consistency with the Arduino library from which this was ported. 
+NOTE: Any numbering of examples is to retain consistency with the Arduino library from which this was ported.
 
-## Qwiic Gpio Ex1A Write
-This script sets up a GPIO 0 as an output and toggles
-   the output HIGH and LOW.
- 
-   This device sinks current. When an output is LOW then current will flow.
+## Example 1A: Write
+`qwiic_gpio_ex1a_write.py`
+
+This example sets up GPIO 0 as an output and toggles the output HIGH and LOW. This device sinks current: when an output is LOW, current will flow.
 
 The key methods showcased by this example are:
-- [pinMode()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#a88956a5327174e453c9f247ae7ea2a07)
-- [digitalWrite()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#a4cd696748424967345528fabe4fc22fa)
 
-## Qwiic Gpio Ex1B Write Port
-This script flips all 8 outputs on and off every second.
-- [pinModePort()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#a0f80b0d4eb2872e5bbdd1eefffcf04cc)
-- [digitalWritePort()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#a52c93eb9bb28236c9b6fffe3456e2249)
+- `pin_mode()`
+- `digital_write()`
 
-## Qwiic Gpio Ex2A Read
-This script allows the user to read a value from GPIO 0
-- [digitalRead()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#a98403a1293a99ff4411cc6a4cca5e691)
+## Example 1B: Write Port
+`qwiic_gpio_ex1b_write_port.py`
 
-## Qwiic Gpio Ex2B Read Port
-This script allows the user to read the status of all 8 GPIO simultaneously
-- [digitalReadPort()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#a6d86c74b1969a08272de93aeaeb128c5)
+This example flips all 8 outputs on and off every second.
 
-## Qwiic Gpio Ex3A Inversion
-This script shows how to invert the input signal on a pin
-- [invertPin()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#af3e28ee15c8bf6dd94d307f3d05c5430)
+The key methods showcased by this example are:
 
-## Qwiic Gpio Ex3B Inversion Port
-This script shows how to invert the input signal on multiple pins
-- [invertPinPort()](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html#a9540c7dbd1b6b10191cf3f7aed9c91b1)
+- `pin_mode_port()`
+- `digital_write_port()`
 
+## Example 2A: Read
+`qwiic_gpio_ex2a_read.py`
 
+This example reads a value from GPIO 0.
+
+The key methods showcased by this example are:
+
+- `pin_mode()`
+- `digital_read()`
+
+## Example 2B: Read Port
+`qwiic_gpio_ex2b_read_port.py`
+
+This example reads the status of all 8 GPIO simultaneously.
+
+The key methods showcased by this example are:
+
+- `pin_mode_port()`
+- `digital_read_port()`
+
+## Example 3A: Inversion
+`qwiic_gpio_ex3a_inversion.py`
+
+This example shows how to invert the input signal on a pin.
+
+The key methods showcased by this example are:
+
+- `invert_pin()`
+- `digital_read()`
+
+## Example 3B: Inversion Port
+`qwiic_gpio_ex3b_inversion_port.py`
+
+This example shows how to invert the input signal on multiple pins.
+
+The key methods showcased by this example are:
+
+- `invert_pin_port()`
+- `digital_read_port()`

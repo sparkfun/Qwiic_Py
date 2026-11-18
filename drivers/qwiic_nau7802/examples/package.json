@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["qwiic_nau7802_examples/qwiic_nau7802_ex1_basic_readings.py", "qwiic_nau7802_ex1_basic_readings.py"],
+        ["qwiic_nau7802_examples/qwiic_nau7802_ex2_complete_scale.py", "qwiic_nau7802_ex2_complete_scale.py"],
+        ["qwiic_nau7802_examples/qwiic_nau7802_ex3_gain_sample_rate.py", "qwiic_nau7802_ex3_gain_sample_rate.py"],
+        ["qwiic_nau7802_examples/qwiic_nau7802_ex4_low_power.py", "qwiic_nau7802_ex4_low_power.py"]
+    ],
+    "version": "3.0.0"
+}

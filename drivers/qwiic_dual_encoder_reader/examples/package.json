@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_dual_encoder_reader_examples/qwiic_dual_encoder_reader_ex1_read_counts.py", "qwiic_dual_encoder_reader_ex1_read_counts.py"],
+        ["qwiic_dual_encoder_reader_examples/qwiic_dual_encoder_reader_ex2_reset_counts.py", "qwiic_dual_encoder_reader_ex2_reset_counts.py"]
+    ],
+    "version": "3.0.0"
+}

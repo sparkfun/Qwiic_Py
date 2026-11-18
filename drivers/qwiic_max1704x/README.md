@@ -1,160 +1,206 @@
-![Qwiic MAX1704X - Python Package](docs/images/gh-banner.png "qwiic MAX1704X Python Package")
+![Qwiic MAX1704X Python Package](docs/images/gh-banner.png "Qwiic MAX1704X Python Package")
 
 # SparkFun Qwiic MAX1704X - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_max1704x)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_max1704x_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_max1704x_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_max1704x_py/classqwiic__max1704x_1_1_qwiic_m_a_x1704_x.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-max1704x)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_max1704x/)
 
-The SparkFun Qwiic LiPo Fuel Guage MAX1704X Sensor provides a simple and cost effective solution for adding LiPo Fuel Guage sensing to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic LiPo Fuel Gauge MAX1704X Sensor provides a simple and cost effective solution for adding LiPo fuel gauge sensing to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic MAX1704X. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the MAX1704X. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_max1704x_py/classqwiic__max1704x_1_1_qwiic_m_a_x1704_x.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the MAX1704X via a single Qwiic cable. This includes reading voltage level, reading state of charge, setting threshold alerts,  and more. The capabilities of the MAX1704X are each demonstrated in the included examples.
+This package reads battery voltage, state of charge and charge rate from the MAX17043, MAX17044, MAX17048 and MAX17049 over a single Qwiic cable, and sets their alert thresholds, sleep and hibernate modes. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun LiPo Fuel Gauge Sensor - MAX1704X](https://www.sparkfun.com/products/20680)
 
-* [SparkFun LiPo Fuel Guage Sensor - MAX1704X](https://www.sparkfun.com/products/20680)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-max1704x
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_max1704x` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-max1704x
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_max1704x` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_max1704x_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_max1704x
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_max1704x_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_max1704x/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_max1704x-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_max1704x
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_max1704x
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_max1704x\qwiic_max1704x_ex1_basic
-circup example qwiic_max1704x\qwiic_max1704x_ex4_kitchen_sink
-
+circup example qwiic_max1704x/qwiic_max1704x_ex1_basic
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the MAX1704X.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_max1704x_py/blob/master/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints the battery voltage and state of charge. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-
-import qwiic_max1704x
 import sys
-import time
-
-def runExample():
-	print("\nQwiic MAX1704X Example 1 - Simple\n")
-
-	myLipo = qwiic_max1704x.QwiicMAX1704X() # defaults to the MAX17043 device
+import qwiic_max1704x
+import qwiic_i2c
 
 
-	if myLipo.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+def run_example():
+    print("\nQwiic MAX1704X Example 1 - Simple\n")
+    # Defaults to the MAX17043. For the MAX17048, pass
+    # device_type=qwiic_max1704x.QwiicMAX1704X.DEVICE_TYPE_MAX17048
+    my_lipo = qwiic_max1704x.QwiicMAX1704X()
 
-	myLipo.begin()
+    if not my_lipo.is_connected():
+        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	myLipo.quick_start()
+    my_lipo.begin()
+    my_lipo.quick_start()
+    my_lipo.set_threshold(20)
 
-	myLipo.set_threshold(20)
+    while True:
+        print("Voltage: %.2fV" % my_lipo.get_voltage())
+        print("State of Charge: %.2f%%" % my_lipo.get_soc())
 
-	while True:
-		voltage = myLipo.get_voltage()
-		print("Voltage: %.2fV" % voltage)
+        if my_lipo.get_alert():
+            print("Battery SoC is below threshold!")
+        else:
+            print("Battery SoC is above threshold.")
 
-		soc = myLipo.get_soc()
-		print("State of Charge: %.2f%%" % soc)
+        qwiic_i2c.delay_ms(500)
 
-		if myLipo.get_alert():
-			print("Battery SoC is below threshold!")
-		else:
-			print("Battery SoC is above threshold.")
 
-		time.sleep(0.500)
-
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_max1704x](https://docs.sparkfun.com/Qwiic_Py/qwiic_max1704x/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `lipo.connected` | `lipo.is_connected()` |
+| `get_hibrt_act_thr_volts(v)` (it set the threshold) | `set_hibrt_act_thr_volts(v)` |
+| `get_hibrt_hib_thr_percent(p)` (it set the threshold) | `set_hibrt_hib_thr_percent(p)` |
+| `set_compensation(newCompensation=...)` | `set_compensation(new_compensation=...)` |
+| `enable_hibernate()`, `disable_hibernate()` raised `AttributeError` | write the HIBRT register as intended |
+| `k`-prefixed constants (`kDeviceTypeMAX17043`, `kDeviceTypeMAX17044`, ...) | UPPER_CASE without the `k` (`DEVICE_TYPE_MAX17043`, `DEVICE_TYPE_MAX17044`, ...); every rename is listed below |
+
+<details>
+<summary>Every renamed constant</summary>
+
+| 2.x | 3.0 |
+| --- | --- |
+| `kDeviceTypeMAX17043` | `DEVICE_TYPE_MAX17043` |
+| `kDeviceTypeMAX17044` | `DEVICE_TYPE_MAX17044` |
+| `kDeviceTypeMAX17048` | `DEVICE_TYPE_MAX17048` |
+| `kDeviceTypeMAX17049` | `DEVICE_TYPE_MAX17049` |
+| `kRegVcell` | `REG_VCELL` |
+| `kRegSoc` | `REG_SOC` |
+| `kRegMode` | `REG_MODE` |
+| `kRegVersion` | `REG_VERSION` |
+| `kRegHibRt` | `REG_HIBRT` |
+| `kRegConfig` | `REG_CONFIG` |
+| `kRegCValrt` | `REG_CVALRT` |
+| `kRegCRate` | `REG_CRATE` |
+| `kRegVResetId` | `REG_VRESET_ID` |
+| `kRegStatus` | `REG_STATUS` |
+| `kRegCommand` | `REG_COMMAND` |
+| `kModeQuickStart` | `MODE_QUICK_START` |
+| `kModeEnSleep` | `MODE_EN_SLEEP` |
+| `kModeHibStat` | `MODE_HIB_STAT` |
+| `kVResetIdVResetShift` | `VRESET_ID_VRESET_SHIFT` |
+| `kVResetIdVResetMask` | `VRESET_ID_VRESET_MASK` |
+| `kVResetIdComparatorDisShift` | `VRESET_ID_COMPARATOR_DIS_SHIFT` |
+| `kVResetIdComparatorDisMask` | `VRESET_ID_COMPARATOR_DIS_MASK` |
+| `kStatusShift` | `STATUS_SHIFT` |
+| `kStatusMask` | `STATUS_MASK` |
+| `kStatusRiShift` | `STATUS_RI_SHIFT` |
+| `kStatusRiMask` | `STATUS_RI_MASK` |
+| `kStatusVhShift` | `STATUS_VH_SHIFT` |
+| `kStatusVhMask` | `STATUS_VH_MASK` |
+| `kStatusVlShift` | `STATUS_VL_SHIFT` |
+| `kStatusVlMask` | `STATUS_VL_MASK` |
+| `kStatusVrShift` | `STATUS_VR_SHIFT` |
+| `kStatusVrMask` | `STATUS_VR_MASK` |
+| `kStatusHdShift` | `STATUS_HD_SHIFT` |
+| `kStatusHdMask` | `STATUS_HD_MASK` |
+| `kStatusScShift` | `STATUS_SC_SHIFT` |
+| `kStatusScMask` | `STATUS_SC_MASK` |
+| `kStatusEnVrShift` | `STATUS_EN_VR_SHIFT` |
+| `kStatusEnVrMask` | `STATUS_EN_VR_MASK` |
+| `kConfigAlertShift` | `CONFIG_ALERT_SHIFT` |
+| `kConfigAlertMask` | `CONFIG_ALERT_MASK` |
+| `kConfigSocAlertShift` | `CONFIG_SOC_ALERT_SHIFT` |
+| `kConfigSocAlertMask` | `CONFIG_SOC_ALERT_MASK` |
+| `kConfigSleepShift` | `CONFIG_SLEEP_SHIFT` |
+| `kConfigSleepMask` | `CONFIG_SLEEP_MASK` |
+| `kConfigThresholdShift` | `CONFIG_THRESHOLD_SHIFT` |
+| `kConfigThresholdMask` | `CONFIG_THRESHOLD_MASK` |
+| `kConfigCompShift` | `CONFIG_COMP_SHIFT` |
+| `kConfigCompMask` | `CONFIG_COMP_MASK` |
+| `kMax17048HibRtEnHib` | `MAX17048_HIBRT_EN_HIB` |
+| `kMax17048HibRtDisHib` | `MAX17048_HIBRT_DIS_HIB` |
+
+</details>
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

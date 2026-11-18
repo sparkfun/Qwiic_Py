@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_proximity_examples/qwiic_proximity_ex1_basic_readings.py", "qwiic_proximity_ex1_basic_readings.py"],
+        ["qwiic_proximity_examples/qwiic_proximity_ex2_presence_sensing.py", "qwiic_proximity_ex2_presence_sensing.py"],
+        ["qwiic_proximity_examples/qwiic_proximity_ex3_ambient_light.py", "qwiic_proximity_ex3_ambient_light.py"],
+        ["qwiic_proximity_examples/qwiic_proximity_ex4_all_readings.py", "qwiic_proximity_ex4_all_readings.py"],
+        ["qwiic_proximity_examples/qwiic_proximity_ex5_advanced_settings.py", "qwiic_proximity_ex5_advanced_settings.py"],
+        ["qwiic_proximity_examples/qwiic_proximity_ex8_connection_check.py", "qwiic_proximity_ex8_connection_check.py"]
+    ],
+    "version": "3.0.0"
+}

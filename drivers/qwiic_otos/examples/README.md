@@ -1,17 +1,21 @@
 # Sparkfun OTOS Examples Reference
-Below is a brief summary of each of the example programs included in this repository. To report a bug in any of these examples or to request a new feature or example [submit an issue in our GitHub issues.](https://github.com/sparkfun/qwiic_otos_py/issues). 
+Below is a brief summary of each of the example programs included in this repository. To report a bug in any of these examples or to request a new feature or example [submit an issue in our GitHub issues.](https://github.com/sparkfun/Qwiic_Py/issues). 
 
 NOTE: Any numbering of examples is to retain consistency with the Arduino library from which this was ported. 
 
-## Qwiic Otos Ex1 Basic Readings
+## Example 1: Basic Readings
+`qwiic_otos_ex1_basic_readings.py`
+
 This example demonstrates how to read the position and heading from the
  SparkFun Qwiic Optical Tracking Odometry Sensor (OTOS).
 
 The key methods showcased by this example are:
-- [resetTracking()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#af10d67665906b6cb5e9f66d25b358a4f)
-- [getPosition()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a507b45aeb4223a732c6e995b64f0e796)
+- `reset_tracking()`
+- `get_position()`
 
-## Qwiic Otos Ex2 Set Units
+## Example 2: Set Units
+`qwiic_otos_ex2_set_units.py`
+
 This example demonstrates how to change the units of the SparkFun Qwiic
  Optical Tracking Odometry Sensor (OTOS).
 
@@ -19,10 +23,12 @@ This example demonstrates how to change the units of the SparkFun Qwiic
  units to suit the needs of your project.
 
 The key methods showcased by this example are:
-- [setLinearUnit()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a6373a18efaa75a35abb7e3171013617f)
-- [setAngularUnit()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#ac2668f8297ed977b005c6577ce58bca0)
+- `set_linear_unit()`
+- `set_angular_unit()`
 
-## Qwiic Otos Ex3 Calibration
+## Example 3: Calibration
+`qwiic_otos_ex3_calibration.py`
+
 This example demonstrates how to calibrate the SparkFun Qwiic Optical
  Tracking Odometry Sensor (OTOS).
 
@@ -35,11 +41,13 @@ This example demonstrates how to calibrate the SparkFun Qwiic Optical
  calibrate the angular scalar first.
  
 The key methods showcased by this example are:
-- [setLinearScalar()](http://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a044cce1266b0870ede4c6d6ad0e24f22)
-- [setAngularScalar()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a0cfe24386907cff6b721ce088b566a95)
-- [calibrateImu()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a6966d47e4b0276882e4575ad512d5b4e)
+- `set_linear_scalar()`
+- `set_angular_scalar()`
+- `calibrate_imu()`
 
-## Qwiic Otos Ex4 Set Offsets And Position
+## Example 4: Set Offsets And Position
+`qwiic_otos_ex4_set_offsets_and_position.py`
+
 This example demonstrates how to set the offset and position of the SparkFun
  Qwiic Optical Tracking Odometry Sensor (OTOS).
 
@@ -51,10 +59,12 @@ This example demonstrates how to set the offset and position of the SparkFun
  position to the OTOS and it will continue to track from there.
 
 The key methods showcased by this example are:
-- [setOffset()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a578d51d9c510a07fe59698ac3ff7a25d)
-- [setPosition()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#ad7921cc40d3ea207340b53622f3a63a5)
+- `set_offset()`
+- `set_position()`
 
-## Qwiic Otos Ex5 Velocity And Acceleration
+## Example 5: Velocity And Acceleration
+`qwiic_otos_ex5_velocity_and_acceleration.py`
+
 This example demonstrates how to read the velocity and acceleration from the
  SparkFun Qwiic Optical Tracking Odometry Sensor (OTOS).
 
@@ -64,10 +74,12 @@ This example demonstrates how to read the velocity and acceleration from the
  sensor is not flat to the ground.
 
 The key methods showcased by this example are:
-- [getVelocity()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a2d5b5f6fc45e28f7c611af7606bb632e)
-- [getAcceleration()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a205c550fbe558fd314ba2a5d80ea2ac8)
+- `get_velocity()`
+- `get_acceleration()`
 
-## Qwiic Otos Ex6 Standard Deviation
+## Example 6: Standard Deviation
+`qwiic_otos_ex6_standard_deviation.py`
+
 This example demonstrates how to read the standard deviation of the
  measurements of the SparkFun Qwiic Optical Tracking Odometry Sensor (OTOS).
 
@@ -83,9 +95,11 @@ This example demonstrates how to read the standard deviation of the
  additional sensors.
 
 The key methods showcased by this example are:
-- [getPositionStdDev()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#abc2101cf659e26f03d9f6a472ab30177)
+- `get_position_std_dev()`
 
-## Qwiic Otos Ex7 Get Version
+## Example 7: Get Version
+`qwiic_otos_ex7_get_version.py`
+
 This example demonstrates how to get the hardware and firmware version
  numbers from the SparkFun Qwiic Optical Tracking Odometry Sensor (OTOS).
 
@@ -96,9 +110,11 @@ This example demonstrates how to get the hardware and firmware version
  https://github.com/sparkfun/SparkFun_Optical_Tracking_Odometry_Sensor
 
 The key methods showcased by this example are:
-- [getVersionInfo()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#a0e4ba26222411f6109b59f7a65e09ad5)
+- `get_version_info()`
 
-## Qwiic Otos Ex8 Self Test
+## Example 8: Self Test
+`qwiic_otos_ex8_self_test.py`
+
 This example demonstrates how to perform a self test of the SparkFun Qwiic
  Optical Tracking Odometry Sensor (OTOS).
 
@@ -107,4 +123,4 @@ This example demonstrates how to perform a self test of the SparkFun Qwiic
  you can also perform this test yourself.
 
 The key methods showcased by this example are:
-- [selfTest()](https://docs.sparkfun.com/qwiic_otos_py/classqwiic__otos_1_1_qwiic_o_t_o_s.html#ac7b2f0230c1fa2b3494a06f75f156a64)
+- `self_test()`

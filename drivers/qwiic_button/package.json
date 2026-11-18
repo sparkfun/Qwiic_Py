@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_button.py", "github:sparkfun/Qwiic_Button_Py/qwiic_button.py"]
+        ["qwiic_button.py", "qwiic_button.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "2.0.3"
+    "version": "3.0.0"
 }

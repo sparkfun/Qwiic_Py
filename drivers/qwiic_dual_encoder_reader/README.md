@@ -1,130 +1,138 @@
-Qwiic_Dual_Encoder_Reader_Py
-==============
+# SparkFun Qwiic Dual Encoder Reader - Python Package
 
-<p align="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
-   <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
-</p>
-<p align="center">
-	<a href="https://pypi.org/project/sparkfun-qwiic-dual-encoder-reader/" alt="Package">
-		<img src="https://img.shields.io/pypi/pyversions/sparkfun_qwiic_dual_encoder_reader.svg" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_Dual_Encoder_Reader_Py/issues" alt="Issues">
-		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_Dual_Encoder_Reader_Py.svg" /></a>
-	<a href="https://qwiic-dual-encoder-reader-py.readthedocs.io/en/latest/" alt="Documentation">
-		<img src="https://readthedocs.org/projects/qwiic-dual-encoder-reader-py/badge/?version=latest&style=flat" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_Dual_Encoder_Reader_Py/blob/master/LICENSE" alt="License">
-		<img src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-	<a href="https://twitter.com/intent/follow?screen_name=sparkfun">
-        	<img src="https://img.shields.io/twitter/follow/sparkfun.svg?style=social&logo=twitter"
-           	 alt="follow on Twitter"></a>
-	
-</p>
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-dual-encoder-reader)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_dual_encoder_reader/)
 
-<img src="https://cdn.sparkfun.com//assets/parts/1/5/0/3/5/16328-SparkFun_Auto_pHAT_for_Raspberry_Pi-01.jpg"  align="right" width=300 alt="SparkFun Auto pHAT for Raspberry Pi">
+The Qwiic Dual Encoder Reader is an ATtiny84 that reads two quadrature motor encoders and reports their counts over I2C. It is built into the SparkFun Auto pHAT for Raspberry Pi. Its firmware is in the [SparkFun Dual Encoder Reader firmware repository](https://github.com/sparkfun/Qwiic_Dual_Encoder_Reader).
 
-Python module for the qwiic dual encoder reader (ATTINY84), which is included on the [SparkFun Auto pHAT for Raspberry Pi](https://www.sparkfun.com/products/16328)
-
-This python package enables the user to take count readings from the on-board ATTINY84 that handles reading the dual motor encoders. The firmware that is used on the ATTiny84 is located in a separate repository here: [SparkFun Dual Encoder Reader Firmware Repository](https://github.com/sparkfun/Qwiic_Dual_Encoder_Reader)
-
-This package can be used in conjunction with the overall [SparkFun qwiic Python Package](https://github.com/sparkfun/Qwiic_Py)
-
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+This package is the Python driver for the Qwiic Dual Encoder Reader. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
 ## Contents
 
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Dependencies](#dependencies)
 * [Installation](#installation)
-* [Documentation](#documentation)
 * [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
-Supported Platforms
---------------------
-The qwiic ICM20948 Python package current supports the following platforms:
-* [Raspberry Pi](https://www.sparkfun.com/search/results?term=raspberry+pi)
-* [NVidia Jetson Nano](https://www.sparkfun.com/products/15297)
-* [Google Coral Development Board](https://www.sparkfun.com/products/15318)
+## About the Package
 
-Dependencies 
----------------
-This driver package depends on the qwiic I2C driver: 
-[Qwiic_I2C_Py](https://github.com/sparkfun/Qwiic_I2C_Py)
+This package reads and sets the counts of both encoders, reads the change since the last check and the time since the last movement, and sets the count limit and interrupt timeout over a single Qwiic cable. Each feature is demonstrated in the [examples](examples/README.md).
 
-Documentation
--------------
-The SparkFun qwiic Dual Encoder Reader documentation is hosted at [ReadTheDocs](https://qwiic-dual-encoder-reader-py.readthedocs.io/en/latest/)
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
-Installation
--------------
+### Supported SparkFun Products
 
-### PyPi Installation
-This repository is hosted on PyPi as the [sparkfun-qwiic-dual-encoder-reader](https://pypi.org/project/sparkfun-qwiic-dual-encoder-reader/) package. On systems that support PyPi installation via pip, this library is installed using the following commands
+* [SparkFun Auto pHAT for Raspberry Pi](https://www.sparkfun.com/products/16328)
 
-For all users (note: the user must have sudo privileges):
+## Supported Platforms
+
+| Python | Platform | Boards |
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+
+> [!NOTE]
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
+
+## Installation
+
+### CPython (pip)
+
 ```sh
-sudo pip install sparkfun-qwiic-dual-encoder-reader
-```
-For the current user:
-
-```sh
-pip install sparkfun-qwiic-dual-encoder-reader
-```
-
-### Local Installation
-To install, make sure the setuptools package is installed on the system.
-
-Direct installation at the command line:
-```sh
-python setup.py install
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-dual-encoder-reader
 ```
 
-To build a package for use with pip:
+Run any example or script that does `import qwiic_dual_encoder_reader` with `~/sparkfun_venv/bin/python3 example_script.py`.
+
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-python setup.py sdist
- ```
-A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
-```sh
-cd dist
-pip install sparkfun_qwiic_dual_encoder_reader-<version>.tar.gz
-  
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_dual_encoder_reader
 ```
-Example Use
- ---------------
-See the examples directory for more detailed use examples.
+
+To install the examples too:
+
+```sh
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_dual_encoder_reader/examples
+```
+
+Add `@qwiic_dual_encoder_reader-<version>` to either command to install a specific release.
+
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
+```sh
+circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_dual_encoder_reader
+```
+
+To copy an example to the board:
+
+```sh
+circup example qwiic_dual_encoder_reader/qwiic_dual_encoder_reader_ex1_read_counts
+```
+
+## Example Use
+
+Below is a quickstart program that prints the counts of both encoders. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-from __future__ import print_function
-import qwiic_dual_encoder_reader
-import time
 import sys
+import qwiic_dual_encoder_reader
+import qwiic_i2c
 
-def runExample():
 
-	print("\nSparkFun Qwiic Dual Encoder Reader   Example 1\n")
-	myEncoders = qwiic_dual_encoder_reader.QwiicDualEncoderReader()
+def run_example():
+    print("\nSparkFun Qwiic Dual Encoder Reader Example 1\n")
+    my_encoders = qwiic_dual_encoder_reader.QwiicDualEncoderReader()
 
-	if myEncoders.connected == False:
-		print("The Qwiic Dual Encoder Reader device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not my_encoders.is_connected():
+        print("The Qwiic Dual Encoder Reader device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	myEncoders.begin()
+    my_encoders.begin()
 
-	while True:
+    while True:
+        print("Count1: %d, Count2: %d" % (my_encoders.get_count1(), my_encoders.get_count2()))
+        qwiic_i2c.delay_ms(300)
 
-		print("Count1: %d, Count2: %s" % (myEncoders.count1, \
-			myEncoders.count2, \
-			))
 
-		time.sleep(.3)
-
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_dual_encoder_reader](https://docs.sparkfun.com/Qwiic_Py/qwiic_dual_encoder_reader/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`. Version 2.x of this driver ran only on Linux; version 3 also runs on MicroPython and CircuitPython.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `encoders.connected` | `encoders.is_connected()` |
+| `encoders.count1`, `encoders.count2` (get / set) | `encoders.get_count1()`, `encoders.set_count1(n)`, `encoders.get_count2()`, `encoders.set_count2(n)` |
+| `encoders.limit` (get / set) | `encoders.get_limit()`, `encoders.set_limit(n)` |
+| `encoders.int_timeout` (get / set) | `encoders.get_int_timeout()`, `encoders.set_int_timeout(ms)` |
+| `encoders.moved` | `encoders.has_moved()` |
+| `encoders.version` | `encoders.get_version()` |
+| `since_last_movement()` raised an error when clearing the value (the default) | `since_last_movement()` clears the value |
+| `get_diff()` returned the difference unsigned (0 to 65535) | `get_diff()` returns it signed (-32768 to 32767), like `get_count1()` |
+| `set_count1()`, `set_count2()` failed for negative counts | they accept counts from -32768 to 32767 |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

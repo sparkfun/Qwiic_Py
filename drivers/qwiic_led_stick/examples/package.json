@@ -1,0 +1,16 @@
+{
+    "urls": [
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex10_change_address.py", "qwiic_led_stick_ex10_change_address.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex11_2_led_sticks.py", "qwiic_led_stick_ex11_2_led_sticks.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex1_blink.py", "qwiic_led_stick_ex1_blink.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex2_single_pixel.py", "qwiic_led_stick_ex2_single_pixel.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex3_single_pixel2.py", "qwiic_led_stick_ex3_single_pixel2.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex4_set_brightness.py", "qwiic_led_stick_ex4_set_brightness.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex5_binary_counter.py", "qwiic_led_stick_ex5_binary_counter.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex6_color_gradient.py", "qwiic_led_stick_ex6_color_gradient.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex7_cycle_rainbow.py", "qwiic_led_stick_ex7_cycle_rainbow.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex8_walking_rainbow.py", "qwiic_led_stick_ex8_walking_rainbow.py"],
+        ["qwiic_led_stick_examples/qwiic_led_stick_ex9_change_length.py", "qwiic_led_stick_ex9_change_length.py"]
+    ],
+    "version": "3.0.0"
+}

@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_rfid_examples/qwiic_rfid_ex1_get_tag.py", "qwiic_rfid_ex1_get_tag.py"],
+        ["qwiic_rfid_examples/qwiic_rfid_ex2_get_all_tags.py", "qwiic_rfid_ex2_get_all_tags.py"],
+        ["qwiic_rfid_examples/qwiic_rfid_ex3_change_i2c_address.py", "qwiic_rfid_ex3_change_i2c_address.py"]
+    ],
+    "version": "3.0.0"
+}

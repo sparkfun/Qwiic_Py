@@ -1,0 +1,22 @@
+{
+    "urls": [
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex10_turn_off_display.py", "qwiic_serlcd_ex10_turn_off_display.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex11_text_direction.py", "qwiic_serlcd_ex11_text_direction.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex12_console_input_to_display.py", "qwiic_serlcd_ex12_console_input_to_display.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex13_fast_backlight.py", "qwiic_serlcd_ex13_fast_backlight.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex14_show_firmware_version.py", "qwiic_serlcd_ex14_show_firmware_version.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex15_message_enable.py", "qwiic_serlcd_ex15_message_enable.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex16_set_splash.py", "qwiic_serlcd_ex16_set_splash.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex17_change_i2c_address.py", "qwiic_serlcd_ex17_change_i2c_address.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex1_hello_world.py", "qwiic_serlcd_ex1_hello_world.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex2_backlight.py", "qwiic_serlcd_ex2_backlight.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex3_set_cursor_position.py", "qwiic_serlcd_ex3_set_cursor_position.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex4_move_cursor.py", "qwiic_serlcd_ex4_move_cursor.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex5_enable_cursor.py", "qwiic_serlcd_ex5_enable_cursor.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex6_blink_cursor.py", "qwiic_serlcd_ex6_blink_cursor.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex7_scroll.py", "qwiic_serlcd_ex7_scroll.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex8_autoscroll_with_text.py", "qwiic_serlcd_ex8_autoscroll_with_text.py"],
+        ["qwiic_serlcd_examples/qwiic_serlcd_ex9_custom_character.py", "qwiic_serlcd_ex9_custom_character.py"]
+    ],
+    "version": "3.0.0"
+}

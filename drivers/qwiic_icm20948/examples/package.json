@@ -1,0 +1,6 @@
+{
+    "urls": [
+        ["qwiic_icm20948_examples/qwiic_icm20948_ex1_basic_readings.py", "qwiic_icm20948_ex1_basic_readings.py"]
+    ],
+    "version": "3.0.0"
+}

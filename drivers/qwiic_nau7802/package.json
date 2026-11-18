@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_nau7802.py", "github:sparkfun/Qwiic_NAU7802_Py/qwiic_nau7802.py"]
+        ["qwiic_nau7802.py", "qwiic_nau7802.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "2.0.0"
+    "version": "3.0.0"
 }

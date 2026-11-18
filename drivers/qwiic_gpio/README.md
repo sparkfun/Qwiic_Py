@@ -1,152 +1,145 @@
-![Qwiic GPIO - Python Package](docs/images/gh-banner.png "qwiic GPIO Python Package")
+![Qwiic GPIO Python Package](docs/images/gh-banner.png "Qwiic GPIO Python Package")
 
 # SparkFun Qwiic GPIO - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_gpio)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_gpio_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_gpio_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-gpio)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_gpio/)
 
-The SparkFun Qwiic GPIO Expander GPIO Module provides a simple and cost effective solution for adding GPIO Expander capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic GPIO provides a simple and cost effective solution for adding eight general purpose inputs and outputs to your project. Implementing a SparkFun Qwiic I2C interface, it can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic GPIO. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the Qwiic GPIO (TCA9534). It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_gpio_py/classqwiic__gpio_1_1_qwiic_g_p_i_o.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the GPIO via a single Qwiic cable. This includes setting GPIOs, reading GPIOs, inverting GPIOs and more. The capabilities of the GPIO are each demonstrated in the included examples.
+This package sets pin modes, writes and reads pins one at a time or as a whole port, and inverts inputs on the Qwiic GPIO over a single Qwiic cable. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Qwiic GPIO](https://www.sparkfun.com/sparkfun-qwiic-gpio.html)
 
-* [SparkFun GPIO Expander - GPIO](https://www.sparkfun.com/sparkfun-qwiic-gpio.html)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-gpio
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_gpio` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-gpio
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_gpio` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_gpio_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_gpio
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_gpio_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_gpio/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_gpio-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_gpio
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_gpio
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_gpio\qwiic_gpio_ex1a_write
-circup example qwiic_gpio\qwiic_gpio_ex1b_write_port
-circup example qwiic_gpio\qwiic_gpio_ex2a_read
-circup example qwiic_gpio\qwiic_gpio_ex2b_read_port
-circup example qwiic_gpio\qwiic_gpio_ex3a_inversion
-circup example qwiic_gpio\qwiic_gpio_ex3b_inversion_port
+circup example qwiic_gpio/qwiic_gpio_ex1a_write
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the GPIO.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_gpio_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that toggles GPIO 0 HIGH and LOW once a second. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_gpio
-import time
 import sys
+import qwiic_gpio
+import qwiic_i2c
 
-def runExample():
 
+def run_example():
     print("\nSparkFun Qwiic GPIO Example 1\n")
-    myGPIO = qwiic_gpio.QwiicGPIO()
+    my_gpio = qwiic_gpio.QwiicGPIO()
 
-    if myGPIO.isConnected() == False:
-        print("The Qwiic GPIO isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
+    if not my_gpio.is_connected():
+        print("The Qwiic GPIO isn't connected to the system. Please check your connection", file=sys.stderr)
         return
 
-    myGPIO.begin()
-    myGPIO.pinMode(0, myGPIO.GPIO_OUT)
+    my_gpio.begin()
+    my_gpio.pin_mode(0, my_gpio.GPIO_OUT)
 
     while True:
-        myGPIO.digitalWrite(0, myGPIO.GPIO_HI)
+        my_gpio.digital_write(0, my_gpio.GPIO_HI)
         print("set pin 0 hi!")
-        time.sleep(1)
-        myGPIO.digitalWrite(0, myGPIO.GPIO_LO)
+        qwiic_i2c.delay_ms(1000)
+        my_gpio.digital_write(0, my_gpio.GPIO_LO)
         print("set pin 0 lo!")
-        time.sleep(1)
+        qwiic_i2c.delay_ms(1000)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
-        runExample()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example 1")
         sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_gpio](https://docs.sparkfun.com/Qwiic_Py/qwiic_gpio/).
+
+## Migrating from 2.x
+
+Version 3 uses PEP 8 `snake_case` names, with one name per method.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `gpio.isConnected()` | `gpio.is_connected()` |
+| `setMode()`, `getMode()` | `set_mode()`, `get_mode()` |
+| `setInversion()`, `getInversion()` | `set_inversion()`, `get_inversion()` |
+| `setGPIO()`, `getGPIO()` | `set_gpio()`, `get_gpio()` |
+| `pinMode(pin, mode)`, `pinModePort(modes)` | `pin_mode(pin, mode)`, `pin_mode_port(modes)` |
+| `invertPin(pin, invert)`, `invertPinPort(inversions)` | `invert_pin(pin, invert)`, `invert_pin_port(inversions)` |
+| `digitalWrite(pin, value)`, `digitalWritePort(values)` | `digital_write(pin, value)`, `digital_write_port(values)` |
+| `digitalRead(pin)`, `digitalReadPort()` | `digital_read(pin)`, `digital_read_port()` |
+| `isConnected()` checked the platform default bus, not the driver's bus | `is_connected()` checks the bus the driver was given |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

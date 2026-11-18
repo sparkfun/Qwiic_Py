@@ -1,160 +1,158 @@
-![Qwiic KX13X - Python Package](docs/images/gh-banner.png "qwiic KX13X Python Package")
+![Qwiic KX13X Python Package](docs/images/gh-banner.png "Qwiic KX13X Python Package")
 
 # SparkFun Qwiic KX13X - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_kx13x)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_kx13x_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_kx13x_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_kx13x_py/namespaceqwiic__kx13x.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-kx13x)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_kx13x/)
 
-The SparkFun Qwiic Accelerometer KX13X Module provides a simple and cost effective solution for adding Accelerometer capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic KX132 and KX134 Triple Axis Accelerometers provide a simple and cost effective solution for adding acceleration sensing to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic KX13X. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the KX132 and KX134 accelerometers. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_kx13x_py/namespaceqwiic__kx13x.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the KX13X via a single Qwiic cable. This includes reading 3-axis acceleration, managing interrupts and more. The capabilities of the KX13X are each demonstrated in the included examples.
+This package reads 3-axis acceleration from the KX132 (`QwiicKX132`) and KX134 (`QwiicKX134`), and manages their sample buffer, tap engine and interrupts over a single Qwiic cable. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Triple Axis Accelerometer Breakout - KX132](https://www.sparkfun.com/products/17871)
+* [SparkFun Triple Axis Accelerometer Breakout - KX134](https://www.sparkfun.com/products/17589)
 
-* [SparkFun Accelerometer Sensor - KX13X](https://www.sparkfun.com/products/17589)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-kx13x
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_kx13x` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-kx13x
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_kx13x` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_kx13x_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_kx13x
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_kx13x_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_kx13x/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_kx13x-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_kx13x
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_kx13x
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_kx13x\qwiic_kx13x_ex1
-circup example qwiic_kx13x\qwiic_kx13x_ex3
-circup example qwiic_kx13x\qwiic_kx13x_ex4
+circup example qwiic_kx13x/qwiic_kx13x_ex1_basic_readings
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the KX13X.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_kx13x_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints the acceleration from a KX132. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_kx13x
-import time
 import sys
+import qwiic_kx13x
+import qwiic_i2c
 
-def runExample():
 
+def run_example():
     print("\nSparkFun KX13X Accelerometer Example 1\n")
-    myKx = qwiic_kx13x.QwiicKX132()
+    my_kx = qwiic_kx13x.QwiicKX132()
 
-    if myKx.connected == False:
-            print("The Qwiic KX13X Accelerometer device isn't connected to the system. Please check your connection", \
-                    file=sys.stderr)
-            return
+    if not my_kx.is_connected():
+        print("The Qwiic KX13X Accelerometer device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-    if myKx.begin():
+    if my_kx.begin():
         print("Ready.")
     else:
         print("Make sure you're using the KX132 and not the KX134")
 
-    if (myKx.software_reset()):
+    if my_kx.software_reset():
         print("Reset")
 
-    myKx.enable_accel(False)
-    myKx.set_range(myKx.KX132_RANGE16G)
-    myKx.enable_data_engine()
-    myKx.enable_accel()
+    # Many settings can only be changed while the accelerometer is off
+    my_kx.enable_accel(False)
+    my_kx.set_range(my_kx.KX132_RANGE16G)
+    my_kx.enable_data_engine()
+    my_kx.enable_accel()
 
     while True:
-        if myKx.data_ready():    
-            myKx.get_accel_data()
-            print("X: {0} Y: {1} Z: {2}".format(myKx.kx132_accel.x,
-                                                myKx.kx132_accel.y,
-                                                myKx.kx132_accel.z))
-            time.sleep(.02) #Set delay to 1/Output Data Rate which is by default 50Hz 1/50 = .02
+        if my_kx.data_ready():
+            my_kx.get_accel_data()
+            print("X: {0} Y: {1} Z: {2}".format(my_kx.kx132_accel.x, my_kx.kx132_accel.y, my_kx.kx132_accel.z))
+            qwiic_i2c.delay_ms(20)  # 1 / output data rate, which is 50 Hz by default
 
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
 
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_kx13x](https://docs.sparkfun.com/Qwiic_Py/qwiic_kx13x/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `kx.connected` | `kx.is_connected()` |
+| `kx.output_data_rate` (get / set) | `kx.get_output_data_rate()`, `kx.set_output_data_rate(rate)` |
+| `kx.beginCore()` (printed on a wrong chip ID) | `kx.begin_core()` returns the chip ID without printing |
+| `kx.accel_control(enable)` | `kx.enable_accel(enable)` |
+| `kx.data_trigger()` | `kx.data_ready()` |
+| `kx.set_buffer_operation(mode, resolution)` | `kx.set_buffer_operation_and_resolution(mode, resolution)` |
+| `kx.get_raw_accel_buffer_data(sixteenBit=...)` | `kx.get_raw_accel_buffer_data(sixteen_bit=...)` |
+| `KXI3X_TSCP` | `KX13X_TSCP` |
+| `get_output_data_rate()` returned 0 or 99.84 whatever the rate | `get_output_data_rate()` returns the rate in Hz (0.78 * 2^OSA) |
+| `set_output_data_rate()` cleared the other ODCNTL bits | `set_output_data_rate()` changes only the rate bits |
+| `set_interrupt_pin()` left the accelerometer turned off | `set_interrupt_pin()` restores the accelerometer's power state |
+| `set_buffer_threshold()` didn't cap the threshold at 86 in 16-bit mode | it caps the threshold at 86 in 16-bit mode |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

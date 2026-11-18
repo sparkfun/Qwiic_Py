@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["qwiic_vl53l1x_examples/qwiic_vl53l1x_ex1_read_distance.py", "qwiic_vl53l1x_ex1_read_distance.py"],
+        ["qwiic_vl53l1x_examples/qwiic_vl53l1x_ex2_set_distance_mode.py", "qwiic_vl53l1x_ex2_set_distance_mode.py"],
+        ["qwiic_vl53l1x_examples/qwiic_vl53l1x_ex3_status_and_rate.py", "qwiic_vl53l1x_ex3_status_and_rate.py"],
+        ["qwiic_vl53l1x_examples/qwiic_vl53l1x_ex4_set_intermeasurement_period.py", "qwiic_vl53l1x_ex4_set_intermeasurement_period.py"]
+    ],
+    "version": "3.0.0"
+}

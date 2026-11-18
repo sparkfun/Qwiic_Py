@@ -1,146 +1,149 @@
-![Qwiic BME280 Python Package](docs/images/bme280-gh-banner-py.png "qwiic BME280 Python Package" )
+![Qwiic BME280 Python Package](docs/images/bme280-gh-banner-py.png "Qwiic BME280 Python Package")
 
 # SparkFun Qwiic BME280 - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_bme280)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_bme280_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_bme280_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_bme280_py/classqwiic__bme280_1_1_qwiic_bme280.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-bme280)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_bme280/)
 
 The SparkFun Qwiic BME280 Atmospheric Sensor and BME280/ENS160 Environmental Combo Breakout Boards provide a simple and cost effective solution for adding atmospheric sensing to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic BME280. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the BME280. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_bme280_py/classqwiic__bme280_1_1_qwiic_bme280.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the BME280 via a single Qwiic cable. This includes reading humidity, pressure, altitude, temperature, calibration and more. The capabilities of the BME280 are each demonstrated in the included examples.
+This package reads humidity, pressure, altitude and temperature from the BME280 over a single Qwiic cable, and configures its oversampling, filtering and standby settings. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
-
-* [SparkFun Atmospheric Sensor Breakout - BME280](https://www.sparkfun.com/sparkfun-atmospheric-sensor-breakout-bme280-qwiic.html?gad_source=1)
+* [SparkFun Atmospheric Sensor Breakout - BME280](https://www.sparkfun.com/sparkfun-atmospheric-sensor-breakout-bme280-qwiic.html)
 * [SparkFun Environmental Combo Breakout - ENS160/BME280](https://www.sparkfun.com/sparkfun-environmental-combo-breakout-ens160-bme280-qwiic.html)
 
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-bme280
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_bme280` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-bme280
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_bme280` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_bme280_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_bme280
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_bme280_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_bme280/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_bme280-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_bme280
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_bme280
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators (i.e. "/" vs. "\"). See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_bme280\qwiic_bme280_ex1
-circup example qwiic_bme280\qwiic_bme280_ex4
-circup example qwiic_bme280\qwiic_bme280_ex5
+circup example qwiic_bme280/qwiic_bme280_ex1_basic_readings
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print humidity, pressure, altitude, and temperature read from the BME280.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_bme280_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints humidity, pressure, altitude and temperature. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-import qwiic_bme280
-import time
 import sys
+import qwiic_bme280
+import qwiic_i2c
 
-def runExample():
 
-	print("\nSparkFun BME280 Sensor  Example 1\n")
-	mySensor = qwiic_bme280.QwiicBme280()
+def run_example():
+    print("\nSparkFun BME280 Sensor Example 1\n")
+    my_sensor = qwiic_bme280.QwiicBME280()
 
-	if mySensor.connected == False:
-		print("The Qwiic BME280 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not my_sensor.is_connected():
+        print("The Qwiic BME280 device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	mySensor.begin()
+    my_sensor.begin()
 
-	while True:
-		print("Humidity:\t%.3f" % mySensor.humidity)
+    while True:
+        print("Humidity:\t%.3f" % my_sensor.read_humidity())
+        print("Pressure:\t%.3f" % my_sensor.read_pressure())
+        print("Altitude:\t%.3f" % my_sensor.get_altitude_feet())
+        print("Temperature:\t%.2f\n" % my_sensor.get_temperature_fahrenheit())
+        qwiic_i2c.delay_ms(1000)
 
-		print("Pressure:\t%.3f" % mySensor.pressure)	
 
-		print("Altitude:\t%.3f" % mySensor.altitude_feet)
-
-		print("Temperature:\t%.2f" % mySensor.temperature_fahrenheit)		
-
-		print("")
-		
-		time.sleep(1)
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_bme280](https://docs.sparkfun.com/Qwiic_Py/qwiic_bme280/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `QwiicBme280` | `QwiicBME280` |
+| `sensor.connected` | `sensor.is_connected()` |
+| `sensor.humidity` | `sensor.read_humidity()` |
+| `sensor.pressure` | `sensor.read_pressure()` |
+| `sensor.temperature_celsius`, `sensor.temperature_fahrenheit` | `sensor.get_temperature_celsius()`, `sensor.get_temperature_fahrenheit()` |
+| `sensor.altitude_meters`, `sensor.altitude_feet` | `sensor.get_altitude_meters()`, `sensor.get_altitude_feet()` |
+| `sensor.dewpoint_celsius`, `sensor.dewpoint_fahrenheit` | `sensor.get_dewpoint_celsius()`, `sensor.get_dewpoint_fahrenheit()` |
+| `sensor.reference_pressure` (get / set) | `sensor.get_reference_pressure()`, `sensor.set_reference_pressure(p)` |
+| `sensor.mode` (get / set) | `sensor.get_mode()`, `sensor.set_mode(m)` |
+| `sensor.filter = f`, `sensor.standby_time = t` | `sensor.set_filter(f)`, `sensor.set_standby_time(t)` |
+| `sensor.pressure_oversample = n`, `sensor.humidity_oversample = n` | `sensor.set_pressure_oversample(n)`, `sensor.set_humidity_oversample(n)` |
+| `sensor.tempature_oversample = n`, `set_tempature_oversample(n)` | `sensor.set_temperature_oversample(n)` |
+| `begin()` printed "Invalid Chip ID" | `begin()` returns `False` without printing |
+| `begin()` raised `OSError` when no device answered | `begin()` returns `False` |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

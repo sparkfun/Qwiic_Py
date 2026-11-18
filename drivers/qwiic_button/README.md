@@ -1,156 +1,143 @@
-![Qwiic BUTTON - Python Package](docs/images/gh-banner.png "qwiic BUTTON Python Package")
+![Qwiic Button Python Package](docs/images/gh-banner.png "Qwiic Button Python Package")
 
 # SparkFun Qwiic Button - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_button)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_button_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_button_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_button_py/classqwiic__button_1_1_qwiic_button.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-button)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_button/)
 
-The SparkFun Qwiic Button Module provides a simple and cost effective solution for adding Button capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic Button provides a simple and cost effective solution for adding a button with a built-in LED to your project. Implementing a SparkFun Qwiic I2C interface, these boards can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic BUTTON. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the Qwiic Button. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_button_py/classqwiic__button_1_1_qwiic_button.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the button via a single Qwiic cable. This includes checking button state, configuring button LED, change I2C address and more. The capabilities of the BUTTON are each demonstrated in the included examples.
+This package checks the button state, reads the pressed and clicked queues, configures the button LED, changes the I2C address and more over a single Qwiic cable. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
-
-* [SparkFun Qwiic Button Red LED](https://www.sparkfun.com/sparkfun-qwiic-button-red-led.html)
-* [SparkFun Qwiic Button Green LED](https://www.sparkfun.com/sparkfun-qwiic-button-green-led.html)
+* [SparkFun Qwiic Button - Red LED](https://www.sparkfun.com/sparkfun-qwiic-button-red-led.html)
+* [SparkFun Qwiic Button - Green LED](https://www.sparkfun.com/sparkfun-qwiic-button-green-led.html)
 * [SparkFun Qwiic Button Breakout](https://www.sparkfun.com/sparkfun-qwiic-button-breakout.html)
 
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-button
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_button` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-button
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_button` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_button_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_button
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_button_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_button/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_button-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_button
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_button
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_button\qwiic_button_ex1_buttonPress
-circup example qwiic_button\qwiic_button_ex2_LEDon
-circup example qwiic_button\qwiic_button_ex3_LEDconfig
-circup example qwiic_button\qwiic_button_ex4_queueUsage
-circup example qwiic_button\qwiic_button_ex5_popQueue
-circup example qwiic_button\qwiic_button_ex6_changeI2CAddress
-circup example qwiic_button\qwiic_button_ex7_2Buttons
+circup example qwiic_button/qwiic_button_ex1_button_press
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the BUTTON.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_button_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints whether the button is pressed. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_button 
-import time
 import sys
+import qwiic_button
+import qwiic_i2c
+
 
 def run_example():
-
     print("\nSparkFun Qwiic Button Example 1")
     my_button = qwiic_button.QwiicButton()
 
-    if my_button.begin() == False:
-        print("\nThe Qwiic Button isn't connected to the system. Please check your connection", \
-            file=sys.stderr)
+    if not my_button.begin():
+        print("The Qwiic Button isn't connected to the system. Please check your connection", file=sys.stderr)
         return
-    print("\nButton ready!")
-    
-    while True:   
-        
-        if my_button.is_button_pressed() == True:
+
+    print("Button ready!")
+
+    while True:
+        if my_button.is_button_pressed():
             print("The button is pressed!")
-
-        else:    
+        else:
             print("The button is not pressed!")
-            
-        time.sleep(0.1)
+        qwiic_i2c.delay_ms(100)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
         run_example()
-    except (KeyboardInterrupt, SystemExit) as exErr:
+    except (KeyboardInterrupt, SystemExit):
         print("\nEnding Example 1")
         sys.exit(0)
-
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_button](https://docs.sparkfun.com/Qwiic_Py/qwiic_button/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `button.LED_config(brightness, cycle_time, off_time, granularity)` | `button.led_config(brightness, cycle_time, off_time, granularity)` |
+| `button.LED_on(brightness)` | `button.led_on(brightness)` |
+| `button.LED_off()` | `button.led_off()` |
+| `button.set_I2C_address(address)` (returned `None` on success) | `button.set_i2c_address(address)` (returns `True` on success) |
+| `button.get_I2C_address()` | `button.get_i2c_address()` |
+| `disable_clicked_interrupt()` also cleared the pressed interrupt | `disable_clicked_interrupt()` clears only the clicked interrupt |
+| `QwiicButton.available_addresses` listed 0x6F twice and left out 0x37 | lists 0x6F first, then every other address from 0x08 to 0x77 |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

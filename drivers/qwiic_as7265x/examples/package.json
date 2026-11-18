@@ -1,0 +1,12 @@
+{
+    "urls": [
+        ["qwiic_as7265x_examples/qwiic_as7265x_ex1_basic.py", "qwiic_as7265x_ex1_basic.py"],
+        ["qwiic_as7265x_examples/qwiic_as7265x_ex2_leds.py", "qwiic_as7265x_ex2_leds.py"],
+        ["qwiic_as7265x_examples/qwiic_as7265x_ex3_settings.py", "qwiic_as7265x_ex3_settings.py"],
+        ["qwiic_as7265x_examples/qwiic_as7265x_ex4_read_raw.py", "qwiic_as7265x_ex4_read_raw.py"],
+        ["qwiic_as7265x_examples/qwiic_as7265x_ex5_max_read_rate.py", "qwiic_as7265x_ex5_max_read_rate.py"],
+        ["qwiic_as7265x_examples/qwiic_as7265x_ex6_read_temp.py", "qwiic_as7265x_ex6_read_temp.py"],
+        ["qwiic_as7265x_examples/qwiic_as7265x_ex7_get_version.py", "qwiic_as7265x_ex7_get_version.py"]
+    ],
+    "version": "3.0.0"
+}

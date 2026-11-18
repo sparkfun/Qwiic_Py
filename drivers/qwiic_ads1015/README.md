@@ -1,148 +1,191 @@
-![Qwiic ADS1015 - Python Package](docs/images/gh-banner.png "qwiic ADS1015 Python Package")
+![Qwiic ADS1015 Python Package](docs/images/gh-banner.png "Qwiic ADS1015 Python Package")
 
 # SparkFun Qwiic ADS1015 - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_ads1015)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_ads1015_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_ads1015_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_ads1015_py/classqwiic__ads1015_1_1_qwiic_a_d_s1015.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-ads1015)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_ads1015/)
 
 The SparkFun Qwiic Analog to Digital Converter ADS1015 Module provides a simple and cost effective solution for adding Analog to Digital Converter capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic ADS1015. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the ADS1015. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_ads1015_py/classqwiic__ads1015_1_1_qwiic_a_d_s1015.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the ADS1015 via a single Qwiic cable. This includes reading single-ended voltage, reading differential voltage, setting gain and more. The capabilities of the ADS1015 are each demonstrated in the included examples.
+This package reads single-ended and differential voltages from the ADS1015 over a single Qwiic cable, and sets its gain, sample rate and comparator. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
-
 * [SparkFun Analog to Digital Converter Sensor - ADS1015](https://www.sparkfun.com/products/15334)
 
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-ads1015
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_ads1015` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-ads1015
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_ads1015` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_ads1015_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_ads1015
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_ads1015_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_ads1015/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_ads1015-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_ads1015
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_ads1015
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_ads1015\qwiic_ads1015_ex1_read_basic
-circup example qwiic_ads1015\qwiic_ads1015_ex2_change_gain
-circup example qwiic_ads1015\qwiic_ads1015_ex3_address
-circup example qwiic_ads1015\qwiic_ads1015_ex4_differential
-circup example qwiic_ads1015\qwiic_ads1015_ex6_display_millivolts
-circup example qwiic_ads1015\qwiic_ads1015_ex7_multi_channel
+circup example qwiic_ads1015/qwiic_ads1015_ex1_read_basic
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the ADS1015.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_ads1015_py/blob/master/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints readings from channel A3 of the ADS1015. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_ads1015
 import sys
-import time
+import qwiic_ads1015
+import qwiic_i2c
 
-def runExample():
-	print("\nQwiic ADS1015 Example 1 - Basic Readings\n")
 
-	myAds = qwiic_ads1015.QwiicADS1015()
+def run_example():
+    print("\nQwiic ADS1015 Example 1 - Basic Readings\n")
+    my_ads = qwiic_ads1015.QwiicADS1015()
 
-	if myAds.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not my_ads.is_connected():
+        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	myAds.begin()
+    my_ads.begin()
 
-	while True:
-		channel_A3 = myAds.get_single_ended(3)
-		print("A3: ", channel_A3)
-		time.sleep(0.050)
+    while True:
+        print("A3: ", my_ads.get_single_ended(3))
+        qwiic_i2c.delay_ms(50)
 
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_ads1015](https://docs.sparkfun.com/Qwiic_Py/qwiic_ads1015/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`. It also fixes four differences from the Arduino library, which change some readings.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `adc.connected` | `adc.is_connected()` |
+| `get_calibration(channel, hiLo)`, `set_calibration(channel, hiLo, value)` | `get_calibration(channel, hi_lo)`, `set_calibration(channel, hi_lo, value)` |
+| `get_single_ended()` in the default mode read the result without waiting for the conversion | waits for the conversion, as `get_differential()` does |
+| `get_single_ended_signed()` raised `UnboundLocalError` | returns the sign-extended reading |
+| `get_single_ended_millivolts()` used the unsigned reading (one count below ground read as 4095 mV) | uses the signed reading, as the Arduino library does |
+| `get_last_conversion_results()` read the config register | reads the conversion register |
+| `set_comparator_single_ended()` wrote the threshold to the config register | writes it to the high-threshold register |
+| `calibrate()` covered channels 0 and 1 only, so `get_scaled_analog_data(2)` and `(3)` raised `IndexError` | all four channels |
+| `k`-prefixed constants (`kPointerConvert`, `kPointerConfig`, ...) | UPPER_CASE without the `k` (`POINTER_CONVERT`, `POINTER_CONFIG`, ...); every rename is listed below |
+
+<details>
+<summary>Every renamed constant</summary>
+
+| 2.x | 3.0 |
+| --- | --- |
+| `kPointerConvert` | `POINTER_CONVERT` |
+| `kPointerConfig` | `POINTER_CONFIG` |
+| `kPointerLowThresh` | `POINTER_LOW_THRESH` |
+| `kPointerHiThresh` | `POINTER_HI_THRESH` |
+| `kConfigOsNo` | `CONFIG_OS_NO` |
+| `kConfigOsSingle` | `CONFIG_OS_SINGLE` |
+| `kConfigOsNotReady` | `CONFIG_OS_NOT_READY` |
+| `kConfigOsReady` | `CONFIG_OS_READY` |
+| `kConfigModeCont` | `CONFIG_MODE_CONT` |
+| `kConfigModeSingle` | `CONFIG_MODE_SINGLE` |
+| `kConfigMuxSingle0` | `CONFIG_MUX_SINGLE_0` |
+| `kConfigMuxSingle1` | `CONFIG_MUX_SINGLE_1` |
+| `kConfigMuxSingle2` | `CONFIG_MUX_SINGLE_2` |
+| `kConfigMuxSingle3` | `CONFIG_MUX_SINGLE_3` |
+| `kConfigMuxDiffP0N1` | `CONFIG_MUX_DIFF_P0N1` |
+| `kConfigMuxDiffP0N3` | `CONFIG_MUX_DIFF_P0N3` |
+| `kConfigMuxDiffP1N3` | `CONFIG_MUX_DIFF_P1N3` |
+| `kConfigMuxDiffP2N3` | `CONFIG_MUX_DIFF_P2N3` |
+| `kConfigRateMask` | `CONFIG_RATE_MASK` |
+| `kConfigRate128Hz` | `CONFIG_RATE_128HZ` |
+| `kConfigRate250Hz` | `CONFIG_RATE_250HZ` |
+| `kConfigRate490Hz` | `CONFIG_RATE_490HZ` |
+| `kConfigRate920Hz` | `CONFIG_RATE_920HZ` |
+| `kConfigRate1600Hz` | `CONFIG_RATE_1600HZ` |
+| `kConfigRate2400Hz` | `CONFIG_RATE_2400HZ` |
+| `kConfigRate3300Hz` | `CONFIG_RATE_3300HZ` |
+| `kConfigPgaMask` | `CONFIG_PGA_MASK` |
+| `kConfigPgaTwoThirds` | `CONFIG_PGA_TWO_THIRDS` |
+| `kConfigPga1` | `CONFIG_PGA_1` |
+| `kConfigPga2` | `CONFIG_PGA_2` |
+| `kConfigPga4` | `CONFIG_PGA_4` |
+| `kConfigPga8` | `CONFIG_PGA_8` |
+| `kConfigPga16` | `CONFIG_PGA_16` |
+| `kConfigCmodeTrad` | `CONFIG_CMODE_TRAD` |
+| `kConfigCmodeWindow` | `CONFIG_CMODE_WINDOW` |
+| `kConfigCpolActvLow` | `CONFIG_CPOL_ACTV_LOW` |
+| `kConfigCpolActvHi` | `CONFIG_CPOL_ACTV_HI` |
+| `kConfigClatNonLat` | `CONFIG_CLAT_NON_LAT` |
+| `kConfigClatLatch` | `CONFIG_CLAT_LATCH` |
+| `kConfigCque1Conv` | `CONFIG_CQUE_1_CONV` |
+| `kConfigCque2Conv` | `CONFIG_CQUE_2_CONV` |
+| `kConfigCque4Conv` | `CONFIG_CQUE_4_CONV` |
+| `kConfigCqueNone` | `CONFIG_CQUE_NONE` |
+
+</details>
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

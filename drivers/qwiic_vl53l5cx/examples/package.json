@@ -1,0 +1,9 @@
+{
+    "urls": [
+        ["qwiic_vl53l5cx_examples/qwiic_vl53l5cx_ex1_distance_array.py", "qwiic_vl53l5cx_ex1_distance_array.py"],
+        ["qwiic_vl53l5cx_examples/qwiic_vl53l5cx_ex3_set_freq.py", "qwiic_vl53l5cx_ex3_set_freq.py"],
+        ["qwiic_vl53l5cx_examples/qwiic_vl53l5cx_ex6_settings.py", "qwiic_vl53l5cx_ex6_settings.py"],
+        ["qwiic_vl53l5cx_examples/qwiic_vl53l5cx_ex8_set_address.py", "qwiic_vl53l5cx_ex8_set_address.py"]
+    ],
+    "version": "3.0.0"
+}

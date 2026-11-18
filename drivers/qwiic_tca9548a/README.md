@@ -1,166 +1,143 @@
-![Qwiic TCA9548A - Python Package](docs/images/gh-banner.png "qwiic TCA9548A Python Package")
+![Qwiic TCA9548A Python Package](docs/images/gh-banner.png "Qwiic TCA9548A Python Package")
 
 # SparkFun Qwiic TCA9548A - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_tca9548a)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_tca9548a_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_tca9548a_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_tca9548a_py/classqwiic__tca9548a_1_1_qwiic_t_c_a9548_a.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-tca9548a)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_tca9548a/)
 
-The SparkFun Qwiic I2C Mux TCA9548A Module provides a simple and cost effective solution for adding I2C Mux capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic Mux Breakout provides a simple and cost effective solution for connecting up to eight devices with the same I2C address to one bus. Implementing a SparkFun Qwiic I2C interface, it can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic TCA9548A. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the TCA9548A 8-channel I2C multiplexer. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_tca9548a_py/classqwiic__tca9548a_1_1_qwiic_t_c_a9548_a.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the TCA9548A via a single Qwiic cable. This includes enabling channels, disabling channels, listing channels, controlling multiple I2C devices with the same address and more. The capabilities of the TCA9548A are each demonstrated in the included examples.
+This package enables and disables the eight downstream channels of the TCA9548A over a single Qwiic cable, and lists which are enabled. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Qwiic Mux Breakout - 8 Channel (TCA9548A)](https://www.sparkfun.com/products/16784)
+* [SparkFun Qwiic Mux Breakout - 8 Channel (TCA9548A), original](https://www.sparkfun.com/products/14685)
 
-* [SparkFun I2C Mux Sensor - TCA9548A](https://www.sparkfun.com/products/14685)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-tca9548a
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_tca9548a` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-tca9548a
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_tca9548a` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_tca9548a_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_tca9548a
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_tca9548a_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_tca9548a/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_tca9548a-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_tca9548a
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_tca9548a
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_tca9548a\qwiic_tca9548a_ex1
-circup example qwiic_tca9548a\qwiic_tca9548a_ex2
-circup example qwiic_tca9548a\simple_disable_channels
-circup example qwiic_tca9548a\simple_enable_channels
+circup example qwiic_tca9548a/qwiic_tca9548a_ex1_scan_channels
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the TCA9548A.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_tca9548a_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that enables channels 0 and 1, then 2 and 3, and scans for the devices on each pair. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-
-import qwiic_tca9548a
-import qwiic_i2c
-import time
 import sys
+import qwiic_i2c
+import qwiic_tca9548a
 
-def runExample():
 
+def run_example():
     print("\nSparkFun TCA9548A 8-Channel Mux Example 1\n")
-    
-    myTca = qwiic_tca9548a.QwiicTCA9548A()
+    my_tca = qwiic_tca9548a.QwiicTCA9548A()
 
-    if myTca.connected == False:
-            print("The Qwiic TCA9548A 8-Channel Mux device isn't connected to the system. Please check your connection", \
-                    file=sys.stderr)
-            return
+    if not my_tca.is_connected():
+        print("The Qwiic TCA9548A 8-Channel Mux device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-    i2c = qwiic_i2c.getI2CDriver()
+    i2c = qwiic_i2c.get_i2c_bus()
 
     while True:
-        print("Enabling channels 0 and 1")
-        myTca.disable_all()
-        myTca.enable_channels([0,1])
-        myTca.list_channels()
+        for channels in ([0, 1], [2, 3]):
+            my_tca.disable_all()
+            my_tca.enable_channels(channels)
+            print("Enabled channels:", my_tca.list_channels())
+            print("Devices found:", i2c.scan())
+            qwiic_i2c.delay_ms(2000)
 
-        print("Checking for i2c devices on ports 0 and 1")
-        devices = i2c.scan()
-        print("Devices found: ", devices)
-        time.sleep(2)
-        
-        print("Enabling channels 2 and 3")
-        myTca.disable_all()
-        myTca.enable_channels([2,3])
-        myTca.list_channels()
 
-        print("Checking for i2c devices on ports 2 and 3")
-        devices = i2c.scan()
-        print("Devices found: ", devices)
-        time.sleep(2)
-
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
-
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_tca9548a](https://docs.sparkfun.com/Qwiic_Py/qwiic_tca9548a/).
+
+## Migrating from 2.x
+
+Version 3 has no `debug` option and never prints.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `mux.connected` | `mux.is_connected()` |
+| `QwiicTCA9548A(address, debug, i2c_driver)` | `QwiicTCA9548A(address, i2c_bus)`: the `debug` argument and attribute are gone |
+| no `begin()` | `begin()` returns `is_connected()` |
+| `list_channels()` printed each channel's state and returned `None` ([Qwiic_TCA9548A_Py#5](https://github.com/sparkfun/Qwiic_TCA9548A_Py/issues/5)) | returns the list of enabled channel numbers, for example `[0, 4]` |
+| `enable_channels()`, `disable_channels()` printed and skipped invalid entries | raise `ValueError` and change nothing |
+| `available_addresses`, `available_channels` were `range` objects | lists |
+| `is_connected()` checked the platform default bus, not the driver's bus | `is_connected()` checks the bus the driver was given |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

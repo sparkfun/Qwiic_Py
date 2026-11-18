@@ -1,0 +1,10 @@
+{
+    "urls": [
+        ["qwiic_bmp581_examples/qwiic_bmp581_ex1_basic.py", "qwiic_bmp581_ex1_basic.py"],
+        ["qwiic_bmp581_examples/qwiic_bmp581_ex4_filtering.py", "qwiic_bmp581_ex4_filtering.py"],
+        ["qwiic_bmp581_examples/qwiic_bmp581_ex5_oversampling.py", "qwiic_bmp581_ex5_oversampling.py"],
+        ["qwiic_bmp581_examples/qwiic_bmp581_ex7_nvm.py", "qwiic_bmp581_ex7_nvm.py"],
+        ["qwiic_bmp581_examples/qwiic_bmp581_ex8_low_power.py", "qwiic_bmp581_ex8_low_power.py"]
+    ],
+    "version": "3.0.0"
+}

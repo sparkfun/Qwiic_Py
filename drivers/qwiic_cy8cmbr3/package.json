@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_template.py", "github:sparkfun/Qwiic_Template_Py/qwiic_cy8cmbr3.py"]
+        ["qwiic_cy8cmbr3.py", "qwiic_cy8cmbr3.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "1.0.0"
+    "version": "3.0.0"
 }

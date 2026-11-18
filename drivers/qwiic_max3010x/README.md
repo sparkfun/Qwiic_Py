@@ -1,161 +1,159 @@
-![Qwiic MAX3010X - Python Package](docs/images/gh-banner.png "qwiic MAX3010X Python Package")
+![Qwiic MAX3010x Python Package](docs/images/gh-banner.png "Qwiic MAX3010x Python Package")
 
-# SparkFun Qwiic MAX3010X - Python Package
+# SparkFun Qwiic MAX3010x - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_max3010x)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_max3010x_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_max3010x_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_max3010x_py/classqwiic__max3010x_1_1qwiic__max3010x_1_1_qwiic_max3010x.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-max3010x)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_max3010x/)
 
-The SparkFun Qwiic Photodetector MAX3010X Module provides a simple and cost effective solution for adding Photodetector capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic Photodetector MAX30101 provides a simple and cost effective solution for adding optical heart rate, presence and particle sensing to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic MAX3010X. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the MAX3010x family (MAX30101, MAX30102, MAX30105). It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_max3010x_py/classqwiic__max3010x_1_1qwiic__max3010x_1_1_qwiic_max3010x.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the MAX3010X via a single Qwiic cable. This includes reading IR measurements, reading green measurements, sensing presense and more. The capabilities of the MAX3010X are each demonstrated in the included examples.
+This package reads red, IR and green values and the die temperature from the MAX3010x over a single Qwiic cable, detects heart beats, and configures its LEDs, sample rate, FIFO and interrupts. Each feature is demonstrated in the [examples](examples/README.md); example 4 (heartbeat plotter) uses matplotlib and runs on CPython only.
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Photodetector Breakout - MAX30101 (Qwiic)](https://www.sparkfun.com/products/16474)
 
-* [SparkFun Photodetector Sensor - MAX3010X](https://www.sparkfun.com/products/16474)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-max3010x
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_max3010x` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-max3010x
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_max3010x` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_max3010x_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_max3010x
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_max3010x_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_max3010x/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_max3010x-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_max3010x
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_max3010x
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_max3010x\ex1_Basic_Readings
-circup example qwiic_max3010x\ex2_Presence_Sensing
-circup example qwiic_max3010x\ex3_Temperature_Sense
-circup example qwiic_max3010x\ex4_HeartBeat_Plotter
-circup example qwiic_max3010x\ex5_HeartRate
-circup example qwiic_max3010x\ex6_FIFO_Readings
+circup example qwiic_max3010x/qwiic_max3010x_ex1_basic_readings
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the MAX3010X.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_max3010x_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints the red, IR and green readings. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_max3010x
-import time
 import sys
-
-def runExample():
-
-	print("\nSparkFun MAX3010x Photodetector - Example 1\n")
-	sensor = qwiic_max3010x.QwiicMax3010x()
-
-	if sensor.begin() == False:
-		print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("The Qwiic MAX3010x is connected.")
-
-	if sensor.setup() == False:
-		print("Device setup failure. Please check your connection", \
-			file=sys.stderr)
-		return
-	else:
-		print("Setup complete.")        
-
-	while True:
-			print(\
-			 'R[', sensor.getRed() , '] \t'\
-                                                             'IR[', sensor.getIR() , '] \t'\
-                                                             'G[', sensor.getGreen() , ']'\
-			)
-			time.sleep(0.1)
-
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+import qwiic_i2c
+import qwiic_max3010x
 
 
+def run_example():
+    print("\nSparkFun MAX3010x Photodetector - Example 1\n")
+    sensor = qwiic_max3010x.QwiicMAX3010x()
 
+    if not sensor.begin():
+        print("The Qwiic MAX3010x device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
+
+    sensor.setup()
+
+    while True:
+        print("R[", sensor.get_red(), "] \tIR[", sensor.get_ir(), "] \tG[", sensor.get_green(), "]")
+        qwiic_i2c.delay_ms(100)
+
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_max3010x](https://docs.sparkfun.com/Qwiic_Py/qwiic_max3010x/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method, all snake_case, and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `QwiicMax3010x` | `QwiicMAX3010x` |
+| `sensor.connected` | `sensor.is_connected()` |
+| `softReset()`, `getINT1()`, `getINT2()` | `soft_reset()`, `get_int1()`, `get_int2()` |
+| `enableAFULL()`, `disableAFULL()`, `enableDATARDY()` | `enable_afull()`, `disable_afull()`, `enable_datardy()` |
+| `disableDATARDY()`, `enableALCOVF()`, `disableALCOVF()` | `disable_datardy()`, `enable_alcovf()`, `disable_alcovf()` |
+| `enablePROXINT()`, `disablePROXINT()`, `enableDIETEMPRDY()` | `enable_proxint()`, `disable_proxint()`, `enable_dietemprdy()` |
+| `disableDIETEMPRDY()`, `shutDown()`, `wakeUp()` | `disable_dietemprdy()`, `shut_down()`, `wake_up()` |
+| `setLEDMode()`, `setADCRange()`, `setSampleRate()` | `set_led_mode()`, `set_adc_range()`, `set_sample_rate()` |
+| `setPulseWidth()`, `setPulseAmplitudeRed()`, `setPulseAmplitudeIR()` | `set_pulse_width()`, `set_pulse_amplitude_red()`, `set_pulse_amplitude_ir()` |
+| `setPulseAmplitudeGreen()`, `setPulseAmplitudeProximity()`, `setProximityThreshold()` | `set_pulse_amplitude_green()`, `set_pulse_amplitude_proximity()`, `set_proximity_threshold()` |
+| `enableSlot()`, `disableSlots()`, `setFIFOAverage()` | `enable_slot()`, `disable_slots()`, `set_fifo_average()` |
+| `clearFIFO()`, `enableFIFORollover()`, `disableFIFORollover()` | `clear_fifo()`, `enable_fifo_rollover()`, `disable_fifo_rollover()` |
+| `setFIFOAlmostFull()`, `getWritePointer()`, `getReadPointer()` | `set_fifo_almost_full()`, `get_write_pointer()`, `get_read_pointer()` |
+| `nextSample()`, `safeCheck()`, `getRed()` | `next_sample()`, `safe_check()`, `get_red()` |
+| `getIR()`, `getGreen()`, `getFIFORed()` | `get_ir()`, `get_green()`, `get_fifo_red()` |
+| `getFIFOIR()`, `getFIFOGreen()`, `readPartID()` | `get_fifo_ir()`, `get_fifo_green()`, `read_part_id()` |
+| `readRevisionID()`, `getRevisionID()`, `readTemperatureF()` | `read_revision_id()`, `get_revision_id()`, `read_temperature_f()` |
+| `readTemperature()`, `checkForBeat()` | `read_temperature()`, `check_for_beat()` |
+| `setup(powerLevel, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange)` | `setup(power_level, sample_average, led_mode, sample_rate, pulse_width, adc_range)` |
+| camelCase arguments of the other methods (`adcRange`, `sampleRate`, `pulseWidth`, `threshMSB`, `slotNumber`, `numberOfSamples`, `maxTimeToCheck`) | snake_case (`adc_range`, `sample_rate`, ...) |
+| `sensor.IR`, `sensor.activeLEDs`, `sensor.revisionID` | `sensor.ir`, `sensor.active_leds`, `sensor.revision_id` |
+| `sensor.red`, `sensor.IR`, `sensor.green` were class attributes shared by every instance | per-instance lists |
+| `read_revision_id()` returned `None` | returns the revision ID (still stored in `sensor.revision_id`) |
+| `millis()` returned wall-clock milliseconds | returns `ticks_ms()`; compare values with `qwiic_i2c.ticks_diff()` |
+| `qwiic_max3010x.heart_rate.HeartRate` with `averageDCEstimator()`, `lowPassFIRFilter()`, `getDCE()`, `checkForBeat()` | `qwiic_max3010x.HeartRate` with `average_dc_estimator()`, `low_pass_fir_filter()`, `get_dce()`, `check_for_beat()`; its camelCase attributes (`IR_AC_Max`, `positiveEdge`, `FIRCoeffs`, ...) are snake_case |
+| one module-level `HeartRate` shared by every sensor | each `QwiicMAX3010x` has its own |
+| `qwiic_max3010x` package | single `qwiic_max3010x.py` module |
+| `check_for_beat()` tested `x > 20 & x < 1000`, which Python evaluates differently from the Arduino C code | tests `(x > 20) and (x < 1000)` as the Arduino library does |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

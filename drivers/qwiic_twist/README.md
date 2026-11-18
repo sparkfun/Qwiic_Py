@@ -1,153 +1,145 @@
-![Qwiic TWIST - Python Package](docs/images/gh-banner.png "qwiic TWIST Python Package")
+![Qwiic Twist Python Package](docs/images/gh-banner.png "Qwiic Twist Python Package")
 
 # SparkFun Qwiic Twist - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_twist)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_twist_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_twist_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_twist_py/classqwiic__twist_1_1_qwiic_twist.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-twist)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_twist/)
 
-The SparkFun Qwiic Twist RGB Rotary Encoder TWIST Module provides a simple and cost effective solution for adding Twist RGB Rotary Encoder capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic Twist RGB Rotary Encoder provides a simple and cost effective solution for adding a rotary encoder with an RGB-lit knob and a push button to your project. Implementing a SparkFun Qwiic I2C interface, it can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic TWIST. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the Qwiic Twist RGB rotary encoder. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_twist_py/classqwiic__twist_1_1_qwiic_twist.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the TWIST via a single Qwiic cable. This includes setting twist color, getting rotation count, getting press status and more. The capabilities of the TWIST are each demonstrated in the included examples.
+This package reads the knob's count and button state, and sets the knob color, over a single Qwiic cable. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Qwiic Twist - RGB Rotary Encoder Breakout](https://www.sparkfun.com/products/15083)
 
-* [SparkFun Twist RGB Rotary Encoder](https://www.sparkfun.com/products/15083)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-twist
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_twist` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-twist
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_twist` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_twist_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_twist
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_twist_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_twist/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_twist-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_twist
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_twist
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_twist\qwiic_twist_ex1
-circup example qwiic_twist\qwiic_twist_ex2
-circup example qwiic_twist\qwiic_twist_ex3
+circup example qwiic_twist/qwiic_twist_ex1_basic_readings
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the TWIST.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_twist_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints the knob count and whether the button is pressed. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_twist
-import time
 import sys
-
-def runExample():
-
-	print("\nSparkFun qwiic Twist   Example 1\n")
-	myTwist = qwiic_twist.QwiicTwist()
-
-	if myTwist.connected == False:
-		print("The Qwiic twist device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-
-	myTwist.begin()
-
-	myTwist.set_color(100, 10, 50)
-
-	while True:
-
-		print("Count: %d, Pressed: %s" % (myTwist.count, \
-			"YES" if myTwist.pressed else "NO", \
-			))
-
-		time.sleep(.3)
-
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+import qwiic_twist
+import qwiic_i2c
 
 
+def run_example():
+    print("\nSparkFun Qwiic Twist Example 1\n")
+    my_twist = qwiic_twist.QwiicTwist()
 
+    if not my_twist.is_connected():
+        print("The Qwiic Twist device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
+
+    my_twist.begin()
+
+    # Set the knob color to pink
+    my_twist.set_color(100, 10, 50)
+
+    while True:
+        print("Count: %d, Pressed: %s" % (my_twist.get_count(), "YES" if my_twist.is_pressed() else "NO"))
+        qwiic_i2c.delay_ms(300)
+
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_twist](https://docs.sparkfun.com/Qwiic_Py/qwiic_twist/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `twist.connected` | `twist.is_connected()` |
+| `twist.count` (get / set) | `twist.get_count()`, `twist.set_count(n)` |
+| `twist.limit` (get / set) | `twist.get_limit()`, `twist.set_limit(n)` |
+| `twist.pressed`, `twist.clicked`, `twist.moved` | `twist.is_pressed()`, `twist.was_clicked()`, `twist.has_moved()` |
+| `twist.red`, `twist.green`, `twist.blue` (get / set) | `twist.get_red()`, `twist.set_red(r)`, `twist.get_green()`, `twist.set_green(g)`, `twist.get_blue()`, `twist.set_blue(b)` |
+| `twist.connect_red`, `twist.connect_green`, `twist.connect_blue` (get / set) | `twist.get_connect_red()`, `twist.set_connect_red(r)`, `twist.get_connect_green()`, `twist.set_connect_green(g)`, `twist.get_connect_blue()`, `twist.set_connect_blue(b)` |
+| `twist.int_timeout` (get / set) | `twist.get_int_timeout()`, `twist.set_int_timeout(ms)` |
+| `twist.version` | `twist.get_version()` |
+| `get_count()`, `get_diff()` and `get_connect_*()` returned 0 to 65535 | They return signed values (-32768 to 32767), as the Twist stores them |
+| `connect_color(r, g, b)` wrote one byte per color | `connect_color(r, g, b)` writes each color as a signed 16-bit value, like `set_connect_red()` and the others |
+| `since_last_movement()`, `since_last_press()` crashed when clearing the value | Fixed |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

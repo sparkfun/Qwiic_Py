@@ -1,10 +1,10 @@
 {
     "urls": [
-      ["pi_servo_hat.py", "github:sparkfun/PiServoHat_Py/pi_servo_hat.py"]
+        ["pi_servo_hat.py", "pi_servo_hat.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"],
-      ["github:sparkfun/Qwiic_PCA9685_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"],
+        ["github:sparkfun/Qwiic_Py/drivers/qwiic_pca9685", "qwiic_pca9685-3.0.0"]
     ],
-    "version": "2.0.0"
+    "version": "3.0.0"
 }

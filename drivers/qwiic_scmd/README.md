@@ -1,166 +1,154 @@
-![Qwiic SCMD - Python Package](docs/images/gh-banner.png "qwiic SCMD Python Package")
+![Qwiic SCMD Python Package](docs/images/gh-banner.png "Qwiic SCMD Python Package")
 
 # SparkFun Qwiic SCMD - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_scmd)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_scmd_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_scmd_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_scmd_py/classqwiic__scmd_1_1_qwiic_scmd.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-scmd)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_scmd/)
 
-The SparkFun Qwiic Motor Driver SCMD Module provides a simple and cost effective solution for adding Motor Driver capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic Motor Driver provides a simple and cost effective solution for driving two DC motors from your project. Implementing a SparkFun Qwiic I2C interface, it can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic SCMD. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the Serial Controlled Motor Driver (SCMD). It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_scmd_py/classqwiic__scmd_1_1_qwiic_scmd.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the SCMD via a single Qwiic cable. This includes driving a single motor, driving two motors and more. The capabilities of the SCMD are each demonstrated in the included examples.
+This package drives the motors of the Serial Controlled Motor Driver over a single Qwiic cable: speed and direction, inversion, bridging, and diagnostics of the driver and of any expansion drivers chained to it. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Qwiic Motor Driver](https://www.sparkfun.com/sparkfun-qwiic-motor-driver.html)
 
-* [SparkFun Motor Driver Sensor - SCMD](https://www.sparkfun.com/sparkfun-qwiic-motor-driver.html)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-scmd
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_scmd` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-scmd
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_scmd` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_scmd_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_scmd
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_scmd_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_scmd/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_scmd-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_scmd
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_scmd
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_scmd\ex1_qwiic_scmd_basic
-circup example qwiic_scmd\ex2_qwiic_scmd_two_motor
+circup example qwiic_scmd/qwiic_scmd_ex1_basic
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the SCMD.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_scmd_py/blob/main/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that speeds one motor up and down. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import time
 import sys
-import math
+import qwiic_i2c
 import qwiic_scmd
 
-myMotor = qwiic_scmd.QwiicScmd()
-
-def runExample():
-	print("Motor Test.")
-	R_MTR = 0
-	L_MTR = 1
-	FWD = 0
-	BWD = 1
-
-	if myMotor.connected == False:
-		print("Motor Driver not connected. Check connections.", \
-			file=sys.stderr)
-		return
-	myMotor.begin()
-	print("Motor initialized.")
-	time.sleep(.250)
-	
-	myMotor.set_drive(0,0,0)
-	myMotor.set_drive(1,0,0)
-	
-	myMotor.enable()
-	print("Motor enabled")
-	time.sleep(.250)
+R_MTR = 0
+FWD = 0
 
 
-	while True:
-		speed = 20
-		for speed in range(20,255):
-			print(speed)
-			myMotor.set_drive(R_MTR,FWD,speed)
-			time.sleep(.05)
-		for speed in range(254,20, -1):
-			print(speed)
-			myMotor.set_drive(R_MTR,FWD,speed)
-			time.sleep(.05)
+def run_example():
+    print("Motor Test.")
+    my_motor = qwiic_scmd.QwiicSCMD()
 
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("Ending example.")
-		myMotor.disable()
-		sys.exit(0)
+    if not my_motor.is_connected():
+        print("Motor Driver not connected. Check connections.", file=sys.stderr)
+        return
 
+    my_motor.begin()
+    my_motor.set_drive(R_MTR, FWD, 0)
+    my_motor.enable()
+
+    try:
+        while True:
+            for speed in range(20, 255):
+                my_motor.set_drive(R_MTR, FWD, speed)
+                qwiic_i2c.delay_ms(50)
+            for speed in range(254, 20, -1):
+                my_motor.set_drive(R_MTR, FWD, speed)
+                qwiic_i2c.delay_ms(50)
+    finally:
+        my_motor.disable()
+
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("Ending example.")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_scmd](https://docs.sparkfun.com/Qwiic_Py/qwiic_scmd/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `QwiicScmd` | `QwiicSCMD` |
+| `motor.connected` | `motor.is_connected()` |
+| `begin()` returned the ID register (`0xA9`) | `begin()` returns `True` if the ID register reads `0xA9`, otherwise `False` |
+| `set_drive(motorNum, ...)`, `inversion_mode(motorNum, ...)` | `set_drive(motor_num, ...)`, `inversion_mode(motor_num, ...)` |
+| `bridging_mode(driverNum, ...)` | `bridging_mode(driver_num, ...)` |
+| `write_remote_register(address, offset, dataToWrite)` | `write_remote_register(address, offset, data_to_write)` |
+| `SCMDDiagnostics.numberOfSlaves` | `SCMDDiagnostics.number_of_slaves` |
+| `set_drive(m, 0, 255)` and `set_drive(m, 1, 255)` sent drive value 0, which leaves the motor stopped ([Qwiic_SCMD_Py#3](https://github.com/sparkfun/Qwiic_SCMD_Py/issues/3)) | both drive at full speed |
+| `available_addresses` listed 5 addresses ([Qwiic_SCMD_Py#4](https://github.com/sparkfun/Qwiic_SCMD_Py/issues/4)) | lists all 10 (0x58 to 0x61, default 0x5D first) |
+| `bridging_mode()` on an expansion driver failed (missing address argument) | works |
+| `begin()` raised `OSError` when no device answered | `begin()` returns `False` |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

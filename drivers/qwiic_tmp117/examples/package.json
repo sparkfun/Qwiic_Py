@@ -1,0 +1,12 @@
+{
+    "urls": [
+        ["qwiic_tmp117_examples/qwiic_tmp117_ex1_basic.py", "qwiic_tmp117_ex1_basic.py"],
+        ["qwiic_tmp117_examples/qwiic_tmp117_ex2_alert_statuses.py", "qwiic_tmp117_ex2_alert_statuses.py"],
+        ["qwiic_tmp117_examples/qwiic_tmp117_ex3_set_offset_temp.py", "qwiic_tmp117_ex3_set_offset_temp.py"],
+        ["qwiic_tmp117_examples/qwiic_tmp117_ex4_set_conv_mode.py", "qwiic_tmp117_ex4_set_conv_mode.py"],
+        ["qwiic_tmp117_examples/qwiic_tmp117_ex5_set_alert_limits.py", "qwiic_tmp117_ex5_set_alert_limits.py"],
+        ["qwiic_tmp117_examples/qwiic_tmp117_ex6_set_conv_cycle.py", "qwiic_tmp117_ex6_set_conv_cycle.py"],
+        ["qwiic_tmp117_examples/qwiic_tmp117_ex7_set_address.py", "qwiic_tmp117_ex7_set_address.py"]
+    ],
+    "version": "3.0.0"
+}

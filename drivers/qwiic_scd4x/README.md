@@ -1,158 +1,153 @@
-![Qwiic SCD4X - Python Package](docs/images/gh-banner.png "qwiic SCD4X Python Package")
+![Qwiic SCD4x Python Package](docs/images/gh-banner.png "Qwiic SCD4x Python Package")
 
-# SparkFun Qwiic SCD4X - Python Package
+# SparkFun Qwiic SCD4x - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_scd4x)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_scd4x_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_scd4x_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_scd4x_py/classqwiic__scd4x_1_1_qwiic_s_c_d4x.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-scd4x)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_scd4x/)
 
-The SparkFun Qwiic CO2, Temperaure, and Humidity SCD4X Module provides a simple and cost effective solution for adding CO2, Temperaure, and Humidity capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic CO2, Temperature, and Humidity SCD4x Module provides a simple and cost effective solution for adding CO2, temperature, and humidity sensing to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic SCD4X. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the SCD40 and SCD41. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_scd4x_py/classqwiic__scd4x_1_1_qwiic_s_c_d4x.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the SCD4X via a single Qwiic cable. This includes reading CO2, reading temperature, reading humidity and more. The capabilities of the SCD4X are each demonstrated in the included examples.
+This package reads CO2, temperature and humidity from the SCD4x over a single Qwiic cable, and sets its signal compensation, calibration, low power and single shot modes. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun CO2, Temperature, and Humidity Sensor - SCD4x](https://www.sparkfun.com/products/22396)
 
-* [SparkFun CO2, Temperaure, and Humidity Sensor - SCD4X](https://www.sparkfun.com/products/22396)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-scd4x
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_scd4x` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-scd4x
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_scd4x` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_scd4x_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_scd4x
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_scd4x_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_scd4x/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_scd4x-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_scd4x
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_scd4x
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_scd4x\qwiic_scd4x_ex1_basic
-circup example qwiic_scd4x\qwiic_scd4x_ex2_low_power
-circup example qwiic_scd4x\qwiic_scd4x_ex3_disable_auto_calibration
-circup example qwiic_scd4x\qwiic_scd4x_ex4_skip_stop_periodic
-circup example qwiic_scd4x\qwiic_scd4x_ex6_signal_compensation
-circup example qwiic_scd4x\qwiic_scd4x_ex7_test_and_reset
-circup example qwiic_scd4x\qwiic_scd4x_ex8_scd41_single_shot
-circup example qwiic_scd4x\qwiic_scd4x_ex9_sensor_type
-
+circup example qwiic_scd4x/qwiic_scd4x_ex1_basic
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the SCD4X.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_scd4x_py/blob/master/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints CO2, temperature and humidity readings. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_scd4x
 import sys
-import time
+import qwiic_i2c
+import qwiic_scd4x
 
-def runExample():
-	print("\nQwiic SCD4x Example 1 - Basic Readings\n")
 
-	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
+def run_example():
+    print("\nQwiic SCD4x Example 1 - Basic Readings\n")
+    my_scd4x = qwiic_scd4x.QwiicSCD4x()
 
-	if mySCD4x.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
-		return
+    if not my_scd4x.is_connected():
+        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	if mySCD4x.begin() == False:
-		print("Error while initializing device", file=sys.stderr)
-		return
-	
+    if not my_scd4x.begin():
+        print("Error while initializing device", file=sys.stderr)
+        return
 
-	while True:
-		if mySCD4x.read_measurement(): # This must be called to get new data. It will return false until new data is available 
-			print("\nCO2(ppm):", mySCD4x.get_co2())
-			print("Temperature(C):", mySCD4x.get_temperature())
-			print("Humidity(%RH):", mySCD4x.get_humidity())
-		else:
-			print(".", end="")
+    while True:
+        # read_measurement() returns False until new data is available
+        if my_scd4x.read_measurement():
+            print("\nCO2(ppm):", my_scd4x.get_co2())
+            print("Temperature(C):", my_scd4x.get_temperature())
+            print("Humidity(%RH):", my_scd4x.get_humidity())
+        else:
+            print(".", end="")
 
-		time.sleep(0.5) # Only check for new data every 0.5 seconds
+        qwiic_i2c.delay_ms(500)
 
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_scd4x](https://docs.sparkfun.com/Qwiic_Py/qwiic_scd4x/).
+
+## Migrating from 2.x
+
+Version 3 has no properties, so it also runs on MicroPython builds without `property()`. The method names are unchanged; the camelCase arguments are now snake_case, and the constants are UPPER_CASE without the `k` prefix.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `sensor.connected` | `sensor.is_connected()` |
+| `begin(measBegin, autoCalibrate, skipStopPeriodicMeasurement, pollAndSetDeviceType)` | `begin(meas_begin, auto_calibrate, skip_stop_periodic_measurement, poll_and_set_device_type)` |
+| `begin()` returned `True` even when its checks failed | `begin()` returns `False` if the serial number, feature set or self-calibration checks fail |
+| `delayMillis=` argument of `stop_periodic_measurement()`, `set_temperature_offset()`, `set_sensor_altitude()`, `set_ambient_pressure()`, `persist_settings()`, `perform_factory_reset()`, `reinit()`, `set_automatic_self_calibration_enabled()`, `read_register()` | `delay_millis=` |
+| `set_sensor_type(sensorType)`, `read_register(registerAddress)` | `set_sensor_type(sensor_type)`, `read_register(register_address)` |
+| `set_sensor_altitude()` returned `None` on success | returns `True` on success |
+| `perform_forced_recalibration()` returned `True` even when the sensor reported failure | returns `False` |
+| `kComGetAutomaticSelfCalibrationEnabled`, `kComGetDataReadyStatus`, `kComGetFeatureSetVersion`, `kComGetSensorAltitude` | `COM_GET_AUTOMATIC_SELF_CALIBRATION_ENABLED`, `COM_GET_DATA_READY_STATUS`, `COM_GET_FEATURE_SET_VERSION`, `COM_GET_SENSOR_ALTITUDE` |
+| `kComGetSerialNumber`, `kComGetTemperatureOffset`, `kComMeasureSingleShot`, `kComMeasureSingleShotRhtOnly` | `COM_GET_SERIAL_NUMBER`, `COM_GET_TEMPERATURE_OFFSET`, `COM_MEASURE_SINGLE_SHOT`, `COM_MEASURE_SINGLE_SHOT_RHT_ONLY` |
+| `kComPerformFactoryReset`, `kComPerformForcedCalibration`, `kComPerformSelfTest`, `kComPersistSettings` | `COM_PERFORM_FACTORY_RESET`, `COM_PERFORM_FORCED_CALIBRATION`, `COM_PERFORM_SELF_TEST`, `COM_PERSIST_SETTINGS` |
+| `kComReadMeasurement`, `kComReinit`, `kComSetAmbientPressure`, `kComSetAutomaticSelfCalibrationEnabled` | `COM_READ_MEASUREMENT`, `COM_REINIT`, `COM_SET_AMBIENT_PRESSURE`, `COM_SET_AUTOMATIC_SELF_CALIBRATION_ENABLED` |
+| `kComSetSensorAltitude`, `kComSetTemperatureOffset`, `kComStartLowPowerPeriodicMeasurement`, `kComStartPeriodicMeasurement` | `COM_SET_SENSOR_ALTITUDE`, `COM_SET_TEMPERATURE_OFFSET`, `COM_START_LOW_POWER_PERIODIC_MEASUREMENT`, `COM_START_PERIODIC_MEASUREMENT` |
+| `kComStopPeriodicMeasurement`, `kTypeSCD40`, `kTypeSCD41`, `kTypeSDC4xInvalid` | `COM_STOP_PERIODIC_MEASUREMENT`, `TYPE_SCD40`, `TYPE_SCD41`, `TYPE_SCD4X_INVALID` |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

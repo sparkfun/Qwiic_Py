@@ -1,0 +1,29 @@
+# Attaches the CircuitPython bundle to a GitHub Release.
+#
+# Create a Release named by date (for example 20261117) after merging driver
+# releases. circup finds the newest bundle through the latest Release, so
+# driver versions are plain tags, not Releases.
+name: CircuitPython bundle
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get install -y gettext
+      - run: pip install circuitpython-build-tools
+      - run: python tools/build_bundle.py --tag "${{ github.event.release.tag_name }}" --output bundles
+      - name: Upload to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" bundles/* --clobber

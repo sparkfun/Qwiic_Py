@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_ads1015_examples/qwiic_ads1015_ex1_read_basic.py", "qwiic_ads1015_ex1_read_basic.py"],
+        ["qwiic_ads1015_examples/qwiic_ads1015_ex2_change_gain.py", "qwiic_ads1015_ex2_change_gain.py"],
+        ["qwiic_ads1015_examples/qwiic_ads1015_ex3_address.py", "qwiic_ads1015_ex3_address.py"],
+        ["qwiic_ads1015_examples/qwiic_ads1015_ex4_differential.py", "qwiic_ads1015_ex4_differential.py"],
+        ["qwiic_ads1015_examples/qwiic_ads1015_ex6_display_millivolts.py", "qwiic_ads1015_ex6_display_millivolts.py"],
+        ["qwiic_ads1015_examples/qwiic_ads1015_ex7_multi_channel.py", "qwiic_ads1015_ex7_multi_channel.py"]
+    ],
+    "version": "3.0.0"
+}

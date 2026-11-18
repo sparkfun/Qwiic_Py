@@ -1,0 +1,6 @@
+{
+    "urls": [
+        ["qwiic_pca9685_examples/qwiic_pca9685_ex1_servo_sweep.py", "qwiic_pca9685_ex1_servo_sweep.py"]
+    ],
+    "version": "3.0.0"
+}

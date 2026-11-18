@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_kx13x_examples/qwiic_kx13x_ex1_basic_readings.py", "qwiic_kx13x_ex1_basic_readings.py"],
+        ["qwiic_kx13x_examples/qwiic_kx13x_ex3_buffer.py", "qwiic_kx13x_ex3_buffer.py"],
+        ["qwiic_kx13x_examples/qwiic_kx13x_ex4_tap.py", "qwiic_kx13x_ex4_tap.py"]
+    ],
+    "version": "3.0.0"
+}

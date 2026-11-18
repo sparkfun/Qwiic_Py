@@ -1,0 +1,12 @@
+{
+    "urls": [
+        ["qwiic_cap1203_examples/qwiic_cap1203_ex1_basic_readings.py", "qwiic_cap1203_ex1_basic_readings.py"],
+        ["qwiic_cap1203_examples/qwiic_cap1203_ex2_detect_any_touch.py", "qwiic_cap1203_ex2_detect_any_touch.py"],
+        ["qwiic_cap1203_examples/qwiic_cap1203_ex3_detect_swipe.py", "qwiic_cap1203_ex3_detect_swipe.py"],
+        ["qwiic_cap1203_examples/qwiic_cap1203_ex4_power_button.py", "qwiic_cap1203_ex4_power_button.py"],
+        ["qwiic_cap1203_examples/qwiic_cap1203_ex5_detect_current_touch.py", "qwiic_cap1203_ex5_detect_current_touch.py"],
+        ["qwiic_cap1203_examples/qwiic_cap1203_ex6_disable_interrupt.py", "qwiic_cap1203_ex6_disable_interrupt.py"],
+        ["qwiic_cap1203_examples/qwiic_cap1203_ex7_set_sensitivity.py", "qwiic_cap1203_ex7_set_sensitivity.py"]
+    ],
+    "version": "3.0.0"
+}

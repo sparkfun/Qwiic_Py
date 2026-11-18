@@ -1,0 +1,8 @@
+{
+    "urls": [
+        ["qwiic_as726x_examples/qwiic_as726x_ex1_basic.py", "qwiic_as726x_ex1_basic.py"],
+        ["qwiic_as726x_examples/qwiic_as726x_ex2_settings.py", "qwiic_as726x_ex2_settings.py"],
+        ["qwiic_as726x_examples/qwiic_as726x_ex3_bulb.py", "qwiic_as726x_ex3_bulb.py"]
+    ],
+    "version": "3.0.0"
+}

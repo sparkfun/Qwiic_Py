@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_as7343.py", "github:sparkfun/qwiic_as7343_py/qwiic_as7343.py"]
+        ["qwiic_as7343.py", "qwiic_as7343.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "1.0.0"
+    "version": "3.0.0"
 }

@@ -1,0 +1,6 @@
+{
+    "urls": [
+        ["qwiic_fs3000_examples/qwiic_fs3000_ex1_basic.py", "qwiic_fs3000_ex1_basic.py"]
+    ],
+    "version": "3.0.0"
+}

@@ -1,148 +1,152 @@
-![Qwiic VL53L1X - Python Package](docs/images/gh-banner.png "qwiic VL53L1X Python Package")
+![Qwiic VL53L1X Python Package](docs/images/gh-banner.png "Qwiic VL53L1X Python Package")
 
 # SparkFun Qwiic VL53L1X - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_vl53l1x)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_vl53l1x_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_vl53l1x_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_vl53l1x_py/classqwiic__vl53l1x_1_1_qwiic_v_l53_l1_x.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-vl53l1x)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_vl53l1x/)
 
 The SparkFun Qwiic ToF Distance Sensor VL53L1X Module provides a simple and cost effective solution for adding ToF Distance Sensor capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic VL53L1X. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the VL53L1X. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_vl53l1x_py/classqwiic__vl53l1x_1_1_qwiic_v_l53_l1_x.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the VL53L1X via a single Qwiic cable. This includes reading distance, setting distance mode, seting intermeasurement period and more. The capabilities of the VL53L1X are each demonstrated in the included examples.
+This package reads distance from the VL53L1X over a single Qwiic cable, and configures its distance mode, timing budget, inter-measurement period, region of interest, thresholds and calibration. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Distance Sensor - VL53L1X (Qwiic)](https://www.sparkfun.com/products/14722)
 
-* [SparkFun ToF Distance Sensor Sensor - VL53L1X](https://www.sparkfun.com/products/14722)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-vl53l1x
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_vl53l1x` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-vl53l1x
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_vl53l1x` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_vl53l1x_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_vl53l1x
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_vl53l1x_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_vl53l1x/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_vl53l1x-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_vl53l1x
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_vl53l1x
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_vl53l1x\Example1_ReadDistance
-circup example qwiic_vl53l1x\Example2_SetDistanceMode
-circup example qwiic_vl53l1x\Example3_StatusandRate
-circup example qwiic_vl53l1x\Example4_SetIntermeasurementPeriod
+circup example qwiic_vl53l1x/qwiic_vl53l1x_ex1_read_distance
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the VL53L1X.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_vl53l1x_py/blob/master/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that prints the distance to an object. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-	Reading distance from the laser based VL53L1X
-
-	This example prints the distance to an object. If you are getting weird
-	readings, be sure the vacuum tape has been removed from the sensor.
-
+import sys
 import qwiic_vl53l1x
-import time
+import qwiic_i2c
 
-print("VL53L1X Qwiic Test\n")
-ToF = qwiic_vl53l1x.QwiicVL53L1X()
-if (ToF.sensor_init() == None):					 # Begin returns 0 on a good init
-	print("Sensor online!\n")
 
-while True:
-	try:
-		ToF.start_ranging()						 # Write configuration bytes to initiate measurement
-		time.sleep(.005)
-		distance = ToF.get_distance()	 # Get the result of the measurement from the sensor
-		time.sleep(.005)
-		ToF.stop_ranging()
+def run_example():
+    print("VL53L1X Qwiic Test\n")
+    tof = qwiic_vl53l1x.QwiicVL53L1X()
 
-		distanceInches = distance / 25.4
-		distanceFeet = distanceInches / 12.0
+    if not tof.begin():
+        print("The Qwiic VL53L1X device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-		print("Distance(mm): %s Distance(ft): %s" % (distance, distanceFeet))
+    while True:
+        tof.start_ranging()
+        while not tof.check_for_data_ready():
+            qwiic_i2c.delay_ms(1)
+        distance = tof.get_distance()
+        tof.clear_interrupt()
+        tof.stop_ranging()
 
-	except Exception as e:
-		print(e)
+        print("Distance(mm): %s" % distance)
 
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example 1")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_vl53l1x](https://docs.sparkfun.com/Qwiic_Py/qwiic_vl53l1x/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `QwiicVL53L1X(address, debug, i2c_driver)` | `QwiicVL53L1X(address, i2c_bus)`: the `debug` argument and its prints are gone |
+| no `is_connected()` or `begin()` | `is_connected()` (address acknowledges and model ID is 0xEACC) and `begin()` (returns `True` or `False`) |
+| `sensor_init()` returned `None` on success | returns `0` (`VL53L1_ERROR_NONE`) on success, `VL53L1_ERROR_TIME_OUT` (-7) on timeout |
+| `_begin()` (returned `sensor_init()`'s status) | `begin()` |
+| Status returned by the setters (`start_ranging()`, `clear_interrupt()`, ...) was `None` | `0`; I2C errors raise `OSError` |
+| no soft reset | `soft_reset()` |
+| `set_distance_mode(DM)` ignored an invalid mode | `set_distance_mode(distance_mode)` raises `ValueError` |
+| `set_interrupt_polarity(NewPolarity)` | `set_interrupt_polarity(new_polarity)` |
+| `set_timing_budget_in_ms(TimingBudgetInMs)` | `set_timing_budget_in_ms(timing_budget_in_ms)` |
+| `set_inter_measurement_in_ms(InterMeasMs)` | `set_inter_measurement_in_ms(inter_meas_ms)` |
+| `set_offset(OffsetValue)`, `set_xtalk(XtalkValue)` | `set_offset(offset_value)`, `set_xtalk(xtalk_value)` |
+| `set_distance_threshold(ThreshLow, ThreshHigh, Window, IntOnNoTarget)` | `set_distance_threshold(thresh_low, thresh_high, window, int_on_no_target)` |
+| `set_roi(X, Y, OpticalCenter)` | `set_roi(x, y, optical_center)` |
+| `set_signal_threshold(Signal)`, `set_sigma_threshold(Sigma)` | `set_signal_threshold(signal)`, `set_sigma_threshold(sigma)` |
+| `calibrate_offset(TargetDistInMm)`, `calibrate_xtalk(TargetDistInMm)` raised `TypeError` | `calibrate_offset(target_dist_in_mm)`, `calibrate_xtalk(target_dist_in_mm)` work |
+| `set_xtalk()` raised `TypeError` | fixed |
+| `get_offset()` returned a large positive number for a negative offset | returns the signed offset |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

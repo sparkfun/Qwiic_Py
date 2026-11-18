@@ -1,0 +1,7 @@
+{
+    "urls": [
+        ["qwiic_ultrasonic_examples/qwiic_ultrasonic_ex1_basic_readings.py", "qwiic_ultrasonic_ex1_basic_readings.py"],
+        ["qwiic_ultrasonic_examples/qwiic_ultrasonic_ex2_change_address.py", "qwiic_ultrasonic_ex2_change_address.py"]
+    ],
+    "version": "3.0.0"
+}

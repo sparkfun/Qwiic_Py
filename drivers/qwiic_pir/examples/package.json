@@ -1,0 +1,10 @@
+{
+    "urls": [
+        ["qwiic_pir_examples/qwiic_pir_ex1_raw_reading.py", "qwiic_pir_ex1_raw_reading.py"],
+        ["qwiic_pir_examples/qwiic_pir_ex2_debounced_events.py", "qwiic_pir_ex2_debounced_events.py"],
+        ["qwiic_pir_examples/qwiic_pir_ex3_queue_timestamps.py", "qwiic_pir_ex3_queue_timestamps.py"],
+        ["qwiic_pir_examples/qwiic_pir_ex4_pop_queue.py", "qwiic_pir_ex4_pop_queue.py"],
+        ["qwiic_pir_examples/qwiic_pir_ex5_change_i2c_address.py", "qwiic_pir_ex5_change_i2c_address.py"]
+    ],
+    "version": "3.0.0"
+}

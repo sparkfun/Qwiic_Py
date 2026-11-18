@@ -1,9 +1,9 @@
 {
     "urls": [
-      ["qwiic_icm20948.py", "github:sparkfun/Qwiic_9DoF_IMU_ICM20948_Py/qwiic_icm20948.py"]
+        ["qwiic_icm20948.py", "qwiic_icm20948.py"]
     ],
     "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+        ["github:sparkfun/Qwiic_Py/qwiic_i2c", "qwiic_i2c-3.0.0"]
     ],
-    "version": "2.0.1"
+    "version": "3.0.0"
 }

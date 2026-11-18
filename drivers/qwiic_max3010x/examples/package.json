@@ -1,0 +1,11 @@
+{
+    "urls": [
+        ["qwiic_max3010x_examples/qwiic_max3010x_ex1_basic_readings.py", "qwiic_max3010x_ex1_basic_readings.py"],
+        ["qwiic_max3010x_examples/qwiic_max3010x_ex2_presence_sensing.py", "qwiic_max3010x_ex2_presence_sensing.py"],
+        ["qwiic_max3010x_examples/qwiic_max3010x_ex3_temperature_sense.py", "qwiic_max3010x_ex3_temperature_sense.py"],
+        ["qwiic_max3010x_examples/qwiic_max3010x_ex4_heartbeat_plotter.py", "qwiic_max3010x_ex4_heartbeat_plotter.py"],
+        ["qwiic_max3010x_examples/qwiic_max3010x_ex5_heart_rate.py", "qwiic_max3010x_ex5_heart_rate.py"],
+        ["qwiic_max3010x_examples/qwiic_max3010x_ex6_fifo_readings.py", "qwiic_max3010x_ex6_fifo_readings.py"]
+    ],
+    "version": "3.0.0"
+}

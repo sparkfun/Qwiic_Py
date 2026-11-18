@@ -1,170 +1,144 @@
-Qwiic_AS6212_Py
-===============
+![Qwiic AS6212 Python Package](https://cdn.sparkfun.com//assets/parts/1/7/9/7/0/18521-SparkFun_Digital_Temperature_Sensor_Breakout_-_AS6212__Qwiic_-01.jpg "Qwiic AS6212 Python Package")
 
-<p align="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
-   <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
-</p>
-<p align="center">
-	<a href="https://pypi.org/project/sparkfun-qwiic-as6212/" alt="Package">
-		<img src="https://img.shields.io/pypi/pyversions/sparkfun-qwiic-as6212.svg" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_AS6212_Py/issues" alt="Issues">
-		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_AS6212_Py.svg" /></a>
-	<a href="https://qwiic-as6212-py.readthedocs.io/en/latest/?" alt="Documentation">
-		<img src="https://readthedocs.org/projects/qwiic-as6212-py/badge/?version=latest&style=flat" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_AS6212_Py/blob/master/LICENSE" alt="License">
-		<img src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-	<a href="https://twitter.com/intent/follow?screen_name=sparkfun">
-        	<img src="https://img.shields.io/twitter/follow/sparkfun.svg?style=social&logo=twitter"
-           	 alt="follow on Twitter"></a>
+# SparkFun Qwiic AS6212 - Python Package
 
-</p>
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-as6212)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_as6212/)
 
-<img src="https://cdn.sparkfun.com//assets/parts/1/7/9/7/0/18521-SparkFun_Digital_Temperature_Sensor_Breakout_-_AS6212__Qwiic_-01.jpg"  align="right" width=300 alt="SparkFun Digital Temperature Sensor Breakout - AS6212 (Qwiic)">
+The SparkFun Digital Temperature Sensor Breakout - AS6212 (Qwiic) provides a simple, low power and high accuracy solution for adding temperature sensing to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-Python module for the [SparkFun Digital Temperature Sensor Breakout - AS6212 (Qwiic)](https://www.sparkfun.com/products/18521)
+This package is a port of the [SparkFun AS6212 Qwiic Arduino Library](https://github.com/sparkfun/SparkFun_AS6212_Qwiic_Arduino_Library).
 
-This python package is a port of the existing [SparkFun AS6212 Qwiic Arduino Library](https://github.com/sparkfun/SparkFun_AS6212_Qwiic_Arduino_Library)
-
-This package can be used in conjunction with the overall [SparkFun qwiic Python Package](https://github.com/sparkfun/Qwiic_Py)
-
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+This package is the Python driver for the AS6212. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
 ## Contents
 
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Dependencies](#dependencies)
 * [Installation](#installation)
-* [Documentation](#documentation)
 * [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
-Supported Platforms
---------------------
-This Python package currently supports the following platforms:
-* [Raspberry Pi](https://www.sparkfun.com/search/results?term=raspberry+pi)
+## About the Package
 
-Dependencies
---------------
-This driver package depends on the qwiic I2C driver:
-[Qwiic_I2C_Py](https://github.com/sparkfun/Qwiic_I2C_Py)
+This package reads temperature from the AS6212 over a single Qwiic cable, and configures its alert thresholds and polarity, consecutive faults, interrupt mode, conversion cycle time, sleep mode and single-shot conversions. Each feature is demonstrated in the [examples](examples/README.md).
 
-Documentation
--------------
-This module documentation is hosted at [ReadTheDocs](https://qwiic-as6212-py.readthedocs.io/en/latest/?)
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
-Installation
----------------
-### PyPi Installation
+### Supported SparkFun Products
 
-This repository is hosted on PyPi as the [sparkfun-qwiic-as6212](https://pypi.org/project/sparkfun-qwiic-as6212/) package. On systems that support PyPi installation via pip, this library is installed using the following commands
+* [SparkFun Digital Temperature Sensor Breakout - AS6212 (Qwiic)](https://www.sparkfun.com/products/18521)
 
-For all users (note: the user must have sudo privileges):
+## Supported Platforms
+
+| Python | Platform | Boards |
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+
+> [!NOTE]
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
+
+## Installation
+
+### CPython (pip)
+
 ```sh
-sudo pip install sparkfun-qwiic-as6212
-```
-For the current user:
-
-```sh
-pip install sparkfun-qwiic-as6212
-```
-
-### Local Installation
-
-To install, make sure the setuptools package is installed on the system.
-
-Direct installation at the command line:
-```sh
-python setup.py install
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-as6212
 ```
 
-### Rebuild Package
+Run any example or script that does `import qwiic_as6212` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-To build a package for use with pip:
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-python setup.py sdist
- ```
-A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
-```sh
-cd dist
-pip install sparkfun-qwiic-as6212-<version>.tar.gz
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_as6212
 ```
 
-Example Use
- -------------
-See the examples directory for more detailed use examples.
+To install the examples too:
+
+```sh
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_as6212/examples
+```
+
+Add `@qwiic_as6212-<version>` to either command to install a specific release.
+
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
+```sh
+circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_as6212
+```
+
+To copy an example to the board:
+
+```sh
+circup example qwiic_as6212/qwiic_as6212_ex1_basic_readings
+```
+
+## Example Use
+
+Below is a quickstart program that prints the temperature in Fahrenheit once a second. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-from __future__ import print_function
-import qwiic_as6212
-import time
 import sys
+import qwiic_as6212
+import qwiic_i2c
 
-def runExample():
 
-	print("\nSparkFun Qwiic AS6212 Sensor Example 1\n")
-	myTempSensor = qwiic_as6212.QwiicAs6212Sensor()
+def run_example():
+    print("\nSparkFun Qwiic AS6212 Sensor Example\n")
+    my_sensor = qwiic_as6212.QwiicAS6212()
 
-	if myTempSensor.is_connected == False:
-		print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not my_sensor.is_connected():
+        print("The Qwiic AS6212 Sensor device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	myTempSensor.begin()
-	time.sleep(1)
+    my_sensor.begin()
 
-	print("Initialized.")
+    while True:
+        print("Temperature: %.2fF" % my_sensor.read_temp_f())
+        qwiic_i2c.delay_ms(1000)
 
-	# Initialize configuration settings
-	# These settings are saved in the sensor, even if it loses power
-  
-	# set the number of consecutive faults before triggering alarm.
-	# valid options: 1,2,3 or 4
-	myTempSensor.set_consecutive_faults(1)
-  
-	# set the polarity of the Alert. (0:Active LOW, 1:Active HIGH).
-	myTempSensor.set_alert_polarity(myTempSensor.AS6212_ALERT_ACTIVE_LOW)
-  
-	# set the sensor in Comparator Mode (0) or Interrupt Mode (1).
-	myTempSensor.set_interrupt_mode(myTempSensor.AS6212_MODE_COMPARATOR)
-  
-	# set the Conversion Cycle Time (how quickly the sensor gets a new reading)
-	myTempSensor.set_conversion_cycletime(myTempSensor.AS6212_CONVERSION_CYCLE_TIME_250MS)
 
-	# set T_HIGH, the upper limit to trigger the alert on
-	myTempSensor.set_high_temp_f(78.0)  # set T_HIGH in F
-	# myTempSensor.set_high_temp_c(25.56) # set T_HIGH in C
-  
-	# set T_LOW, the lower limit to shut turn off the alert
-	myTempSensor.set_low_temp_f(75.0)	# set T_LOW in F
-	# myTempSensor.set_low_temp_c(23.89)	# set T_LOW in C
-
-	print("TLOW F: ", myTempSensor.read_low_temp_f())
-	print("THIGH F: ", myTempSensor.read_high_temp_f())
-		
-	while True:
-		myTempSensor.set_sleep_mode(0) # turn sleep  mode off (0)
-		time.sleep(0.250) # allow time to wake up and complete first conversion
-		
-		temperature = myTempSensor.read_temp_f()
-		
-		# Check for alert
-		alertRegisterState = myTempSensor.get_alert_status()		# read the Alert from register
-		
-		# Place sensor in sleep mode to save power.
-		# Current consumption typically ~0.1uA.
-		myTempSensor.set_sleep_mode(1) # turn sleep  mode on (1)
-		
-		print("Temperature: ", temperature, "\tAlert Register: ", alertRegisterState)
-		time.sleep(1)
-
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 1")
-		sys.exit(0)
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_as6212](https://docs.sparkfun.com/Qwiic_Py/qwiic_as6212/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `QwiicAs6212Sensor` | `QwiicAS6212` |
+| `sensor.connected` | `sensor.is_connected()` |
+| `sensor.tempC`, `sensor.tempF` (last reading) | `sensor.temp_c`, `sensor.temp_f` |
+| `write_config(targetState=...)` | `write_config(target_state=...)` |
+| `print_config_binary()` (printed) | `get_config_binary()` (returns a string) |
+| `print_binary(data)` (printed) | `format_binary(data)` (returns a string) |
+| `set_consecutive_faults()`, `set_conversion_cycletime()` raised `NameError` for an invalid value | raise `ValueError` |
+| `read_temp_c()`, `read_temp_f()` returned wrong values below 0 C | fixed (two's complement) |
+| `get_conversion_cycletime()` raised `NameError` (and would have returned 4000 for 250 ms) | fixed |
+| `is_connected()` used the default bus even when an `i2c_driver` was given | `is_connected()` uses the driver's own bus |
+| Linux only (Raspberry Pi) | CPython, MicroPython and CircuitPython |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>
-

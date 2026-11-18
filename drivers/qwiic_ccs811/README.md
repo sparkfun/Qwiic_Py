@@ -1,158 +1,164 @@
-Qwiic_CCS811_Py
-===============
+<img src="https://cdn.sparkfun.com//assets/parts/1/2/3/2/9/14348-01.jpg" align="right" width=300 alt="SparkFun Qwiic Environmental Combo Breakout">
 
-<p align="center">
-   <img src="https://cdn.sparkfun.com/assets/custom_pages/2/7/2/qwiic-logo-registered.jpg"  width=200>  
-   <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM.png"  width=240>   
-</p>
-<p align="center">
-	<a href="https://pypi.org/project/sparkfun-qwiic-ccs811/" alt="Package">
-		<img src="https://img.shields.io/pypi/pyversions/sparkfun_qwiic_ccs811.svg" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_CCS811_Py/issues" alt="Issues">
-		<img src="https://img.shields.io/github/issues/sparkfun/Qwiic_CCS811_Py.svg" /></a>
-	<a href="https://qwiic-ccs811-py.readthedocs.io/en/latest/?" alt="Documentation">
-		<img src="https://readthedocs.org/projects/qwiic-ccs811-py/badge/?version=latest&style=flat" /></a>
-	<a href="https://github.com/sparkfun/Qwiic_CCS811_Py/blob/master/LICENSE" alt="License">
-		<img src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-	<a href="https://twitter.com/intent/follow?screen_name=sparkfun">
-        	<img src="https://img.shields.io/twitter/follow/sparkfun.svg?style=social&logo=twitter"
-           	 alt="follow on Twitter"></a>
-	
-</p>
+# SparkFun Qwiic CCS811 - Python Package
 
-<img src="https://cdn.sparkfun.com//assets/parts/1/2/3/2/9/14348-01.jpg"  align="right" width=300 alt="SparkFun qwiic Environmental Combo">
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-ccs811)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_ccs811/)
 
+The CCS811 is a digital gas sensor that measures equivalent CO2 (eCO2) and total volatile organic compounds (TVOC). Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-Python module for the qwiic ccs811 sensor, which is part of the [SparkFun Qwiic Environmental Combo Breakout](https://www.sparkfun.com/products/14348)
-
-This python package is a port of the existing [SparkFun CCS811 Arduino Library](https://github.com/sparkfun/SparkFun_CCS811_Arduino_Library)
-
-This package can be used in conjunction with the overall [SparkFun qwiic Python Package](https://github.com/sparkfun/Qwiic_Py)
-
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
-
-### :warning: **Using this sensor on a Raspberry Pi**? :warning:
-Your system might need modification. See this [note](#raspberry-pi-use).
+This package is the Python driver for the CCS811, ported from the [SparkFun CCS811 Arduino Library](https://github.com/sparkfun/SparkFun_CCS811_Arduino_Library). It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
 ## Contents
 
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Dependencies](#dependencies)
 * [Installation](#installation)
-* [Documentation](#documentation)
 * [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
-Supported Platforms
---------------------
-The qwiic CCS811 Python package current supports the following platforms:
-* [Raspberry Pi](https://www.sparkfun.com/search/results?term=raspberry+pi)
-* [NVidia Jetson Nano](https://www.sparkfun.com/products/15297)
-* [Google Coral Development Board](https://www.sparkfun.com/products/15318)
+## About the Package
 
-Dependencies 
---------------
-This driver package depends on the qwiic I2C driver: 
-[Qwiic_I2C_Py](https://github.com/sparkfun/Qwiic_I2C_Py)
+This package reads equivalent CO2 and TVOC from the CCS811 over a single Qwiic cable, and sets its drive mode, interrupts, baseline and temperature and humidity compensation. Each feature is demonstrated in the [examples](examples/README.md).
 
-Documentation
--------------
-The SparkFun qwiic CCS811 module documentation is hosted at [ReadTheDocs](https://qwiic-ccs811-py.readthedocs.io/en/latest/?)
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
-Installation
----------------
-### PyPi Installation
+### Supported SparkFun Products
 
-This repository is hosted on PyPi as the [sparkfun-qwiic-ccs811](https://pypi.org/project/sparkfun-qwiic-ccs811/) package. On systems that support PyPi installation via pip, this library is installed using the following commands
+* [SparkFun Environmental Combo Breakout - CCS811/BME280](https://www.sparkfun.com/products/14348)
+* [SparkFun Air Quality Breakout - CCS811](https://www.sparkfun.com/products/14193)
 
-For all users (note: the user must have sudo privileges):
-```sh
-sudo pip install sparkfun-qwiic-ccs811
-```
-For the current user:
+> [!NOTE]
+> Both boards are retired, and their product pages now open the successor, the Environmental Combo Breakout - ENS160/BME280. That board uses the [qwiic_ens160](https://github.com/sparkfun/Qwiic_Py/tree/main/drivers/qwiic_ens160) and [qwiic_bme280](https://github.com/sparkfun/Qwiic_Py/tree/main/drivers/qwiic_bme280) drivers, not this one.
 
-```sh
-pip install sparkfun-qwiic-ccs811
-```
-To install, make sure the setuptools package is installed on the system.
+## Supported Platforms
 
-Direct installation at the command line:
-```sh
-python setup.py install
-```
+| Python | Platform | Boards |
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
-To build a package for use with pip:
-```sh
-python setup.py sdist
- ```
-A package file is built and placed in a subdirectory called dist. This package file can be installed using pip.
-```sh
-cd dist
-pip install sparkfun_qwiic_ccs811-<version>.tar.gz
-```
+> [!NOTE]
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-Raspberry Pi Use
--------------------
-For this sensor to work on the Raspberry Pi, I2C clock stretching must be enabled. 
+### Raspberry Pi
 
-To do this:
-- Login as root to the target Raspberry Pi
-- Open the file /boot/config.txt in your favorite editor (vi, nano ...etc)
-- Scroll down until the block that contains the following is found:
-```ini
-dtparam=i2c_arm=on
-dtparam=i2s=on
-dtparam=spi=on
-```
-- Add the following line:
+The CCS811 stretches the I2C clock, which the Raspberry Pi only handles with a slower I2C clock. Add this line to `/boot/firmware/config.txt` (`/boot/config.txt` before Raspberry Pi OS Bookworm), then reboot:
+
 ```ini
 # Enable I2C clock stretching
 dtparam=i2c_arm_baudrate=10000
 ```
-- Save the file
-- Reboot the raspberry pi
 
-Example Use
- -------------
-See the examples directory for more detailed use examples.
+`QwiicCCS811.is_rpi_i2c_baudrate_ok()` returns `False` on a Raspberry Pi without this setting, and `True` on every other system.
+
+## Installation
+
+### CPython (pip)
+
+```sh
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-ccs811
+```
+
+Run any example or script that does `import qwiic_ccs811` with `~/sparkfun_venv/bin/python3 example_script.py`.
+
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
+```sh
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_ccs811
+```
+
+To install the examples too:
+
+```sh
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_ccs811/examples
+```
+
+Add `@qwiic_ccs811-<version>` to either command to install a specific release.
+
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
+```sh
+circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_ccs811
+```
+
+To copy an example to the board:
+
+```sh
+circup example qwiic_ccs811/qwiic_ccs811_ex1_basic_readings
+```
+
+## Example Use
+
+Below is a quickstart program that prints the equivalent CO2 and TVOC readings. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-from __future__ import print_function
-import qwiic_ccs811
-import time
 import sys
-
-def runExample():
-
-	print("\nSparkFun CCS811 Sensor Basic Example \n")
-	mySensor = qwiic_ccs811.QwiicCcs811()
-
-	if mySensor.isConnected() == False:
-		print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
-
-	mySensor.begin()
-
-	while True:
-
-		mySensor.readAlgorithmResults()
-
-		print("CO2:\t%.3f" % mySensor.getCO2())
-
-		print("tVOC:\t%.3f\n" % mySensor.getTVOC())	
-
-		
-		time.sleep(1)
+import qwiic_ccs811
+import qwiic_i2c
 
 
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Basic Example")
-		sys.exit(0)
+def run_example():
+    print("\nSparkFun CCS811 Sensor Basic Example\n")
+    my_sensor = qwiic_ccs811.QwiicCCS811()
 
+    if not my_sensor.is_connected():
+        print("The Qwiic CCS811 device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
+
+    if not my_sensor.begin():
+        print("Unable to initialize the CCS811. Please check your connection", file=sys.stderr)
+        return
+
+    while True:
+        my_sensor.read_algorithm_results()
+        print("CO2:\t%.3f" % my_sensor.get_co2())
+        print("tVOC:\t%.3f\n" % my_sensor.get_tvoc())
+        qwiic_i2c.delay_ms(1000)
+
+
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Basic Example")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_ccs811](https://docs.sparkfun.com/Qwiic_Py/qwiic_ccs811/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`. It is no longer Linux only.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `QwiicCcs811` | `QwiicCCS811` |
+| `sensor.connected` | `sensor.is_connected()` |
+| `begin()` returned `SENSOR_SUCCESS` (0) or an error code, and printed "Invalid Chip ID" | `begin()` returns `True` or `False` without printing |
+| `sensor.CO2`, `sensor.TVOC` | `sensor.get_co2()`, `sensor.get_tvoc()` |
+| `sensor.resistance`, `sensor.temperature` | `sensor.get_resistance()`, `sensor.get_temperature()` |
+| `sensor.baseline` (get / set) | `sensor.get_baseline()`, `sensor.set_baseline(b)` |
+| `sensor.error_register` | `sensor.get_error_register()` |
+| `sensor.referance_resistance` (get / set) | `sensor.get_reference_resistance()`, `sensor.set_reference_resistance(r)` |
+| `sensor.refResistance`, `sensor.vrefCounts`, `sensor.ntcCounts` | `sensor.ref_resistance`, `sensor.vref_counts`, `sensor.ntc_counts` |
+| `set_environmental_data(relativeHumidity, temperature)` | `set_environmental_data(relative_humidity, temperature)` |
+| `read_ntc()` printed an error and returned 1 on a zero reading | `read_ntc()` returns `SENSOR_GENERIC_ERROR` without printing |
+| The constructor printed a warning on a Raspberry Pi without `i2c_arm_baudrate=10000` | `QwiicCCS811.is_rpi_i2c_baudrate_ok()` returns `False` instead; it also reads `/boot/firmware/config.txt` (Bookworm) |
+| Linux only (`setup.py`) | CPython, MicroPython and CircuitPython |
+| `begin()` raised `OSError` when no device answered | `begin()` returns `False` |
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>

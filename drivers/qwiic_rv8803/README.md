@@ -1,165 +1,236 @@
-![Qwiic RV8803 - Python Package](docs/images/gh-banner.png "qwiic RV8803 Python Package")
+![Qwiic RV8803 Python Package](docs/images/gh-banner.png "Qwiic RV8803 Python Package")
 
 # SparkFun Qwiic RV8803 - Python Package
 
-![PyPi Version](https://img.shields.io/pypi/v/sparkfun_qwiic_rv8803)
-![GitHub issues](https://img.shields.io/github/issues/sparkfun/qwiic_rv8803_py)
-![License](https://img.shields.io/github/license/sparkfun/qwiic_rv8803_py)
-![X](https://img.shields.io/twitter/follow/sparkfun)
-[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/qwiic_rv-8803_py/classqwiic__rv8803_1_1_qwiic_r_v8803.html)
+![PyPI Version](https://img.shields.io/pypi/v/sparkfun-qwiic-rv8803)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![API](https://img.shields.io/badge/API%20Reference-blue)](https://docs.sparkfun.com/Qwiic_Py/qwiic_rv8803/)
 
-The SparkFun Qwiic Real Time Clock RV8803 Module provides a simple and cost effective solution for adding Real Time Clock capabilities to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
+The SparkFun Qwiic Real Time Clock RV8803 Module provides a simple and cost effective solution for adding a real time clock to your project. Implementing a SparkFun Qwiic I2C interface, these sensors can be rapidly added to any project with boards that are part of the SparkFun Qwiic ecosystem.
 
-This repository implements a Python package for the SparkFun Qwiic RV8803. This package works with Python, MicroPython and CircuitPython.
+This package is the Python driver for the RV8803. It works on CPython (Linux), MicroPython and CircuitPython, and is part of the [SparkFun Qwiic Python package](https://github.com/sparkfun/Qwiic_Py).
 
-### Contents
+## Contents
 
-* [About](#about-the-package)
-* [Installation](#installation)
+* [About the Package](#about-the-package)
 * [Supported Platforms](#supported-platforms)
-* [Documentation](https://docs.sparkfun.com/qwiic_rv-8803_py/classqwiic__rv8803_1_1_qwiic_r_v8803.html)
-* [Examples](#example-use)
+* [Installation](#installation)
+* [Example Use](#example-use)
+* [Documentation](#documentation)
+* [Migrating from 2.x](#migrating-from-2x)
 
 ## About the Package
 
-This python package enables the user to access the features of the RV8803 via a single Qwiic cable. This includes setting time, printing time, setting alarm interrupts and more. The capabilities of the RV8803 are each demonstrated in the included examples.
+This package sets and reads the time and date of the RV8803 over a single Qwiic cable, as date and time fields or as a Unix epoch, and configures its alarm, countdown, periodic and event (EVI) interrupts and calibration offset. Each feature is demonstrated in the [examples](examples/README.md).
 
-New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
+New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
 ### Supported SparkFun Products
 
-This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
+* [SparkFun Real Time Clock Module - RV-8803 (Qwiic)](https://www.sparkfun.com/products/16281)
 
-* [SparkFun Real Time Clock Sensor - RV8803](https://www.sparkfun.com/products/16281)
-
-### Supported Platforms
+## Supported Platforms
 
 | Python | Platform | Boards |
-|--|--|--|
-| Python | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html) , [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
-| MicroPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
-|CircuitPython | Raspberry Pi - RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html)
+| --- | --- | --- |
+| CPython | Linux | [Raspberry Pi](https://www.sparkfun.com/raspberry-pi-5-8gb.html), [NVIDIA Jetson Orin Nano](https://www.sparkfun.com/nvidia-jetson-orin-nano-developer-kit.html) via the [SparkFun Qwiic SHIM](https://www.sparkfun.com/sparkfun-qwiic-shim-for-raspberry-pi.html) |
+| MicroPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
+| CircuitPython | Raspberry Pi RP2, ESP32 | [SparkFun Pro Micro RP2350](https://www.sparkfun.com/sparkfun-pro-micro-rp2350.html), [SparkFun IoT RedBoard ESP32](https://www.sparkfun.com/sparkfun-iot-redboard-esp32-development-board.html), [SparkFun IoT RedBoard RP2350](https://www.sparkfun.com/sparkfun-iot-redboard-rp2350.html) |
 
 > [!NOTE]
-> The listed supported platforms and boards are the primary platform targets tested. It is fully expected that this package will work across a wide variety of Python enabled systems. 
+> These are the primary platforms tested. The package is expected to work on most Python-enabled systems.
 
-## Installation 
+## Installation
 
-The first step to using this package is installing it on your system. The install method depends on the python platform. The following sections outline installation on Python, MicroPython and CircuitPython.
+### CPython (pip)
 
-### Python 
-
-#### PyPi Installation
-
-The package is primarily installed using the `pip3` command, downloading the package from the Python Index - "PyPi". 
-
-Note - the below instructions outline installation on a Linux-based (Raspberry Pi) system.
-
-First, setup a virtual environment from a specific directory using venv:
 ```sh
-python3 -m venv path/to/venv
-```
-You can pass any path as path/to/venv, just make sure you use the same one for all future steps. For more information on venv [click here](https://docs.python.org/3/library/venv.html).
-
-Next, install the qwiic package with:
-```sh
-path/to/venv/bin/pip3 install sparkfun-qwiic-rv8803
-```
-Now you should be able to run any example or custom python scripts that have `import qwiic_rv8803` by running e.g.:
-```sh
-path/to/venv/bin/python3 example_script.py
+python3 -m venv ~/sparkfun_venv
+~/sparkfun_venv/bin/pip install sparkfun-qwiic-rv8803
 ```
 
-### MicroPython Installation
-If not already installed, follow the [instructions here](https://docs.micropython.org/en/latest/reference/mpremote.html) to install mpremote on your computer.
+Run any example or script that does `import qwiic_rv8803` with `~/sparkfun_venv/bin/python3 example_script.py`.
 
-Connect a device with MicroPython installed to your computer and then install the package directly to your device with mpremote mip.
+### MicroPython (mip)
+
+Install [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html), connect your board, then install the driver (this also installs `qwiic_i2c`):
+
 ```sh
-mpremote mip install github:sparkfun/qwiic_rv8803_py
+mpremote mip install github:sparkfun/Qwiic_Py/drivers/qwiic_rv8803
 ```
 
-If you would also like to install the examples for this repository, issue the following mip command as well:
+To install the examples too:
+
 ```sh
-mpremote mip install --target "" github:sparkfun/qwiic_rv8803_py@examples
+mpremote mip install --target "" github:sparkfun/Qwiic_Py/drivers/qwiic_rv8803/examples
 ```
 
-### CircuitPython Installation
-If not already installed, follow the [instructions here](https://docs.circuitpython.org/projects/circup/en/latest/#installation) to install CircUp on your computer.
+Add `@qwiic_rv8803-<version>` to either command to install a specific release.
 
-Ensure that you have the latest version of the SparkFun Qwiic CircuitPython bundle. 
+### CircuitPython (circup)
+
+Install [CircUp](https://docs.circuitpython.org/projects/circup/en/latest/#installation), add the SparkFun Qwiic bundle once, then install the driver:
+
 ```sh
 circup bundle-add sparkfun/Qwiic_Py
+circup install qwiic_rv8803
 ```
 
-Finally, connect a device with CircuitPython installed to your computer and then install the package directly to your device with circup.
-```sh
-circup install --py qwiic_rv8803
-```
-
-If you would like to install any of the examples from this repository, issue the corresponding circup command from below. (NOTE: The below syntax assumes you are using CircUp on Windows. Linux and Mac will have different path seperators. See the [CircUp "example" command documentation](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup/example-command) for more information)
+To copy an example to the board:
 
 ```sh
-circup example qwiic_rv8803\qwiic_rv8803_ex1_set_time
-circup example qwiic_rv8803\qwiic_rv8803_ex2_print_time
-circup example qwiic_rv8803\qwiic_rv8803_ex3_set_hundredths
-circup example qwiic_rv8803\qwiic_rv8803_ex4a_alarm_interrupt
-circup example qwiic_rv8803\qwiic_rv8803_ex4b_countdown_interrupt
-circup example qwiic_rv8803\qwiic_rv8803_ex4c_periodic_interrupt
-circup example qwiic_rv8803\qwiic_rv8803_ex5_timestamp
-circup example qwiic_rv8803\qwiic_rv8803_ex6_fine_tuning
-circup example qwiic_rv8803\qwiic_rv8803_ex7_print_epoch
-circup example qwiic_rv8803\qwiic_rv8803_ex8_set_epoch
-
+circup example qwiic_rv8803/qwiic_rv8803_ex1_set_time
 ```
 
-Example Use
- ---------------
-Below is a quickstart program to print readings from the RV8803.
+## Example Use
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_rv8803_py/blob/master/examples/README.md) for a summary of the available examples.
+Below is a quickstart program that sets the time and prints it every second. See the [examples directory](examples) for more, and [examples/README.md](examples/README.md) for a summary of each.
 
 ```python
-
-import qwiic_rv8803
 import sys
-import time
+import qwiic_rv8803
+import qwiic_i2c
 
-def runExample():
-	print("\nQwiic RV8803 Example 1 - Set Time\n")
 
-	myRTC = qwiic_rv8803.QwiicRV8803()
+def run_example():
+    print("\nQwiic RV8803 Example 1 - Set Time\n")
+    my_rtc = qwiic_rv8803.QwiicRV8803()
 
-	if myRTC.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not my_rtc.is_connected():
+        print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
+        return
 
-	myRTC.begin()
+    my_rtc.begin()
 
-	sec = 2
-	minute = 47
-	hour = 14
-	date = 2
-	month = 3
-	weekday = myRTC.kTuesday
-	year = 2020
+    # seconds, minutes, hours, weekday, date, month, year
+    my_rtc.set_time(2, 47, 14, my_rtc.TUESDAY, 2, 3, 2020)
 
-	myRTC.set_time(sec, minute, hour, weekday, date, month, year)
+    while True:
+        my_rtc.update_time()
+        print("Current Time:", my_rtc.string_date_usa(), my_rtc.string_time())
+        qwiic_i2c.delay_ms(1000)
 
-	while True:
-		myRTC.update_time()
-		print ("Current Time: ", end="")
-		print (myRTC.string_date_usa(), end="")
-		print (" ", myRTC.string_time())
-		time.sleep(1)
 
-if __name__ == '__main__':
-	try:
-		runExample()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example")
-		sys.exit(0)
+if __name__ == "__main__":
+    try:
+        run_example()
+    except (KeyboardInterrupt, SystemExit):
+        print("\nEnding Example")
+        sys.exit(0)
 ```
+
+## Documentation
+
+The API reference is at [docs.sparkfun.com/Qwiic_Py/qwiic_rv8803](https://docs.sparkfun.com/Qwiic_Py/qwiic_rv8803/).
+
+## Migrating from 2.x
+
+Version 3 has one name per method and no properties, so it also runs on MicroPython builds without `property()`. The driver no longer uses the `time` module: epoch conversions are done in the driver, the same way on every platform.
+
+| 2.x | 3.0 |
+| --- | --- |
+| `rtc.connected` | `rtc.is_connected()` |
+| `is_PM()` | `is_pm()` |
+| `string_time_8601_TZ()` | `string_time_8601_tz()` |
+| `set_epoch(value, use1970sEpoch, timeZoneQuarterHours)` | `set_epoch(value, use_1970s_epoch, time_zone_quarter_hours)` |
+| `set_local_epoch(value, use1970sEpoch)`, `get_epoch(use1970sEpoch)`, `get_local_epoch(use1970sEpoch)` | `use_1970s_epoch` argument |
+| `set_items_to_match_for_alarm(minuteAlarm, hourAlarm, weekdayAlarm, dateAlarm)` | `set_items_to_match_for_alarm(minute_alarm, hour_alarm, weekday_alarm, date_alarm)` |
+| The alarm getters included the alarm enable bit (values of 80 or more), and `get_alarm_weekday()` decoded the weekday mask as BCD | they return the value alone, and the weekday as the mask `set_alarm_weekday()` takes |
+| `kTmYear`, `kTmMonth`, ... `kTmIsDST` (indices into `time.localtime()`) | removed |
+| Epoch methods used `time.localtime()` / `time.mktime()`, so the result depended on the platform's epoch and, on Linux, the system time zone | the epoch is always UTC-style seconds since 1970-01-01 (or 2000-01-01); use the time zone methods for local offsets |
+| `get_local_epoch()` returned a float on CPython | returns an `int` |
+| `set_time()`, `set_weekday()` and `set_local_epoch()` wrote the weekday as BCD (Thursday to Saturday were stored wrong), `set_local_epoch()` was one day off, and `get_weekday()` decoded it as BCD | the weekday register holds one bit per day: pass and compare `SUNDAY` ... `SATURDAY` |
+| `string_month()` returned "Invalid Month" for October to December | returns the month name |
+| `k`-prefixed constants (`kSunday`, `kMonday`, ...) | UPPER_CASE without the `k` (`SUNDAY`, `MONDAY`, ...); every rename is listed below |
+
+<details>
+<summary>Every renamed constant</summary>
+
+| 2.x | 3.0 |
+| --- | --- |
+| `kSunday` | `SUNDAY` |
+| `kMonday` | `MONDAY` |
+| `kTuesday` | `TUESDAY` |
+| `kWednesday` | `WEDNESDAY` |
+| `kThursday` | `THURSDAY` |
+| `kFriday` | `FRIDAY` |
+| `kSaturday` | `SATURDAY` |
+| `kRegRAM` | `REG_RAM` |
+| `kRegHundredths` | `REG_HUNDREDTHS` |
+| `kRegSeconds` | `REG_SECONDS` |
+| `kRegMinutes` | `REG_MINUTES` |
+| `kRegHours` | `REG_HOURS` |
+| `kRegWeekdays` | `REG_WEEKDAYS` |
+| `kRegDate` | `REG_DATE` |
+| `kRegMonths` | `REG_MONTHS` |
+| `kRegYears` | `REG_YEARS` |
+| `kRegMinutesAlarm` | `REG_MINUTES_ALARM` |
+| `kRegHoursAlarm` | `REG_HOURS_ALARM` |
+| `kRegWeekdaysDateAlarm` | `REG_WEEKDAYS_DATE_ALARM` |
+| `kRegTimer0` | `REG_TIMER0` |
+| `kRegTimer1` | `REG_TIMER1` |
+| `kRegExtension` | `REG_EXTENSION` |
+| `kRegFlag` | `REG_FLAG` |
+| `kRegControl` | `REG_CONTROL` |
+| `kRegHundredthsCapture` | `REG_HUNDREDTHS_CAPTURE` |
+| `kRegSecondsCapture` | `REG_SECONDS_CAPTURE` |
+| `kRegOffset` | `REG_OFFSET` |
+| `kRegEventControl` | `REG_EVENT_CONTROL` |
+| `kAlarmEnable` | `ALARM_ENABLE` |
+| `kExtensionTest` | `EXTENSION_TEST` |
+| `kExtensionWada` | `EXTENSION_WADA` |
+| `kExtensionUsel` | `EXTENSION_USEL` |
+| `kExtensionTe` | `EXTENSION_TE` |
+| `kExtensionFd` | `EXTENSION_FD` |
+| `kExtensionTd` | `EXTENSION_TD` |
+| `kFlagUpdate` | `FLAG_UPDATE` |
+| `kFlagTimer` | `FLAG_TIMER` |
+| `kFlagAlarm` | `FLAG_ALARM` |
+| `kFlagEvi` | `FLAG_EVI` |
+| `kFlagV2f` | `FLAG_V2F` |
+| `kFlagV1f` | `FLAG_V1F` |
+| `kUpdateInterrupt` | `UPDATE_INTERRUPT` |
+| `kTimerInterrupt` | `TIMER_INTERRUPT` |
+| `kAlarmInterrupt` | `ALARM_INTERRUPT` |
+| `kEviInterrupt` | `EVI_INTERRUPT` |
+| `kControlReset` | `CONTROL_RESET` |
+| `kEventEcp` | `EVENT_ECP` |
+| `kEventEhl` | `EVENT_EHL` |
+| `kEventEt` | `EVENT_ET` |
+| `kEventErst` | `EVENT_ERST` |
+| `kCountdownTimerFrequency4096Hz` | `COUNTDOWN_TIMER_FREQUENCY_4096HZ` |
+| `kCountdownTimerFrequency64Hz` | `COUNTDOWN_TIMER_FREQUENCY_64HZ` |
+| `kCountdownTimerFrequency1Hz` | `COUNTDOWN_TIMER_FREQUENCY_1HZ` |
+| `kCountdownTimerFrequency1_60thHz` | `COUNTDOWN_TIMER_FREQUENCY_1_60TH_HZ` |
+| `kClockOutFrequency32768Hz` | `CLOCK_OUT_FREQUENCY_32768HZ` |
+| `kClockOutFrequency1024Hz` | `CLOCK_OUT_FREQUENCY_1024HZ` |
+| `kClockOutFrequency1Hz` | `CLOCK_OUT_FREQUENCY_1HZ` |
+| `kCountdownTimerOn` | `COUNTDOWN_TIMER_ON` |
+| `kCountdownTimerOff` | `COUNTDOWN_TIMER_OFF` |
+| `kTimeUpdate1Second` | `TIME_UPDATE_1_SECOND` |
+| `kTimeUpdate1Minute` | `TIME_UPDATE_1_MINUTE` |
+| `kEnableEviCalibration` | `ENABLE_EVI_CALIBRATION` |
+| `kDisableEviCalibration` | `DISABLE_EVI_CALIBRATION` |
+| `kEviDebounceNone` | `EVI_DEBOUNCE_NONE` |
+| `kEviDebounce256Hz` | `EVI_DEBOUNCE_256HZ` |
+| `kEviDebounce64Hz` | `EVI_DEBOUNCE_64HZ` |
+| `kEviDebounce8Hz` | `EVI_DEBOUNCE_8HZ` |
+| `kRisingEdge` | `RISING_EDGE` |
+| `kFallingEdge` | `FALLING_EDGE` |
+| `kEviCaptureEnable` | `EVI_CAPTURE_ENABLE` |
+| `kEviCaptureDisable` | `EVI_CAPTURE_DISABLE` |
+| `kTimeListLength` | `TIME_LIST_LENGTH` |
+| `kIdxHundredths` | `IDX_HUNDREDTHS` |
+| `kIdxSeconds` | `IDX_SECONDS` |
+| `kIdxMinutes` | `IDX_MINUTES` |
+| `kIdxHours` | `IDX_HOURS` |
+| `kIdxWeekday` | `IDX_WEEKDAY` |
+| `kIdxDate` | `IDX_DATE` |
+| `kIdxMonth` | `IDX_MONTH` |
+| `kIdxYear` | `IDX_YEAR` |
+
+</details>
+
 <p align="center">
 <img src="https://cdn.sparkfun.com/assets/custom_pages/3/3/4/dark-logo-red-flame.png" alt="SparkFun - Start Something">
 </p>
